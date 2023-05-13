@@ -3,7 +3,7 @@ import { createEffect } from 'solid-js';
 import { multiagent } from '~/api/global';
 import { A, useNavigate } from '~/router';
 
-import button from '~/styles/primitives/button.css';
+import button from '~/styles/primitives/button';
 
 const IndexPage = () => {
 	const navigate = useNavigate();
@@ -32,11 +32,11 @@ const IndexPage = () => {
 
 			<div class='flex mt-8 gap-4'>
 				<A href='/login' class={button({ color: 'primary' })}>
-					login
+					Log in
 				</A>
 
-				<A href='/register' class={button()}>
-					register
+				<A href='/register' class={button({ color: 'outline' })}>
+					Sign up
 				</A>
 			</div>
 		</div>

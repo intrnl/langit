@@ -6,7 +6,8 @@ import { multiagent } from '~/api/global';
 import { useNavigate } from '~/router';
 import { XRPC } from '~/utils/xrpc';
 
-import button from '~/styles/primitives/button.css';
+import button from '~/styles/primitives/button';
+import input from '~/styles/primitives/input';
 
 const AuthLoginPage = () => {
 	const navigate = useNavigate();
@@ -53,14 +54,14 @@ const AuthLoginPage = () => {
 				class='flex flex-col gap-4'
 			>
 				<div class='flex gap-1 items-center text-sm'>
-					<span class='font-medium text-gray-600'>Connecting to</span>
-					<span class='font-medium text-gray-900 grow'>{service().name}</span>
+					<span class='font-medium text-muted-fg'>Connecting to</span>
+					<span class='font-medium text-primary grow'>{service().name}</span>
 
-					<button disabled type='button' class={button()}>change</button>
+					<button disabled type='button' class={button({ color: 'outline' })}>Change</button>
 				</div>
 
 				<div class='flex flex-col gap-2'>
-					<label for='user' class='block text-sm font-medium leading-6 text-gray-900'>
+					<label for='user' class='block text-sm font-medium leading-6 text-primary'>
 						Identifier
 					</label>
 					<input
@@ -69,12 +70,12 @@ const AuthLoginPage = () => {
 						id='user'
 						required
 						autocomplete='username'
-						class='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm leading-6'
+						class={input()}
 					/>
 				</div>
 
 				<div class='flex flex-col gap-2'>
-					<label for='pwd' class='block text-sm font-medium leading-6 text-gray-900'>
+					<label for='pwd' class='block text-sm font-medium leading-6 text-primary'>
 						Password
 					</label>
 					<input
@@ -83,16 +84,16 @@ const AuthLoginPage = () => {
 						id='pwd'
 						required
 						autocomplete='password'
-						class='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm leading-6'
+						class={input()}
 					/>
 				</div>
 
 				<Show when={describeQuery.data} keyed>
 					{(data) => (
-						<p class='leading-6 text-gray-600 text-xs'>
+						<p class='leading-6 text-muted-fg text-xs'>
 							By continuing, you agree to the service's{' '}
-							<a href={data.links.termsOfService} class='hover:underline text-indigo-600'>Terms of Service</a> and{' '}
-							<a href={data.links.privacyPolicy} class='hover:underline text-indigo-600'>Privacy Policy</a>.
+							<a href={data.links.termsOfService} class='hover:underline text-primary'>Terms of Service</a> and{' '}
+							<a href={data.links.privacyPolicy} class='hover:underline text-primary'>Privacy Policy</a>.
 						</p>
 					)}
 				</Show>
@@ -103,7 +104,7 @@ const AuthLoginPage = () => {
 						type='submit'
 						class={button({ color: 'primary' })}
 					>
-						login
+						Login
 					</button>
 				</div>
 			</form>

@@ -58,12 +58,32 @@ export default {
 		// 	80: '320px',
 		// 	96: '384px',
 		// },
+		colors: {
+			primary: {
+				DEFAULT: 'rgb(var(--primary))',
+				fg: 'rgb(var(--primary-fg))',
+			},
+			secondary: {
+				DEFAULT: 'rgb(var(--secondary))',
+				fg: 'rgb(var(--secondary-fg))',
+			},
+			accent: {
+				DEFAULT: 'rgb(var(--accent))',
+				fg: 'rgb(var(--accent-fg))',
+			},
+			muted: {
+				DEFAULT: 'rgb(var(--muted))',
+				fg: 'rgb(var(--muted-fg))',
+			},
+			input: 'rgb(var(--input))',
+			divider: 'rgb(var(--divider))',
+		},
 		fontFamily: {
 			sans: `"Roboto", ui-sans-serif, sans-serif`,
 			mono: `"JetBrains Mono NL", ui-monospace, monospace`,
 		},
 	},
 	plugins: [
-		forms(),
+		// forms(),
 	],
 };

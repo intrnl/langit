@@ -67,9 +67,9 @@ export default {
 				DEFAULT: 'rgb(var(--secondary))',
 				fg: 'rgb(var(--secondary-fg))',
 			},
-			accent: {
-				DEFAULT: 'rgb(var(--accent))',
-				fg: 'rgb(var(--accent-fg))',
+			hinted: {
+				DEFAULT: 'rgb(var(--hinted))',
+				fg: 'rgb(var(--hinted-fg))',
 			},
 			muted: {
 				DEFAULT: 'rgb(var(--muted))',

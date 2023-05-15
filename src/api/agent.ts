@@ -123,7 +123,7 @@ export class Agent {
 		const session = this.session.peek();
 		let res = await fetchHandler(httpUri, httpMethod, this._addAuthHeader(httpHeaders), httpReqBody);
 
-		if (isErrorResponse(res, ['ExpiredToken']) && session?.refreshJwt) {
+		if (isErrorResponse(res.body, ['ExpiredToken']) && session?.refreshJwt) {
 			// refresh session
 			await this._refreshSession();
 

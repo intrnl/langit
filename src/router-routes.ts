@@ -15,8 +15,20 @@ const routes: RouteDefinition[] = [
     component: lazy(() => import("./routes/u.$uid.tsx")),
     children: [
       {
+        path: "notifications",
+        component: lazy(() => import("./routes/u.$uid.notifications.tsx")),
+      },
+      {
         path: "/",
         component: lazy(() => import("./routes/u.$uid._index.tsx")),
+      },
+      {
+        path: "search",
+        component: lazy(() => import("./routes/u.$uid.search.tsx")),
+      },
+      {
+        path: "you",
+        component: lazy(() => import("./routes/u.$uid.you.tsx")),
       },
     ],
   },

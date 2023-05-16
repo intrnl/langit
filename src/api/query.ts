@@ -3,6 +3,8 @@ import { QueryFunctionContext } from '@tanstack/solid-query';
 import { multiagent } from './global';
 import { UID } from './multiagent';
 
+import { type BskyProfile } from './types';
+
 export const getProfileKey = (uid: UID, handle: string) => ['getProfile', uid, handle] as const;
 export const getProfile = async (context: QueryFunctionContext<ReturnType<typeof getProfileKey>>) => {
 	const [, uid, handle] = context.queryKey;
@@ -16,5 +18,5 @@ export const getProfile = async (context: QueryFunctionContext<ReturnType<typeof
 		},
 	});
 
-	return res.data;
+	return res.data as BskyProfile;
 };

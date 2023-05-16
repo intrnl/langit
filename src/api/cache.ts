@@ -7,14 +7,9 @@
 
 // this is a form of normalized caching
 
-import { type ReadonlySignal, type Signal } from '~/utils/signals';
+import { type Signal } from '~/utils/signals';
 
-export interface BskyPost {
-	record: {
-		text: string;
-		facets: any[];
-		renderedContent: ReadonlySignal<any>;
-	};
-}
+import { type BskyPost, type BskyPostAuthor } from './types';
 
+export const postAuthors: Record<string, WeakRef<Signal<BskyPostAuthor>>> = {};
 export const posts: Record<string, WeakRef<Signal<BskyPost>>> = {};

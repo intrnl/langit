@@ -1,5 +1,6 @@
+import { Show, batch, createSignal } from 'solid-js';
+
 import { createQuery } from '@tanstack/solid-query';
-import { Show, createSignal } from 'solid-js';
 
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 import { multiagent } from '~/api/global.ts';
@@ -14,6 +15,8 @@ const AuthLoginPage = () => {
 
 	const [service, setService] = createSignal(DEFAULT_DATA_SERVERS[0]);
 	const [dispatching, setDispatching] = createSignal(false);
+
+	const [error, setError] = createSignal<string>('');
 
 	const describeQuery = createQuery(() => ['describeServer', service().url], async (query) => {
 		const rpc = new XRPC(service().url);
@@ -39,14 +42,19 @@ const AuthLoginPage = () => {
 					const password = form.get('pwd') as string;
 
 					ev.preventDefault();
-					setDispatching(true);
+
+					batch(() => {
+						setError('');
+						setDispatching(true);
+					});
 
 					multiagent.login({ service: url, identifier, password }).then(
 						(uid) => {
 							navigate(`/u/:uid`, { params: { uid } });
 						},
 						(err) => {
-							console.error(err);
+							const message = err.cause ? err.cause.message : err.message;
+							setError(message);
 							setDispatching(false);
 						},
 					);
@@ -87,6 +95,14 @@ const AuthLoginPage = () => {
 						class={input()}
 					/>
 				</div>
+
+				<Show when={error()} keyed>
+					{(error) => (
+						<p class='leading-6 text-red-600 text-sm'>
+							{error}
+						</p>
+					)}
+				</Show>
 
 				<Show when={describeQuery.data} keyed>
 					{(data) => (

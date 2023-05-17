@@ -56,12 +56,14 @@ export interface BskyPostRecordEmbed {
 	};
 }
 
+/** TODO: fix the typing for this later */
 export interface BskyPostEmbed {
 	images: Array<{
 		thumb: string;
 		fullsize: string;
 		alt: string;
 	}>;
+	media?: { images: BskyPostEmbed['images'] };
 	record: {
 		/** If `images` is present then you need to access `embed.record.record` */
 		record?: BskyPostEmbed['record'];

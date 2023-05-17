@@ -116,7 +116,7 @@ const Post = (props: PostProps) => {
 
 					<Show when={post().embed} keyed>
 						{(embed) => {
-							const images = embed.images;
+							const images = embed.media?.images || embed.images;
 							const record = embed.record?.record || embed.record;
 
 							return (

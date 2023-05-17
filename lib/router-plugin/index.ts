@@ -196,8 +196,6 @@ import { mergeProps, splitProps } from "solid-js";
 import {
 	A as A_,
 	type AnchorProps,
-	NavLink as NavLink_,
-	type NavLinkProps,
 	Navigate as Navigate_,
 	type NavigateOptions,
 	type NavigateProps,

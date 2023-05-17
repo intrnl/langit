@@ -87,7 +87,7 @@ export class Multiagent {
 				const account = accounts[aid];
 
 				if (did === account.did) {
-					this._storage.set('active', uid);
+					this._storage.set('active', aid);
 					return aid;
 				}
 			}

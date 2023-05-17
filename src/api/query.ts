@@ -56,7 +56,7 @@ export const createTimelineLatestQuery = (limit: number) => {
 		});
 
 		const data = response.data as BskyTimeline;
-		const page = createTimelinePage(data, session.did);
+		const page = createTimelinePage(data, session.did, true);
 
 		if (page.slices.length > 0) {
 			const slice = page.slices[0];

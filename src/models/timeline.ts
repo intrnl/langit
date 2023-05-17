@@ -33,8 +33,8 @@ export interface TimelinePage {
 	slices: TimelineSlice[];
 }
 
-export const createTimelinePage = (data: BskyTimeline, selfdid?: string): TimelinePage => {
-	const key = Date.now();
+export const createTimelinePage = (data: BskyTimeline, selfdid?: string, temporal?: boolean): TimelinePage => {
+	const key = temporal ? null : Date.now();
 
 	const orig = data.feed;
 	const len = orig.length;

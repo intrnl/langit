@@ -13,14 +13,18 @@ import { type BskyPost, type BskyPostAuthor } from './types.ts';
 
 export const postAuthors: Record<string, WeakRef<Signal<BskyPostAuthor>>> = {};
 export const posts: Record<string, WeakRef<Signal<BskyPost>>> = {};
+export const signalizePost = (post: BskyPost, key?: number | null) => {
+	const disabled = key === null;
 
-export const signalizePost = (post: BskyPost, key?: number) => {
 	let ref: WeakRef<Signal<BskyPost>> | undefined = posts[post.cid];
 	let signalized: Signal<BskyPost>;
 
-	if (!ref || !(signalized = ref.deref()!)) {
+	if (disabled || !ref || !(signalized = ref.deref()!)) {
 		signalized = signal(post);
-		posts[post.cid] = new WeakRef(signalized);
+
+		if (!disabled) {
+			posts[post.cid] = new WeakRef(signalized);
+		}
 	}
 	else if (signalized) {
 		// Prevent further updates if if the post currently contains that key

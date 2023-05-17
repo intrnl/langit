@@ -30,6 +30,7 @@ const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => 
 
 export interface TimelinePage {
 	cursor?: string;
+	cid?: string;
 	slices: TimelineSlice[];
 }
 
@@ -100,5 +101,9 @@ export const createTimelinePage = (data: BskyTimeline, selfdid?: string, tempora
 		jlen++;
 	}
 
-	return { cursor: data.cursor, slices };
+	return {
+		cursor: data.cursor,
+		cid: len > 0 ? orig[0].post.cid : undefined,
+		slices,
+	};
 };

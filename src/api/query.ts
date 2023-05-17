@@ -43,28 +43,18 @@ export const createTimelineQuery = (limit: number) => {
 };
 
 export const getTimelineLatestKey = (uid: UID, algorithm: string) => ['getTimelineLatest', uid, algorithm] as const;
-export const createTimelineLatestQuery = (limit: number) => {
-	return async (ctx: QueryFunctionContext<ReturnType<typeof getTimelineLatestKey>>) => {
-		const [, uid, algorithm] = ctx.queryKey;
+export const getTimelineLatest = async (ctx: QueryFunctionContext<ReturnType<typeof getTimelineLatestKey>>) => {
+	const [, uid, algorithm] = ctx.queryKey;
 
-		const session = multiagent.accounts[uid].session;
-		const agent = await multiagent.connect(uid);
+	const agent = await multiagent.connect(uid);
 
-		const response = await agent.rpc.get({
-			method: 'app.bsky.feed.getTimeline',
-			params: { algorithm, limit },
-		});
+	const response = await agent.rpc.get({
+		method: 'app.bsky.feed.getTimeline',
+		params: { algorithm, limit: 1 },
+	});
 
-		const data = response.data as BskyTimeline;
-		const page = createTimelinePage(data, session.did, true);
+	const data = response.data as BskyTimeline;
+	const feed = data.feed;
 
-		if (page.slices.length > 0) {
-			const slice = page.slices[0];
-			const items = slice.items;
-
-			return items[items.length - 1].post.peek().cid;
-		}
-
-		return null;
-	};
+	return feed.length > 0 ? feed[0].post.cid : undefined;
 };

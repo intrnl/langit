@@ -1,18 +1,20 @@
 import { For, Show } from 'solid-js';
 
-import { createInfiniteQuery, createQuery } from '@tanstack/solid-query';
+import { InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
-import { createTimelineLatestQuery, createTimelineQuery, getTimelineKey, getTimelineLatestKey } from '~/api/query';
+import { createTimelineQuery, getTimelineKey, getTimelineLatest, getTimelineLatestKey } from '~/api/query';
 import { TimelinePage } from '~/models/timeline.ts';
 import { useParams } from '~/router.ts';
 
 import Post from '~/components/Post.tsx';
 
 const DEFAULT_ALGORITHM = 'reverse-chronological';
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 30;
 
 const AuthenticatedHome = () => {
 	const params = useParams('/u/:uid');
+
+	const client = useQueryClient();
 
 	const timelineQuery = createInfiniteQuery({
 		queryKey: () => getTimelineKey(params.uid, DEFAULT_ALGORITHM),
@@ -25,14 +27,10 @@ const AuthenticatedHome = () => {
 
 	const latestQuery = createQuery({
 		queryKey: () => getTimelineLatestKey(params.uid, DEFAULT_ALGORITHM),
-		queryFn: createTimelineLatestQuery(PAGE_SIZE),
-		staleTime: 15000,
+		queryFn: getTimelineLatest,
+		staleTime: 10000,
 		get enabled () {
-			if (
-				!timelineQuery.data ||
-				timelineQuery.data.pages.length < 1 ||
-				timelineQuery.data.pages[0].slices.length < 1
-			) {
+			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
 				return false;
 			}
 
@@ -41,10 +39,7 @@ const AuthenticatedHome = () => {
 	});
 
 	const getLatestCid = () => {
-		const slice = timelineQuery.data!.pages[0].slices[0];
-		const items = slice.items;
-
-		return items[items.length - 1].post.peek().cid;
+		return timelineQuery.data!.pages[0].cid;
 	};
 
 	return (
@@ -54,9 +49,31 @@ const AuthenticatedHome = () => {
 			</div>
 
 			<div class='flex flex-col'>
-				<Show when={latestQuery.data && latestQuery.data !== getLatestCid()}>
+				<Show
+					when={latestQuery.data &&
+						!latestQuery.isFetching &&
+						!timelineQuery.isRefetching &&
+						latestQuery.data !== getLatestCid()}
+				>
 					<button
-						onClick={() => timelineQuery.refetch()}
+						onClick={() => {
+							// we need to empty the query data first
+							client.setQueryData(
+								getTimelineKey(params.uid, DEFAULT_ALGORITHM),
+								(prev?: InfiniteData<TimelinePage>) => {
+									if (prev) {
+										return {
+											pages: prev.pages.slice(0, 1),
+											pageParams: prev.pageParams.slice(0, 1),
+										};
+									}
+
+									return;
+								},
+							);
+
+							timelineQuery.refetch();
+						}}
 						class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
 					>
 						Show new posts
@@ -96,7 +113,8 @@ const AuthenticatedHome = () => {
 				<Show when={timelineQuery.hasNextPage && !timelineQuery.isFetchingNextPage}>
 					<button
 						onClick={() => timelineQuery.fetchNextPage()}
-						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted'
+						disabled={timelineQuery.isRefetching}
+						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
 					>
 						Show more posts
 					</button>

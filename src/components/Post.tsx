@@ -2,6 +2,7 @@ import { Show } from 'solid-js';
 
 import { type BskyPost, type BskyTimelinePost } from '~/api/types';
 
+import { A } from '~/router';
 import * as relformat from '~/utils/relformatter';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz';
@@ -10,7 +11,12 @@ import ShareIcon from '~/icons/baseline-share';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite';
 
-const Post = (props: { post: BskyPost; next?: boolean; reason?: BskyTimelinePost['reason'] }) => {
+const getPostId = (uri: string) => {
+	const idx = uri.lastIndexOf('/');
+	return uri.slice(idx + 1);
+};
+
+const Post = (props: { uid: string; post: BskyPost; next?: boolean; reason?: BskyTimelinePost['reason'] }) => {
 	return (
 		<div class='relative px-4 hover:bg-hinted border-divider' classList={{ 'border-b': !props.next }}>
 			<div class='pt-3'></div>
@@ -43,7 +49,17 @@ const Post = (props: { post: BskyPost; next?: boolean; reason?: BskyTimelinePost
 
 							<span class='text-muted-fg'>
 								<span class='px-1'>·</span>
-								<span>{relformat.format(props.post.record.createdAt)}</span>
+								<A
+									href='/u/:uid/profile/:handle/status/:status'
+									params={{
+										uid: props.uid,
+										handle: props.post.author.handle,
+										status: getPostId(props.post.uri),
+									}}
+									class='hover:underline'
+								>
+									{relformat.format(props.post.record.createdAt)}
+								</A>
 							</span>
 						</div>
 						<div class='shrink-0'>

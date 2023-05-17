@@ -15,6 +15,7 @@ import {
 
 export type PathsWithParams = 
 	| "/u/:uid"
+	| "/u/:uid/profile/:handle/status/:status"
 	| "/u/:uid/notifications"
 	| "/u/:uid/search"
 	| "/u/:uid/you";
@@ -26,6 +27,7 @@ export type Paths = PathsWithParams | PathsWithoutParams;
 
 export interface Params {
 	"/u/:uid": { "uid": string };
+	"/u/:uid/profile/:handle/status/:status": { "uid": string, "handle": string, "status": string };
 	"/u/:uid/notifications": { "uid": string };
 	"/u/:uid/search": { "uid": string };
 	"/u/:uid/you": { "uid": string };

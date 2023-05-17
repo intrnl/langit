@@ -62,7 +62,7 @@ const AuthenticatedHome = () => {
 
 			return null;
 		},
-		staleTime: 10000,
+		staleTime: 15000,
 		get enabled () {
 			if (
 				!timelineQuery.data ||

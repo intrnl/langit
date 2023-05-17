@@ -1,87 +1,64 @@
-import { createWindowVirtualizer } from '@tanstack/solid-virtual';
+import { For } from 'solid-js';
 
-import MoreHorizIcon from '~/icons/baseline-more-horiz';
-import RepeatIcon from '~/icons/baseline-repeat';
-import ShareIcon from '~/icons/baseline-share';
-import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble';
-import FavoriteOutlinedIcon from '~/icons/outline-favorite';
+import { createInfiniteQuery } from '@tanstack/solid-query';
+
+import { multiagent } from '~/api/global';
+import { type BskyTimeline } from '~/api/types';
+import { TimelinePage, createTimelinePage } from '~/models/timeline';
+import { useParams } from '~/router';
+
+import Post from '~/components/Post';
+
+const DEFAULT_ALGORITHM = 'reverse-chronological';
 
 const AuthenticatedHome = () => {
+	const params = useParams('/u/:uid');
+
+	const timelineQuery = createInfiniteQuery({
+		queryKey: () => ['getTimeline', params.uid, DEFAULT_ALGORITHM] as const,
+		getNextPageParam: (last: TimelinePage) => last.cursor,
+		queryFn: async ({ queryKey, pageParam }) => {
+			const [, uid, algorithm] = queryKey;
+
+			const session = multiagent.accounts[params.uid].session;
+			const agent = await multiagent.connect(uid);
+
+			const response = await agent.rpc.get({
+				method: 'app.bsky.feed.getTimeline',
+				params: { algorithm: algorithm, cursor: pageParam },
+			});
+
+			const data = response.data as BskyTimeline;
+			const page = createTimelinePage(data, session.did);
+
+			return page;
+		},
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		refetchOnReconnect: false,
+	});
+
 	return (
 		<div>
-			<div class='flex items-center h-13 px-4 border-b border-divider sticky top-0'>
+			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
 				<p class='font-bold text-base'>Home</p>
 			</div>
 
 			<div>
-				<div class='px-4 hover:bg-hinted'>
-					<div class='pt-3'></div>
-					<div class='flex gap-3'>
-						<div class='shrink-0'>
-							<div class='h-12 w-12 rounded-full bg-muted-fg'>
-							</div>
-						</div>
+				<For each={timelineQuery.data ? timelineQuery.data.pages : []}>
+					{(page) => (
+						page.slices.map((slice) => {
+							const items = slice.items;
+							const len = items.length;
 
-						<div class='grow min-w-0 pb-3'>
-							<div class='flex gap-4 items-center justify-between mb-0.5'>
-								<div class='flex items-center text-sm'>
-									<div>
-										<a class='flex gap-1'>
-											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1'>
-												non aesthetic things
-											</span>
-											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
-												@PicturesFolder
-											</span>
-										</a>
-									</div>
-
-									<span class='text-muted-fg'>
-										<span class='px-1'>·</span>
-										<span>16h</span>
-									</span>
+							return (
+								<div data-testid='timeline-slice'>
+									{items.map((item, idx) => <Post post={item.post.value} next={idx !== len - 1} />)}
 								</div>
-								<div class='shrink-0'>
-									<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mr-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
-										<MoreHorizIcon />
-									</button>
-								</div>
-							</div>
-
-							<div class='text-sm whitespace-pre-wrap'>
-								<p>
-									{'I\'m looking for the correct terminology for Haskell fuse function in Rust , but apparently Rust fuse is entirely another thing.\n\nfuse means: map f . map g --> map (f . g); an optimizer method that merges some function calls into one.\n\nI want to merge AST passes in Rust'}
-								</p>
-							</div>
-
-							<div class='flex mt-3 text-muted-fg'>
-								<div class='flex items-center flex-grow gap-0.5'>
-									<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
-										<ChatBubbleOutlinedIcon />
-									</button>
-									<span class='text-[0.8125rem]'>189</span>
-								</div>
-								<div class='flex items-center flex-grow gap-0.5'>
-									<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
-										<RepeatIcon />
-									</button>
-									<span class='text-[0.8125rem]'>1,995</span>
-								</div>
-								<div class='flex items-center flex-grow gap-0.5'>
-									<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
-										<FavoriteOutlinedIcon />
-									</button>
-									<span class='text-[0.8125rem]'>59.3K</span>
-								</div>
-								<div class='flex-shrink'>
-									<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base hover:bg-secondary'>
-										<ShareIcon />
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+							);
+						})
+					)}
+				</For>
 			</div>
 		</div>
 	);

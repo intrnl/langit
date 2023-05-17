@@ -23,7 +23,7 @@ const AuthenticatedYouPage = () => {
 		<div class='flex flex-col pb-4'>
 			<Show when={profileQuery.data} keyed>
 				{(profile) => (
-					<div>
+					<div class='hover:bg-hinted'>
 						<div class='aspect-banner bg-muted-fg'>
 						</div>
 

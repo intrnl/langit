@@ -60,7 +60,7 @@ const AuthenticatedLayout = () => {
 				<Outlet />
 			</div>
 
-			<div class='text-primary flex h-13 border-t border-divider sticky bottom-0 md:hidden'>
+			<div class='bg-background text-primary flex h-13 border-t border-divider sticky bottom-0 md:hidden'>
 				<A
 					href='/u/:uid'
 					params={{ uid: params.uid }}

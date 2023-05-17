@@ -1,4 +1,5 @@
 import forms from '@tailwindcss/forms';
+import colors from 'tailwindcss/colors';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -33,6 +34,9 @@ export default {
 			},
 			input: 'rgb(var(--input))',
 			divider: 'rgb(var(--divider))',
+
+			red: colors.red,
+			green: colors.green,
 		},
 		fontFamily: {
 			sans: `"Roboto", ui-sans-serif, sans-serif`,

@@ -5,6 +5,7 @@ import { type BskyPost, type BskyTimelinePost } from '~/api/types';
 import { A } from '~/router';
 import * as relformat from '~/utils/relformatter';
 
+import FavoriteIcon from '~/icons/baseline-favorite';
 import MoreHorizIcon from '~/icons/baseline-more-horiz';
 import RepeatIcon from '~/icons/baseline-repeat';
 import ShareIcon from '~/icons/baseline-share';
@@ -122,11 +123,12 @@ const Post = (props: PostProps) => {
 						</div>
 
 						<div
-							class='flex items-end grow gap-0.5'
-							classList={{ 'text-red-600': !!props.post.viewer.like }}
+							class='group flex items-end grow gap-0.5'
+							classList={{ 'is-active text-red-600': !!props.post.viewer.like }}
 						>
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
-								<FavoriteOutlinedIcon />
+								<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
+								<FavoriteIcon class='hidden group-[.is-active]:block' />
 							</button>
 							<span class='text-[0.8125rem]'>{props.post.likeCount}</span>
 						</div>

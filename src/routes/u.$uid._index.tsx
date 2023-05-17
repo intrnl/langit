@@ -43,83 +43,79 @@ const AuthenticatedHome = () => {
 	};
 
 	return (
-		<div>
+		<div class='flex flex-col'>
 			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
 				<p class='font-bold text-base'>Home</p>
 			</div>
 
-			<div class='flex flex-col'>
-				<Show
-					when={latestQuery.data &&
-						!latestQuery.isFetching &&
-						!timelineQuery.isRefetching &&
-						latestQuery.data !== getLatestCid()}
+			<Show
+				when={latestQuery.data &&
+					!latestQuery.isFetching &&
+					!timelineQuery.isRefetching &&
+					latestQuery.data !== getLatestCid()}
+			>
+				<button
+					onClick={() => {
+						// we need to empty the query data first
+						client.setQueryData(
+							getTimelineKey(params.uid, DEFAULT_ALGORITHM),
+							(prev?: InfiniteData<TimelinePage>) => {
+								if (prev) {
+									return {
+										pages: prev.pages.slice(0, 1),
+										pageParams: prev.pageParams.slice(0, 1),
+									};
+								}
+
+								return;
+							},
+						);
+
+						timelineQuery.refetch();
+					}}
+					class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
 				>
-					<button
-						onClick={() => {
-							// we need to empty the query data first
-							client.setQueryData(
-								getTimelineKey(params.uid, DEFAULT_ALGORITHM),
-								(prev?: InfiniteData<TimelinePage>) => {
-									if (prev) {
-										return {
-											pages: prev.pages.slice(0, 1),
-											pageParams: prev.pageParams.slice(0, 1),
-										};
-									}
+					Show new posts
+				</button>
+			</Show>
 
-									return;
-								},
-							);
-
-							timelineQuery.refetch();
-						}}
-						class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
-					>
-						Show new posts
-					</button>
-				</Show>
-
+			<div>
 				<For each={timelineQuery.data ? timelineQuery.data.pages : []}>
 					{(page) => (
 						page.slices.map((slice) => {
 							const items = slice.items;
 							const len = items.length;
 
-							return (
-								<div data-testid='timeline-slice'>
-									{items.map((item, idx) => (
-										<Post
-											uid={params.uid}
-											post={item.post.value}
-											parent={item.reply?.parent.value}
-											reason={item.reason}
-											prev={idx !== 0}
-											next={idx !== len - 1}
-										/>
-									))}
-								</div>
-							);
+							return items.map((item, idx) => (
+								<Post
+									uid={params.uid}
+									post={item.post.value}
+									parent={item.reply?.parent.value}
+									reason={item.reason}
+									prev={idx !== 0}
+									next={idx !== len - 1}
+								/>
+							));
 						})
 					)}
 				</For>
-
-				<Show when={timelineQuery.isFetchingNextPage}>
-					<div>
-						Loading next page
-					</div>
-				</Show>
-
-				<Show when={timelineQuery.hasNextPage && !timelineQuery.isFetchingNextPage}>
-					<button
-						onClick={() => timelineQuery.fetchNextPage()}
-						disabled={timelineQuery.isRefetching}
-						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
-					>
-						Show more posts
-					</button>
-				</Show>
 			</div>
+
+			<Show when={timelineQuery.isFetchingNextPage}>
+				<div>
+					Loading next page
+				</div>
+			</Show>
+
+			<Show when={timelineQuery.hasNextPage && !timelineQuery.isFetchingNextPage}>
+				<button
+					onClick={() => timelineQuery.fetchNextPage()}
+					disabled={timelineQuery.isRefetching}
+					class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
+				>
+					Show more posts
+				</button>
+			</Show>
 		</div>
 	);
 };

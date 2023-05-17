@@ -1,5 +1,5 @@
-import { Agent, type AtpLoginOptions, type AtpSessionData } from './agent';
-import { ReactiveLocalStorage } from './storage';
+import { Agent, type AtpLoginOptions, type AtpSessionData } from './agent.ts';
+import { ReactiveLocalStorage } from './storage.ts';
 
 export enum MultiagentState {
 	PRISTINE,

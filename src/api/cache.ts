@@ -7,9 +7,9 @@
 
 // this is a form of normalized caching
 
-import { type Signal, signal } from '~/utils/signals';
+import { type Signal, signal } from '~/utils/signals.ts';
 
-import { type BskyPost, type BskyPostAuthor } from './types';
+import { type BskyPost, type BskyPostAuthor } from './types.ts';
 
 export const postAuthors: Record<string, WeakRef<Signal<BskyPostAuthor>>> = {};
 export const posts: Record<string, WeakRef<Signal<BskyPost>>> = {};

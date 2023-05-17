@@ -1,5 +1,3 @@
-import { type ReadonlySignal } from '~/utils/signals';
-
 export interface BskyLabel {
 	cts: string;
 	neg: false;

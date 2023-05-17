@@ -1,8 +1,6 @@
 import {
-	type CallOptions,
 	type Headers,
 	NewCallOptions,
-	type QueryParams,
 	ResponseType,
 	XRPCError,
 	XRPCResponse,
@@ -11,7 +9,7 @@ import {
 	encodeMethodCallBody,
 	httpResponseBodyParse,
 	httpResponseCodeToEnum,
-} from './xrpc-utils';
+} from './xrpc-utils.ts';
 
 export interface FetchHandlerResponse {
 	status: number;

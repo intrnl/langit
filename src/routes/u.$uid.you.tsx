@@ -2,9 +2,9 @@ import { Show, createMemo } from 'solid-js';
 
 import { createQuery } from '@tanstack/solid-query';
 
-import { multiagent } from '~/api/global';
-import { getProfile, getProfileKey } from '~/api/query';
-import { Navigate, useParams } from '~/router';
+import { multiagent } from '~/api/global.ts';
+import { getProfile, getProfileKey } from '~/api/query.ts';
+import { Navigate, useParams } from '~/router.ts';
 
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');

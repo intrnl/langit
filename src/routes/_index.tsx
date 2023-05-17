@@ -1,9 +1,9 @@
 import { createEffect } from 'solid-js';
 
-import { multiagent } from '~/api/global';
-import { A, useNavigate } from '~/router';
+import { multiagent } from '~/api/global.ts';
+import { A, useNavigate } from '~/router.ts';
 
-import button from '~/styles/primitives/button';
+import button from '~/styles/primitives/button.ts';
 
 const IndexPage = () => {
 	const navigate = useNavigate();

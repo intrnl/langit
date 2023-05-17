@@ -1,6 +1,6 @@
 import { batch, createEffect, createRoot } from 'solid-js';
 
-import { Signal, signal } from '~/utils/signals';
+import { Signal, signal } from '~/utils/signals.ts';
 
 export type StorageType = Record<string, any>;
 

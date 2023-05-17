@@ -2,12 +2,12 @@ import { For } from 'solid-js';
 
 import { createInfiniteQuery } from '@tanstack/solid-query';
 
-import { multiagent } from '~/api/global';
-import { type BskyTimeline } from '~/api/types';
-import { TimelinePage, createTimelinePage } from '~/models/timeline';
-import { useParams } from '~/router';
+import { multiagent } from '~/api/global.ts';
+import { type BskyTimeline } from '~/api/types.ts';
+import { TimelinePage, createTimelinePage } from '~/models/timeline.ts';
+import { useParams } from '~/router.ts';
 
-import Post from '~/components/Post';
+import Post from '~/components/Post.tsx';
 
 const DEFAULT_ALGORITHM = 'reverse-chronological';
 

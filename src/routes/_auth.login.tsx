@@ -1,13 +1,13 @@
 import { createQuery } from '@tanstack/solid-query';
 import { Show, createSignal } from 'solid-js';
 
-import { DEFAULT_DATA_SERVERS } from '~/api/defaults';
-import { multiagent } from '~/api/global';
-import { useNavigate } from '~/router';
-import { XRPC } from '~/utils/xrpc';
+import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
+import { multiagent } from '~/api/global.ts';
+import { useNavigate } from '~/router.ts';
+import { XRPC } from '~/utils/xrpc.ts';
 
-import button from '~/styles/primitives/button';
-import input from '~/styles/primitives/input';
+import button from '~/styles/primitives/button.ts';
+import input from '~/styles/primitives/input.ts';
 
 const AuthLoginPage = () => {
 	const navigate = useNavigate();

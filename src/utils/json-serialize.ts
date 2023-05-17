@@ -1,7 +1,7 @@
 // import { CID } from 'multiformats/cid';
 
-import { isTypedJsonBlobRef, isUntypedJsonBlobRef } from './blob-refs';
-import { type IpldValue, type JsonValue, jsonToIpld } from './ipld';
+import { isTypedJsonBlobRef, isUntypedJsonBlobRef } from './blob-refs.ts';
+import { type IpldValue, type JsonValue, jsonToIpld } from './ipld.ts';
 
 export type LexValue =
 	| IpldValue

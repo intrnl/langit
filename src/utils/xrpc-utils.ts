@@ -1,4 +1,4 @@
-import { jsonStringToLex } from './json-serialize';
+import { jsonStringToLex } from './json-serialize.ts';
 
 export type QueryParams = Record<string, any>;
 export type Headers = Record<string, string>;

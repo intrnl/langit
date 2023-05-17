@@ -2,15 +2,15 @@ import { Outlet } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 import { Show, createMemo } from 'solid-js';
 
-import { multiagent } from '~/api/global';
-import { getProfile, getProfileKey } from '~/api/query';
-import { A, Navigate, useParams } from '~/router';
+import { multiagent } from '~/api/global.ts';
+import { getProfile, getProfileKey } from '~/api/query.ts';
+import { A, Navigate, useParams } from '~/router.ts';
 
-import HomeIcon from '~/icons/baseline-home';
-import NotificationsIcon from '~/icons/baseline-notifications';
-import SearchIcon from '~/icons/baseline-search';
-import HomeOutlinedIcon from '~/icons/outline-home';
-import NotificationsOutlinedIcon from '~/icons/outline-notifications';
+import HomeIcon from '~/icons/baseline-home.tsx';
+import NotificationsIcon from '~/icons/baseline-notifications.tsx';
+import SearchIcon from '~/icons/baseline-search.tsx';
+import HomeOutlinedIcon from '~/icons/outline-home.tsx';
+import NotificationsOutlinedIcon from '~/icons/outline-notifications.tsx';
 
 const AuthenticatedLayout = () => {
 	const params = useParams('/u/:uid');

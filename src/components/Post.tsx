@@ -2,15 +2,15 @@ import { Show } from 'solid-js';
 
 import { type BskyPost, type BskyTimelinePost } from '~/api/types';
 
-import { A } from '~/router';
-import * as relformat from '~/utils/relformatter';
+import { A } from '~/router.ts';
+import * as relformat from '~/utils/relformatter.ts';
 
-import FavoriteIcon from '~/icons/baseline-favorite';
-import MoreHorizIcon from '~/icons/baseline-more-horiz';
-import RepeatIcon from '~/icons/baseline-repeat';
-import ShareIcon from '~/icons/baseline-share';
-import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble';
-import FavoriteOutlinedIcon from '~/icons/outline-favorite';
+import FavoriteIcon from '~/icons/baseline-favorite.tsx';
+import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+import RepeatIcon from '~/icons/baseline-repeat.tsx';
+import ShareIcon from '~/icons/baseline-share.tsx';
+import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
+import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
 
 const getPostId = (uri: string) => {
 	const idx = uri.lastIndexOf('/');

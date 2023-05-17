@@ -1,6 +1,6 @@
-import { signalizePost } from '~/api/cache';
-import { type BskyPost, type BskyTimeline, type BskyTimelinePost } from '~/api/types';
-import { type Signal } from '~/utils/signals';
+import { signalizePost } from '~/api/cache.ts';
+import { type BskyPost, type BskyTimeline, type BskyTimelinePost } from '~/api/types.ts';
+import { type Signal } from '~/utils/signals.ts';
 
 export interface SignalizedTimelinePost extends Omit<BskyTimelinePost, 'post' | 'reply'> {
 	post: Signal<BskyPost>;

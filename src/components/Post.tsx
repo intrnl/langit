@@ -104,25 +104,34 @@ const Post = (props: PostProps) => {
 					</div>
 
 					<div class='flex mt-3 text-muted-fg'>
-						<div class='flex items-center flex-grow gap-0.5'>
+						<div class='flex items-end grow gap-0.5'>
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
 								<ChatBubbleOutlinedIcon />
 							</button>
 							<span class='text-[0.8125rem]'>{props.post.replyCount}</span>
 						</div>
-						<div class='flex items-center flex-grow gap-0.5'>
+
+						<div
+							class='flex items-end grow gap-0.5'
+							classList={{ 'text-green-600': !!props.post.viewer.repost }}
+						>
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
 								<RepeatIcon />
 							</button>
 							<span class='text-[0.8125rem]'>{props.post.repostCount}</span>
 						</div>
-						<div class='flex items-center flex-grow gap-0.5'>
+
+						<div
+							class='flex items-end grow gap-0.5'
+							classList={{ 'text-red-600': !!props.post.viewer.like }}
+						>
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
 								<FavoriteOutlinedIcon />
 							</button>
 							<span class='text-[0.8125rem]'>{props.post.likeCount}</span>
 						</div>
-						<div class='flex-shrink'>
+
+						<div class='shrink-0'>
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base hover:bg-secondary'>
 								<ShareIcon />
 							</button>

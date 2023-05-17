@@ -6,6 +6,7 @@ import { createTimelineQuery, getTimelineKey, getTimelineLatest, getTimelineLate
 import { TimelinePage } from '~/models/timeline.ts';
 import { useParams } from '~/router.ts';
 
+import CircularProgress from '~/components/CircularProgress';
 import Post from '~/components/Post.tsx';
 
 const DEFAULT_ALGORITHM = 'reverse-chronological';
@@ -47,6 +48,12 @@ const AuthenticatedHome = () => {
 			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
 				<p class='font-bold text-base'>Home</p>
 			</div>
+
+			<Show when={timelineQuery.isInitialLoading || timelineQuery.isRefetching}>
+				<div class='h-13 flex items-center justify-center'>
+					<CircularProgress />
+				</div>
+			</Show>
 
 			<Show
 				when={latestQuery.data &&
@@ -102,8 +109,8 @@ const AuthenticatedHome = () => {
 			</div>
 
 			<Show when={timelineQuery.isFetchingNextPage}>
-				<div>
-					Loading next page
+				<div class='h-13 flex items-center justify-center'>
+					<CircularProgress />
 				</div>
 			</Show>
 

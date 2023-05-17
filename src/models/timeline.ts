@@ -29,7 +29,7 @@ const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => 
 };
 
 export interface TimelinePage {
-	cursor: string;
+	cursor?: string;
 	slices: TimelineSlice[];
 }
 

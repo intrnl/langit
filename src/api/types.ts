@@ -139,6 +139,6 @@ export interface BskyTimelinePost {
 }
 
 export interface BskyTimeline {
-	cursor: string;
+	cursor?: string;
 	feed: BskyTimelinePost[];
 }

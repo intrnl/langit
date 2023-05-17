@@ -50,7 +50,10 @@ const AuthenticatedHome = () => {
 			</div>
 
 			<Show when={timelineQuery.isInitialLoading || timelineQuery.isRefetching}>
-				<div class='h-13 flex items-center justify-center'>
+				<div
+					class='h-13 flex items-center justify-center border-divider'
+					classList={{ 'border-b': timelineQuery.isRefetching }}
+				>
 					<CircularProgress />
 				</div>
 			</Show>

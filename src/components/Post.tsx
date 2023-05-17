@@ -19,7 +19,17 @@ const getPostId = (uri: string) => {
 const Post = (props: { uid: string; post: BskyPost; next?: boolean; reason?: BskyTimelinePost['reason'] }) => {
 	return (
 		<div class='relative px-4 hover:bg-hinted border-divider' classList={{ 'border-b': !props.next }}>
-			<div class='pt-3'></div>
+			<div class='pt-3'>
+				<Show when={props.reason && props.reason.$type === 'app.bsky.feed.defs#reasonRepost'}>
+					<div class='-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg'>
+						<div class='flex justify-end w-12 shrink-0'>
+							<RepeatIcon />
+						</div>
+						<span class='grow min-w-0 font-medium'>{props.reason!.by.displayName} Retweeted</span>
+					</div>
+				</Show>
+			</div>
+
 			<div class='flex gap-3'>
 				<div class='flex flex-col items-center shrink-0'>
 					<div class='h-12 w-12 rounded-full bg-muted-fg overflow-hidden'>

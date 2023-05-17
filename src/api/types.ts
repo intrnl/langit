@@ -132,9 +132,7 @@ export interface BskyTimelinePost {
 		root: BskyPost;
 		parent: BskyPost;
 	};
-	reason?:
-		| { by: BskyPostAuthor; indexedAt: string }
-		| { $type: string; [k: string]: unknown };
+	reason?: { $type: 'app.bsky.feed.defs#reasonRepost'; by: BskyPostAuthor; indexedAt: string };
 }
 
 export interface BskyTimeline {

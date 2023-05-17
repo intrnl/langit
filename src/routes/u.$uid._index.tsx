@@ -24,6 +24,13 @@ const AuthenticatedHome = () => {
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
+		onSuccess: (data) => {
+			const pages = data.pages;
+
+			if (pages.length > 0) {
+				client.setQueryData(getTimelineLatestKey(params.uid, DEFAULT_ALGORITHM), pages[0].cid);
+			}
+		},
 	});
 
 	const latestQuery = createQuery({

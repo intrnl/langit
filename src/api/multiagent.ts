@@ -76,14 +76,29 @@ export class Multiagent {
 
 			await promise;
 
+			// check if there are existing accounts that shares the same account,
+			// if so, use that instead.
+			const session = agent.session.value!;
+			const did = session.did;
+
+			const accounts = this.accounts;
+
+			for (const aid in accounts) {
+				const account = accounts[aid];
+
+				if (did === account.did) {
+					return aid;
+				}
+			}
+
 			this._storage.set('counter', count + 1);
 			this._storage.set('active', uid);
 			this._storage.set('accounts', {
 				...this._storage.get('accounts'),
 				[uid]: {
-					did: agent.session.value!.did,
+					did: did,
 					service: service,
-					session: agent.session.value!,
+					session: session,
 				},
 			});
 

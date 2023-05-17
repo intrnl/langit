@@ -40,6 +40,49 @@ export interface BskyPostAuthor {
 	labels: BskyLabel[];
 }
 
+export interface BskyPostRecordEmbed {
+	images: Array<{
+		alt: string;
+		image: {
+			$type: 'blob';
+			ref: {
+				$link: string;
+			};
+			mimeType: string;
+			size: number;
+		};
+	}>;
+	record: {
+		cid: string;
+		uri: string;
+	};
+}
+
+export interface BskyPostEmbed {
+	images: Array<{
+		thumb: string;
+		fullsize: string;
+		alt: string;
+	}>;
+	record: {
+		/** If `images` is present then you need to access `embed.record.record` */
+		record?: BskyPostEmbed['record'];
+
+		$type: 'app.bsky.embed.record#viewRecord';
+		uri: string;
+		cid: string;
+		author: BskyPostAuthor;
+		embeds: [];
+		indexedAt: string;
+		labels: BskyLabel[];
+		value: {
+			$type: 'app.bsky.feed.post';
+			text: string;
+			createdAt: string;
+		};
+	};
+}
+
 export interface BskyPost {
 	/**
 	 * Timeline API provides context to replies in full details, which means that
@@ -67,47 +110,9 @@ export interface BskyPost {
 				uri: string;
 			};
 		};
+		embed?: BskyPostRecordEmbed;
 	};
-	embed?: {
-		$type: 'app.bsky.embed.recordWithMedia#view';
-		record: {
-			record: {
-				$type: 'app.bsky.embed.record#viewRecord';
-				uri: string;
-				cid: string;
-				author: BskyPostAuthor;
-				value: {
-					$type: 'app.bsky.feed.post';
-					text: string;
-					embed: {
-						$type: 'app.bsky.embed.images';
-						images: Array<{
-							alt: string;
-							image: {
-								$type: 'blob';
-								ref: {
-									$link: string;
-								};
-								mimeType: string;
-								size: 800267;
-							};
-						}>;
-					};
-					createdAt: string;
-				};
-				labels: BskyLabel[];
-				indexedAt: string;
-				embeds: Array<{
-					$type: 'app.bsky.embed.images#view';
-					images: Array<{
-						thumb: string;
-						fullsize: string;
-						alt: string;
-					}>;
-				}>;
-			};
-		};
-	};
+	embed?: BskyPostEmbed;
 	replyCount: number;
 	repostCount: number;
 	likeCount: number;

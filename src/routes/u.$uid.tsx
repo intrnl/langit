@@ -26,7 +26,7 @@ const AuthenticatedLayout = () => {
 	const profileQuery = createQuery({
 		queryKey: () => getProfileKey(params.uid, handle()),
 		queryFn: getProfile,
-		staleTime: 30000,
+		staleTime: 60000,
 	});
 
 	return (

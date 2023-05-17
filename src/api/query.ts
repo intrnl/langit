@@ -59,7 +59,10 @@ export const createTimelineLatestQuery = (limit: number) => {
 		const page = createTimelinePage(data, session.did);
 
 		if (page.slices.length > 0) {
-			return page.slices[0].items[0].post.peek().cid;
+			const slice = page.slices[0];
+			const items = slice.items;
+
+			return items[items.length - 1].post.peek().cid;
 		}
 
 		return null;

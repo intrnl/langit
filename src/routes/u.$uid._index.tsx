@@ -41,7 +41,10 @@ const AuthenticatedHome = () => {
 	});
 
 	const getLatestCid = () => {
-		return timelineQuery.data!.pages[0].slices[0].items[0].post.peek().cid;
+		const slice = timelineQuery.data!.pages[0].slices[0];
+		const items = slice.items;
+
+		return items[items.length - 1].post.peek().cid;
 	};
 
 	return (

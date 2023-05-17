@@ -15,8 +15,8 @@ const routes: RouteDefinition[] = [
     component: lazy(() => import("./routes/u.$uid.tsx")),
     children: [
       {
-        path: "profile/:handle/status/:status",
-        component: lazy(() => import("./routes/u.$uid.profile.$handle.status.$status.tsx")),
+        path: "profile/:handle/post/:status",
+        component: lazy(() => import("./routes/u.$uid.profile.$handle.post.$status.tsx")),
       },
       {
         path: "profile/:handle",

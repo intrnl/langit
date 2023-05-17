@@ -91,7 +91,7 @@ const Post = (props: PostProps) => {
 							<span class='text-muted-fg'>
 								<span class='px-1'>·</span>
 								<A
-									href='/u/:uid/profile/:handle/status/:status'
+									href='/u/:uid/profile/:handle/post/:status'
 									params={{
 										uid: props.uid,
 										handle: author().handle,

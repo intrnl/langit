@@ -9,7 +9,7 @@
 	},
 	"dependencies": {
 		"@solidjs/router": "^0.8.2",
-		"@tanstack/solid-query": "^4.29.5",
+		"@tanstack/solid-query": "^4.29.7",
 		"@tanstack/solid-virtual": "3.0.0-beta.6",
 		"class-variance-authority": "^0.6.0",
 		"solid-js": "^1.7.5"
@@ -17,14 +17,14 @@
 	"devDependencies": {
 		"@tailwindcss/forms": "^0.5.3",
 		"@tanstack/virtual-core": "3.0.0-alpha.1",
-		"@types/node": "^18.16.8",
+		"@types/node": "^18.16.12",
 		"autoprefixer": "^10.4.14",
 		"dprint": "^0.36.1",
 		"glob-to-regexp": "^0.4.1",
 		"postcss": "^8.4.23",
 		"remix-flat-routes": "^0.5.8",
 		"tailwindcss": "^3.3.2",
-		"terser": "^5.17.3",
+		"terser": "^5.17.4",
 		"typescript": "^5.0.4",
 		"vite": "4.3.5",
 		"vite-plugin-solid": "^2.7.0"

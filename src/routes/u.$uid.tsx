@@ -23,7 +23,11 @@ const AuthenticatedLayout = () => {
 		return multiagent.accounts[params.uid].session.handle;
 	});
 
-	const profileQuery = createQuery(() => getProfileKey(params.uid, handle()), getProfile);
+	const profileQuery = createQuery({
+		queryKey: () => getProfileKey(params.uid, handle()),
+		queryFn: getProfile,
+		staleTime: 30000,
+	});
 
 	return (
 		<div class='flex flex-col max-w-7xl min-h-screen mx-auto md:flex-row md:gap-4'>

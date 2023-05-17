@@ -7,7 +7,6 @@ import router from './lib/router-plugin';
 import { flatRoutes } from './lib/router-plugin/flat-routes';
 
 export default defineConfig({
-	base: './',
 	plugins: [
 		solid(),
 		router({

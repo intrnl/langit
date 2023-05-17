@@ -8,6 +8,7 @@ export default {
 		extend: {
 			spacing: {
 				13: '3.25rem',
+				17: '4.24rem',
 			},
 			aspectRatio: {
 				banner: '3 / 1',

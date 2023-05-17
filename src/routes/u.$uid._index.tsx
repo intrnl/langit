@@ -2,66 +2,30 @@ import { For, Show } from 'solid-js';
 
 import { createInfiniteQuery, createQuery } from '@tanstack/solid-query';
 
-import { multiagent } from '~/api/global.ts';
-import { type BskyTimeline } from '~/api/types.ts';
-import { TimelinePage, createTimelinePage } from '~/models/timeline.ts';
+import { createTimelineLatestQuery, createTimelineQuery, getTimelineKey, getTimelineLatestKey } from '~/api/query';
+import { TimelinePage } from '~/models/timeline.ts';
 import { useParams } from '~/router.ts';
 
 import Post from '~/components/Post.tsx';
 
 const DEFAULT_ALGORITHM = 'reverse-chronological';
-
 const PAGE_SIZE = 50;
 
 const AuthenticatedHome = () => {
 	const params = useParams('/u/:uid');
 
 	const timelineQuery = createInfiniteQuery({
-		queryKey: () => ['getTimeline', params.uid, DEFAULT_ALGORITHM] as const,
+		queryKey: () => getTimelineKey(params.uid, DEFAULT_ALGORITHM),
 		getNextPageParam: (last: TimelinePage) => last.cursor,
-		queryFn: async ({ queryKey, pageParam }) => {
-			const [, uid, algorithm] = queryKey;
-
-			const session = multiagent.accounts[uid].session;
-			const agent = await multiagent.connect(uid);
-
-			const response = await agent.rpc.get({
-				method: 'app.bsky.feed.getTimeline',
-				params: { algorithm, cursor: pageParam, limit: PAGE_SIZE },
-			});
-
-			const data = response.data as BskyTimeline;
-			const page = createTimelinePage(data, session.did);
-
-			return page;
-		},
+		queryFn: createTimelineQuery(PAGE_SIZE),
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
 	});
 
 	const latestQuery = createQuery({
-		queryKey: () => ['getTimelineLatest', params.uid, DEFAULT_ALGORITHM] as const,
-		queryFn: async ({ queryKey }) => {
-			const [, uid, algorithm] = queryKey;
-
-			const session = multiagent.accounts[uid].session;
-			const agent = await multiagent.connect(uid);
-
-			const response = await agent.rpc.get({
-				method: 'app.bsky.feed.getTimeline',
-				params: { algorithm, limit: PAGE_SIZE },
-			});
-
-			const data = response.data as BskyTimeline;
-			const page = createTimelinePage(data, session.did);
-
-			if (page.slices.length > 0) {
-				return page.slices[0].items[0].post.peek().cid;
-			}
-
-			return null;
-		},
+		queryKey: () => getTimelineLatestKey(params.uid, DEFAULT_ALGORITHM),
+		queryFn: createTimelineLatestQuery(PAGE_SIZE),
 		staleTime: 15000,
 		get enabled () {
 			if (

@@ -54,7 +54,14 @@ const AuthenticatedHome = () => {
 							return (
 								<div data-testid='timeline-slice'>
 									{items.map((item, idx) => (
-										<Post uid={params.uid} post={item.post.value} reason={item.reason} next={idx !== len - 1} />
+										<Post
+											uid={params.uid}
+											post={item.post.value}
+											parent={item.reply?.parent.value}
+											reason={item.reason}
+											prev={idx !== 0}
+											next={idx !== len - 1}
+										/>
 									))}
 								</div>
 							);

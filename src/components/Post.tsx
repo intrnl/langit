@@ -16,7 +16,16 @@ const getPostId = (uri: string) => {
 	return uri.slice(idx + 1);
 };
 
-const Post = (props: { uid: string; post: BskyPost; next?: boolean; reason?: BskyTimelinePost['reason'] }) => {
+interface PostProps {
+	uid: string;
+	post: BskyPost;
+	parent?: BskyPost;
+	reason?: BskyTimelinePost['reason'];
+	prev?: boolean;
+	next?: boolean;
+}
+
+const Post = (props: PostProps) => {
 	return (
 		<div class='relative px-4 hover:bg-hinted border-divider' classList={{ 'border-b': !props.next }}>
 			<div class='pt-3'>
@@ -26,6 +35,15 @@ const Post = (props: { uid: string; post: BskyPost; next?: boolean; reason?: Bsk
 							<RepeatIcon />
 						</div>
 						<span class='grow min-w-0 font-medium'>{props.reason!.by.displayName} Retweeted</span>
+					</div>
+				</Show>
+
+				<Show when={props.parent && !props.prev}>
+					<div class='-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg'>
+						<div class='flex justify-end w-12 shrink-0'>
+							<ChatBubbleOutlinedIcon />
+						</div>
+						<span class='grow min-w-0 font-medium'>Replying to {props.parent!.author.displayName}</span>
 					</div>
 				</Show>
 			</div>

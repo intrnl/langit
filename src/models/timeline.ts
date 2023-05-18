@@ -23,7 +23,7 @@ const isNextInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
 
 const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
 	const items = slice.items;
-	const first = items[items.length - 1];
+	const first = items[0];
 
 	return !!first && !!first.reply && (first.reply.parent.peek().cid === item.post.peek().cid);
 };

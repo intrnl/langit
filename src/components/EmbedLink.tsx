@@ -22,8 +22,8 @@ const EmbedLink = (props: EmbedLinkProps) => {
 
 			<div class='flex flex-col gap-0.5 p-3 text-sm'>
 				<p class='text-muted-fg'>{getDomain(link().uri)}</p>
-				<p>{link().title}</p>
-				<p class='text-muted-fg'>{link().description}</p>
+				<p class='line-clamp-2 overflow-hidden'>{link().title}</p>
+				<p class='line-clamp-2 overflow-hidden text-muted-fg'>{link().description}</p>
 			</div>
 		</div>
 	);

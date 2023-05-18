@@ -19,12 +19,12 @@ const AuthenticatedLayout = () => {
 		return <Navigate href='/' />;
 	}
 
-	const handle = createMemo(() => {
-		return multiagent.accounts[params.uid].session.handle;
+	const did = createMemo(() => {
+		return multiagent.accounts[params.uid].session.did;
 	});
 
 	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(params.uid, handle()),
+		queryKey: () => getProfileKey(params.uid, did()),
 		queryFn: getProfile,
 		staleTime: 60000,
 	});

@@ -68,7 +68,7 @@ const Post = (props: PostProps) => {
 				<div class='flex flex-col items-center shrink-0'>
 					<A
 						href='/u/:uid/profile/:handle'
-						params={{ uid: props.uid, handle: author().handle }}
+						params={{ uid: props.uid, handle: author().did }}
 						class='h-12 w-12 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
 					>
 						<Show when={author().avatar}>
@@ -87,7 +87,7 @@ const Post = (props: PostProps) => {
 							<div>
 								<A
 									href='/u/:uid/profile/:handle'
-									params={{ uid: props.uid, handle: author().handle }}
+									params={{ uid: props.uid, handle: author().did }}
 									class='group flex gap-1'
 								>
 									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline'>
@@ -105,7 +105,7 @@ const Post = (props: PostProps) => {
 									href='/u/:uid/profile/:handle/post/:status'
 									params={{
 										uid: props.uid,
-										handle: author().handle,
+										handle: author().did,
 										status: getPostId(post().uri),
 									}}
 									class='hover:underline'

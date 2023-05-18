@@ -13,17 +13,17 @@ const AuthenticatedYouPage = () => {
 		return <Navigate href='/' />;
 	}
 
-	const handle = createMemo(() => {
-		return multiagent.accounts[params.uid].session.handle;
+	const did = createMemo(() => {
+		return multiagent.accounts[params.uid].session.did;
 	});
 
-	const profileQuery = createQuery(() => getProfileKey(params.uid, handle()), getProfile);
+	const profileQuery = createQuery(() => getProfileKey(params.uid, did()), getProfile);
 
 	return (
 		<div class='flex flex-col pb-4'>
 			<Show when={profileQuery.data}>
 				{(profile) => (
-					<A href='/u/:uid/profile/:handle' params={{ uid: params.uid, handle: handle() }} class='hover:bg-hinted'>
+					<A href='/u/:uid/profile/:handle' params={{ uid: params.uid, handle: did() }} class='hover:bg-hinted'>
 						<div class='aspect-banner bg-muted-fg'>
 						</div>
 

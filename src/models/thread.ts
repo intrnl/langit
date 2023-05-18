@@ -25,6 +25,12 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 	}
 
 	while (node = stack.pop()) {
+		// skip any nodes that doesn't have a replies array, think this might be
+		// when we reach the depth limit? not certain.
+		if (!node.replies) {
+			continue;
+		}
+
 		const replies = node.replies.slice();
 
 		if (node !== thread) {

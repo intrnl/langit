@@ -6,17 +6,15 @@ import { type UID } from './multiagent.ts';
 import { createTimelinePage } from '~/models/timeline.ts';
 import { type BskyProfile, type BskyTimeline } from './types.ts';
 
-export const getProfileKey = (uid: UID, handle: string) => ['getProfile', uid, handle] as const;
+export const getProfileKey = (uid: UID, actor: string) => ['getProfile', uid, actor] as const;
 export const getProfile = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileKey>>) => {
-	const [, uid, handle] = ctx.queryKey;
+	const [, uid, actor] = ctx.queryKey;
 	const agent = await multiagent.connect(uid);
 
 	const res = await agent.rpc.get({
 		method: 'app.bsky.actor.getProfile',
 		signal: ctx.signal,
-		params: {
-			actor: handle,
-		},
+		params: { actor },
 	});
 
 	return res.data as BskyProfile;

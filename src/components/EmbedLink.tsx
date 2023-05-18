@@ -6,6 +6,11 @@ export interface EmbedLinkProps {
 	link: EmbeddedLink;
 }
 
+const getDomain = (url: string) => {
+	const host = new URL(url).host;
+	return host.startsWith('www.') ? host.slice(4) : host;
+};
+
 const EmbedLink = (props: EmbedLinkProps) => {
 	const link = () => props.link;
 
@@ -16,7 +21,7 @@ const EmbedLink = (props: EmbedLinkProps) => {
 			</Show>
 
 			<div class='flex flex-col gap-0.5 p-3 text-sm'>
-				<p class='text-muted-fg'>{new URL(link().uri).host}</p>
+				<p class='text-muted-fg'>{getDomain(link().uri)}</p>
 				<p>{link().title}</p>
 				<p class='text-muted-fg'>{link().description}</p>
 			</div>

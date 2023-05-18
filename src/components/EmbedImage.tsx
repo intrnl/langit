@@ -42,7 +42,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 				</Match>
 
 				<Match when={images().length === 1}>
-					{renderImg(images()[0], 'w-full h-full object-cover')}
+					{renderImg(images()[0], 'max-h-50vh w-full object-cover')}
 				</Match>
 			</Switch>
 		</div>

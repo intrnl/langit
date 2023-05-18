@@ -12,6 +12,7 @@ export default {
 			},
 			maxHeight: {
 				141: '35.25rem',
+				'50vh': '50vh',
 			},
 			flexGrow: {
 				4: '4',

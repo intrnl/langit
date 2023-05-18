@@ -15,7 +15,12 @@ const EmbedLink = (props: EmbedLinkProps) => {
 	const link = () => props.link;
 
 	return (
-		<div class='rounded-md border border-divider overflow-hidden hover:bg-secondary'>
+		<a
+			href={link().uri}
+			rel='noopener noreferrer nofollow'
+			target='_blank'
+			class='rounded-md border border-divider overflow-hidden hover:bg-secondary'
+		>
 			<Show when={link().thumb}>
 				{(thumb) => <img src={thumb()} class='w-full max-h-141 bg-muted-fg border-b border-divider' />}
 			</Show>
@@ -25,7 +30,7 @@ const EmbedLink = (props: EmbedLinkProps) => {
 				<p class='line-clamp-2 overflow-hidden'>{link().title}</p>
 				<p class='line-clamp-2 overflow-hidden text-muted-fg'>{link().description}</p>
 			</div>
-		</div>
+		</a>
 	);
 };
 

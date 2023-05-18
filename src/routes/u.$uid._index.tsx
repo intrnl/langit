@@ -68,12 +68,7 @@ const AuthenticatedHome = () => {
 				</div>
 			</Show>
 
-			<Show
-				when={!latestQuery.isFetching &&
-					latestQuery.data &&
-					!timelineQuery.isRefetching &&
-					latestQuery.data !== getLatestCid()}
-			>
+			<Show when={!timelineQuery.isRefetching && latestQuery.data && latestQuery.data !== getLatestCid()}>
 				<button
 					onClick={() => {
 						// we want to truncate the timeline here so that the refetch doesn't

@@ -30,6 +30,7 @@ export const createTimelineQuery = (limit: number) => {
 
 		const response = await agent.rpc.get({
 			method: 'app.bsky.feed.getTimeline',
+			signal: ctx.signal,
 			params: { algorithm, cursor: ctx.pageParam, limit },
 		});
 
@@ -48,6 +49,7 @@ export const getTimelineLatest = async (ctx: QueryFunctionContext<ReturnType<typ
 
 	const response = await agent.rpc.get({
 		method: 'app.bsky.feed.getTimeline',
+		signal: ctx.signal,
 		params: { algorithm, limit: 1 },
 	});
 

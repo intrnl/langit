@@ -28,8 +28,8 @@ const EmbedImage = (props: EmbedImageProps) => {
 
 				<Match when={images().length >= 3}>
 					<div class='grid grid-flow-col grid-rows-2 gap-0.5'>
-						{renderImg(images()[0], 'object-cover')}
-						{renderImg(images()[1], 'object-cover')}
+						{renderImg(images()[0], 'h-full object-cover')}
+						{renderImg(images()[1], 'h-full object-cover')}
 						{renderImg(images()[2], 'h-full row-span-2 object-cover')}
 					</div>
 				</Match>

@@ -215,10 +215,10 @@ type NavigateWithParamOptions<P> = P extends number
 		? [Partial<NavigateOptions> & { params: Params[P] }]
 		: [Partial<NavigateOptions> & { params?: never }] | [];
 
-type AnchorWithParamProps<P> =
+export type AnchorWithParamProps<P> =
 	& AnchorProps
 	& (P extends PathsWithParams ? { href: P; params: Params[P] } : { href: P; params?: never });
-type NavigateWithParamProps<P> =
+export type NavigateWithParamProps<P> =
 	& NavigateProps
 	& (P extends PathsWithParams ? { href: P; params: Params[P] } : { href: P; params?: never });
 

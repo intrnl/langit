@@ -19,9 +19,21 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$handle_.post.$status.tsx")),
       },
       {
+        path: "profile/:handle/followers",
+        component: lazy(() => import("./routes/u.$uid.profile.$handle_.followers.tsx")),
+      },
+      {
+        path: "profile/:handle/following",
+        component: lazy(() => import("./routes/u.$uid.profile.$handle_.following.tsx")),
+      },
+      {
         path: "profile/:handle",
         component: lazy(() => import("./routes/u.$uid.profile.$handle.tsx")),
         children: [
+          {
+            path: "with_replies",
+            component: lazy(() => import("./routes/u.$uid.profile.$handle.with_replies.tsx")),
+          },
           {
             path: "/",
             component: lazy(() => import("./routes/u.$uid.profile.$handle._index.tsx")),

@@ -10,6 +10,9 @@ export default {
 				13: '3.25rem',
 				17: '4.24rem',
 			},
+			minWidth: {
+				14: '3.5rem',
+			},
 			maxHeight: {
 				141: '35.25rem',
 				'50vh': '50vh',

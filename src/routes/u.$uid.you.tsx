@@ -4,7 +4,7 @@ import { createQuery } from '@tanstack/solid-query';
 
 import { multiagent } from '~/api/global.ts';
 import { getProfile, getProfileKey } from '~/api/query.ts';
-import { Navigate, useParams } from '~/router.ts';
+import { A, Navigate, useParams } from '~/router.ts';
 
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');
@@ -23,7 +23,7 @@ const AuthenticatedYouPage = () => {
 		<div class='flex flex-col pb-4'>
 			<Show when={profileQuery.data}>
 				{(profile) => (
-					<div class='hover:bg-hinted'>
+					<A href='/u/:uid/profile/:handle' params={{ uid: params.uid, handle: handle() }} class='hover:bg-hinted'>
 						<div class='aspect-banner bg-muted-fg'>
 						</div>
 
@@ -41,7 +41,7 @@ const AuthenticatedYouPage = () => {
 								<p class='text-sm text-muted-fg'>@{profile().handle}</p>
 							</div>
 						</div>
-					</div>
+					</A>
 				)}
 			</Show>
 

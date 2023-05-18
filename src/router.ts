@@ -16,7 +16,10 @@ import {
 export type PathsWithParams = 
 	| "/u/:uid"
 	| "/u/:uid/profile/:handle/post/:status"
+	| "/u/:uid/profile/:handle/followers"
+	| "/u/:uid/profile/:handle/following"
 	| "/u/:uid/profile/:handle"
+	| "/u/:uid/profile/:handle/with_replies"
 	| "/u/:uid/notifications"
 	| "/u/:uid/search"
 	| "/u/:uid/you";
@@ -29,7 +32,10 @@ export type Paths = PathsWithParams | PathsWithoutParams;
 export interface Params {
 	"/u/:uid": { "uid": string };
 	"/u/:uid/profile/:handle/post/:status": { "uid": string, "handle": string, "status": string };
+	"/u/:uid/profile/:handle/followers": { "uid": string, "handle": string };
+	"/u/:uid/profile/:handle/following": { "uid": string, "handle": string };
 	"/u/:uid/profile/:handle": { "uid": string, "handle": string };
+	"/u/:uid/profile/:handle/with_replies": { "uid": string, "handle": string };
 	"/u/:uid/notifications": { "uid": string };
 	"/u/:uid/search": { "uid": string };
 	"/u/:uid/you": { "uid": string };
@@ -41,10 +47,10 @@ type NavigateWithParamOptions<P> = P extends number
 		? [Partial<NavigateOptions> & { params: Params[P] }]
 		: [Partial<NavigateOptions> & { params?: never }] | [];
 
-type AnchorWithParamProps<P> =
+export type AnchorWithParamProps<P> =
 	& AnchorProps
 	& (P extends PathsWithParams ? { href: P; params: Params[P] } : { href: P; params?: never });
-type NavigateWithParamProps<P> =
+export type NavigateWithParamProps<P> =
 	& NavigateProps
 	& (P extends PathsWithParams ? { href: P; params: Params[P] } : { href: P; params?: never });
 

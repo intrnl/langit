@@ -1,3 +1,7 @@
+import { type DID } from './utils';
+
+import { type Signal } from '~/utils/signals';
+
 export interface BskyLabel {
 	cts: string;
 	neg: false;
@@ -161,6 +165,22 @@ export interface BskyThread {
 	replies: BskyThread[];
 }
 
+export interface BskyThreadResponse {
+	thread: BskyThread;
+}
+
+export interface LinearizedThread {
+	post: BskyPost;
+	ancestors: BskyPost[];
+	descendants: BskyPost[];
+}
+
+export interface SignalizedLinearThread {
+	post: Signal<BskyPost>;
+	ancestors: Signal<BskyPost>[];
+	descendants: Signal<BskyPost>[];
+}
+
 export interface BskyTimelinePost {
 	post: BskyPost;
 	reply?: {
@@ -170,7 +190,19 @@ export interface BskyTimelinePost {
 	reason?: { $type: 'app.bsky.feed.defs#reasonRepost'; by: BskyProfileBasic; indexedAt: string };
 }
 
-export interface BskyTimeline {
+export interface SignalizedTimelinePost extends Omit<BskyTimelinePost, 'post' | 'reply'> {
+	post: Signal<BskyPost>;
+	reply?: {
+		root: Signal<BskyPost>;
+		parent: Signal<BskyPost>;
+	};
+}
+
+export interface BskyTimelineResponse {
 	cursor?: string;
 	feed: BskyTimelinePost[];
+}
+
+export interface BskyResolvedDidResponse {
+	did: DID;
 }

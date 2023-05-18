@@ -1,14 +1,5 @@
 import { signalizePost } from '~/api/cache.ts';
-import { type BskyPost, type BskyTimeline, type BskyTimelinePost } from '~/api/types.ts';
-import { type Signal } from '~/utils/signals.ts';
-
-export interface SignalizedTimelinePost extends Omit<BskyTimelinePost, 'post' | 'reply'> {
-	post: Signal<BskyPost>;
-	reply?: {
-		root: Signal<BskyPost>;
-		parent: Signal<BskyPost>;
-	};
-}
+import { type BskyTimelineResponse, type SignalizedTimelinePost } from '~/api/types.ts';
 
 export interface TimelineSlice {
 	items: SignalizedTimelinePost[];
@@ -36,7 +27,7 @@ export interface TimelinePage {
 
 export type SliceFilter = (slice: TimelineSlice, seen: Set<string>) => boolean;
 
-export const createTimelinePage = (data: BskyTimeline, filter?: SliceFilter): TimelinePage => {
+export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFilter): TimelinePage => {
 	const key = Date.now();
 
 	const orig = data.feed;

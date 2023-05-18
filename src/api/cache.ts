@@ -9,22 +9,18 @@
 
 import { type Signal, signal } from '~/utils/signals.ts';
 
-import { type BskyPost, type BskyProfileBasic } from './types.ts';
+import { type BskyPost, type BskyProfileBasic, type LinearizedThread, SignalizedLinearThread } from './types.ts';
 
 export const postAuthors: Record<string, WeakRef<Signal<BskyProfileBasic>>> = {};
 export const posts: Record<string, WeakRef<Signal<BskyPost>>> = {};
-export const signalizePost = (post: BskyPost, key?: number | null) => {
-	const disabled = key === null;
 
+export const signalizePost = (post: BskyPost, key?: number) => {
 	let ref: WeakRef<Signal<BskyPost>> | undefined = posts[post.cid];
 	let signalized: Signal<BskyPost>;
 
-	if (disabled || !ref || !(signalized = ref.deref()!)) {
+	if (!ref || !(signalized = ref.deref()!)) {
 		signalized = signal(post);
-
-		if (!disabled) {
-			posts[post.cid] = new WeakRef(signalized);
-		}
+		posts[post.cid] = new WeakRef(signalized);
 	}
 	else if (signalized) {
 		// Prevent further updates if if the post currently contains that key
@@ -34,4 +30,31 @@ export const signalizePost = (post: BskyPost, key?: number | null) => {
 	}
 
 	return signalized;
+};
+
+export const signalizeLinearThread = (thread: LinearizedThread, key?: number): SignalizedLinearThread => {
+	const anc = thread.ancestors;
+	const dec = thread.descendants;
+
+	const anclen = anc.length;
+	const declen = dec.length;
+
+	const ancestors: Signal<BskyPost>[] = new Array(anclen);
+	const descendants: Signal<BskyPost>[] = new Array(declen);
+
+	for (let idx = 0; idx < anclen; idx++) {
+		const post = anc[idx];
+		ancestors[idx] = signalizePost(post, key);
+	}
+
+	for (let idx = 0; idx < declen; idx++) {
+		const post = dec[idx];
+		descendants[idx] = signalizePost(post, key);
+	}
+
+	return {
+		post: signalizePost(thread.post),
+		ancestors,
+		descendants,
+	};
 };

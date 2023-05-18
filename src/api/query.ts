@@ -2,8 +2,16 @@ import { QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from './global.ts';
 import { type UID } from './multiagent.ts';
-import { type BskyProfile, type BskyTimeline } from './types.ts';
+import { type DID, isDid } from './utils.ts';
 
+import {
+	type BskyProfile,
+	type BskyResolvedDidResponse,
+	type BskyThreadResponse,
+	type BskyTimelineResponse,
+} from './types.ts';
+
+import { createThreadPage } from '~/models/thread.ts';
 import { createTimelinePage } from '~/models/timeline.ts';
 
 export const getProfileKey = (uid: UID, actor: string) => ['getProfile', uid, actor] as const;
@@ -36,7 +44,7 @@ export const createTimelineQuery = (limit: number) => {
 			params: { algorithm, cursor: ctx.pageParam, limit },
 		});
 
-		const data = response.data as BskyTimeline;
+		const data = response.data as BskyTimelineResponse;
 		const page = createTimelinePage(data, (slice) => {
 			const items = slice.items;
 			const first = items[0];
@@ -69,7 +77,7 @@ export const getTimelineLatest = async (ctx: QueryFunctionContext<ReturnType<typ
 		params: { algorithm, limit: 1 },
 	});
 
-	const data = response.data as BskyTimeline;
+	const data = response.data as BskyTimelineResponse;
 	const feed = data.feed;
 
 	return feed.length > 0 ? feed[0].post.cid : undefined;
@@ -89,7 +97,7 @@ export const createProfileFeedQuery = (limit: number) => {
 			params: { actor, cursor: ctx.pageParam, limit },
 		});
 
-		const data = response.data as BskyTimeline;
+		const data = response.data as BskyTimelineResponse;
 		const page = createTimelinePage(data, (slice) => {
 			const items = slice.items;
 			const first = items[0];
@@ -121,8 +129,45 @@ export const getProfileFeedLatest = async (ctx: QueryFunctionContext<ReturnType<
 		params: { actor, limit: 1 },
 	});
 
-	const data = response.data as BskyTimeline;
+	const data = response.data as BskyTimelineResponse;
 	const feed = data.feed;
 
 	return feed.length > 0 ? feed[0].post.cid : undefined;
+};
+
+export const getPostThreadKey = (uid: UID, actor: string, post: string) => ['getPostThread', uid, actor, post] as const;
+export const getPostThread = async (ctx: QueryFunctionContext<ReturnType<typeof getPostThreadKey>>) => {
+	const [, uid, actor, post] = ctx.queryKey;
+
+	const agent = await multiagent.connect(uid);
+
+	let did: DID;
+	if (isDid(actor)) {
+		did = actor;
+	}
+	else {
+		const res = await agent.rpc.get({
+			method: 'com.atproto.identity.resolveHandle',
+			signal: ctx.signal,
+			params: { handle: actor },
+		});
+
+		const data = res.data as BskyResolvedDidResponse;
+		did = data.did;
+	}
+
+	const uri = `at://${did}/app.bsky.feed.post/${post}`;
+	const response = await agent.rpc.get({
+		method: 'app.bsky.feed.getPostThread',
+		signal: ctx.signal,
+		params: { uri },
+	});
+
+	const data = response.data as BskyThreadResponse;
+	const page = createThreadPage(data.thread);
+
+	return page;
+};
+
+export const createInitialPostThread = (uid: UID, actor: string, post: string) => {
 };

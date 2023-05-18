@@ -59,7 +59,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 			</div>
 
 			<div class='flex items-start'>
-				<Show when={images() && !large()}>
+				<Show when={!large() && images()}>
 					<div class='grow basis-0 ml-3 mt-2 mb-3'>
 						<EmbedImage images={images()!} />
 					</div>
@@ -69,6 +69,10 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 					{val().text}
 				</div>
 			</div>
+
+			<Show when={large() && images()}>
+				<EmbedImage images={images()!} borderless />
+			</Show>
 		</div>
 	);
 };

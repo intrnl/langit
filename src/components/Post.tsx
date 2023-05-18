@@ -3,18 +3,12 @@ import { Show } from 'solid-js';
 import {
 	type BskyPost,
 	type BskyTimelinePost,
-	type EmbeddedImage,
-	type EmbeddedLink,
-	type EmbeddedRecord,
 } from '~/api/types.ts';
 
 import { A } from '~/router.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
-import EmbedImage from '~/components/EmbedImage.tsx';
-import EmbedLink from '~/components/EmbedLink.tsx';
-import EmbedRecord from '~/components/EmbedRecord.tsx';
-import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
+import Embed from './Embed.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
@@ -144,62 +138,8 @@ const Post = (props: PostProps) => {
 						)}
 					</Show>
 
-					<Show when={post().embed} keyed>
-						{(embed) => {
-							const type = embed.$type;
-
-							let images: EmbeddedImage[] | undefined;
-							let link: EmbeddedLink | undefined;
-							let record: EmbeddedRecord | undefined;
-							let recordUnresolved = false;
-
-							if (type === 'app.bsky.embed.external#view') {
-								link = embed.external;
-							}
-							else if (type === 'app.bsky.embed.images#view') {
-								images = embed.images;
-							}
-							else if (type === 'app.bsky.embed.record#view') {
-								const rec = embed.record;
-
-								if (rec.$type === 'app.bsky.embed.record#viewRecord') {
-									record = rec;
-								}
-								else {
-									recordUnresolved = true;
-								}
-							}
-							else if (type === 'app.bsky.embed.recordWithMedia#view') {
-								const rec = embed.record.record;
-
-								const media = embed.media;
-								const mediatype = media.$type;
-
-								if (rec.$type === 'app.bsky.embed.record#viewRecord') {
-									record = rec;
-								}
-								else {
-									recordUnresolved = true;
-								}
-
-								if (mediatype === 'app.bsky.embed.external#view') {
-									link = media.external;
-								}
-								else if (mediatype === 'app.bsky.embed.images#view') {
-									images = media.images;
-								}
-							}
-
-							return (
-								<div class='flex flex-col gap-3 mt-3'>
-									{link && <EmbedLink link={link} />}
-									{images && <EmbedImage images={images} />}
-
-									{recordUnresolved && <EmbedRecordNotFound />}
-									{record && <EmbedRecord record={record} />}
-								</div>
-							);
-						}}
+					<Show when={post().embed}>
+						{(embed) => <Embed embed={embed()} />}
 					</Show>
 
 					<div class='flex mt-3 text-muted-fg'>

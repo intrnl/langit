@@ -200,9 +200,13 @@ const Post = (props: PostProps) => {
 
 					<div class='flex mt-3 text-muted-fg'>
 						<div class='flex items-end grow gap-0.5'>
-							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
+							<A
+								href='/u/:uid/profile/:actor/post/:status'
+								params={{ uid: uid(), actor: author().did, status: getPostId(post().uri) }}
+								class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
+							>
 								<ChatBubbleOutlinedIcon />
-							</button>
+							</A>
 							<span class='text-[0.8125rem]'>{post().replyCount}</span>
 						</div>
 

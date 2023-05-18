@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createEffect } from 'solid-js';
+import { For, Match, Show, Switch } from 'solid-js';
 
 import { useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
@@ -33,8 +33,8 @@ const AuthenticatedPostPage = () => {
 	});
 
 	const focusRef = (node: HTMLDivElement) => {
-		createEffect(() => {
-			const data = !threadQuery.isLoading && threadQuery.data;
+		requestAnimationFrame(() => {
+			const data = threadQuery.data;
 			const key = location.key;
 
 			if (data && key && !seen.has(key)) {
@@ -57,22 +57,22 @@ const AuthenticatedPostPage = () => {
 					</div>
 				</Match>
 
-				<Match when={threadQuery.data}>
+				<Match when={threadQuery.data} keyed>
 					{(data) => {
-						const post = () => data().post.value;
+						const post = data.post.value;
 
-						const record = () => post().record;
-						const author = () => post().author;
+						const record = post.record;
+						const author = post.author;
 
 						return (
 							<>
-								<Show when={data().parentNotFound}>
+								<Show when={data.parentNotFound}>
 									<div class='p-3'>
 										<EmbedRecordNotFound />
 									</div>
 								</Show>
 
-								<Show when={data().ancestors} keyed>
+								<Show when={data.ancestors} keyed>
 									{(slice) => {
 										const items = slice.items;
 
@@ -91,24 +91,24 @@ const AuthenticatedPostPage = () => {
 									<div class='flex items-center gap-3 mb-1'>
 										<A
 											href='/u/:uid/profile/:actor'
-											params={{ uid: uid(), actor: author().did }}
+											params={{ uid: uid(), actor: author.did }}
 											class='h-12 w-12 shrink-0 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
 										>
-											<Show when={author().avatar}>
+											<Show when={author.avatar}>
 												{(avatar) => <img src={avatar()} class='h-full w-full' />}
 											</Show>
 										</A>
 
 										<A
 											href='/u/:uid/profile/:actor'
-											params={{ uid: uid(), actor: author().did }}
+											params={{ uid: uid(), actor: author.did }}
 											class='flex flex-col text-sm'
 										>
 											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 hover:underline'>
-												{author().displayName}
+												{author.displayName}
 											</span>
 											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
-												@{author().handle}
+												@{author.handle}
 											</span>
 										</A>
 
@@ -119,7 +119,7 @@ const AuthenticatedPostPage = () => {
 										</div>
 									</div>
 
-									<Show when={record().text}>
+									<Show when={record.text}>
 										{(text) => (
 											<div class='text-base whitespace-pre-wrap break-words mt-3'>
 												{text()}
@@ -127,14 +127,14 @@ const AuthenticatedPostPage = () => {
 										)}
 									</Show>
 
-									<Show when={post().embed}>
+									<Show when={post.embed}>
 										{(embed) => <Embed uid={uid()} embed={embed()} large />}
 									</Show>
 								</div>
 
 								<hr class='border-divider' />
 
-								<For each={data().descendants}>
+								<For each={data.descendants}>
 									{(slice) => {
 										const items = slice.items;
 										const len = items.length;

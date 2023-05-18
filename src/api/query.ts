@@ -77,3 +77,55 @@ export const getTimelineLatest = async (ctx: QueryFunctionContext<ReturnType<typ
 
 	return feed.length > 0 ? feed[0].post.cid : undefined;
 };
+
+export const getProfileFeedKey = (uid: UID, actor: string, replies: boolean) =>
+	['getProfileFeed', uid, actor, replies] as const;
+export const createProfileFeedQuery = (limit: number) => {
+	return async (ctx: QueryFunctionContext<ReturnType<typeof getProfileFeedKey>>) => {
+		const [, uid, actor, replies] = ctx.queryKey;
+
+		const agent = await multiagent.connect(uid);
+
+		const response = await agent.rpc.get({
+			method: 'app.bsky.feed.getAuthorFeed',
+			signal: ctx.signal,
+			params: { actor, cursor: ctx.pageParam, limit },
+		});
+
+		const data = response.data as BskyTimeline;
+		const page = createTimelinePage(data, (slice) => {
+			const items = slice.items;
+			const first = items[0];
+
+			if (!replies && first.reply && (!first.reason || first.reason.$type === 'app.bsky.feed.defs#reasonRepost')) {
+				const parent = first.reply.parent.peek();
+
+				if (parent.author.handle !== actor) {
+					return false;
+				}
+			}
+
+			return true;
+		});
+
+		return page;
+	};
+};
+
+export const getProfileFeedLatestKey = (uid: UID, actor: string) => ['getProfileFieldLatest', uid, actor] as const;
+export const getProfileFeedLatest = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileFeedLatestKey>>) => {
+	const [, uid, actor] = ctx.queryKey;
+
+	const agent = await multiagent.connect(uid);
+
+	const response = await agent.rpc.get({
+		method: 'app.bsky.feed.getAuthorFeed',
+		signal: ctx.signal,
+		params: { actor, limit: 1 },
+	});
+
+	const data = response.data as BskyTimeline;
+	const feed = data.feed;
+
+	return feed.length > 0 ? feed[0].post.cid : undefined;
+};

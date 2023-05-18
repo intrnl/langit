@@ -34,7 +34,7 @@ export interface TimelinePage {
 	slices: TimelineSlice[];
 }
 
-export type SliceFilter = (slice: TimelineSlice) => boolean;
+export type SliceFilter = (slice: TimelineSlice, seen: Set<string>) => boolean;
 
 export const createTimelinePage = (data: BskyTimeline, filter?: SliceFilter): TimelinePage => {
 	const key = Date.now();
@@ -116,7 +116,7 @@ export const createTimelinePage = (data: BskyTimeline, filter?: SliceFilter): Ti
 		for (let i = 0; i < jlen; i++) {
 			const slice = slices[i];
 
-			if (filter(slice)) {
+			if (filter(slice, seen)) {
 				finalslices.push(slice);
 			}
 		}

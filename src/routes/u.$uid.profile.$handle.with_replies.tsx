@@ -1,9 +1,7 @@
-import { useParams } from '~/router';
+import AuthenticatedProfileTimelinePage from './u.$uid.profile.$handle._index.tsx';
 
 const AuthenticatedProfileTimelineRepliesPage = () => {
-	const params = useParams('/u/:uid/profile/:handle/with_replies');
-
-	return <div>this is the timeline with replies!</div>;
+	return AuthenticatedProfileTimelinePage({ replies: true });
 };
 
 export default AuthenticatedProfileTimelineRepliesPage;

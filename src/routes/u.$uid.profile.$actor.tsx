@@ -13,10 +13,10 @@ import TabLink from '~/components/TabLink';
 import { A, useParams } from '~/router';
 
 const AuthenticatedProfileLayout = () => {
-	const params = useParams('/u/:uid/profile/:handle');
+	const params = useParams('/u/:uid/profile/:actor');
 
 	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(params.uid, params.handle),
+		queryKey: () => getProfileKey(params.uid, params.actor),
 		queryFn: getProfile,
 		staleTime: 10_000,
 	});
@@ -82,11 +82,11 @@ const AuthenticatedProfileLayout = () => {
 								</Show>
 
 								<div class='text-sm flex flex-wrap gap-4'>
-									<A href='/u/:uid/profile/:handle/following' params={params} class='hover:underline'>
+									<A href='/u/:uid/profile/:actor/following' params={params} class='hover:underline'>
 										<span class='font-bold'>{profile().followsCount}</span> <span class='text-muted-fg'>Following</span>
 									</A>
 
-									<A href='/u/:uid/profile/:handle/followers' params={params} class='hover:underline'>
+									<A href='/u/:uid/profile/:actor/followers' params={params} class='hover:underline'>
 										<span class='font-bold'>{profile().followersCount}</span>{' '}
 										<span class='text-muted-fg'>Followers</span>
 									</A>
@@ -94,10 +94,10 @@ const AuthenticatedProfileLayout = () => {
 							</div>
 
 							<div class='flex overflow-x-auto border-b border-divider'>
-								<TabLink href='/u/:uid/profile/:handle' params={params} replace end>
+								<TabLink href='/u/:uid/profile/:actor' params={params} replace end>
 									Tweets
 								</TabLink>
-								<TabLink href='/u/:uid/profile/:handle/with_replies' params={params} replace>
+								<TabLink href='/u/:uid/profile/:actor/with_replies' params={params} replace>
 									Replies
 								</TabLink>
 							</div>

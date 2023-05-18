@@ -14,13 +14,13 @@ export interface AuthenticatedProfileTimelinePageProps {
 }
 
 const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePageProps) => {
-	const params = useParams('/u/:uid/profile/:handle');
+	const params = useParams('/u/:uid/profile/:actor');
 	const client = useQueryClient();
 
 	const withReplies = () => props.replies || false;
 
 	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getProfileFeedKey(params.uid, params.handle, withReplies()),
+		queryKey: () => getProfileFeedKey(params.uid, params.actor, withReplies()),
 		getNextPageParam: (last: TimelinePage) => last.cursor,
 		queryFn: createProfileFeedQuery(PAGE_SIZE),
 		refetchOnMount: false,
@@ -34,7 +34,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 			// fetch, or a refetch, since our refetch process involves truncating the
 			// timeline first.
 			if (length === 1) {
-				client.setQueryData(getProfileFeedLatestKey(params.uid, params.handle), pages[0].cid);
+				client.setQueryData(getProfileFeedLatestKey(params.uid, params.actor), pages[0].cid);
 			}
 
 			// check if the last page is empty because of its slices being filtered
@@ -50,7 +50,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 	});
 
 	const latestQuery = createQuery({
-		queryKey: () => getProfileFeedLatestKey(params.uid, params.handle),
+		queryKey: () => getProfileFeedLatestKey(params.uid, params.actor),
 		queryFn: getProfileFeedLatest,
 		staleTime: 10000,
 		get enabled () {
@@ -79,7 +79,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 				// but unfortunately that breaks the `hasNextPage` check down below
 				// and would also mean the user gets to see nothing for a bit.
 				client.setQueryData(
-					getProfileFeedKey(params.uid, params.handle, withReplies()),
+					getProfileFeedKey(params.uid, params.actor, withReplies()),
 					(prev?: InfiniteData<TimelinePage>) => {
 						if (prev) {
 							return {

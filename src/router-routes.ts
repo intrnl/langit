@@ -15,28 +15,28 @@ const routes: RouteDefinition[] = [
     component: lazy(() => import("./routes/u.$uid.tsx")),
     children: [
       {
-        path: "profile/:handle/post/:status",
-        component: lazy(() => import("./routes/u.$uid.profile.$handle_.post.$status.tsx")),
+        path: "profile/:actor/post/:status",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status.tsx")),
       },
       {
-        path: "profile/:handle/followers",
-        component: lazy(() => import("./routes/u.$uid.profile.$handle_.followers.tsx")),
+        path: "profile/:actor/followers",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.followers.tsx")),
       },
       {
-        path: "profile/:handle/following",
-        component: lazy(() => import("./routes/u.$uid.profile.$handle_.following.tsx")),
+        path: "profile/:actor/following",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.following.tsx")),
       },
       {
-        path: "profile/:handle",
-        component: lazy(() => import("./routes/u.$uid.profile.$handle.tsx")),
+        path: "profile/:actor",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor.tsx")),
         children: [
           {
             path: "with_replies",
-            component: lazy(() => import("./routes/u.$uid.profile.$handle.with_replies.tsx")),
+            component: lazy(() => import("./routes/u.$uid.profile.$actor.with_replies.tsx")),
           },
           {
             path: "/",
-            component: lazy(() => import("./routes/u.$uid.profile.$handle._index.tsx")),
+            component: lazy(() => import("./routes/u.$uid.profile.$actor._index.tsx")),
           },
         ],
       },

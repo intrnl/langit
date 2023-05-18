@@ -15,11 +15,11 @@ import {
 
 export type PathsWithParams = 
 	| "/u/:uid"
-	| "/u/:uid/profile/:handle/post/:status"
-	| "/u/:uid/profile/:handle/followers"
-	| "/u/:uid/profile/:handle/following"
-	| "/u/:uid/profile/:handle"
-	| "/u/:uid/profile/:handle/with_replies"
+	| "/u/:uid/profile/:actor/post/:status"
+	| "/u/:uid/profile/:actor/followers"
+	| "/u/:uid/profile/:actor/following"
+	| "/u/:uid/profile/:actor"
+	| "/u/:uid/profile/:actor/with_replies"
 	| "/u/:uid/notifications"
 	| "/u/:uid/search"
 	| "/u/:uid/you";
@@ -31,11 +31,11 @@ export type Paths = PathsWithParams | PathsWithoutParams;
 
 export interface Params {
 	"/u/:uid": { "uid": string };
-	"/u/:uid/profile/:handle/post/:status": { "uid": string, "handle": string, "status": string };
-	"/u/:uid/profile/:handle/followers": { "uid": string, "handle": string };
-	"/u/:uid/profile/:handle/following": { "uid": string, "handle": string };
-	"/u/:uid/profile/:handle": { "uid": string, "handle": string };
-	"/u/:uid/profile/:handle/with_replies": { "uid": string, "handle": string };
+	"/u/:uid/profile/:actor/post/:status": { "uid": string, "actor": string, "status": string };
+	"/u/:uid/profile/:actor/followers": { "uid": string, "actor": string };
+	"/u/:uid/profile/:actor/following": { "uid": string, "actor": string };
+	"/u/:uid/profile/:actor": { "uid": string, "actor": string };
+	"/u/:uid/profile/:actor/with_replies": { "uid": string, "actor": string };
 	"/u/:uid/notifications": { "uid": string };
 	"/u/:uid/search": { "uid": string };
 	"/u/:uid/you": { "uid": string };

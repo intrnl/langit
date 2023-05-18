@@ -67,8 +67,8 @@ const Post = (props: PostProps) => {
 			<div class='flex gap-3'>
 				<div class='flex flex-col items-center shrink-0'>
 					<A
-						href='/u/:uid/profile/:handle'
-						params={{ uid: props.uid, handle: author().did }}
+						href='/u/:uid/profile/:actor'
+						params={{ uid: props.uid, actor: author().did }}
 						class='h-12 w-12 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
 					>
 						<Show when={author().avatar}>
@@ -86,8 +86,8 @@ const Post = (props: PostProps) => {
 						<div class='flex items-center text-sm'>
 							<div>
 								<A
-									href='/u/:uid/profile/:handle'
-									params={{ uid: props.uid, handle: author().did }}
+									href='/u/:uid/profile/:actor'
+									params={{ uid: props.uid, actor: author().did }}
 									class='group flex gap-1'
 								>
 									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline'>
@@ -102,10 +102,10 @@ const Post = (props: PostProps) => {
 							<span class='text-muted-fg'>
 								<span class='px-1'>·</span>
 								<A
-									href='/u/:uid/profile/:handle/post/:status'
+									href='/u/:uid/profile/:actor/post/:status'
 									params={{
 										uid: props.uid,
-										handle: author().did,
+										actor: author().did,
 										status: getPostId(post().uri),
 									}}
 									class='hover:underline'

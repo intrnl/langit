@@ -23,7 +23,7 @@ const AuthenticatedYouPage = () => {
 		<div class='flex flex-col pb-4'>
 			<Show when={profileQuery.data}>
 				{(profile) => (
-					<A href='/u/:uid/profile/:handle' params={{ uid: params.uid, handle: did() }} class='hover:bg-hinted'>
+					<A href='/u/:uid/profile/:actor' params={{ uid: params.uid, actor: did() }} class='hover:bg-hinted'>
 						<div class='aspect-banner bg-muted-fg'>
 						</div>
 

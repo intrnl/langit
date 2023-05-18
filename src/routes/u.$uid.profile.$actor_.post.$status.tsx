@@ -1,7 +1,7 @@
 import { useParams } from '~/router';
 
 const AuthenticatedPostPage = () => {
-	const params = useParams('/u/:uid/profile/:handle/post/:status');
+	const params = useParams('/u/:uid/profile/:actor/post/:status');
 
 	return (
 		<div>

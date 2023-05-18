@@ -27,7 +27,7 @@ const AuthenticatedHome = () => {
 		onSuccess: (data) => {
 			const pages = data.pages;
 
-			if (pages.length > 0) {
+			if (pages.length === 1) {
 				client.setQueryData(getTimelineLatestKey(params.uid, DEFAULT_ALGORITHM), pages[0].cid);
 			}
 		},

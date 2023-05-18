@@ -18,14 +18,14 @@ const isNextInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
 	const items = slice.items;
 	const last = items[items.length - 1];
 
-	return !!last && !!item.reply && (last.post.peek().cid === item.reply.parent.peek().cid);
+	return !!item.reply && (last.post.peek().cid === item.reply.parent.peek().cid);
 };
 
 const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
 	const items = slice.items;
 	const first = items[0];
 
-	return !!first && !!first.reply && (first.reply.parent.peek().cid === item.post.peek().cid);
+	return !!first.reply && (first.reply.parent.peek().cid === item.post.peek().cid);
 };
 
 export interface TimelinePage {

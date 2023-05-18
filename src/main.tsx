@@ -4,7 +4,6 @@ import { render } from 'solid-js/web';
 import { Router, useRoutes } from '@solidjs/router';
 
 import routes from './router-routes.ts';
-import { pathIntegration } from './utils/router.ts';
 
 import '~/styles/tailwind.css';
 
@@ -18,7 +17,7 @@ const App = () => {
 	]);
 
 	return (
-		<Router source={pathIntegration()}>
+		<Router>
 			<Routes />
 		</Router>
 	);

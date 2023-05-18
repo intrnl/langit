@@ -6,10 +6,10 @@ import { createQuery } from '@tanstack/solid-query';
 import { getPostThread, getPostThreadKey } from '~/api/query.ts';
 
 import { A, useParams } from '~/router.ts';
-import { ENTRY_KEY } from '~/utils/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
+import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
@@ -17,8 +17,8 @@ import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 const seen = new Set<string>();
 
 const AuthenticatedPostPage = () => {
-	const location = useLocation();
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
+	const location = useLocation();
 
 	const uid = () => params.uid;
 
@@ -34,15 +34,10 @@ const AuthenticatedPostPage = () => {
 
 	const focusRef = (node: HTMLDivElement) => {
 		createEffect(() => {
-			const state = location.state as any;
+			const data = !threadQuery.isLoading && threadQuery.data;
+			const key = location.key;
 
-			if (!state) {
-				return;
-			}
-
-			const key = state[ENTRY_KEY];
-
-			if (threadQuery.data && !seen.has(key)) {
+			if (data && key && !seen.has(key)) {
 				seen.add(key);
 				node.scrollIntoView();
 			}
@@ -71,7 +66,28 @@ const AuthenticatedPostPage = () => {
 
 						return (
 							<>
-								<div ref={focusRef} class='px-4 py-3'>
+								<Show when={data().parentNotFound}>
+									<div class='p-3'>
+										<EmbedRecordNotFound />
+									</div>
+								</Show>
+
+								<Show when={data().ancestors} keyed>
+									{(slice) => {
+										const items = slice.items;
+
+										return items.map((item, idx) => (
+											<Post
+												uid={uid()}
+												post={item.value}
+												prev={idx !== 0}
+												next
+											/>
+										));
+									}}
+								</Show>
+
+								<div ref={focusRef} class='px-4 py-3 scroll-m-13'>
 									<div class='flex items-center gap-3 mb-1'>
 										<A
 											href='/u/:uid/profile/:actor'

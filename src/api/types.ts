@@ -184,6 +184,7 @@ export interface LinearizedThread {
 
 export interface SignalizedLinearThread {
 	post: Signal<BskyPost>;
+	parentNotFound: boolean;
 	ancestors: Signal<BskyPost>[];
 	descendants: Signal<BskyPost>[];
 }

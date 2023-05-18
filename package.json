@@ -26,5 +26,10 @@
 		"typescript": "^5.0.4",
 		"vite": "4.3.5",
 		"vite-plugin-solid": "^2.7.0"
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"@solidjs/router@0.8.2": "patches/@solidjs__router@0.8.2.patch"
+		}
 	}
 }

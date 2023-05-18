@@ -54,6 +54,7 @@ export const signalizeLinearThread = (thread: LinearizedThread, key?: number): S
 
 	return {
 		post: signalizePost(thread.post),
+		parentNotFound: thread.parentNotFound,
 		ancestors,
 		descendants,
 	};

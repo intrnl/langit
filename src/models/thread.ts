@@ -96,7 +96,8 @@ const isNextInThread = (slice: ThreadSlice, child: BskyPost) => {
 
 export interface ThreadPage {
 	post: Signal<BskyPost>;
-	ancestors: Signal<BskyPost>[];
+	parentNotFound: boolean;
+	ancestors?: ThreadSlice;
 	descendants: ThreadSlice[];
 }
 
@@ -104,6 +105,7 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 	const thread = signalizeLinearThread(linearizeThread(data));
 
 	const cid = thread.post.peek().cid;
+	const ancestors = thread.ancestors;
 	const descendants = thread.descendants;
 
 	const slices: ThreadSlice[] = [];
@@ -132,7 +134,8 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 
 	return {
 		post: thread.post,
-		ancestors: thread.ancestors,
+		parentNotFound: thread.parentNotFound,
+		ancestors: ancestors.length > 0 ? { items: ancestors } : undefined,
 		descendants: slices,
 	};
 };

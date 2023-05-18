@@ -1,9 +1,14 @@
 lockfileVersion: '6.0'
 
+patchedDependencies:
+  '@solidjs/router@0.8.2':
+    hash: c3drdvrwxamj6xkllh2z5xfdoe
+    path: patches/@solidjs__router@0.8.2.patch
+
 dependencies:
   '@solidjs/router':
     specifier: ^0.8.2
-    version: 0.8.2(solid-js@1.7.5)
+    version: 0.8.2(patch_hash=c3drdvrwxamj6xkllh2z5xfdoe)(solid-js@1.7.5)
   '@tanstack/solid-query':
     specifier: ^4.29.7
     version: 4.29.7(solid-js@1.7.5)
@@ -661,13 +666,14 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@solidjs/router@0.8.2(solid-js@1.7.5):
+  /@solidjs/router@0.8.2(patch_hash=c3drdvrwxamj6xkllh2z5xfdoe)(solid-js@1.7.5):
     resolution: {integrity: sha512-gUKW+LZqxtX6y/Aw6JKyy4gQ9E7dLqp513oB9pSYJR1HM5c56Pf7eijzyXX+b3WuXig18Cxqah4tMtF0YGu80w==}
     peerDependencies:
       solid-js: ^1.5.3
     dependencies:
       solid-js: 1.7.5
     dev: false
+    patched: true
 
   /@tailwindcss/forms@0.5.3(tailwindcss@3.3.2):
     resolution: {integrity: sha512-y5mb86JUoiUgBjY/o6FJSFZSEttfb3Q5gllE4xoKjAAD+vBrnIhE4dViwUuow3va8mpH4s9jyUbUbrRGoRdc2Q==}

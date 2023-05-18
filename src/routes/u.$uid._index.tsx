@@ -3,7 +3,8 @@ import { For, Show } from 'solid-js';
 import { InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
 import { createTimelineQuery, getTimelineKey, getTimelineLatest, getTimelineLatestKey } from '~/api/query';
-import { TimelinePage } from '~/models/timeline.ts';
+import { type TimelinePage } from '~/models/timeline.ts';
+
 import { useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress';

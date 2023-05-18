@@ -2,9 +2,9 @@ import { QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from './global.ts';
 import { type UID } from './multiagent.ts';
+import { type BskyProfile, type BskyTimeline } from './types.ts';
 
 import { createTimelinePage } from '~/models/timeline.ts';
-import { type BskyProfile, type BskyTimeline } from './types.ts';
 
 export const getProfileKey = (uid: UID, actor: string) => ['getProfile', uid, actor] as const;
 export const getProfile = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileKey>>) => {
@@ -28,6 +28,8 @@ export const createTimelineQuery = (limit: number) => {
 		const session = multiagent.accounts[uid].session;
 		const agent = await multiagent.connect(uid);
 
+		const selfdid = session.did;
+
 		const response = await agent.rpc.get({
 			method: 'app.bsky.feed.getTimeline',
 			signal: ctx.signal,
@@ -35,7 +37,24 @@ export const createTimelineQuery = (limit: number) => {
 		});
 
 		const data = response.data as BskyTimeline;
-		const page = createTimelinePage(data, session.did);
+		const page = createTimelinePage(data, (slice) => {
+			const items = slice.items;
+
+			// skip any posts that are in reply to non-followed
+			for (let idx = 0, len = items.length; idx < len; idx++) {
+				const item = items[idx];
+
+				if (item.reply && (!item.reason || item.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+					const parent = item.reply.parent.peek();
+
+					if (parent.author.did !== selfdid && !parent.author.viewer.following) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		});
 
 		return page;
 	};

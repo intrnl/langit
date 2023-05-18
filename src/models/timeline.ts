@@ -34,8 +34,10 @@ export interface TimelinePage {
 	slices: TimelineSlice[];
 }
 
-export const createTimelinePage = (data: BskyTimeline, selfdid?: string, temporal?: boolean): TimelinePage => {
-	const key = temporal ? null : Date.now();
+export type SliceFilter = (slice: TimelineSlice) => boolean;
+
+export const createTimelinePage = (data: BskyTimeline, filter?: SliceFilter): TimelinePage => {
+	const key = Date.now();
 
 	const orig = data.feed;
 	const len = orig.length;
@@ -59,22 +61,13 @@ export const createTimelinePage = (data: BskyTimeline, selfdid?: string, tempora
 	}
 
 	const seen = new Set<string>();
-	const slices: TimelineSlice[] = [];
+	let slices: TimelineSlice[] = [];
 	let jlen = 0;
 
 	// arrange the posts into connected slices
 	loop:
 	for (let i = feed.length - 1; i >= 0; i--) {
 		const item = feed[i];
-
-		// skip any posts that are in reply to non-followed
-		if (item.reply) {
-			const parent = item.reply.parent.peek();
-
-			if ((!selfdid || parent.author.did !== selfdid) && !parent.author.viewer.following) {
-				continue;
-			}
-		}
 
 		// skip any posts that have been seen already
 		if (seen.has(item.post.peek().cid)) {
@@ -115,6 +108,20 @@ export const createTimelinePage = (data: BskyTimeline, selfdid?: string, tempora
 
 		slices.unshift({ items: [item] });
 		jlen++;
+	}
+
+	if (filter && jlen > 0) {
+		const finalslices: TimelineSlice[] = [];
+
+		for (let i = 0; i < jlen; i++) {
+			const slice = slices[i];
+
+			if (filter(slice)) {
+				finalslices.push(slice);
+			}
+		}
+
+		slices = finalslices;
 	}
 
 	return {

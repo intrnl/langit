@@ -96,20 +96,20 @@ const AuthLoginPage = () => {
 					/>
 				</div>
 
-				<Show when={error()} keyed>
+				<Show when={error()}>
 					{(error) => (
 						<p class='leading-6 text-red-600 text-sm'>
-							{error}
+							{error()}
 						</p>
 					)}
 				</Show>
 
-				<Show when={describeQuery.data} keyed>
+				<Show when={describeQuery.data}>
 					{(data) => (
 						<p class='leading-6 text-muted-fg text-xs'>
 							By continuing, you agree to the service's{' '}
-							<a href={data.links.termsOfService} class='hover:underline text-primary'>Terms of Service</a> and{' '}
-							<a href={data.links.privacyPolicy} class='hover:underline text-primary'>Privacy Policy</a>.
+							<a href={data().links.termsOfService} class='hover:underline text-primary'>Terms of Service</a> and{' '}
+							<a href={data().links.privacyPolicy} class='hover:underline text-primary'>Privacy Policy</a>.
 						</p>
 					)}
 				</Show>

@@ -71,8 +71,8 @@ const Post = (props: PostProps) => {
 						params={{ uid: props.uid, handle: author().handle }}
 						class='h-12 w-12 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
 					>
-						<Show when={author().avatar} keyed>
-							{(avatar) => <img src={avatar} class='h-full w-full' />}
+						<Show when={author().avatar}>
+							{(avatar) => <img src={avatar()} class='h-full w-full' />}
 						</Show>
 					</A>
 

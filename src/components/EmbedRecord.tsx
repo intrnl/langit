@@ -43,8 +43,8 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 		<div class='rounded-md border border-divider overflow-hidden hover:bg-secondary'>
 			<div class='mx-3 mt-3 flex text-sm text-muted-fg'>
 				<div class='h-5 w-5 mr-1 rounded-full overflow-hidden bg-muted-fg shrink-0'>
-					<Show when={author().avatar} keyed>
-						{(avatar) => <img src={avatar} class='h-full w-full' />}
+					<Show when={author().avatar}>
+						{(avatar) => <img src={avatar()} class='h-full w-full' />}
 					</Show>
 				</div>
 

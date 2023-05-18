@@ -103,8 +103,8 @@ const AuthenticatedLayout = () => {
 					activeClass='is-active'
 				>
 					<div class='h-6 w-6 rounded-full bg-muted-fg ring-primary overflow-hidden group-[.is-active]:ring-2'>
-						<Show when={profileQuery.data?.avatar} keyed>
-							{(avatar) => <img src={avatar} class='h-full w-full object-cover' />}
+						<Show when={profileQuery.data?.avatar}>
+							{(avatar) => <img src={avatar()} class='h-full w-full object-cover' />}
 						</Show>
 					</div>
 				</A>

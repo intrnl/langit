@@ -16,11 +16,17 @@ const routes: RouteDefinition[] = [
     children: [
       {
         path: "profile/:handle/post/:status",
-        component: lazy(() => import("./routes/u.$uid.profile.$handle.post.$status.tsx")),
+        component: lazy(() => import("./routes/u.$uid.profile.$handle_.post.$status.tsx")),
       },
       {
         path: "profile/:handle",
-        component: lazy(() => import("./routes/u.$uid.profile.$handle._index.tsx")),
+        component: lazy(() => import("./routes/u.$uid.profile.$handle.tsx")),
+        children: [
+          {
+            path: "/",
+            component: lazy(() => import("./routes/u.$uid.profile.$handle._index.tsx")),
+          },
+        ],
       },
       {
         path: "notifications",

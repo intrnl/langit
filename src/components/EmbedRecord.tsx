@@ -4,7 +4,7 @@ import { type EmbeddedRecord } from '~/api/types.ts';
 
 import EmbedImage from '~/components/EmbedImage.tsx';
 
-import * as relformat from '~/utils/relformatter.ts';
+import * as relformat from '~/utils/intl/relformatter.ts';
 
 export interface EmbedRecordProps {
 	record: EmbeddedRecord;

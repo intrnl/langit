@@ -9,7 +9,7 @@ import {
 } from '~/api/types.ts';
 
 import { A } from '~/router.ts';
-import * as relformat from '~/utils/relformatter.ts';
+import * as relformat from '~/utils/intl/relformatter.ts';
 
 import EmbedImage from '~/components/EmbedImage.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';

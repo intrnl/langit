@@ -136,9 +136,13 @@ const Post = (props: PostProps) => {
 						</div>
 					</div>
 
-					<div class='text-sm whitespace-pre-wrap break-words empty:hidden'>
-						{record().text}
-					</div>
+					<Show when={record().text}>
+						{(text) => (
+							<div class='text-sm whitespace-pre-wrap break-words'>
+								{text()}
+							</div>
+						)}
+					</Show>
 
 					<Show when={post().embed} keyed>
 						{(embed) => {

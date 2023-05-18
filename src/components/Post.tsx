@@ -115,7 +115,7 @@ const Post = (props: PostProps) => {
 							</span>
 						</div>
 						<div class='shrink-0'>
-							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mr-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
+							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
 								<MoreHorizIcon />
 							</button>
 						</div>

@@ -9,9 +9,9 @@
 
 import { type Signal, signal } from '~/utils/signals.ts';
 
-import { type BskyPost, type BskyPostAuthor } from './types.ts';
+import { type BskyPost, type BskyProfileBasic } from './types.ts';
 
-export const postAuthors: Record<string, WeakRef<Signal<BskyPostAuthor>>> = {};
+export const postAuthors: Record<string, WeakRef<Signal<BskyProfileBasic>>> = {};
 export const posts: Record<string, WeakRef<Signal<BskyPost>>> = {};
 export const signalizePost = (post: BskyPost, key?: number | null) => {
 	const disabled = key === null;

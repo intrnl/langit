@@ -25,7 +25,7 @@ export interface BskyProfile {
 	};
 }
 
-export interface BskyPostAuthor {
+export interface BskyProfileBasic {
 	did: string;
 	handle: string;
 	displayName: string;
@@ -56,31 +56,61 @@ export interface BskyPostRecordEmbed {
 	};
 }
 
-/** TODO: fix the typing for this later */
-export interface BskyPostEmbed {
-	images: Array<{
-		thumb: string;
-		fullsize: string;
-		alt: string;
-	}>;
-	media?: { images: BskyPostEmbed['images'] };
-	record: {
-		/** If `images` is present then you need to access `embed.record.record` */
-		record?: BskyPostEmbed['record'];
+export interface EmbeddedLink {
+	$type: 'app.bsky.embed.external#viewExternal';
+	uri: string;
+	title: string;
+	description: string;
+	thumb?: string;
+}
 
-		$type: 'app.bsky.embed.record#viewRecord';
-		uri: string;
-		cid: string;
-		author: BskyPostAuthor;
-		embeds: [];
-		indexedAt: string;
-		labels: BskyLabel[];
-		value: {
-			$type: 'app.bsky.feed.post';
-			text: string;
-			createdAt: string;
-		};
-	};
+export interface BskyPostEmbedLink {
+	$type: 'app.bsky.embed.external#view';
+	external: EmbeddedLink;
+}
+
+export interface EmbeddedImage {
+	$type: 'app.bsky.embed.images#viewImage';
+	thumb: string;
+	fullsize: string;
+	alt: string;
+}
+
+export interface BskyPostEmbedImage {
+	$type: 'app.bsky.embed.images#view';
+	images: EmbeddedImage[];
+}
+
+export interface EmbeddedRecord {
+	$type: 'app.bsky.embed.record#viewRecord';
+	uri: string;
+	cid: string;
+	author: BskyProfileBasic;
+	value: any;
+	labels?: BskyLabel[];
+	embeds?: Array<BskyPostEmbedLink | BskyPostEmbedImage | BskyPostEmbedRecord | BskyPostEmbedRecordWithMedia>;
+	indexedAt?: string;
+}
+
+export interface EmbeddedRecordNotFound {
+	$type: 'app.bsky.embed.record#viewNotFound';
+	uri: string;
+}
+
+export interface EmbeddedRecordBlocked {
+	$type: 'app.bsky.embed.record#viewBlocked';
+	uri: string;
+}
+
+export interface BskyPostEmbedRecord {
+	$type: 'app.bsky.embed.record#view';
+	record: EmbeddedRecord | EmbeddedRecordNotFound | EmbeddedRecordBlocked;
+}
+
+export interface BskyPostEmbedRecordWithMedia {
+	$type: 'app.bsky.embed.recordWithMedia#view';
+	record: BskyPostEmbedRecord;
+	media: BskyPostEmbedLink | BskyPostEmbedImage;
 }
 
 export interface BskyPost {
@@ -94,7 +124,7 @@ export interface BskyPost {
 
 	uri: string;
 	cid: string;
-	author: BskyPostAuthor;
+	author: BskyProfileBasic;
 	record: {
 		$type: 'app.bsky.feed.post';
 		text: string;
@@ -112,7 +142,7 @@ export interface BskyPost {
 		};
 		embed?: BskyPostRecordEmbed;
 	};
-	embed?: BskyPostEmbed;
+	embed?: BskyPostEmbedLink | BskyPostEmbedImage | BskyPostEmbedRecord | BskyPostEmbedRecordWithMedia;
 	replyCount: number;
 	repostCount: number;
 	likeCount: number;
@@ -137,7 +167,7 @@ export interface BskyTimelinePost {
 		root: BskyPost;
 		parent: BskyPost;
 	};
-	reason?: { $type: 'app.bsky.feed.defs#reasonRepost'; by: BskyPostAuthor; indexedAt: string };
+	reason?: { $type: 'app.bsky.feed.defs#reasonRepost'; by: BskyProfileBasic; indexedAt: string };
 }
 
 export interface BskyTimeline {

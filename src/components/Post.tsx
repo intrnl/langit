@@ -1,9 +1,20 @@
 import { Show } from 'solid-js';
 
-import { type BskyPost, type BskyTimelinePost } from '~/api/types';
+import {
+	type BskyPost,
+	type BskyTimelinePost,
+	type EmbeddedImage,
+	type EmbeddedLink,
+	type EmbeddedRecord,
+} from '~/api/types.ts';
 
 import { A } from '~/router.ts';
 import * as relformat from '~/utils/relformatter.ts';
+
+import EmbedImage from '~/components/EmbedImage.tsx';
+import EmbedLink from '~/components/EmbedLink.tsx';
+import EmbedRecord from '~/components/EmbedRecord.tsx';
+import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
@@ -116,41 +127,57 @@ const Post = (props: PostProps) => {
 
 					<Show when={post().embed} keyed>
 						{(embed) => {
-							const images = embed.media?.images || embed.images;
-							const record = embed.record?.record || embed.record;
+							const type = embed.$type;
+
+							let images: EmbeddedImage[] | undefined;
+							let link: EmbeddedLink | undefined;
+							let record: EmbeddedRecord | undefined;
+							let recordUnresolved = false;
+
+							if (type === 'app.bsky.embed.external#view') {
+								link = embed.external;
+							}
+							else if (type === 'app.bsky.embed.images#view') {
+								images = embed.images;
+							}
+							else if (type === 'app.bsky.embed.record#view') {
+								const rec = embed.record;
+
+								if (rec.$type === 'app.bsky.embed.record#viewRecord') {
+									record = rec;
+								}
+								else {
+									recordUnresolved = true;
+								}
+							}
+							else if (type === 'app.bsky.embed.recordWithMedia#view') {
+								const rec = embed.record.record;
+
+								const media = embed.media;
+								const mediatype = media.$type;
+
+								if (rec.$type === 'app.bsky.embed.record#viewRecord') {
+									record = rec;
+								}
+								else {
+									recordUnresolved = true;
+								}
+
+								if (mediatype === 'app.bsky.embed.external#view') {
+									link = media.external;
+								}
+								else if (mediatype === 'app.bsky.embed.images#view') {
+									images = media.images;
+								}
+							}
 
 							return (
 								<div class='flex flex-col gap-3 mt-3'>
-									{images && (
-										<div class='rounded-md border border-divider overflow-hidden'>
-											<img src={images[0].thumb} class='w-full' />
-										</div>
-									)}
+									{link && <EmbedLink link={link} />}
+									{images && <EmbedImage images={images} />}
 
-									{record && (
-										<div class='rounded-md border border-divider overflow-hidden hover:bg-secondary'>
-											<div class='mx-3 mt-3 flex text-sm text-muted-fg'>
-												<div class='h-5 w-5 mr-1 rounded-full overflow-hidden bg-muted-fg shrink-0'>
-													<Show when={record.author?.avatar} keyed>
-														{(avatar) => <img src={avatar} class='h-full w-full' />}
-													</Show>
-												</div>
-
-												<span class='text-primary font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline'>
-													{record.author?.displayName}
-												</span>
-												<span class='ml-1 break-all whitespace-pre-wrap line-clamp-1'>
-													@{record.author?.handle}
-												</span>
-												<span class='px-1'>·</span>
-												<span>{relformat.format(record.value.createdAt)}</span>
-											</div>
-
-											<div class='mx-3 mt-1 mb-3 text-sm whitespace-pre-wrap break-words empty:hidden'>
-												{record.value.text}
-											</div>
-										</div>
-									)}
+									{recordUnresolved && <EmbedRecordNotFound />}
+									{record && <EmbedRecord record={record} />}
 								</div>
 							);
 						}}

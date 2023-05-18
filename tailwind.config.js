@@ -10,6 +10,13 @@ export default {
 				13: '3.25rem',
 				17: '4.24rem',
 			},
+			maxHeight: {
+				141: '35.25rem',
+			},
+			flexGrow: {
+				2: '2',
+				8: '8',
+			},
 			aspectRatio: {
 				banner: '3 / 1',
 			},

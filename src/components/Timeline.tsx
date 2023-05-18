@@ -1,4 +1,4 @@
-import { For, Show } from 'solid-js';
+import { For, Match, Switch } from 'solid-js';
 
 import { type CreateInfiniteQueryResult, type CreateQueryResult } from '@tanstack/solid-query';
 
@@ -26,23 +26,25 @@ const Timeline = (props: TimelineProps) => {
 
 	return (
 		<>
-			<Show when={timelineQuery.isInitialLoading || timelineQuery.isRefetching}>
-				<div
-					class='h-13 flex items-center justify-center border-divider'
-					classList={{ 'border-b': timelineQuery.isRefetching }}
-				>
-					<CircularProgress />
-				</div>
-			</Show>
+			<Switch>
+				<Match when={timelineQuery.isInitialLoading || timelineQuery.isRefetching}>
+					<div
+						class='h-13 flex items-center justify-center border-divider'
+						classList={{ 'border-b': timelineQuery.isRefetching }}
+					>
+						<CircularProgress />
+					</div>
+				</Match>
 
-			<Show when={!timelineQuery.isRefetching && latestQuery.data && latestQuery.data !== getLatestCid()}>
-				<button
-					onClick={onRefetch}
-					class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
-				>
-					Show new posts
-				</button>
-			</Show>
+				<Match when={latestQuery.data && latestQuery.data !== getLatestCid()}>
+					<button
+						onClick={onRefetch}
+						class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
+					>
+						Show new posts
+					</button>
+				</Match>
+			</Switch>
 
 			<div>
 				<For each={timelineQuery.data ? timelineQuery.data.pages : []}>
@@ -66,21 +68,23 @@ const Timeline = (props: TimelineProps) => {
 				</For>
 			</div>
 
-			<Show when={timelineQuery.isFetchingNextPage}>
-				<div class='h-13 flex items-center justify-center'>
-					<CircularProgress />
-				</div>
-			</Show>
+			<Switch>
+				<Match when={timelineQuery.isFetchingNextPage}>
+					<div class='h-13 flex items-center justify-center'>
+						<CircularProgress />
+					</div>
+				</Match>
 
-			<Show when={timelineQuery.hasNextPage && !timelineQuery.isFetchingNextPage}>
-				<button
-					onClick={onLoadMore}
-					disabled={timelineQuery.isRefetching}
-					class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
-				>
-					Show more posts
-				</button>
-			</Show>
+				<Match when={timelineQuery.hasNextPage}>
+					<button
+						onClick={onLoadMore}
+						disabled={timelineQuery.isRefetching}
+						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
+					>
+						Show more posts
+					</button>
+				</Match>
+			</Switch>
 		</>
 	);
 };

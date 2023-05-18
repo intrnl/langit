@@ -97,7 +97,7 @@ export const createProfileFeedQuery = (limit: number) => {
 			const items = slice.items;
 			const first = items[0];
 
-			if (!replies && first.reply && (!first.reason || first.reason.$type === 'app.bsky.feed.defs#reasonRepost')) {
+			if (!replies && first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
 				const parent = first.reply.parent.peek();
 
 				if (parent.author.handle !== actor) {

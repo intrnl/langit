@@ -14,8 +14,7 @@ export default {
 				141: '35.25rem',
 			},
 			flexGrow: {
-				2: '2',
-				8: '8',
+				4: '4',
 			},
 			aspectRatio: {
 				banner: '3 / 1',

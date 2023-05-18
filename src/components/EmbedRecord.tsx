@@ -60,12 +60,12 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 
 			<div class='flex items-start'>
 				<Show when={images() && !large()}>
-					<div class='basis-1/5 ml-3 mt-2 mb-3'>
+					<div class='grow basis-0 ml-3 mt-2 mb-3'>
 						<EmbedImage images={images()!} />
 					</div>
 				</Show>
 
-				<div class='basis-4/5 mx-3 mt-1 mb-3 text-sm whitespace-pre-wrap break-words empty:hidden'>
+				<div class='grow-4 basis-0 mx-3 mt-1 mb-3 text-sm whitespace-pre-wrap break-words empty:hidden'>
 					{val().text}
 				</div>
 			</div>

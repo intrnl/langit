@@ -39,17 +39,15 @@ export const createTimelineQuery = (limit: number) => {
 		const data = response.data as BskyTimeline;
 		const page = createTimelinePage(data, (slice) => {
 			const items = slice.items;
+			const first = items[0];
 
 			// skip any posts that are in reply to non-followed
-			for (let idx = 0, len = items.length; idx < len; idx++) {
-				const item = items[idx];
+			if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+				const parent = first.reply.parent.peek();
 
-				if (item.reply && (!item.reason || item.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
-					const parent = item.reply.parent.peek();
-
-					if (parent.author.did !== selfdid && !parent.author.viewer.following) {
-						return false;
-					}
+				if (parent.author.did !== selfdid && !parent.author.viewer.following) {
+					console.log(`dropped slice`, slice);
+					return false;
 				}
 			}
 

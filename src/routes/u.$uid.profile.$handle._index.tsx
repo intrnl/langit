@@ -28,12 +28,23 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 		refetchOnReconnect: false,
 		onSuccess: (data) => {
 			const pages = data.pages;
+			const length = pages.length;
 
 			// if the page size is 1, that means we've just went through an initial
 			// fetch, or a refetch, since our refetch process involves truncating the
 			// timeline first.
-			if (pages.length === 1) {
+			if (length === 1) {
 				client.setQueryData(getProfileFeedLatestKey(params.uid, params.handle), pages[0].cid);
+			}
+
+			// check if the last page is empty because of its slices being filtered
+			// away, if so, fetch next page
+			if (length > 0) {
+				const last = pages[length - 1];
+
+				if (last.slices.length === 0) {
+					timelineQuery.fetchNextPage();
+				}
 			}
 		},
 	});

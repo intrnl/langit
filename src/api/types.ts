@@ -158,10 +158,16 @@ export interface BskyPost {
 	};
 }
 
+export interface BskyThreadNotFound {
+	$type: 'app.bsky.feed.defs#notFoundPost';
+	notFound: true;
+	uri: string;
+}
+
 export interface BskyThread {
 	$type: 'app.bsky.feed.defs#threadViewPost';
 	post: BskyPost;
-	parent?: BskyThread;
+	parent?: BskyThread | BskyThreadNotFound;
 	replies: BskyThread[];
 }
 
@@ -171,6 +177,7 @@ export interface BskyThreadResponse {
 
 export interface LinearizedThread {
 	post: BskyPost;
+	parentNotFound: boolean;
 	ancestors: BskyPost[];
 	descendants: BskyPost[];
 }

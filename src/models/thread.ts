@@ -17,9 +17,16 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 	let parent = thread.parent;
 	let node: BskyThread | undefined;
 
+	let parentNotFound = false;
+
 	stack.push(thread);
 
 	while (parent) {
+		if (parent.$type === 'app.bsky.feed.defs#notFoundPost') {
+			parentNotFound = true;
+			break;
+		}
+
 		ancestors.push(parent.post);
 		parent = parent.parent;
 	}
@@ -62,6 +69,7 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 
 	return {
 		post: thread.post,
+		parentNotFound,
 		ancestors,
 		descendants,
 	};

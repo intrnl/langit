@@ -4,6 +4,7 @@ import { useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { getPostThread, getPostThreadKey } from '~/api/query.ts';
+import { getPostId } from '~/api/utils.ts';
 
 import { A, useParams } from '~/router.ts';
 
@@ -15,6 +16,8 @@ import Post from '~/components/Post.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
 const seen = new Set<string>();
+
+const MAX_ANCESTORS = 10;
 
 const AuthenticatedPostPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
@@ -66,24 +69,50 @@ const AuthenticatedPostPage = () => {
 
 						return (
 							<>
-								<Show when={data.parentNotFound}>
-									<div class='p-3'>
-										<EmbedRecordNotFound />
-									</div>
-								</Show>
-
 								<Show when={data.ancestors} keyed>
 									{(slice) => {
-										const items = slice.items;
+										let overflowing = false;
+										let items = slice.items;
 
-										return items.map((item, idx) => (
-											<Post
-												uid={uid()}
-												post={item.value}
-												prev={idx !== 0}
-												next
-											/>
-										));
+										if (items.length > MAX_ANCESTORS) {
+											overflowing = true;
+											items = items.slice(-MAX_ANCESTORS);
+										}
+
+										return (
+											<>
+												{overflowing
+													? (
+														<A
+															href='/u/:uid/profile/:actor/post/:status'
+															params={{
+																uid: params.uid,
+																actor: items[0].value.author.did,
+																status: getPostId(items[0].value.uri),
+															}}
+															class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
+														>
+															Show parent posts
+														</A>
+													)
+													: data.parentNotFound
+													? (
+														<div class='p-3'>
+															<EmbedRecordNotFound />
+														</div>
+													)
+													: null}
+
+												{items.map((item, idx) => (
+													<Post
+														uid={uid()}
+														post={item.value}
+														prev={idx !== 0}
+														next
+													/>
+												))}
+											</>
+										);
 									}}
 								</Show>
 

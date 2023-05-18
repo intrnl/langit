@@ -1,17 +1,23 @@
-import { Match, Show, Switch } from 'solid-js';
+import { For, Match, Show, Switch, createEffect } from 'solid-js';
 
+import { useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { getPostThread, getPostThreadKey } from '~/api/query.ts';
 
 import { A, useParams } from '~/router.ts';
+import { ENTRY_KEY } from '~/utils/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
+import Post from '~/components/Post.tsx';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
+const seen = new Set<string>();
+
 const AuthenticatedPostPage = () => {
+	const location = useLocation();
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
 
 	const uid = () => params.uid;
@@ -25,6 +31,23 @@ const AuthenticatedPostPage = () => {
 		refetchOnWindowFocus: false,
 		retry: false,
 	});
+
+	const focusRef = (node: HTMLDivElement) => {
+		createEffect(() => {
+			const state = location.state as any;
+
+			if (!state) {
+				return;
+			}
+
+			const key = state[ENTRY_KEY];
+
+			if (threadQuery.data && !seen.has(key)) {
+				seen.add(key);
+				node.scrollIntoView();
+			}
+		});
+	};
 
 	return (
 		<div class='flex flex-col'>
@@ -48,7 +71,7 @@ const AuthenticatedPostPage = () => {
 
 						return (
 							<>
-								<div class='px-4 py-3'>
+								<div ref={focusRef} class='px-4 py-3'>
 									<div class='flex items-center gap-3 mb-1'>
 										<A
 											href='/u/:uid/profile/:actor'
@@ -92,6 +115,24 @@ const AuthenticatedPostPage = () => {
 										{(embed) => <Embed uid={uid()} embed={embed()} large />}
 									</Show>
 								</div>
+
+								<hr class='border-divider' />
+
+								<For each={data().descendants}>
+									{(slice) => {
+										const items = slice.items;
+										const len = items.length;
+
+										return items.map((item, idx) => (
+											<Post
+												uid={uid()}
+												post={item.value}
+												prev={idx !== 0}
+												next={idx !== len - 1}
+											/>
+										));
+									}}
+								</For>
 							</>
 						);
 					}}

@@ -13,6 +13,7 @@ import EmbedRecord from '~/components/EmbedRecord.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 
 export interface EmbedProps {
+	uid: string;
 	embed: NonNullable<BskyPost['embed']>;
 	/** Whether it should show a large UI for certain embeds */
 	large?: boolean;
@@ -82,7 +83,7 @@ const Embed = (props: EmbedProps) => {
 					<EmbedRecordNotFound />
 				</Match>
 				<Match when={val().record}>
-					{(record) => <EmbedRecord record={record()} large={props.large} />}
+					{(record) => <EmbedRecord uid={props.uid} record={record()} large={props.large} />}
 				</Match>
 			</Switch>
 		</div>

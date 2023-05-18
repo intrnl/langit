@@ -89,7 +89,7 @@ const AuthenticatedPostPage = () => {
 									</Show>
 
 									<Show when={post().embed}>
-										{(embed) => <Embed embed={embed()} large />}
+										{(embed) => <Embed uid={uid()} embed={embed()} large />}
 									</Show>
 								</div>
 							</>

@@ -4,6 +4,7 @@ import {
 	type BskyPost,
 	type BskyTimelinePost,
 } from '~/api/types.ts';
+import { getPostId } from '~/api/utils.ts';
 
 import { A } from '~/router.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
@@ -16,11 +17,6 @@ import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
-
-const getPostId = (uri: string) => {
-	const idx = uri.lastIndexOf('/');
-	return uri.slice(idx + 1);
-};
 
 interface PostProps {
 	uid: string;
@@ -139,7 +135,7 @@ const Post = (props: PostProps) => {
 					</Show>
 
 					<Show when={post().embed}>
-						{(embed) => <Embed embed={embed()} />}
+						{(embed) => <Embed uid={uid()} embed={embed()} />}
 					</Show>
 
 					<div class='flex mt-3 text-muted-fg'>

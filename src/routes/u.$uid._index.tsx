@@ -50,7 +50,7 @@ const AuthenticatedHome = () => {
 	});
 
 	const getLatestCid = () => {
-		return timelineQuery.data!.pages[0].cid;
+		return timelineQuery.data?.pages[0].cid;
 	};
 
 	return (
@@ -69,8 +69,8 @@ const AuthenticatedHome = () => {
 			</Show>
 
 			<Show
-				when={latestQuery.data &&
-					!latestQuery.isFetching &&
+				when={!latestQuery.isFetching &&
+					latestQuery.data &&
 					!timelineQuery.isRefetching &&
 					latestQuery.data !== getLatestCid()}
 			>

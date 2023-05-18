@@ -38,7 +38,10 @@ interface PostProps {
 }
 
 const Post = (props: PostProps) => {
+	const uid = () => props.uid;
 	const post = () => props.post;
+	const parent = () => props.parent;
+
 	const author = () => post().author;
 	const record = () => post().record;
 
@@ -50,16 +53,28 @@ const Post = (props: PostProps) => {
 						<div class='flex justify-end w-12 shrink-0'>
 							<RepeatIcon />
 						</div>
-						<span class='grow min-w-0 font-medium'>{props.reason!.by.displayName} Retweeted</span>
+						<A
+							href='/u/:uid/profile/:actor'
+							params={{ uid: uid(), actor: props.reason!.by.did }}
+							class='grow min-w-0 font-medium hover:underline'
+						>
+							{props.reason!.by.displayName} Retweeted
+						</A>
 					</div>
 				</Show>
 
-				<Show when={props.parent && !props.prev}>
+				<Show when={parent() && !props.prev}>
 					<div class='-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg'>
 						<div class='flex justify-end w-12 shrink-0'>
 							<ChatBubbleOutlinedIcon />
 						</div>
-						<span class='grow min-w-0 font-medium'>Replying to {props.parent!.author.displayName}</span>
+						<A
+							href='/u/:uid/profile/:actor/post/:status'
+							params={{ uid: uid(), actor: parent()!.author.did, status: getPostId(parent()!.uri) }}
+							class='grow min-w-0 font-medium hover:underline'
+						>
+							Replying to {parent()!.author.displayName}
+						</A>
 					</div>
 				</Show>
 			</div>
@@ -68,7 +83,7 @@ const Post = (props: PostProps) => {
 				<div class='flex flex-col items-center shrink-0'>
 					<A
 						href='/u/:uid/profile/:actor'
-						params={{ uid: props.uid, actor: author().did }}
+						params={{ uid: uid(), actor: author().did }}
 						class='h-12 w-12 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
 					>
 						<Show when={author().avatar}>
@@ -87,7 +102,7 @@ const Post = (props: PostProps) => {
 							<div>
 								<A
 									href='/u/:uid/profile/:actor'
-									params={{ uid: props.uid, actor: author().did }}
+									params={{ uid: uid(), actor: author().did }}
 									class='group flex gap-1'
 								>
 									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline'>
@@ -104,7 +119,7 @@ const Post = (props: PostProps) => {
 								<A
 									href='/u/:uid/profile/:actor/post/:status'
 									params={{
-										uid: props.uid,
+										uid: uid(),
 										actor: author().did,
 										status: getPostId(post().uri),
 									}}

@@ -46,7 +46,6 @@ export const createTimelineQuery = (limit: number) => {
 				const parent = first.reply.parent.peek();
 
 				if (parent.author.did !== selfdid && !parent.author.viewer.following) {
-					console.log(`dropped slice`, slice);
 					return false;
 				}
 			}

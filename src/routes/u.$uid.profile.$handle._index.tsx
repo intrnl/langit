@@ -42,7 +42,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 			if (length > 0) {
 				const last = pages[length - 1];
 
-				if (last.slices.length === 0) {
+				if (last.cid && last.slices.length === 0) {
 					timelineQuery.fetchNextPage();
 				}
 			}

@@ -34,11 +34,10 @@ const AuthenticatedHome = () => {
 			}
 
 			// check if the last page is empty because of its slices being filtered
-			// away, if so, fetch next page
 			if (length > 0) {
 				const last = pages[length - 1];
 
-				if (last.slices.length === 0) {
+				if (last.cid && last.slices.length === 0) {
 					timelineQuery.fetchNextPage();
 				}
 			}

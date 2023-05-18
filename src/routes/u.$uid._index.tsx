@@ -27,6 +27,9 @@ const AuthenticatedHome = () => {
 		onSuccess: (data) => {
 			const pages = data.pages;
 
+			// if the page size is 1, that means we've just went through an initial
+			// fetch, or a refetch, since our refetch process involves truncating the
+			// timeline first.
 			if (pages.length === 1) {
 				client.setQueryData(getTimelineLatestKey(params.uid, DEFAULT_ALGORITHM), pages[0].cid);
 			}
@@ -73,7 +76,15 @@ const AuthenticatedHome = () => {
 			>
 				<button
 					onClick={() => {
-						// we need to empty the query data first
+						// we want to truncate the timeline here so that the refetch doesn't
+						// also refetching however many pages of timeline that the user has
+						// gone through.
+
+						// this is the only way we can do that in tanstack query
+
+						// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
+						// but unfortunately that breaks the `hasNextPage` check down below
+						// and would also mean the user gets to see nothing for a bit.
 						client.setQueryData(
 							getTimelineKey(params.uid, DEFAULT_ALGORITHM),
 							(prev?: InfiniteData<TimelinePage>) => {

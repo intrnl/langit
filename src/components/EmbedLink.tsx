@@ -15,7 +15,7 @@ const EmbedLink = (props: EmbedLinkProps) => {
 	const link = () => props.link;
 
 	return (
-		<div class='rounded-md border border-divider overflow-hidden'>
+		<div class='rounded-md border border-divider overflow-hidden hover:bg-secondary'>
 			<Show when={link().thumb}>
 				{(thumb) => <img src={thumb()} class='w-full max-h-141 bg-muted-fg border-b border-divider' />}
 			</Show>

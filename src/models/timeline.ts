@@ -84,15 +84,31 @@ export const createTimelinePage = (data: BskyTimeline, selfdid?: string, tempora
 		seen.add(item.post.peek().cid);
 
 		// find a slice that matches
+
+		// if we find a matching slice and it's currently not in front, then bump
+		// it to the front. this is so that new reply don't get buried away because
+		// there's multiple posts separating it and the parent post.
 		for (let j = 0; j < jlen; j++) {
 			const slice = slices[j];
 
 			if (isNextInThread(slice, item)) {
 				slice.items.push(item);
+
+				if (j !== 0) {
+					slices.splice(j, 1);
+					slices.unshift(slice);
+				}
+
 				continue loop;
 			}
 			else if (isFirstInThread(slice, item)) {
 				slice.items.unshift(item);
+
+				if (j !== 0) {
+					slices.splice(j, 1);
+					slices.unshift(slice);
+				}
+
 				continue loop;
 			}
 		}

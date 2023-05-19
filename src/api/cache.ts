@@ -12,6 +12,7 @@ import {
 	type BskyPost,
 	type BskyProfile,
 	type BskyProfileBasic,
+	type BskyProfileFollow,
 	type BskyTimelinePost,
 	type LinearizedThread,
 } from './types.ts';
@@ -22,102 +23,6 @@ type Ref<T extends object> = WeakRef<T>;
 
 export const posts: Record<string, Ref<SignalizedPost>> = {};
 export const profiles: Record<string, Ref<SignalizedProfile>> = {};
-export const profilesBasic: Record<string, Ref<SignalizedProfileBasic>> = {};
-
-const update = <T>(ref: Signal<T>, value: T): Signal<T> => {
-	ref.value = value;
-	return ref;
-};
-
-/** @see BskyProfileBasic */
-export interface SignalizedProfileBasic {
-	_key?: number;
-	did: BskyProfileBasic['did'];
-	handle: Signal<BskyProfileBasic['handle']>;
-	displayName: Signal<BskyProfileBasic['displayName']>;
-	avatar: Signal<BskyProfileBasic['avatar']>;
-	labels: Signal<BskyProfileBasic['labels']>;
-	viewer: {
-		muted: Signal<BskyProfileBasic['viewer']['muted']>;
-		blockedBy: Signal<BskyProfileBasic['viewer']['blockedBy']>;
-		following: Signal<BskyProfileBasic['viewer']['following']>;
-	};
-}
-
-// create SignalizedProfileBasic by sharing the same signals as SignalizedProfile
-const createSignalizedProfileBasicFromProfile = (
-	basic: BskyProfileBasic,
-	key?: number,
-): SignalizedProfileBasic | undefined => {
-	const did = basic.did;
-
-	const ref = profiles[did];
-	const full = ref && ref.deref();
-
-	if (full) {
-		return {
-			_key: key,
-			did: did,
-			handle: update(full.handle, basic.handle),
-			displayName: update(full.displayName, basic.displayName),
-			avatar: update(full.avatar, basic.avatar),
-			labels: update(full.labels, basic.labels),
-			viewer: {
-				muted: update(full.viewer.muted, basic.viewer.muted),
-				blockedBy: update(full.viewer.blockedBy, basic.viewer.blockedBy),
-				following: update(full.viewer.following, basic.viewer.following),
-			},
-		};
-	}
-};
-
-const createSignalizedProfileBasic = (profile: BskyProfileBasic, key?: number): SignalizedProfileBasic => {
-	const conversion = createSignalizedProfileBasicFromProfile(profile, key);
-
-	if (conversion) {
-		return conversion;
-	}
-
-	return {
-		_key: key,
-		did: profile.did,
-		handle: signal(profile.handle),
-		displayName: signal(profile.displayName),
-		avatar: signal(profile.avatar),
-		labels: signal(profile.labels),
-		viewer: {
-			muted: signal(profile.viewer.muted),
-			blockedBy: signal(profile.viewer.blockedBy),
-			following: signal(profile.viewer.following),
-		},
-	};
-};
-
-export const mergeSignalizedProfileBasic = (profile: BskyProfileBasic, key?: number) => {
-	let did = profile.did;
-
-	let ref: Ref<SignalizedProfileBasic> | undefined = profilesBasic[did];
-	let val: SignalizedProfileBasic;
-
-	if (!ref || !(val = ref.deref()!)) {
-		val = createSignalizedProfileBasic(profile, key);
-		profilesBasic[did] = new WeakRef(val);
-	}
-	else if (!key || val._key !== key) {
-		val._key = key;
-
-		val.handle.value = profile.handle;
-		val.displayName.value = profile.displayName;
-		val.avatar.value = profile.avatar;
-		val.labels.value = profile.labels;
-
-		val.viewer.muted.value = profile.viewer.muted;
-		val.viewer.blockedBy.value = profile.viewer.blockedBy;
-		val.viewer.following.value = profile.viewer.following;
-	}
-
-	return val;
-};
 
 /** @see BskyProfile */
 export interface SignalizedProfile {
@@ -140,55 +45,25 @@ export interface SignalizedProfile {
 	};
 }
 
-// create SignalizedProfile by sharing the same signals as SignalizedProfileBasic
-const createSignalizedProfileFromProfileBasic = (full: BskyProfile, key?: number): SignalizedProfile | undefined => {
-	const did = full.did;
-
-	const ref = profilesBasic[did];
-	const basic = ref && ref.deref();
-
-	if (basic) {
-		return {
-			_key: key,
-			did: did,
-			handle: update(basic.handle, full.handle),
-			displayName: update(basic.displayName, full.displayName),
-			description: signal(full.description),
-			avatar: update(basic.avatar, full.avatar),
-			banner: signal(full.banner),
-			followersCount: signal(full.followersCount),
-			followsCount: signal(full.followsCount),
-			postsCount: signal(full.postsCount),
-			indexedAt: signal(full.indexedAt),
-			labels: update(basic.labels, full.labels),
-			viewer: {
-				muted: update(basic.viewer.muted, full.viewer.muted),
-				blockedBy: update(basic.viewer.blockedBy, full.viewer.blockedBy),
-				following: update(basic.viewer.following, full.viewer.following),
-			},
-		};
-	}
-};
-
-const createSignalizedProfile = (profile: BskyProfile, key?: number): SignalizedProfile => {
-	const conversion = createSignalizedProfileFromProfileBasic(profile, key);
-
-	if (conversion) {
-		return conversion;
-	}
+const createSignalizedProfile = (
+	profile: BskyProfile | BskyProfileBasic | BskyProfileFollow,
+	key?: number,
+): SignalizedProfile => {
+	const isProfileFollow = 'description' in profile;
+	const isProfile = 'banner' in profile;
 
 	return {
 		_key: key,
 		did: profile.did,
 		handle: signal(profile.handle),
 		displayName: signal(profile.displayName),
-		description: signal(profile.description),
+		description: signal(isProfileFollow ? profile.description : ''),
 		avatar: signal(profile.avatar),
-		banner: signal(profile.banner),
-		followersCount: signal(profile.followersCount),
-		followsCount: signal(profile.followsCount),
-		postsCount: signal(profile.postsCount),
-		indexedAt: signal(profile.indexedAt),
+		banner: signal(isProfile ? profile.banner : ''),
+		followersCount: signal(isProfile ? profile.followersCount : 0),
+		followsCount: signal(isProfile ? profile.followsCount : 0),
+		postsCount: signal(isProfile ? profile.postsCount : 0),
+		indexedAt: signal(isProfileFollow ? profile.indexedAt : ''),
 		labels: signal(profile.labels),
 		viewer: {
 			muted: signal(profile.viewer.muted),
@@ -198,7 +73,7 @@ const createSignalizedProfile = (profile: BskyProfile, key?: number): Signalized
 	};
 };
 
-export const mergeSignalizedProfile = (profile: BskyProfile, key?: number) => {
+export const mergeSignalizedProfile = (profile: BskyProfile | BskyProfileBasic | BskyProfileFollow, key?: number) => {
 	let did = profile.did;
 
 	let ref: Ref<SignalizedProfile> | undefined = profiles[did];
@@ -213,18 +88,24 @@ export const mergeSignalizedProfile = (profile: BskyProfile, key?: number) => {
 
 		val.handle.value = profile.handle;
 		val.displayName.value = profile.displayName;
-		val.description.value = profile.description;
 		val.avatar.value = profile.avatar;
-		val.banner.value = profile.banner;
-		val.followersCount.value = profile.followersCount;
-		val.followsCount.value = profile.followsCount;
-		val.postsCount.value = profile.postsCount;
-		val.indexedAt.value = profile.indexedAt;
 		val.labels.value = profile.labels;
 
 		val.viewer.muted.value = profile.viewer.muted;
 		val.viewer.blockedBy.value = profile.viewer.blockedBy;
 		val.viewer.following.value = profile.viewer.following;
+
+		if ('description' in profile) {
+			val.description.value = profile.description;
+			val.indexedAt.value = profile.indexedAt;
+		}
+
+		if ('banner' in profile) {
+			val.banner.value = profile.banner;
+			val.followersCount.value = profile.followersCount;
+			val.followsCount.value = profile.followsCount;
+			val.postsCount.value = profile.postsCount;
+		}
 	}
 
 	return val;
@@ -235,7 +116,7 @@ export interface SignalizedPost {
 	_key?: number;
 	uri: BskyPost['uri'];
 	cid: BskyPost['cid'];
-	author: SignalizedProfileBasic;
+	author: SignalizedProfile;
 	record: Signal<BskyPost['record']>;
 	embed: Signal<BskyPost['embed']>;
 	replyCount: Signal<BskyPost['replyCount']>;
@@ -256,7 +137,7 @@ const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
 		_key: key,
 		uri: post.uri,
 		cid: post.cid,
-		author: mergeSignalizedProfileBasic(post.author, key),
+		author: mergeSignalizedProfile(post.author, key),
 		record: signal(post.record, { equals: dequal }),
 		embed: signal(post.embed),
 		replyCount: signal(post.replyCount),
@@ -285,7 +166,7 @@ export const mergeSignalizedPost = (post: BskyPost, key?: number) => {
 	else if (!key || val._key !== key) {
 		val._key = key;
 
-		val.author = mergeSignalizedProfileBasic(post.author, key);
+		val.author = mergeSignalizedProfile(post.author, key);
 
 		val.record.value = post.record;
 		val.embed.value = post.embed;

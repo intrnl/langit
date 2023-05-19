@@ -57,7 +57,7 @@ export const mergeSignalizedProfileBasic = (profile: BskyProfileBasic, key?: num
 
 	if (!ref || !(val = ref.deref()!)) {
 		val = createSignalizedProfileBasic(profile, key);
-		profilesBasic[did] = ref;
+		profilesBasic[did] = new WeakRef(val);
 	}
 	else if (!key || val._key !== key) {
 		val._key = key;

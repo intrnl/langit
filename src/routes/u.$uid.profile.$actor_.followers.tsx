@@ -1,32 +1,28 @@
-import { Show, createMemo } from 'solid-js';
+import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import { createInfiniteQuery } from '@tanstack/solid-query';
 
-import {
-	createFollowersQuery,
-	createInfinitePlaceholder,
-	createInitialFollowers,
-	getFollowersKey,
-} from '~/api/query.ts';
-import { type BskyFollowersResponse } from '~/api/types.ts';
+import { createFollowersQuery, getFollowersKey } from '~/api/query.ts';
 
-import { useParams } from '~/router.ts';
+import { A, useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
+import button from '~/styles/primitives/button';
 
 const PAGE_LIMIT = 30;
 
 const AuthenticatedProfileFollowersPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/followers');
 
+	const uid = () => params.uid;
+
 	const followersQuery = createInfiniteQuery({
-		queryKey: () => getFollowersKey(params.uid, params.actor),
+		queryKey: () => getFollowersKey(uid(), params.actor),
 		queryFn: createFollowersQuery(PAGE_LIMIT),
-		getNextPageParam: (last: BskyFollowersResponse) => last.cursor,
+		getNextPageParam: (last) => last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
-		placeholderData: () => createInfinitePlaceholder(createInitialFollowers(params.actor)),
 	});
 
 	const subject = createMemo(() => {
@@ -40,16 +36,71 @@ const AuthenticatedProfileFollowersPage = () => {
 					<p class='text-base leading-5 font-bold'>Followers</p>
 
 					<Show when={subject()}>
-						{(subject) => <p class='text-xs text-muted-fg'>@{subject().handle}</p>}
+						{(subject) => <p class='text-xs text-muted-fg'>@{subject().handle.value}</p>}
 					</Show>
 				</div>
 			</div>
 
-			<Show when={followersQuery.isLoading}>
-				<div class='h-13 flex items-center justify-center border-divider'>
-					<CircularProgress />
-				</div>
-			</Show>
+			<For each={followersQuery.data ? followersQuery.data.pages : []}>
+				{(page) => {
+					return page.profiles.map((profile) => {
+						const isFollowing = () => profile.viewer.following.value;
+
+						return (
+							<div role='button' tabindex={0} class='px-4 py-3 flex gap-3 hover:bg-hinted'>
+								<div class='h-12 w-12 shrink-0 rounded-full bg-hinted-fg overflow-hidden'>
+									<Show when={profile.avatar.value}>
+										{(avatar) => <img src={avatar()} class='h-full w-full' />}
+									</Show>
+								</div>
+
+								<div class='grow flex flex-col gap-1 min-w-0'>
+									<div class='flex justify-between gap-3'>
+										<div class='flex flex-col text-sm'>
+											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1'>
+												{profile.displayName.value}
+											</span>
+											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
+												@{profile.handle.value}
+											</span>
+										</div>
+
+										<div>
+											<button class={button({ color: isFollowing() ? 'outline' : 'primary' })}>
+												{isFollowing() ? 'Following' : 'Follow'}
+											</button>
+										</div>
+									</div>
+
+									<Show when={profile.description.value}>
+										<div class='text-sm break-words line-clamp-3'>
+											{profile.$renderedDescription(uid())}
+										</div>
+									</Show>
+								</div>
+							</div>
+						);
+					});
+				}}
+			</For>
+
+			<Switch>
+				<Match when={followersQuery.isFetching}>
+					<div class='h-13 flex items-center justify-center border-divider'>
+						<CircularProgress />
+					</div>
+				</Match>
+
+				<Match when={followersQuery.hasNextPage}>
+					<button
+						onClick={() => followersQuery.fetchNextPage()}
+						disabled={followersQuery.isRefetching}
+						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
+					>
+						Show more
+					</button>
+				</Match>
+			</Switch>
 		</div>
 	);
 };

@@ -42,8 +42,8 @@ export interface BskyProfileBasic {
 
 export interface BskyProfileFollow {
 	did: string;
-	displayName: string;
 	handle: string;
+	displayName: string;
 	description: string;
 	avatar?: string;
 	labels: BskyLabel[];

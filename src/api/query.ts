@@ -1,4 +1,4 @@
-import { type InfiniteData, type QueryFunctionContext } from '@tanstack/solid-query';
+import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { type Agent } from './agent.ts';
 import { multiagent } from './global.ts';
@@ -15,6 +15,7 @@ import {
 	type BskyTimelineResponse,
 } from './types.ts';
 
+import { createProfilesPage } from '~/models/profiles.ts';
 import { createThreadPage } from '~/models/thread.ts';
 import { createTimelinePage } from '~/models/timeline.ts';
 
@@ -35,17 +36,6 @@ const _getDid = async (agent: Agent, actor: string, signal?: AbortSignal) => {
 	}
 
 	return did;
-};
-
-export const createInfinitePlaceholder = <T>(data?: T): InfiniteData<T> | undefined => {
-	if (!data) {
-		return;
-	}
-
-	return {
-		pageParams: [undefined],
-		pages: [data],
-	};
 };
 
 export const getProfileKey = (uid: UID, actor: string) => ['getProfile', uid, actor] as const;
@@ -209,32 +199,12 @@ export const createFollowersQuery = (limit: number) => {
 		});
 
 		const data = response.data as BskyFollowersResponse;
+		const profiles = createProfilesPage(data.followers);
 
-		return data;
-	};
-};
-export const createInitialFollowers = (actor: string): BskyFollowersResponse | undefined => {
-	const profile = cache.profilesBasic[actor]?.deref();
-
-	if (!profile) {
-		return;
-	}
-
-	return {
-		cursor: undefined,
-		subject: {
-			did: profile.did,
-			displayName: profile.displayName.peek(),
-			handle: profile.handle.peek(),
-			labels: profile.labels.peek(),
-			description: '',
-			indexedAt: '',
-			viewer: {
-				blockedBy: profile.viewer.blockedBy.peek(),
-				muted: profile.viewer.muted.peek(),
-				following: profile.viewer.following.peek(),
-			},
-		},
-		followers: [],
+		return {
+			cursor: data.cursor,
+			subject: cache.mergeSignalizedProfile(data.subject),
+			profiles: profiles,
+		};
 	};
 };

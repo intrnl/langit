@@ -73,9 +73,9 @@ const AuthenticatedPostPage = () => {
 
 				<Match when={threadQuery.data} keyed>
 					{(data) => {
-						const post = data.post.value;
+						const post = data.post;
 
-						const record = post.record;
+						const record = () => post.record.value;
 						const author = post.author;
 
 						return (
@@ -98,8 +98,8 @@ const AuthenticatedPostPage = () => {
 															href='/u/:uid/profile/:actor/post/:status'
 															params={{
 																uid: uid(),
-																actor: items[0].value.author.did,
-																status: getPostId(items[0].value.uri),
+																actor: items[0].author.did,
+																status: getPostId(items[0].uri),
 															}}
 															class='h-10 flex items-center gap-3 px-4 hover:bg-hinted'
 														>
@@ -120,7 +120,7 @@ const AuthenticatedPostPage = () => {
 												{items.map((item, idx) => (
 													<Post
 														uid={uid()}
-														post={item.value}
+														post={item}
 														prev={idx !== 0}
 														next
 													/>
@@ -137,7 +137,7 @@ const AuthenticatedPostPage = () => {
 											params={{ uid: uid(), actor: author.did }}
 											class='h-12 w-12 shrink-0 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
 										>
-											<Show when={author.avatar}>
+											<Show when={author.avatar.value}>
 												{(avatar) => <img src={avatar()} class='h-full w-full' />}
 											</Show>
 										</A>
@@ -148,10 +148,10 @@ const AuthenticatedPostPage = () => {
 											class='flex flex-col text-sm'
 										>
 											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 hover:underline'>
-												{author.displayName}
+												{author.displayName.value}
 											</span>
 											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
-												@{author.handle}
+												@{author.handle.value}
 											</span>
 										</A>
 
@@ -162,7 +162,7 @@ const AuthenticatedPostPage = () => {
 										</div>
 									</div>
 
-									<Show when={record.text}>
+									<Show when={record().text}>
 										{(text) => (
 											<div class='text-base whitespace-pre-wrap break-words mt-3'>
 												{text()}
@@ -170,13 +170,13 @@ const AuthenticatedPostPage = () => {
 										)}
 									</Show>
 
-									<Show when={post.embed}>
+									<Show when={post.embed.value}>
 										{(embed) => <Embed uid={uid()} embed={embed()} large />}
 									</Show>
 
 									<div class='my-3'>
 										<span class='text-muted-fg text-sm'>
-											{formatter.format(new Date(post.record.createdAt))}
+											{formatter.format(new Date(record().createdAt))}
 										</span>
 									</div>
 
@@ -184,11 +184,11 @@ const AuthenticatedPostPage = () => {
 
 									<div class='flex flex-wrap gap-4 py-4 text-sm'>
 										<div>
-											<span class='font-bold'>{comformat.format(post.repostCount)}</span>{' '}
+											<span class='font-bold'>{comformat.format(post.repostCount.value)}</span>{' '}
 											<span class='text-muted-fg'>Reposts</span>
 										</div>
 										<div>
-											<span class='font-bold'>{comformat.format(post.likeCount)}</span>{' '}
+											<span class='font-bold'>{comformat.format(post.likeCount.value)}</span>{' '}
 											<span class='text-muted-fg'>Likes</span>
 										</div>
 									</div>
@@ -234,7 +234,7 @@ const AuthenticatedPostPage = () => {
 												{items.map((item, idx) => (
 													<Post
 														uid={uid()}
-														post={item.value}
+														post={item}
 														prev={idx !== 0}
 														next={overflowing || idx !== len - 1}
 													/>
@@ -245,8 +245,8 @@ const AuthenticatedPostPage = () => {
 														href='/u/:uid/profile/:actor/post/:status'
 														params={{
 															uid: uid(),
-															actor: items[len - 1].value.author.did,
-															status: getPostId(items[len - 1].value.uri),
+															actor: items[len - 1].author.did,
+															status: getPostId(items[len - 1].uri),
 														}}
 														class='h-10 flex items-center gap-3 px-4 border-b border-divider hover:bg-hinted'
 													>

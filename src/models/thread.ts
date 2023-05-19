@@ -1,7 +1,6 @@
-import { signalizeLinearThread } from '~/api/cache.ts';
+import { type SignalizedPost, createSignalizedLinearThread } from '~/api/cache.ts';
 import { type BskyPost, type BskyThread, type LinearizedThread } from '~/api/types.ts';
 
-import { type Signal } from '~/utils/signals.ts';
 import { Stack } from '~/utils/stack.ts';
 
 const calculatePostScore = (post: BskyPost) => {
@@ -80,35 +79,35 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 };
 
 export interface ThreadSlice {
-	items: Signal<BskyPost>[];
+	items: SignalizedPost[];
 }
 
-const isChildOf = (cid: string, child: BskyPost) => {
-	const reply = child.record.reply;
+const isChildOf = (cid: string, child: SignalizedPost) => {
+	const reply = child.record.peek().reply;
 
 	return !!reply && (reply.parent.cid === cid);
 };
 
-const isNextInThread = (slice: ThreadSlice, child: BskyPost) => {
-	const reply = child.record.reply;
+const isNextInThread = (slice: ThreadSlice, child: SignalizedPost) => {
+	const reply = child.record.peek().reply;
 
 	const items = slice.items;
 	const last = items[items.length - 1];
 
-	return !!reply && (last.peek().cid === reply.parent.cid);
+	return !!reply && (last.cid == reply.parent.cid);
 };
 
 export interface ThreadPage {
-	post: Signal<BskyPost>;
+	post: SignalizedPost;
 	parentNotFound: boolean;
 	ancestors?: ThreadSlice;
 	descendants: ThreadSlice[];
 }
 
 export const createThreadPage = (data: BskyThread): ThreadPage => {
-	const thread = signalizeLinearThread(linearizeThread(data));
+	const thread = createSignalizedLinearThread(linearizeThread(data));
 
-	const cid = thread.post.peek().cid;
+	const cid = thread.post.cid;
 	const ancestors = thread.ancestors;
 	const descendants = thread.descendants;
 
@@ -117,9 +116,8 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 
 	for (let idx = 0, len = descendants.length; idx < len; idx++) {
 		const post = descendants[idx];
-		const peek = post.peek();
 
-		if (isChildOf(cid, peek)) {
+		if (isChildOf(cid, post)) {
 			slices.push({ items: [post] });
 			jlen++;
 
@@ -129,7 +127,7 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 		if (jlen > 0) {
 			const slice = slices[jlen - 1];
 
-			if (isNextInThread(slice, peek)) {
+			if (isNextInThread(slice, post)) {
 				slice.items.push(post);
 				continue;
 			}

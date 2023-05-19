@@ -1,5 +1,5 @@
-import { signalizePost } from '~/api/cache.ts';
-import { type BskyTimelineResponse, type SignalizedTimelinePost } from '~/api/types.ts';
+import { type SignalizedTimelinePost, createSignalizedTimelinePost } from '~/api/cache.ts';
+import { type BskyTimelineResponse } from '~/api/types.ts';
 
 export interface TimelineSlice {
 	items: SignalizedTimelinePost[];
@@ -9,14 +9,18 @@ const isNextInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
 	const items = slice.items;
 	const last = items[items.length - 1];
 
-	return !!item.reply && (last.post.peek().cid === item.reply.parent.peek().cid);
+	const reply = item.reply;
+
+	return !!reply && (last.post.cid == reply.parent.cid);
 };
 
 const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
 	const items = slice.items;
 	const first = items[0];
 
-	return !!first.reply && (first.reply.parent.peek().cid === item.post.peek().cid);
+	const reply = first.reply;
+
+	return !!reply && (reply.parent.cid === item.post.cid);
 };
 
 export interface TimelinePage {
@@ -37,18 +41,7 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 
 	for (let idx = 0; idx < len; idx++) {
 		const item = orig[idx];
-
-		const post = item.post;
-		const reply = item.reply;
-
-		feed[idx] = {
-			post: signalizePost(post, key),
-			reply: reply && {
-				root: signalizePost(reply.root, key),
-				parent: signalizePost(reply.parent, key),
-			},
-			reason: item.reason,
-		};
+		feed[idx] = createSignalizedTimelinePost(item, key);
 	}
 
 	const seen = new Set<string>();
@@ -59,13 +52,14 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 	loop:
 	for (let i = feed.length - 1; i >= 0; i--) {
 		const item = feed[i];
+		const cid = item.post.cid;
 
 		// skip any posts that have been seen already
-		if (seen.has(item.post.peek().cid)) {
+		if (seen.has(cid)) {
 			continue;
 		}
 
-		seen.add(item.post.peek().cid);
+		seen.add(cid);
 
 		// find a slice that matches
 

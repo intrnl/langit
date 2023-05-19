@@ -1,7 +1,5 @@
 import { type DID } from './utils';
 
-import { type Signal } from '~/utils/signals';
-
 export interface BskyLabel {
 	cts: string;
 	neg: false;
@@ -189,13 +187,6 @@ export interface LinearizedThread {
 	descendants: BskyPost[];
 }
 
-export interface SignalizedLinearThread {
-	post: Signal<BskyPost>;
-	parentNotFound: boolean;
-	ancestors: Signal<BskyPost>[];
-	descendants: Signal<BskyPost>[];
-}
-
 export interface BskyTimelinePost {
 	post: BskyPost;
 	reply?: {
@@ -203,14 +194,6 @@ export interface BskyTimelinePost {
 		parent: BskyPost;
 	};
 	reason?: { $type: 'app.bsky.feed.defs#reasonRepost'; by: BskyProfileBasic; indexedAt: string };
-}
-
-export interface SignalizedTimelinePost extends Omit<BskyTimelinePost, 'post' | 'reply'> {
-	post: Signal<BskyPost>;
-	reply?: {
-		root: Signal<BskyPost>;
-		parent: Signal<BskyPost>;
-	};
 }
 
 export interface BskyTimelineResponse {

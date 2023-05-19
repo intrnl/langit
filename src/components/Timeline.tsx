@@ -56,8 +56,8 @@ const Timeline = (props: TimelineProps) => {
 							return items.map((item, idx) => (
 								<Post
 									uid={props.uid}
-									post={item.post.value}
-									parent={item.reply?.parent.value}
+									post={item.post}
+									parent={item.reply?.parent}
 									reason={item.reason}
 									prev={idx !== 0}
 									next={idx !== len - 1}

@@ -1,100 +1,204 @@
-// we keep a global cache outside of tanstack-query because these records can be
-// returned in multiple places, e.g. you open a post and then one of its replies
+// we keep a normalized cache outside of tanstack-query because these resources
+// can be mutated or refreshed by many endpoints
 
-// in that one example, we can feed some initial data to tanstack-query so you
-// can at least see the reply and its parents while the app tries to get the
-// replies for that one
-
-// this is a form of normalized caching
-
-import { type Signal, signal } from '~/utils/signals.ts';
+// for example:
+// from timeline, opening a thread and liking it should reflect back into the
+// timeline, without needing the timeline itself to actually refresh.
 
 import {
 	type BskyPost,
 	type BskyProfileBasic,
+	type BskyTimelinePost,
 	type LinearizedThread,
-	type SignalizedLinearThread,
 } from './types.ts';
 
-type Kignal<T> = Signal<T> & { _key?: number };
+import { type Signal, signal } from '~/utils/signals.ts';
 
-export const profilesBasic: Record<string, WeakRef<Kignal<BskyProfileBasic>>> = {};
-export const posts: Record<string, WeakRef<Kignal<BskyPost>>> = {};
+type Ref<T extends object> = WeakRef<T>;
 
-export const signalizeProfileBasic = (profile: BskyProfileBasic, key?: number) => {
+/** @see BskyProfileBasic */
+export interface SignalizedProfileBasic {
+	_key?: number;
+	did: BskyProfileBasic['did'];
+	handle: Signal<BskyProfileBasic['handle']>;
+	displayName: Signal<BskyProfileBasic['displayName']>;
+	avatar: Signal<BskyProfileBasic['avatar']>;
+	labels: Signal<BskyProfileBasic['labels']>;
+	viewer: {
+		muted: Signal<BskyProfileBasic['viewer']['muted']>;
+		blockedBy: Signal<BskyProfileBasic['viewer']['blockedBy']>;
+		following: Signal<BskyProfileBasic['viewer']['following']>;
+	};
+}
+
+export const profilesBasic: Record<string, Ref<SignalizedProfileBasic>> = {};
+
+const createSignalizedProfileBasic = (profile: BskyProfileBasic, key?: number): SignalizedProfileBasic => {
+	return {
+		_key: key,
+		did: profile.did,
+		handle: signal(profile.handle),
+		displayName: signal(profile.displayName),
+		avatar: signal(profile.avatar),
+		labels: signal(profile.labels),
+		viewer: {
+			muted: signal(profile.viewer.muted),
+			blockedBy: signal(profile.viewer.blockedBy),
+			following: signal(profile.viewer.following),
+		},
+	};
+};
+
+export const mergeSignalizedProfileBasic = (profile: BskyProfileBasic, key?: number) => {
 	let did = profile.did;
 
-	let ref: WeakRef<Kignal<BskyProfileBasic>> | undefined = profilesBasic[profile.did];
-	let signalized: Kignal<BskyProfileBasic>;
+	let ref: Ref<SignalizedProfileBasic> | undefined = profilesBasic[did];
+	let val: SignalizedProfileBasic;
 
-	if (!ref || !(signalized = ref.deref()!)) {
-		signalized = signal(profile);
-		profilesBasic[did] = new WeakRef(signalized);
+	if (!ref || !(val = ref.deref()!)) {
+		val = createSignalizedProfileBasic(profile, key);
+		profilesBasic[did] = ref;
 	}
-	else if (signalized) {
-		if (!key || signalized._key !== key) {
-			signalized.value = profile;
-		}
+	else if (!key || val._key !== key) {
+		val._key = key;
+
+		val.handle.value = profile.handle;
+		val.displayName.value = profile.displayName;
+		val.avatar.value = profile.avatar;
+		val.labels.value = profile.labels;
+
+		val.viewer.muted.value = profile.viewer.muted;
+		val.viewer.blockedBy.value = profile.viewer.blockedBy;
+		val.viewer.following.value = profile.viewer.following;
 	}
 
-	return signalized;
+	return val;
 };
 
-const patchPost = (post: BskyPost, key?: number) => {
-	let profile = signalizeProfileBasic(post.author, key);
+/** @see BskyPost */
+export interface SignalizedPost {
+	_key?: number;
+	uri: BskyPost['uri'];
+	cid: BskyPost['cid'];
+	author: SignalizedProfileBasic;
+	record: Signal<BskyPost['record']>;
+	embed: Signal<BskyPost['embed']>;
+	replyCount: Signal<BskyPost['replyCount']>;
+	repostCount: Signal<BskyPost['repostCount']>;
+	likeCount: Signal<BskyPost['likeCount']>;
+	indexedAt: Signal<BskyPost['indexedAt']>;
+	labels: Signal<BskyPost['labels']>;
+	viewer: {
+		like: Signal<BskyPost['viewer']['like']>;
+		repost: Signal<BskyPost['viewer']['repost']>;
+	};
+}
 
-	Object.defineProperty(post, 'author', {
-		get () {
-			return profile.value;
+export const posts: Record<string, Ref<SignalizedPost>> = {};
+
+const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
+	return {
+		_key: key,
+		uri: post.uri,
+		cid: post.cid,
+		author: mergeSignalizedProfileBasic(post.author, key),
+		record: signal(post.record),
+		embed: signal(post.embed),
+		replyCount: signal(post.replyCount),
+		repostCount: signal(post.repostCount),
+		likeCount: signal(post.likeCount),
+		indexedAt: signal(post.indexedAt),
+		labels: signal(post.labels),
+		viewer: {
+			like: signal(post.viewer.like),
+			repost: signal(post.viewer.repost),
 		},
-	});
+	};
 };
 
-export const signalizePost = (post: BskyPost, key?: number) => {
+export const mergeSignalizedPost = (post: BskyPost, key?: number) => {
 	let cid = post.cid;
 
-	let ref: WeakRef<Kignal<BskyPost>> | undefined = posts[cid];
-	let signalized: Kignal<BskyPost>;
+	let ref: Ref<SignalizedPost> | undefined = posts[cid];
+	let val: SignalizedPost;
 
-	if (!ref || !(signalized = ref.deref()!)) {
-		patchPost(post, key);
-
-		signalized = signal(post);
-		posts[cid] = new WeakRef(signalized);
+	if (!ref || !(val = ref.deref()!)) {
+		val = createSignalizedPost(post, key);
+		posts[cid] = new WeakRef(val);
 	}
-	else if (signalized) {
-		// Prevent further updates if if the post currently contains that key
-		if (!key || signalized._key !== key) {
-			patchPost(post, key);
-			signalized.value = post;
-		}
+	else if (!key || val._key !== key) {
+		val._key = key;
+
+		val.author = mergeSignalizedProfileBasic(post.author, key);
+
+		val.record.value = post.record;
+		val.embed.value = post.embed;
+		val.replyCount.value = post.replyCount;
+		val.repostCount.value = post.repostCount;
+		val.likeCount.value = post.likeCount;
+		val.indexedAt.value = post.indexedAt;
+		val.labels.value = post.labels;
+
+		val.viewer.like.value = post.viewer.like;
+		val.viewer.repost.value = post.viewer.repost;
 	}
 
-	return signalized;
+	return val;
 };
 
-export const signalizeLinearThread = (thread: LinearizedThread, key?: number): SignalizedLinearThread => {
+/** @see BskyTimelinePost */
+export interface SignalizedTimelinePost {
+	post: SignalizedPost;
+	reply?: {
+		root: SignalizedPost;
+		parent: SignalizedPost;
+	};
+	reason: BskyTimelinePost['reason'];
+}
+
+export const createSignalizedTimelinePost = (item: BskyTimelinePost, key?: number): SignalizedTimelinePost => {
+	const reply = item.reply;
+
+	return {
+		post: mergeSignalizedPost(item.post, key),
+		reply: reply && {
+			root: mergeSignalizedPost(reply.root, key),
+			parent: mergeSignalizedPost(reply.parent, key),
+		},
+		reason: item.reason,
+	};
+};
+
+/** @see LinearizedThread */
+export interface SignalizedLinearThread {
+	post: SignalizedPost;
+	parentNotFound: boolean;
+	ancestors: SignalizedPost[];
+	descendants: SignalizedPost[];
+}
+
+export const createSignalizedLinearThread = (thread: LinearizedThread, key?: number): SignalizedLinearThread => {
 	const anc = thread.ancestors;
 	const dec = thread.descendants;
 
 	const anclen = anc.length;
 	const declen = dec.length;
 
-	const ancestors: Signal<BskyPost>[] = new Array(anclen);
-	const descendants: Signal<BskyPost>[] = new Array(declen);
+	const ancestors: SignalizedPost[] = new Array(anclen);
+	const descendants: SignalizedPost[] = new Array(declen);
 
 	for (let idx = 0; idx < anclen; idx++) {
 		const post = anc[idx];
-		ancestors[idx] = signalizePost(post, key);
+		ancestors[idx] = mergeSignalizedPost(post, key);
 	}
 
 	for (let idx = 0; idx < declen; idx++) {
 		const post = dec[idx];
-		descendants[idx] = signalizePost(post, key);
+		descendants[idx] = mergeSignalizedPost(post, key);
 	}
 
 	return {
-		post: signalizePost(thread.post),
+		post: mergeSignalizedPost(thread.post),
 		parentNotFound: thread.parentNotFound,
 		ancestors,
 		descendants,

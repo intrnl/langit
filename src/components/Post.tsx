@@ -1,9 +1,6 @@
 import { Show } from 'solid-js';
 
-import {
-	type BskyPost,
-	type BskyTimelinePost,
-} from '~/api/types.ts';
+import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache.ts';
 import { getPostId } from '~/api/utils.ts';
 
 import { A } from '~/router.ts';
@@ -21,9 +18,9 @@ import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
 
 interface PostProps {
 	uid: string;
-	post: BskyPost;
-	parent?: BskyPost;
-	reason?: BskyTimelinePost['reason'];
+	post: SignalizedPost;
+	parent?: SignalizedPost;
+	reason?: SignalizedTimelinePost['reason'];
 	prev?: boolean;
 	next?: boolean;
 }
@@ -34,7 +31,7 @@ const Post = (props: PostProps) => {
 	const parent = () => props.parent;
 
 	const author = () => post().author;
-	const record = () => post().record;
+	const record = () => post().record.value;
 
 	return (
 		<div class='relative px-4 hover:bg-hinted border-divider' classList={{ 'border-b': !props.next }}>
@@ -64,7 +61,7 @@ const Post = (props: PostProps) => {
 							params={{ uid: uid(), actor: parent()!.author.did, status: getPostId(parent()!.uri) }}
 							class='grow min-w-0 font-medium hover:underline'
 						>
-							Replying to {parent()!.author.displayName}
+							Replying to {parent()!.author.displayName.value}
 						</A>
 					</div>
 				</Show>
@@ -77,7 +74,7 @@ const Post = (props: PostProps) => {
 						params={{ uid: uid(), actor: author().did }}
 						class='h-12 w-12 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
 					>
-						<Show when={author().avatar}>
+						<Show when={author().avatar.value}>
 							{(avatar) => <img src={avatar()} class='h-full w-full' />}
 						</Show>
 					</A>
@@ -97,10 +94,10 @@ const Post = (props: PostProps) => {
 									class='group flex gap-1'
 								>
 									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline empty:hidden'>
-										{author().displayName}
+										{author().displayName.value}
 									</span>
 									<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
-										@{author().handle}
+										@{author().handle.value}
 									</span>
 								</A>
 							</div>
@@ -135,7 +132,7 @@ const Post = (props: PostProps) => {
 						)}
 					</Show>
 
-					<Show when={post().embed}>
+					<Show when={post().embed.value}>
 						{(embed) => <Embed uid={uid()} embed={embed()} />}
 					</Show>
 
@@ -148,28 +145,28 @@ const Post = (props: PostProps) => {
 							>
 								<ChatBubbleOutlinedIcon />
 							</A>
-							<span class='text-[0.8125rem]'>{comformat.format(post().replyCount)}</span>
+							<span class='text-[0.8125rem]'>{comformat.format(post().replyCount.value)}</span>
 						</div>
 
 						<div
 							class='flex items-end grow gap-0.5'
-							classList={{ 'text-green-600': !!post().viewer.repost }}
+							classList={{ 'text-green-600': !!post().viewer.repost.value }}
 						>
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
 								<RepeatIcon />
 							</button>
-							<span class='text-[0.8125rem]'>{comformat.format(post().repostCount)}</span>
+							<span class='text-[0.8125rem]'>{comformat.format(post().repostCount.value)}</span>
 						</div>
 
 						<div
 							class='group flex items-end grow gap-0.5'
-							classList={{ 'is-active text-red-600': !!post().viewer.like }}
+							classList={{ 'is-active text-red-600': !!post().viewer.like.value }}
 						>
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
 								<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
 								<FavoriteIcon class='hidden group-[.is-active]:block' />
 							</button>
-							<span class='text-[0.8125rem]'>{comformat.format(post().likeCount)}</span>
+							<span class='text-[0.8125rem]'>{comformat.format(post().likeCount.value)}</span>
 						</div>
 
 						<div class='shrink-0'>

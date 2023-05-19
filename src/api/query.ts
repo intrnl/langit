@@ -1,5 +1,6 @@
 import { type InfiniteData, type QueryFunctionContext } from '@tanstack/solid-query';
 
+import { type Agent } from './agent.ts';
 import { multiagent } from './global.ts';
 import { type UID } from './multiagent.ts';
 import { type DID, isDid } from './utils.ts';
@@ -16,6 +17,25 @@ import {
 
 import { createThreadPage } from '~/models/thread.ts';
 import { createTimelinePage } from '~/models/timeline.ts';
+
+const _getDid = async (agent: Agent, actor: string, signal?: AbortSignal) => {
+	let did: DID;
+	if (isDid(actor)) {
+		did = actor;
+	}
+	else {
+		const res = await agent.rpc.get({
+			method: 'com.atproto.identity.resolveHandle',
+			signal: signal,
+			params: { handle: actor },
+		});
+
+		const data = res.data as BskyResolvedDidResponse;
+		did = data.did;
+	}
+
+	return did;
+};
 
 export const createInfinitePlaceholder = <T>(data?: T): InfiniteData<T> | undefined => {
 	if (!data) {
@@ -65,7 +85,7 @@ export const createTimelineQuery = (limit: number) => {
 
 			// skip any posts that are in reply to non-followed
 			if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
-				const parent = first.reply.parent.peek();
+				const parent = first.reply.parent;
 
 				if (parent.author.did !== selfdid && !parent.author.viewer.following) {
 					return false;
@@ -104,6 +124,7 @@ export const createProfileFeedQuery = (limit: number) => {
 		const [, uid, actor, replies] = ctx.queryKey;
 
 		const agent = await multiagent.connect(uid);
+		const did = await _getDid(agent, actor, ctx.signal);
 
 		const response = await agent.rpc.get({
 			method: 'app.bsky.feed.getAuthorFeed',
@@ -117,9 +138,9 @@ export const createProfileFeedQuery = (limit: number) => {
 			const first = items[0];
 
 			if (!replies && first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
-				const parent = first.reply.parent.peek();
+				const parent = first.reply.parent;
 
-				if (parent.author.handle !== actor) {
+				if (parent.author.did !== did) {
 					return false;
 				}
 			}
@@ -154,21 +175,7 @@ export const getPostThread = async (ctx: QueryFunctionContext<ReturnType<typeof 
 	const [, uid, actor, post] = ctx.queryKey;
 
 	const agent = await multiagent.connect(uid);
-
-	let did: DID;
-	if (isDid(actor)) {
-		did = actor;
-	}
-	else {
-		const res = await agent.rpc.get({
-			method: 'com.atproto.identity.resolveHandle',
-			signal: ctx.signal,
-			params: { handle: actor },
-		});
-
-		const data = res.data as BskyResolvedDidResponse;
-		did = data.did;
-	}
+	const did = await _getDid(agent, actor, ctx.signal);
 
 	const uri = `at://${did}/app.bsky.feed.post/${post}`;
 	const response = await agent.rpc.get({
@@ -204,7 +211,7 @@ export const createFollowersQuery = (limit: number) => {
 	};
 };
 export const createInitialFollowers = (actor: string): BskyFollowersResponse | undefined => {
-	const profile = cache.profilesBasic[actor]?.deref()?.peek();
+	const profile = cache.profilesBasic[actor]?.deref();
 
 	if (!profile) {
 		return;
@@ -213,9 +220,17 @@ export const createInitialFollowers = (actor: string): BskyFollowersResponse | u
 	return {
 		cursor: undefined,
 		subject: {
-			...profile,
+			did: profile.did,
+			displayName: profile.displayName.peek(),
+			handle: profile.handle.peek(),
+			labels: profile.labels.peek(),
 			description: '',
 			indexedAt: '',
+			viewer: {
+				blockedBy: profile.viewer.blockedBy.peek(),
+				muted: profile.viewer.muted.peek(),
+				following: profile.viewer.following.peek(),
+			},
 		},
 		followers: [],
 	};

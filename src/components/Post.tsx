@@ -7,9 +7,10 @@ import {
 import { getPostId } from '~/api/utils.ts';
 
 import { A } from '~/router.ts';
+import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
-import Embed from './Embed.tsx';
+import Embed from '~/components/Embed.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
@@ -147,7 +148,7 @@ const Post = (props: PostProps) => {
 							>
 								<ChatBubbleOutlinedIcon />
 							</A>
-							<span class='text-[0.8125rem]'>{post().replyCount}</span>
+							<span class='text-[0.8125rem]'>{comformat.format(post().replyCount)}</span>
 						</div>
 
 						<div
@@ -157,7 +158,7 @@ const Post = (props: PostProps) => {
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
 								<RepeatIcon />
 							</button>
-							<span class='text-[0.8125rem]'>{post().repostCount}</span>
+							<span class='text-[0.8125rem]'>{comformat.format(post().repostCount)}</span>
 						</div>
 
 						<div
@@ -168,7 +169,7 @@ const Post = (props: PostProps) => {
 								<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
 								<FavoriteIcon class='hidden group-[.is-active]:block' />
 							</button>
-							<span class='text-[0.8125rem]'>{post().likeCount}</span>
+							<span class='text-[0.8125rem]'>{comformat.format(post().likeCount)}</span>
 						</div>
 
 						<div class='shrink-0'>

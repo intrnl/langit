@@ -3,14 +3,15 @@ import { Show } from 'solid-js';
 import { Outlet } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
-import { getProfile, getProfileKey } from '~/api/query';
+import { getProfile, getProfileKey } from '~/api/query.ts';
 
-import button from '~/styles/primitives/button';
+import { A, useParams } from '~/router.ts';
+import * as comformat from '~/utils/intl/comformatter.ts';
 
-import CircularProgress from '~/components/CircularProgress';
-import TabLink from '~/components/TabLink';
+import button from '~/styles/primitives/button.ts';
 
-import { A, useParams } from '~/router';
+import CircularProgress from '~/components/CircularProgress.tsx';
+import TabLink from '~/components/TabLink.tsx';
 
 const AuthenticatedProfileLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor');
@@ -83,11 +84,12 @@ const AuthenticatedProfileLayout = () => {
 
 								<div class='text-sm flex flex-wrap gap-4'>
 									<A href='/u/:uid/profile/:actor/following' params={params} class='hover:underline'>
-										<span class='font-bold'>{profile().followsCount}</span> <span class='text-muted-fg'>Following</span>
+										<span class='font-bold'>{comformat.format(profile().followsCount)}</span>{' '}
+										<span class='text-muted-fg'>Following</span>
 									</A>
 
 									<A href='/u/:uid/profile/:actor/followers' params={params} class='hover:underline'>
-										<span class='font-bold'>{profile().followersCount}</span>{' '}
+										<span class='font-bold'>{comformat.format(profile().followersCount)}</span>{' '}
 										<span class='text-muted-fg'>Followers</span>
 									</A>
 								</div>

@@ -7,6 +7,7 @@ import { getPostThread, getPostThreadKey } from '~/api/query.ts';
 import { getPostId } from '~/api/utils.ts';
 
 import { A, useParams } from '~/router.ts';
+import * as comformat from '~/utils/intl/comformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
@@ -183,12 +184,12 @@ const AuthenticatedPostPage = () => {
 									<hr class='border-divider' />
 
 									<div class='flex flex-wrap gap-4 py-4 text-sm'>
-										<div class='flex gap-1'>
-											<span class='font-bold'>{post.repostCount}</span>
+										<div>
+											<span class='font-bold'>{comformat.format(post.repostCount)}</span>{' '}
 											<span class='text-muted-fg'>Reposts</span>
 										</div>
-										<div class='flex gap-1'>
-											<span class='font-bold'>{post.likeCount}</span>
+										<div>
+											<span class='font-bold'>{comformat.format(post.likeCount)}</span>{' '}
 											<span class='text-muted-fg'>Likes</span>
 										</div>
 									</div>

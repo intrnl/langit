@@ -20,7 +20,7 @@ const AuthenticatedYouPage = () => {
 	const profileQuery = createQuery(() => getProfileKey(params.uid, did()), getProfile);
 
 	return (
-		<div class='flex flex-col pb-4'>
+		<div class='flex flex-col pb-4 grow border-divider md:border-x'>
 			<Show when={profileQuery.data}>
 				{(profile) => (
 					<A href='/u/:uid/profile/:actor' params={{ uid: params.uid, actor: did() }} class='hover:bg-hinted'>

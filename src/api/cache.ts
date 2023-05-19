@@ -7,7 +7,7 @@
 
 import { dequal } from 'dequal/lite';
 
-import { RichText } from './richtext/richtext.ts';
+import { segmentRichText } from './richtext/segmentize.ts';
 import {
 	type BskyPost,
 	type BskyProfile,
@@ -280,14 +280,10 @@ const createRenderedPost = () => {
 			cuid = uid;
 
 			if (record.facets) {
-				const richtext = new RichText({
-					text: record.text,
-					facets: record.facets,
-				});
-
+				const segments = segmentRichText({ text: record.text, facets: record.facets });
 				const div = document.createElement('div');
 
-				for (const segment of richtext.segments()) {
+				for (const segment of segments) {
 					const mention = segment.mention;
 					const link = segment.link;
 

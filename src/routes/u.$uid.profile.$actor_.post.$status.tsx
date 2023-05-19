@@ -200,11 +200,17 @@ const AuthenticatedPostPage = () => {
 											<ChatBubbleOutlinedIcon />
 										</button>
 
-										<button class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'>
+										<button
+											class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'
+											classList={{ 'text-green-600': !!post.viewer.repost.value }}
+										>
 											<RepeatIcon />
 										</button>
 
-										<button class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'>
+										<button
+											class='group flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'
+											classList={{ 'is-active text-red-600': !!post.viewer.like.value }}
+										>
 											<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
 											<FavoriteIcon class='hidden group-[.is-active]:block' />
 										</button>

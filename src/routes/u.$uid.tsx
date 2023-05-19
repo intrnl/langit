@@ -27,6 +27,9 @@ const AuthenticatedLayout = () => {
 		queryKey: () => getProfileKey(params.uid, did()),
 		queryFn: getProfile,
 		staleTime: 60000,
+		refetchOnMount: true,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: false,
 	});
 
 	return (

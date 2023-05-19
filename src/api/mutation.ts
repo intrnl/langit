@@ -3,29 +3,31 @@ import { multiagent } from './global.ts';
 import { type BskyCreateRecordResponse } from './types.ts';
 import { getPostId } from './utils.ts';
 
-import { Locker } from '~/utils/lock.ts';
+const locked = new WeakMap<any, boolean>();
 
-const locks = new WeakMap<any, Locker<void>>();
-
-const acquireLock = (value: any) => {
-	let locker = locks.get(value);
-
-	if (!locker) {
-		locks.set(value, locker = new Locker(undefined));
+const acquire = async (value: any, callback: () => Promise<void>) => {
+	if (locked.has(value)) {
+		return;
 	}
 
-	return locker.acquire();
-};
-
-export const favoritePost = async (uid: string, post: SignalizedPost) => {
-	const session = multiagent.accounts[uid].session;
-	const agent = await multiagent.connect(uid);
-
-	const lock = await acquireLock(post);
-
-	const prev = post.viewer.like.peek();
+	locked.set(value, true);
 
 	try {
+		const result = await callback();
+		return result;
+	}
+	finally {
+		locked.delete(value);
+	}
+};
+
+export const favoritePost = (uid: string, post: SignalizedPost) => {
+	return acquire(post, async () => {
+		const session = multiagent.accounts[uid].session;
+		const agent = await multiagent.connect(uid);
+
+		const prev = post.viewer.like.peek();
+
 		if (prev) {
 			await agent.rpc.post({
 				method: 'com.atproto.repo.deleteRecord',
@@ -61,21 +63,16 @@ export const favoritePost = async (uid: string, post: SignalizedPost) => {
 			post.viewer.like.value = data.uri;
 			post.likeCount.value++;
 		}
-	}
-	finally {
-		lock.release();
-	}
+	});
 };
 
-export const repostPost = async (uid: string, post: SignalizedPost) => {
-	const session = multiagent.accounts[uid].session;
-	const agent = await multiagent.connect(uid);
+export const repostPost = (uid: string, post: SignalizedPost) => {
+	return acquire(post, async () => {
+		const session = multiagent.accounts[uid].session;
+		const agent = await multiagent.connect(uid);
 
-	const lock = await acquireLock(post);
+		const prev = post.viewer.repost.peek();
 
-	const prev = post.viewer.repost.peek();
-
-	try {
 		if (prev) {
 			await agent.rpc.post({
 				method: 'com.atproto.repo.deleteRecord',
@@ -111,8 +108,5 @@ export const repostPost = async (uid: string, post: SignalizedPost) => {
 			post.viewer.repost.value = data.uri;
 			post.repostCount.value++;
 		}
-	}
-	finally {
-		lock.release();
-	}
+	});
 };

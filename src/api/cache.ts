@@ -50,7 +50,7 @@ const createSignalizedProfile = (
 	key?: number,
 ): SignalizedProfile => {
 	const isProfileFollow = 'description' in profile;
-	const isProfile = 'banner' in profile;
+	const isProfile = 'postsCount' in profile;
 
 	return {
 		_key: key,
@@ -100,7 +100,7 @@ export const mergeSignalizedProfile = (profile: BskyProfile | BskyProfileBasic |
 			val.indexedAt.value = profile.indexedAt;
 		}
 
-		if ('banner' in profile) {
+		if ('postsCount' in profile) {
 			val.banner.value = profile.banner;
 			val.followersCount.value = profile.followersCount;
 			val.followsCount.value = profile.followsCount;

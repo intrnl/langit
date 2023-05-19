@@ -45,7 +45,7 @@ const Post = (props: PostProps) => {
 						<A
 							href='/u/:uid/profile/:actor'
 							params={{ uid: uid(), actor: props.reason!.by.did }}
-							class='grow min-w-0 font-medium hover:underline'
+							class='grow line-clamp-1 min-w-0 font-medium hover:underline'
 						>
 							{props.reason!.by.displayName} Retweeted
 						</A>
@@ -60,7 +60,7 @@ const Post = (props: PostProps) => {
 						<A
 							href='/u/:uid/profile/:actor/post/:status'
 							params={{ uid: uid(), actor: parent()!.author.did, status: getPostId(parent()!.uri) }}
-							class='grow min-w-0 font-medium hover:underline'
+							class='grow line-clamp-1 min-w-0 font-medium hover:underline'
 						>
 							Replying to {parent()!.author.displayName.value}
 						</A>

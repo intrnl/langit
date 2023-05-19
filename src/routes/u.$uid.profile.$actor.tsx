@@ -46,7 +46,7 @@ const AuthenticatedProfileLayout = () => {
 				}
 			>
 				{(profile) => {
-					const isFollowing = () => profile().viewer.following;
+					const isFollowing = () => profile().viewer.following.value;
 
 					return (
 						<>

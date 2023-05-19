@@ -210,3 +210,8 @@ export interface BskyFollowersResponse {
 	subject: BskyProfileFollow;
 	followers: BskyProfileFollow[];
 }
+
+export interface BskyCreateRecordResponse {
+	uri: string;
+	cid: string;
+}

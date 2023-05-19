@@ -1,6 +1,7 @@
 import { Show } from 'solid-js';
 
 import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache.ts';
+import { favoritePost } from '~/api/mutation.ts';
 import { getPostId } from '~/api/utils.ts';
 
 import { A } from '~/router.ts';
@@ -161,6 +162,7 @@ const Post = (props: PostProps) => {
 						<div
 							class='group flex items-end grow gap-0.5'
 							classList={{ 'is-active text-red-600': !!post().viewer.like.value }}
+							onClick={() => favoritePost(uid(), post())}
 						>
 							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'>
 								<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />

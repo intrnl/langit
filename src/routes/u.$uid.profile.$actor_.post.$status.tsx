@@ -3,6 +3,7 @@ import { For, Match, Show, Switch } from 'solid-js';
 import { useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
+import { favoritePost } from '~/api/mutation.ts';
 import { getPostThread, getPostThreadKey } from '~/api/query.ts';
 import { getPostId } from '~/api/utils.ts';
 
@@ -210,6 +211,7 @@ const AuthenticatedPostPage = () => {
 										<button
 											class='group flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'
 											classList={{ 'is-active text-red-600': !!post.viewer.like.value }}
+											onClick={() => favoritePost(uid(), post)}
 										>
 											<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
 											<FavoriteIcon class='hidden group-[.is-active]:block' />

@@ -1,10 +1,11 @@
-import { type Signal, signal } from '~/utils/signals.ts';
-import { type FetchHandlerResponse, XRPC, fetchHandler, isErrorResponse } from '~/utils/xrpc.ts';
 import {
 	type Headers,
 	ResponseType,
 	httpResponseCodeToEnum,
-} from '~/utils/xrpc-utils.ts';
+} from '~/utils/atproto/xrpc-utils.ts';
+import { type FetchHandlerResponse, XRPC, fetchHandler, isErrorResponse } from '~/utils/atproto/xrpc.ts';
+
+import { type Signal, signal } from '~/utils/signals.ts';
 
 type SessionType = 'create' | 'create-failed' | 'update' | 'expired';
 type PersistSessionHandler = (type: SessionType, session?: AtpSessionData) => void;

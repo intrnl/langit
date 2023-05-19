@@ -5,7 +5,7 @@ import { createQuery } from '@tanstack/solid-query';
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 import { multiagent } from '~/api/global.ts';
 import { useNavigate } from '~/router.ts';
-import { XRPC } from '~/utils/xrpc.ts';
+import { XRPC } from '~/utils/atproto/xrpc.ts';
 
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input.ts';

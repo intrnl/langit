@@ -248,104 +248,8 @@ export interface SignalizedPost {
 		repost: Signal<BskyPost['viewer']['repost']>;
 	};
 
-	$renderedContent: ReturnType<typeof createRenderedPost>;
+	$renderedContent: ReturnType<typeof createPostRenderer>;
 }
-
-const toShortUrl = (uri: string): string => {
-	try {
-		const url = new URL(uri);
-		const shortened = url.host + (url.pathname === '/' ? '' : url.pathname) + url.search + url.hash;
-
-		if (shortened.length > 30) {
-			return shortened.slice(0, 27) + '...';
-		}
-
-		return shortened;
-	}
-	catch (e) {
-		return uri;
-	}
-};
-
-const createRenderedPost = () => {
-	let record: BskyPost['record'] | undefined;
-	let template: HTMLElement | undefined;
-	let cuid: string | undefined;
-
-	return function (this: SignalizedPost, uid: string) {
-		const curr = this.record.value;
-
-		if (!record || record !== curr) {
-			record = curr;
-			cuid = uid;
-
-			if (record.facets) {
-				const segments = segmentRichText({ text: record.text, facets: record.facets });
-				const div = document.createElement('div');
-
-				for (let idx = 0, len = segments.length; idx < len; idx++) {
-					const segment = segments[idx];
-
-					const mention = segment.mention;
-					const link = segment.link;
-
-					if (mention) {
-						const did = mention.did;
-						const anchor = document.createElement('a');
-
-						anchor.href = `/u/${uid}/profile/${did}`;
-						anchor.className = 'text-accent hover:underline';
-						anchor.textContent = segment.text;
-						anchor.toggleAttribute('link', true);
-						anchor.setAttribute('data-mention', did);
-
-						div.appendChild(anchor);
-					}
-					else if (link) {
-						const uri = link.uri;
-						const anchor = document.createElement('a');
-
-						anchor.rel = 'noopener noreferrer nofollow';
-						anchor.target = '_blank';
-						anchor.href = uri;
-						anchor.className = 'text-accent hover:underline';
-						anchor.textContent = toShortUrl(uri);
-
-						div.appendChild(anchor);
-					}
-					else {
-						div.appendChild(document.createTextNode(segment.text));
-					}
-				}
-
-				template = div;
-			}
-			else {
-				template = undefined;
-			}
-		}
-
-		if (template) {
-			if (cuid !== uid) {
-				const mentions = template.querySelectorAll<HTMLAnchorElement>('a[data-mention]');
-
-				for (let idx = 0, len = mentions.length; idx < len; idx++) {
-					const node = mentions[idx];
-					const did = node.getAttribute('data-mention')!;
-
-					node.href = `/u/${uid}/profile/${did}`;
-				}
-
-				cuid = uid;
-			}
-
-			return template.cloneNode(true);
-		}
-		else {
-			return record.text;
-		}
-	};
-};
 
 const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
 	return {
@@ -364,7 +268,7 @@ const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
 			like: signal(post.viewer.like),
 			repost: signal(post.viewer.repost),
 		},
-		$renderedContent: createRenderedPost(),
+		$renderedContent: createPostRenderer(),
 	};
 };
 
@@ -454,5 +358,102 @@ export const createSignalizedLinearThread = (thread: LinearizedThread, key?: num
 		parentNotFound: thread.parentNotFound,
 		ancestors,
 		descendants,
+	};
+};
+
+// Miscellaneous
+const toShortUrl = (uri: string): string => {
+	try {
+		const url = new URL(uri);
+		const shortened = url.host + (url.pathname === '/' ? '' : url.pathname) + url.search + url.hash;
+
+		if (shortened.length > 30) {
+			return shortened.slice(0, 27) + '...';
+		}
+
+		return shortened;
+	}
+	catch (e) {
+		return uri;
+	}
+};
+
+const createPostRenderer = () => {
+	let record: BskyPost['record'] | undefined;
+	let template: HTMLElement | undefined;
+	let cuid: string | undefined;
+
+	return function (this: SignalizedPost, uid: string) {
+		const curr = this.record.value;
+
+		if (!record || record !== curr) {
+			record = curr;
+			cuid = uid;
+
+			if (record.facets) {
+				const segments = segmentRichText({ text: record.text, facets: record.facets });
+				const div = document.createElement('div');
+
+				for (let idx = 0, len = segments.length; idx < len; idx++) {
+					const segment = segments[idx];
+
+					const mention = segment.mention;
+					const link = segment.link;
+
+					if (mention) {
+						const did = mention.did;
+						const anchor = document.createElement('a');
+
+						anchor.href = `/u/${uid}/profile/${did}`;
+						anchor.className = 'text-accent hover:underline';
+						anchor.textContent = segment.text;
+						anchor.toggleAttribute('link', true);
+						anchor.setAttribute('data-mention', did);
+
+						div.appendChild(anchor);
+					}
+					else if (link) {
+						const uri = link.uri;
+						const anchor = document.createElement('a');
+
+						anchor.rel = 'noopener noreferrer nofollow';
+						anchor.target = '_blank';
+						anchor.href = uri;
+						anchor.className = 'text-accent hover:underline';
+						anchor.textContent = toShortUrl(uri);
+
+						div.appendChild(anchor);
+					}
+					else {
+						div.appendChild(document.createTextNode(segment.text));
+					}
+				}
+
+				template = div;
+			}
+			else {
+				template = undefined;
+			}
+		}
+
+		if (template) {
+			if (cuid !== uid) {
+				const mentions = template.querySelectorAll<HTMLAnchorElement>('a[data-mention]');
+
+				for (let idx = 0, len = mentions.length; idx < len; idx++) {
+					const node = mentions[idx];
+					const did = node.getAttribute('data-mention')!;
+
+					node.href = `/u/${uid}/profile/${did}`;
+				}
+
+				cuid = uid;
+			}
+
+			return template.cloneNode(true);
+		}
+		else {
+			return record.text;
+		}
 	};
 };

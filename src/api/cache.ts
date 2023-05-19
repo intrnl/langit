@@ -298,6 +298,7 @@ const createRenderedPost = () => {
 						anchor.href = `/u/${uid}/profile/${did}`;
 						anchor.className = 'text-accent hover:underline';
 						anchor.textContent = segment.text;
+						anchor.toggleAttribute('link', true);
 						anchor.setAttribute('data-mention', did);
 
 						div.appendChild(anchor);

@@ -42,13 +42,15 @@ const Post = (props: PostProps) => {
 						<div class='flex justify-end w-12 shrink-0'>
 							<RepeatIcon />
 						</div>
-						<A
-							href='/u/:uid/profile/:actor'
-							params={{ uid: uid(), actor: props.reason!.by.did }}
-							class='grow line-clamp-1 min-w-0 font-medium hover:underline'
-						>
-							{props.reason!.by.displayName} Retweeted
-						</A>
+						<div>
+							<A
+								href='/u/:uid/profile/:actor'
+								params={{ uid: uid(), actor: props.reason!.by.did }}
+								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
+							>
+								{props.reason!.by.displayName} Retweeted
+							</A>
+						</div>
 					</div>
 				</Show>
 
@@ -57,13 +59,15 @@ const Post = (props: PostProps) => {
 						<div class='flex justify-end w-12 shrink-0'>
 							<ChatBubbleOutlinedIcon />
 						</div>
-						<A
-							href='/u/:uid/profile/:actor/post/:status'
-							params={{ uid: uid(), actor: parent()!.author.did, status: getPostId(parent()!.uri) }}
-							class='grow line-clamp-1 min-w-0 font-medium hover:underline'
-						>
-							Replying to {parent()!.author.displayName.value}
-						</A>
+						<div>
+							<A
+								href='/u/:uid/profile/:actor/post/:status'
+								params={{ uid: uid(), actor: parent()!.author.did, status: getPostId(parent()!.uri) }}
+								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
+							>
+								Replying to {parent()!.author.displayName.value}
+							</A>
+						</div>
 					</div>
 				</Show>
 			</div>

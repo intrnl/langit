@@ -95,7 +95,7 @@ const Post = (props: PostProps) => {
 									params={{ uid: uid(), actor: author().did }}
 									class='group flex gap-1'
 								>
-									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline'>
+									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline empty:hidden'>
 										{author().displayName}
 									</span>
 									<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>

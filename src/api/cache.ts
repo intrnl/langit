@@ -283,7 +283,9 @@ const createRenderedPost = () => {
 				const segments = segmentRichText({ text: record.text, facets: record.facets });
 				const div = document.createElement('div');
 
-				for (const segment of segments) {
+				for (let idx = 0, len = segments.length; idx < len; idx++) {
+					const segment = segments[idx];
+
 					const mention = segment.mention;
 					const link = segment.link;
 

@@ -87,7 +87,7 @@ export const createTimelineQuery = (limit: number) => {
 			if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
 				const parent = first.reply.parent;
 
-				if (parent.author.did !== selfdid && !parent.author.viewer.following) {
+				if (parent.author.did !== selfdid && !parent.author.viewer.following.peek()) {
 					return false;
 				}
 			}

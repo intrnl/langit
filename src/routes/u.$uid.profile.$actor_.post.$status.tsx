@@ -13,12 +13,22 @@ import Embed from '~/components/Embed.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
 
+import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+import RepeatIcon from '~/icons/baseline-repeat.tsx';
+import ShareIcon from '~/icons/baseline-share.tsx';
+import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
+import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
 
 const seen = new Set<string>();
 
 const MAX_ANCESTORS = 10;
 const MAX_DESCENDANTS = 4;
+
+const formatter = new Intl.DateTimeFormat('en', {
+	dateStyle: 'long',
+	timeStyle: 'short',
+});
 
 const AuthenticatedPostPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
@@ -120,7 +130,7 @@ const AuthenticatedPostPage = () => {
 									}}
 								</Show>
 
-								<div ref={focusRef} class='px-4 py-3 scroll-m-13'>
+								<div ref={focusRef} class='px-4 pt-3 scroll-m-13'>
 									<div class='flex items-center gap-3 mb-1'>
 										<A
 											href='/u/:uid/profile/:actor'
@@ -163,6 +173,46 @@ const AuthenticatedPostPage = () => {
 									<Show when={post.embed}>
 										{(embed) => <Embed uid={uid()} embed={embed()} large />}
 									</Show>
+
+									<div class='my-3'>
+										<span class='text-muted-fg text-sm'>
+											{formatter.format(new Date(post.record.createdAt))}
+										</span>
+									</div>
+
+									<hr class='border-divider' />
+
+									<div class='flex flex-wrap gap-4 py-4 text-sm'>
+										<div class='flex gap-1'>
+											<span class='font-bold'>{post.repostCount}</span>
+											<span class='text-muted-fg'>Reposts</span>
+										</div>
+										<div class='flex gap-1'>
+											<span class='font-bold'>{post.likeCount}</span>
+											<span class='text-muted-fg'>Likes</span>
+										</div>
+									</div>
+
+									<hr class='border-divider' />
+
+									<div class='h-13 flex items-center justify-around text-muted-fg'>
+										<button class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'>
+											<ChatBubbleOutlinedIcon />
+										</button>
+
+										<button class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'>
+											<RepeatIcon />
+										</button>
+
+										<button class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'>
+											<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
+											<FavoriteIcon class='hidden group-[.is-active]:block' />
+										</button>
+
+										<button class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'>
+											<ShareIcon />
+										</button>
+									</div>
 								</div>
 
 								<hr class='border-divider' />

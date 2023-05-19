@@ -36,7 +36,7 @@ const Post = (props: PostProps) => {
 
 	return (
 		<div class='relative px-4 hover:bg-hinted border-divider' classList={{ 'border-b': !props.next }}>
-			<div class='pt-3'>
+			<div class='pt-3 flex flex-col gap-1'>
 				<Show when={props.reason && props.reason.$type === 'app.bsky.feed.defs#reasonRepost'}>
 					<div class='-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg'>
 						<div class='flex justify-end w-12 shrink-0'>

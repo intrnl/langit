@@ -164,11 +164,9 @@ const AuthenticatedPostPage = () => {
 									</div>
 
 									<Show when={record().text}>
-										{(text) => (
-											<div class='text-base whitespace-pre-wrap break-words mt-3'>
-												{text()}
-											</div>
-										)}
+										<div class='text-base whitespace-pre-wrap break-words mt-3'>
+											{post.$renderedContent(uid())}
+										</div>
 									</Show>
 
 									<Show when={post.embed.value}>

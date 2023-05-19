@@ -126,11 +126,9 @@ const Post = (props: PostProps) => {
 					</div>
 
 					<Show when={record().text}>
-						{(text) => (
-							<div class='text-sm whitespace-pre-wrap break-words'>
-								{text()}
-							</div>
-						)}
+						<div class='text-sm whitespace-pre-wrap break-words'>
+							{post().$renderedContent(uid())}
+						</div>
 					</Show>
 
 					<Show when={post().embed.value}>

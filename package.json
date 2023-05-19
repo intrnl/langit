@@ -2,7 +2,7 @@
 	"private": true,
 	"type": "module",
 	"name": "langit",
-	"packageManager": "pnpm@8.3.1",
+	"packageManager": "pnpm@8.5.1",
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build"
@@ -11,6 +11,7 @@
 		"@solidjs/router": "^0.8.2",
 		"@tanstack/solid-query": "^4.29.7",
 		"class-variance-authority": "^0.6.0",
+		"dequal": "^2.0.3",
 		"solid-js": "^1.7.5"
 	},
 	"devDependencies": {

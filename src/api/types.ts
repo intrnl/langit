@@ -34,12 +34,27 @@ export interface BskyProfileBasic {
 	handle: string;
 	displayName: string;
 	avatar?: string;
+	labels: BskyLabel[];
 	viewer: {
 		muted: boolean;
 		blockedBy: boolean;
 		following?: string;
 	};
+}
+
+export interface BskyProfileFollow {
+	did: string;
+	displayName: string;
+	handle: string;
+	description: string;
+	avatar?: string;
 	labels: BskyLabel[];
+	indexedAt: string;
+	viewer: {
+		muted: boolean;
+		blockedBy: boolean;
+		following?: string;
+	};
 }
 
 export interface BskyPostRecordEmbed {
@@ -118,14 +133,6 @@ export interface BskyPostEmbedRecordWithMedia {
 }
 
 export interface BskyPost {
-	/**
-	 * Timeline API provides context to replies in full details, which means that
-	 * we can see the same signal being updated multiple times in the course of a
-	 * single timeline query, this property allows preventing those needless
-	 * updates from happening.
-	 */
-	$key?: number;
-
 	uri: string;
 	cid: string;
 	author: BskyProfileBasic;
@@ -213,4 +220,10 @@ export interface BskyTimelineResponse {
 
 export interface BskyResolvedDidResponse {
 	did: DID;
+}
+
+export interface BskyFollowersResponse {
+	cursor?: string;
+	subject: BskyProfileFollow;
+	followers: BskyProfileFollow[];
 }

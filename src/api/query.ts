@@ -1,10 +1,13 @@
-import { QueryFunctionContext } from '@tanstack/solid-query';
+import { type InfiniteData, type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from './global.ts';
 import { type UID } from './multiagent.ts';
 import { type DID, isDid } from './utils.ts';
 
+import * as cache from './cache.ts';
+
 import {
+	type BskyFollowersResponse,
 	type BskyProfile,
 	type BskyResolvedDidResponse,
 	type BskyThreadResponse,
@@ -13,6 +16,17 @@ import {
 
 import { createThreadPage } from '~/models/thread.ts';
 import { createTimelinePage } from '~/models/timeline.ts';
+
+export const createInfinitePlaceholder = <T>(data?: T): InfiniteData<T> | undefined => {
+	if (!data) {
+		return;
+	}
+
+	return {
+		pageParams: [undefined],
+		pages: [data],
+	};
+};
 
 export const getProfileKey = (uid: UID, actor: string) => ['getProfile', uid, actor] as const;
 export const getProfile = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileKey>>) => {
@@ -168,6 +182,41 @@ export const getPostThread = async (ctx: QueryFunctionContext<ReturnType<typeof 
 
 	return page;
 };
-
 export const createInitialPostThread = (uid: UID, actor: string, post: string) => {
+};
+
+export const getFollowersKey = (uid: UID, actor: string) => ['getFollowers', uid, actor] as const;
+export const createFollowersQuery = (limit: number) => {
+	return async (ctx: QueryFunctionContext<ReturnType<typeof getFollowersKey>>) => {
+		const [, uid, actor] = ctx.queryKey;
+
+		const agent = await multiagent.connect(uid);
+
+		const response = await agent.rpc.get({
+			method: 'app.bsky.graph.getFollowers',
+			signal: ctx.signal,
+			params: { actor, limit, cursor: ctx.pageParam },
+		});
+
+		const data = response.data as BskyFollowersResponse;
+
+		return data;
+	};
+};
+export const createInitialFollowers = (actor: string): BskyFollowersResponse | undefined => {
+	const profile = cache.profilesBasic[actor]?.deref()?.peek();
+
+	if (!profile) {
+		return;
+	}
+
+	return {
+		cursor: undefined,
+		subject: {
+			...profile,
+			description: '',
+			indexedAt: '',
+		},
+		followers: [],
+	};
 };

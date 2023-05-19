@@ -66,3 +66,53 @@ export const favoritePost = async (uid: string, post: SignalizedPost) => {
 		lock.release();
 	}
 };
+
+export const repostPost = async (uid: string, post: SignalizedPost) => {
+	const session = multiagent.accounts[uid].session;
+	const agent = await multiagent.connect(uid);
+
+	const lock = await acquireLock(post);
+
+	const prev = post.viewer.repost.peek();
+
+	try {
+		if (prev) {
+			await agent.rpc.post({
+				method: 'com.atproto.repo.deleteRecord',
+				data: {
+					collection: 'app.bsky.feed.repost',
+					repo: session.did,
+					rkey: getPostId(prev),
+				},
+			});
+
+			post.viewer.repost.value = undefined;
+			post.repostCount.value--;
+		}
+		else {
+			const response = await agent.rpc.post({
+				method: 'com.atproto.repo.createRecord',
+				data: {
+					repo: session.did,
+					collection: 'app.bsky.feed.repost',
+					record: {
+						$type: 'app.bsky.feed.repost',
+						createdAt: new Date(),
+						subject: {
+							cid: post.cid,
+							uri: post.uri,
+						},
+					},
+				},
+			});
+
+			const data = response.data as BskyCreateRecordResponse;
+
+			post.viewer.repost.value = data.uri;
+			post.repostCount.value++;
+		}
+	}
+	finally {
+		lock.release();
+	}
+};

@@ -3,7 +3,7 @@ import { For, Match, Show, Switch } from 'solid-js';
 import { useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
-import { favoritePost } from '~/api/mutation.ts';
+import { favoritePost, repostPost } from '~/api/mutation.ts';
 import { getPostThread, getPostThreadKey } from '~/api/query.ts';
 import { getPostId } from '~/api/utils.ts';
 
@@ -204,6 +204,7 @@ const AuthenticatedPostPage = () => {
 										<button
 											class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'
 											classList={{ 'text-green-600': !!post.viewer.repost.value }}
+											onClick={() => repostPost(uid(), post)}
 										>
 											<RepeatIcon />
 										</button>

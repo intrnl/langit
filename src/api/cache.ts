@@ -7,7 +7,11 @@
 
 import { dequal } from 'dequal/lite';
 
+import { detectFacets } from './richtext/detection.ts';
 import { segmentRichText } from './richtext/segmentize.ts';
+import { RichTextSegment } from './richtext/types.ts';
+import { UnicodeString } from './richtext/unicode.ts';
+
 import {
 	type BskyPost,
 	type BskyProfile,
@@ -43,6 +47,8 @@ export interface SignalizedProfile {
 		blockedBy: Signal<BskyProfile['viewer']['blockedBy']>;
 		following: Signal<BskyProfile['viewer']['following']>;
 	};
+
+	$renderedDescription: ReturnType<typeof createProfileDescriptionRenderer>;
 }
 
 const createSignalizedProfile = (
@@ -70,6 +76,7 @@ const createSignalizedProfile = (
 			blockedBy: signal(profile.viewer.blockedBy),
 			following: signal(profile.viewer.following),
 		},
+		$renderedDescription: createProfileDescriptionRenderer(),
 	};
 };
 
@@ -261,8 +268,9 @@ const toShortUrl = (uri: string): string => {
 
 const createPostRenderer = () => {
 	let record: BskyPost['record'] | undefined;
-	let template: HTMLElement | undefined;
 	let cuid: string | undefined;
+
+	let template: HTMLElement | undefined;
 
 	return function (this: SignalizedPost, uid: string) {
 		const curr = this.record.value;
@@ -273,42 +281,7 @@ const createPostRenderer = () => {
 
 			if (record.facets) {
 				const segments = segmentRichText({ text: record.text, facets: record.facets });
-				const div = document.createElement('div');
-
-				for (let idx = 0, len = segments.length; idx < len; idx++) {
-					const segment = segments[idx];
-
-					const mention = segment.mention;
-					const link = segment.link;
-
-					if (mention) {
-						const did = mention.did;
-						const anchor = document.createElement('a');
-
-						anchor.href = `/u/${uid}/profile/${did}`;
-						anchor.className = 'text-accent hover:underline';
-						anchor.textContent = segment.text;
-						anchor.toggleAttribute('link', true);
-						anchor.setAttribute('data-mention', did);
-
-						div.appendChild(anchor);
-					}
-					else if (link) {
-						const uri = link.uri;
-						const anchor = document.createElement('a');
-
-						anchor.rel = 'noopener noreferrer nofollow';
-						anchor.target = '_blank';
-						anchor.href = uri;
-						anchor.className = 'text-accent hover:underline';
-						anchor.textContent = toShortUrl(uri);
-
-						div.appendChild(anchor);
-					}
-					else {
-						div.appendChild(document.createTextNode(segment.text));
-					}
-				}
+				const div = createRenderedRichText(uid, segments);
 
 				template = div;
 			}
@@ -319,15 +292,7 @@ const createPostRenderer = () => {
 
 		if (template) {
 			if (cuid !== uid) {
-				const mentions = template.querySelectorAll<HTMLAnchorElement>('a[data-mention]');
-
-				for (let idx = 0, len = mentions.length; idx < len; idx++) {
-					const node = mentions[idx];
-					const did = node.getAttribute('data-mention')!;
-
-					node.href = `/u/${uid}/profile/${did}`;
-				}
-
+				alterRenderedRichTextUid(template, uid);
 				cuid = uid;
 			}
 
@@ -337,4 +302,97 @@ const createPostRenderer = () => {
 			return record.text;
 		}
 	};
+};
+
+const createProfileDescriptionRenderer = () => {
+	let description: string;
+	let cuid: string;
+
+	let template: HTMLElement | undefined;
+
+	return function (this: SignalizedProfile, uid: string) {
+		const curr = this.description.value;
+
+		if (description === undefined || description !== curr) {
+			const text = new UnicodeString(curr);
+			const facets = detectFacets(text);
+
+			description = curr;
+			cuid = uid;
+
+			if (facets) {
+				const segments = segmentRichText({ text: curr, facets: facets });
+				const div = createRenderedRichText(uid, segments);
+
+				template = div;
+			}
+			else {
+				template = undefined;
+			}
+		}
+
+		if (template) {
+			if (cuid !== uid) {
+				alterRenderedRichTextUid(template, uid);
+				cuid = uid;
+			}
+
+			return template.cloneNode(true);
+		}
+		else {
+			return description;
+		}
+	};
+};
+
+const createRenderedRichText = (uid: string, segments: RichTextSegment[]) => {
+	const div = document.createElement('div');
+
+	for (let idx = 0, len = segments.length; idx < len; idx++) {
+		const segment = segments[idx];
+
+		const mention = segment.mention;
+		const link = segment.link;
+
+		if (mention) {
+			const did = mention.did;
+			const anchor = document.createElement('a');
+
+			anchor.href = `/u/${uid}/profile/${did}`;
+			anchor.className = 'text-accent hover:underline';
+			anchor.textContent = segment.text;
+			anchor.toggleAttribute('link', true);
+			anchor.setAttribute('data-mention', did);
+
+			div.appendChild(anchor);
+		}
+		else if (link) {
+			const uri = link.uri;
+			const anchor = document.createElement('a');
+
+			anchor.rel = 'noopener noreferrer nofollow';
+			anchor.target = '_blank';
+			anchor.href = uri;
+			anchor.className = 'text-accent hover:underline';
+			anchor.textContent = toShortUrl(uri);
+
+			div.appendChild(anchor);
+		}
+		else {
+			div.appendChild(document.createTextNode(segment.text));
+		}
+	}
+
+	return div;
+};
+
+const alterRenderedRichTextUid = (template: HTMLElement, uid: string) => {
+	const mentions = template.querySelectorAll<HTMLAnchorElement>('a[data-mention]');
+
+	for (let idx = 0, len = mentions.length; idx < len; idx++) {
+		const node = mentions[idx];
+		const did = node.getAttribute('data-mention')!;
+
+		node.href = `/u/${uid}/profile/${did}`;
+	}
 };

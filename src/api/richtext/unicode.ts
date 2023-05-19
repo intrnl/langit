@@ -27,3 +27,7 @@ export class UnicodeString {
 		return decoder.decode(this.utf8.slice(start, end));
 	}
 }
+
+export const utf16IndexToUtf8Index = (text: UnicodeString, index: number) => {
+	return encoder.encode(text.utf16.slice(0, index)).byteLength;
+};

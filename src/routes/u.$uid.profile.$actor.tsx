@@ -16,8 +16,10 @@ import TabLink from '~/components/TabLink.tsx';
 const AuthenticatedProfileLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor');
 
+	const uid = () => params.uid;
+
 	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(params.uid, params.actor),
+		queryKey: () => getProfileKey(uid(), params.actor),
 		queryFn: getProfile,
 		staleTime: 10_000,
 	});
@@ -75,11 +77,9 @@ const AuthenticatedProfileLayout = () => {
 								</div>
 
 								<Show when={profile().description.value}>
-									{(description) => (
-										<div class='text-sm whitespace-pre-wrap break-words'>
-											{description()}
-										</div>
-									)}
+									<div class='text-sm whitespace-pre-wrap break-words'>
+										{profile().$renderedDescription(uid())}
+									</div>
 								</Show>
 
 								<div class='text-sm flex flex-wrap gap-4'>

@@ -9,22 +9,63 @@
 
 import { type Signal, signal } from '~/utils/signals.ts';
 
-import { type BskyPost, type BskyProfileBasic, type LinearizedThread, SignalizedLinearThread } from './types.ts';
+import {
+	type BskyPost,
+	type BskyProfileBasic,
+	type LinearizedThread,
+	type SignalizedLinearThread,
+} from './types.ts';
 
-export const postAuthors: Record<string, WeakRef<Signal<BskyProfileBasic>>> = {};
-export const posts: Record<string, WeakRef<Signal<BskyPost>>> = {};
+type Kignal<T> = Signal<T> & { _key?: number };
 
-export const signalizePost = (post: BskyPost, key?: number) => {
-	let ref: WeakRef<Signal<BskyPost>> | undefined = posts[post.cid];
-	let signalized: Signal<BskyPost>;
+export const profilesBasic: Record<string, WeakRef<Kignal<BskyProfileBasic>>> = {};
+export const posts: Record<string, WeakRef<Kignal<BskyPost>>> = {};
+
+export const signalizeProfileBasic = (profile: BskyProfileBasic, key?: number) => {
+	let did = profile.did;
+
+	let ref: WeakRef<Kignal<BskyProfileBasic>> | undefined = profilesBasic[profile.did];
+	let signalized: Kignal<BskyProfileBasic>;
 
 	if (!ref || !(signalized = ref.deref()!)) {
+		signalized = signal(profile);
+		profilesBasic[did] = new WeakRef(signalized);
+	}
+	else if (signalized) {
+		if (!key || signalized._key !== key) {
+			signalized.value = profile;
+		}
+	}
+
+	return signalized;
+};
+
+const patchPost = (post: BskyPost, key?: number) => {
+	let profile = signalizeProfileBasic(post.author, key);
+
+	Object.defineProperty(post, 'author', {
+		get () {
+			return profile.value;
+		},
+	});
+};
+
+export const signalizePost = (post: BskyPost, key?: number) => {
+	let cid = post.cid;
+
+	let ref: WeakRef<Kignal<BskyPost>> | undefined = posts[cid];
+	let signalized: Kignal<BskyPost>;
+
+	if (!ref || !(signalized = ref.deref()!)) {
+		patchPost(post, key);
+
 		signalized = signal(post);
-		posts[post.cid] = new WeakRef(signalized);
+		posts[cid] = new WeakRef(signalized);
 	}
 	else if (signalized) {
 		// Prevent further updates if if the post currently contains that key
-		if (!key || signalized.peek().$key !== key) {
+		if (!key || signalized._key !== key) {
+			patchPost(post, key);
 			signalized.value = post;
 		}
 	}

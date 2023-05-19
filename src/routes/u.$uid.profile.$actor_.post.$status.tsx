@@ -18,6 +18,7 @@ import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 const seen = new Set<string>();
 
 const MAX_ANCESTORS = 10;
+const MAX_DESCENDANTS = 4;
 
 const AuthenticatedPostPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
@@ -86,13 +87,16 @@ const AuthenticatedPostPage = () => {
 														<A
 															href='/u/:uid/profile/:actor/post/:status'
 															params={{
-																uid: params.uid,
+																uid: uid(),
 																actor: items[0].value.author.did,
 																status: getPostId(items[0].value.uri),
 															}}
-															class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
+															class='h-10 flex items-center gap-3 px-4 hover:bg-hinted'
 														>
-															Show parent posts
+															<div class='w-12 h-full flex justify-center'>
+																<div class='border-l-2 border-divider border-dashed mt-3' />
+															</div>
+															<span class='text-accent text-sm'>Show parent post</span>
 														</A>
 													)
 													: data.parentNotFound
@@ -165,17 +169,45 @@ const AuthenticatedPostPage = () => {
 
 								<For each={data.descendants}>
 									{(slice) => {
-										const items = slice.items;
-										const len = items.length;
+										let overflowing = false;
+										let items = slice.items;
+										let len = items.length;
 
-										return items.map((item, idx) => (
-											<Post
-												uid={uid()}
-												post={item.value}
-												prev={idx !== 0}
-												next={idx !== len - 1}
-											/>
-										));
+										if (len > MAX_DESCENDANTS) {
+											overflowing = true;
+											items = items.slice(0, MAX_DESCENDANTS);
+											len = MAX_DESCENDANTS;
+										}
+
+										return (
+											<>
+												{items.map((item, idx) => (
+													<Post
+														uid={uid()}
+														post={item.value}
+														prev={idx !== 0}
+														next={overflowing || idx !== len - 1}
+													/>
+												))}
+
+												{overflowing && (
+													<A
+														href='/u/:uid/profile/:actor/post/:status'
+														params={{
+															uid: uid(),
+															actor: items[len - 1].value.author.did,
+															status: getPostId(items[len - 1].value.uri),
+														}}
+														class='h-10 flex items-center gap-3 px-4 border-b border-divider hover:bg-hinted'
+													>
+														<div class='w-12 h-full flex justify-center'>
+															<div class='border-l-2 border-divider border-dashed mb-3' />
+														</div>
+														<span class='text-accent text-sm'>Continue thread</span>
+													</A>
+												)}
+											</>
+										);
 									}}
 								</For>
 							</>

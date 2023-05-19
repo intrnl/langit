@@ -30,15 +30,15 @@ const AuthenticatedYouPage = () => {
 						<div class='flex flex-col gap-3 p-4'>
 							<div class='flex'>
 								<div class='h-20 w-20 -mt-11 bg-muted-fg rounded-full overflow-hidden ring-2 ring-background'>
-									<Show when={profile().avatar}>
+									<Show when={profile().avatar.value}>
 										{(avatar) => <img src={avatar()} class='h-full w-full' />}
 									</Show>
 								</div>
 							</div>
 
 							<div>
-								<p class='text-xl font-bold'>{profile().displayName}</p>
-								<p class='text-sm text-muted-fg'>@{profile().handle}</p>
+								<p class='text-xl font-bold'>{profile().displayName.value}</p>
+								<p class='text-sm text-muted-fg'>@{profile().handle.value}</p>
 							</div>
 						</div>
 					</A>

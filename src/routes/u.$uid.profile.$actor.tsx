@@ -28,8 +28,8 @@ const AuthenticatedProfileLayout = () => {
 				<Show when={profileQuery.data} fallback={<p class='font-bold text-base'>Profile</p>}>
 					{(profile) => (
 						<div class='flex flex-col gap-0.5'>
-							<p class='text-base leading-5 font-bold'>{profile().displayName}</p>
-							<p class='text-xs text-muted-fg'>{profile().postsCount} posts</p>
+							<p class='text-base leading-5 font-bold'>{profile().displayName.value}</p>
+							<p class='text-xs text-muted-fg'>{profile().postsCount.value} posts</p>
 						</div>
 					)}
 				</Show>
@@ -49,7 +49,7 @@ const AuthenticatedProfileLayout = () => {
 					return (
 						<>
 							<div class='aspect-banner bg-muted-fg'>
-								<Show when={profile().banner}>
+								<Show when={profile().banner.value}>
 									{(banner) => <img src={banner()} class='h-full w-full' />}
 								</Show>
 							</div>
@@ -57,7 +57,7 @@ const AuthenticatedProfileLayout = () => {
 							<div class='flex flex-col gap-3 p-4'>
 								<div class='flex gap-2'>
 									<div class='shrink-0 h-20 w-20 -mt-11 bg-muted-fg rounded-full overflow-hidden ring-2 ring-background'>
-										<Show when={profile().avatar}>
+										<Show when={profile().avatar.value}>
 											{(avatar) => <img src={avatar()} class='h-full w-full' />}
 										</Show>
 									</div>
@@ -70,11 +70,11 @@ const AuthenticatedProfileLayout = () => {
 								</div>
 
 								<div>
-									<p class='text-xl font-bold'>{profile().displayName}</p>
-									<p class='text-sm text-muted-fg'>@{profile().handle}</p>
+									<p class='text-xl font-bold'>{profile().displayName.value}</p>
+									<p class='text-sm text-muted-fg'>@{profile().handle.value}</p>
 								</div>
 
-								<Show when={profile().description}>
+								<Show when={profile().description.value}>
 									{(description) => (
 										<div class='text-sm whitespace-pre-wrap break-words'>
 											{description()}
@@ -84,12 +84,12 @@ const AuthenticatedProfileLayout = () => {
 
 								<div class='text-sm flex flex-wrap gap-4'>
 									<A href='/u/:uid/profile/:actor/following' params={params} class='hover:underline'>
-										<span class='font-bold'>{comformat.format(profile().followsCount)}</span>{' '}
+										<span class='font-bold'>{comformat.format(profile().followsCount.value)}</span>{' '}
 										<span class='text-muted-fg'>Following</span>
 									</A>
 
 									<A href='/u/:uid/profile/:actor/followers' params={params} class='hover:underline'>
-										<span class='font-bold'>{comformat.format(profile().followersCount)}</span>{' '}
+										<span class='font-bold'>{comformat.format(profile().followersCount.value)}</span>{' '}
 										<span class='text-muted-fg'>Followers</span>
 									</A>
 								</div>

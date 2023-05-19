@@ -53,13 +53,16 @@ export const getProfile = async (ctx: QueryFunctionContext<ReturnType<typeof get
 	const [, uid, actor] = ctx.queryKey;
 	const agent = await multiagent.connect(uid);
 
-	const res = await agent.rpc.get({
+	const response = await agent.rpc.get({
 		method: 'app.bsky.actor.getProfile',
 		signal: ctx.signal,
 		params: { actor },
 	});
 
-	return res.data as BskyProfile;
+	const data = response.data as BskyProfile;
+	const profile = cache.mergeSignalizedProfile(data);
+
+	return profile;
 };
 
 export const getTimelineKey = (uid: UID, algorithm: string) => ['getTimeline', uid, algorithm] as const;

@@ -250,16 +250,20 @@ export const createSignalizedLinearThread = (thread: LinearizedThread, key?: num
 };
 
 // Miscellaneous
+const TRIM_HOST_RE = /^www\./;
+
 const toShortUrl = (uri: string): string => {
 	try {
 		const url = new URL(uri);
-		const shortened = url.host + (url.pathname === '/' ? '' : url.pathname) + url.search + url.hash;
 
-		if (shortened.length > 30) {
-			return shortened.slice(0, 27) + '...';
+		const host = url.host.replace(TRIM_HOST_RE, '');
+		const short = host + (url.pathname === '/' ? '' : url.pathname) + url.search + url.hash;
+
+		if (short.length > 30) {
+			return short.slice(0, 27) + '...';
 		}
 
-		return shortened;
+		return short;
 	}
 	catch (e) {
 		return uri;

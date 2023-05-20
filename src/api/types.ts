@@ -1,4 +1,5 @@
-import { type DID } from './utils';
+import { type Facet } from './richtext/types.ts';
+import { type DID } from './utils.ts';
 
 export interface BskyLabel {
 	cts: string;
@@ -55,6 +56,19 @@ export interface BskyProfileFollow {
 	};
 }
 
+export interface BskyProfileTypeaheadSearch {
+	did: string;
+	handle: string;
+	displayName: string;
+	avatar?: string;
+	labels: BskyLabel[];
+	viewer: {
+		muted: boolean;
+		blockedBy: boolean;
+		following?: string;
+	};
+}
+
 export interface BskyPostRecordEmbed {
 	images: Array<{
 		alt: string;
@@ -71,6 +85,23 @@ export interface BskyPostRecordEmbed {
 		cid: string;
 		uri: string;
 	};
+}
+
+export interface BskyPostRecordReply {
+	cid: string;
+	uri: string;
+}
+
+export interface BskyPostRecord {
+	$type: 'app.bsky.feed.post';
+	text: string;
+	facets?: Facet[];
+	createdAt: string;
+	reply?: {
+		root: BskyPostRecordReply;
+		parent: BskyPostRecordReply;
+	};
+	embed?: BskyPostRecordEmbed;
 }
 
 export interface EmbeddedLink {
@@ -134,23 +165,7 @@ export interface BskyPost {
 	uri: string;
 	cid: string;
 	author: BskyProfileBasic;
-	record: {
-		$type: 'app.bsky.feed.post';
-		text: string;
-		facets: any[];
-		createdAt: string;
-		reply?: {
-			root: {
-				cid: string;
-				uri: string;
-			};
-			parent: {
-				cid: string;
-				uri: string;
-			};
-		};
-		embed?: BskyPostRecordEmbed;
-	};
+	record: BskyPostRecord;
 	embed?: BskyPostEmbedLink | BskyPostEmbedImage | BskyPostEmbedRecord | BskyPostEmbedRecordWithMedia;
 	replyCount: number;
 	repostCount: number;
@@ -214,4 +229,8 @@ export interface BskyFollowersResponse {
 export interface BskyCreateRecordResponse {
 	uri: string;
 	cid: string;
+}
+
+export interface BskySearchActorTypeaheadResponse {
+	actors: BskyProfileTypeaheadSearch[];
 }

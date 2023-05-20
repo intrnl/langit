@@ -8,9 +8,11 @@ import { getProfile, getProfileKey } from '~/api/query.ts';
 import { A, Navigate, useParams } from '~/router.ts';
 import { useMediaQuery } from '~/utils/media-query';
 
+import AddBoxIcon from '~/icons/baseline-add-box.tsx';
 import HomeIcon from '~/icons/baseline-home.tsx';
 import NotificationsIcon from '~/icons/baseline-notifications.tsx';
 import SearchIcon from '~/icons/baseline-search.tsx';
+import AddBoxOutlinedIcon from '~/icons/outline-add-box.tsx';
 import HomeOutlinedIcon from '~/icons/outline-home.tsx';
 import NotificationsOutlinedIcon from '~/icons/outline-notifications.tsx';
 
@@ -82,7 +84,7 @@ const AuthenticatedLayout = () => {
 				</div>
 			</Show>
 
-			<div class='flex flex-col grow shrink basis-2/4'>
+			<div class='flex flex-col grow shrink basis-2/4 min-w-0'>
 				<Outlet />
 			</div>
 
@@ -112,6 +114,16 @@ const AuthenticatedLayout = () => {
 						activeClass='is-active'
 					>
 						<SearchIcon class='group-[.is-active]:stroke-primary' />
+					</A>
+					<A
+						href='/u/:uid/compose'
+						params={{ uid: params.uid }}
+						title='Compose'
+						class='group flex items-center justify-center grow basis-0 text-2xl'
+						activeClass='is-active'
+					>
+						<AddBoxOutlinedIcon class='group-[.is-active]:hidden' />
+						<AddBoxIcon class='hidden group-[.is-active]:block' />
 					</A>
 					<A
 						href='/u/:uid/notifications'

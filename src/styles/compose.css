@@ -1,0 +1,21 @@
+.compose-editor {
+	@apply text-xl;
+}
+
+.compose-editor .ProseMirror {
+	@apply pr-3 pt-6 pb-4 outline-none;
+}
+
+.compose-editor .ProseMirror p {
+	@apply whitespace-pre-wrap break-words;
+}
+
+.compose-editor .ProseMirror p.is-editor-empty:first-child::before {
+	@apply text-muted-fg float-left h-0 pointer-events-none;
+	content: attr(data-placeholder);
+}
+
+.compose-editor .ProseMirror span[data-type='mention'],
+.compose-editor .ProseMirror a {
+	@apply text-accent;
+}

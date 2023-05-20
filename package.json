@@ -8,11 +8,24 @@
 		"build": "vite build"
 	},
 	"dependencies": {
+		"@floating-ui/dom": "^1.2.8",
 		"@solidjs/router": "^0.8.2",
 		"@tanstack/solid-query": "^4.29.7",
+		"@tiptap/core": "^2.0.3",
+		"@tiptap/extension-document": "^2.0.3",
+		"@tiptap/extension-hard-break": "^2.0.3",
+		"@tiptap/extension-history": "^2.0.3",
+		"@tiptap/extension-link": "^2.0.3",
+		"@tiptap/extension-mention": "^2.0.3",
+		"@tiptap/extension-paragraph": "^2.0.3",
+		"@tiptap/extension-placeholder": "^2.0.3",
+		"@tiptap/extension-text": "^2.0.3",
+		"@tiptap/pm": "^2.0.3",
+		"@tiptap/suggestion": "^2.0.3",
 		"class-variance-authority": "^0.6.0",
 		"dequal": "^2.0.3",
-		"solid-js": "^1.7.5"
+		"solid-js": "^1.7.5",
+		"solid-tiptap": "^0.6.0"
 	},
 	"devDependencies": {
 		"@tailwindcss/forms": "^0.5.3",

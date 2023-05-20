@@ -45,6 +45,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.notifications.tsx")),
       },
       {
+        path: "compose",
+        component: lazy(() => import("./routes/u.$uid.compose.tsx")),
+      },
+      {
         path: "/",
         component: lazy(() => import("./routes/u.$uid._index.tsx")),
       },

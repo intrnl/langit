@@ -1,9 +1,11 @@
 import { type SignalizedPost } from './cache.ts';
 import { multiagent } from './global.ts';
-import { type BskyCreateRecordResponse } from './types.ts';
+import { type BskyCreateRecordResponse, type BskyPostRecord } from './types.ts';
 import { getPostId } from './utils.ts';
 
 const locked = new WeakMap<any, boolean>();
+
+const CREATE_RECORD = 'com.atproto.repo.createRecord';
 
 const acquire = async (value: any, callback: () => Promise<void>) => {
 	if (locked.has(value)) {
@@ -43,7 +45,7 @@ export const favoritePost = (uid: string, post: SignalizedPost) => {
 		}
 		else {
 			const response = await agent.rpc.post({
-				method: 'com.atproto.repo.createRecord',
+				method: CREATE_RECORD,
 				data: {
 					repo: session.did,
 					collection: 'app.bsky.feed.like',
@@ -88,7 +90,7 @@ export const repostPost = (uid: string, post: SignalizedPost) => {
 		}
 		else {
 			const response = await agent.rpc.post({
-				method: 'com.atproto.repo.createRecord',
+				method: CREATE_RECORD,
 				data: {
 					repo: session.did,
 					collection: 'app.bsky.feed.repost',
@@ -109,4 +111,22 @@ export const repostPost = (uid: string, post: SignalizedPost) => {
 			post.repostCount.value++;
 		}
 	});
+};
+
+export const createPost = async (uid: string, record: BskyPostRecord) => {
+	const session = multiagent.accounts[uid].session;
+	const agent = await multiagent.connect(uid);
+
+	const response = await agent.rpc.post({
+		method: CREATE_RECORD,
+		data: {
+			repo: session.did,
+			collection: 'app.bsky.feed.post',
+			record: record,
+		},
+	});
+
+	const data = response.data as BskyCreateRecordResponse;
+
+	return data;
 };

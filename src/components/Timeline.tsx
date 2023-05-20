@@ -55,6 +55,7 @@ const Timeline = (props: TimelineProps) => {
 
 							return items.map((item, idx) => (
 								<Post
+									interactive
 									uid={props.uid}
 									post={item.post}
 									parent={item.reply?.parent}

@@ -120,6 +120,7 @@ const AuthenticatedPostPage = () => {
 
 												{items.map((item, idx) => (
 													<Post
+														interactive
 														uid={uid()}
 														post={item}
 														prev={idx !== 0}
@@ -240,6 +241,7 @@ const AuthenticatedPostPage = () => {
 											<>
 												{items.map((item, idx) => (
 													<Post
+														interactive
 														uid={uid()}
 														post={item}
 														prev={idx !== 0}

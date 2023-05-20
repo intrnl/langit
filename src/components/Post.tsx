@@ -4,7 +4,7 @@ import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache.ts
 import { favoritePost, repostPost } from '~/api/mutation.ts';
 import { getPostId } from '~/api/utils.ts';
 
-import { A } from '~/router.ts';
+import { A, useNavigate } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
@@ -24,9 +24,12 @@ interface PostProps {
 	reason?: SignalizedTimelinePost['reason'];
 	prev?: boolean;
 	next?: boolean;
+	interactive?: boolean;
 }
 
 const Post = (props: PostProps) => {
+	const navigate = useNavigate();
+
 	const uid = () => props.uid;
 	const post = () => props.post;
 	const parent = () => props.parent;
@@ -34,8 +37,46 @@ const Post = (props: PostProps) => {
 	const author = () => post().author;
 	const record = () => post().record.value;
 
+	const handleClick = (ev: MouseEvent | KeyboardEvent) => {
+		if (!props.interactive) {
+			return;
+		}
+
+		const path = ev.composedPath() as HTMLElement[];
+
+		for (let idx = 0, len = path.length; idx < len; idx++) {
+			const node = path[idx];
+			const tag = node.localName;
+
+			if (node == ev.currentTarget) {
+				break;
+			}
+
+			if (tag === 'a' || tag === 'button' || tag === 'img' || tag === 'video') {
+				return;
+			}
+		}
+
+		if (window.getSelection()?.toString()) {
+			return;
+		}
+
+		navigate('/u/:uid/profile/:actor/post/:status', {
+			params: {
+				uid: uid(),
+				actor: author().did,
+				status: getPostId(post().uri),
+			},
+		});
+	};
+
 	return (
-		<div class='relative px-4 hover:bg-hinted border-divider' classList={{ 'border-b': !props.next }}>
+		<div
+			tabindex={props.interactive ? 0 : undefined}
+			onClick={handleClick}
+			class='relative px-4 hover:bg-hinted border-divider'
+			classList={{ 'border-b': !props.next }}
+		>
 			<div class='pt-3 flex flex-col gap-1'>
 				<Show when={props.reason && props.reason.$type === 'app.bsky.feed.defs#reasonRepost'}>
 					<div class='-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg'>

@@ -161,7 +161,7 @@ const AuthenticatedComposePage = () => {
 	});
 
 	return (
-		<div class='flex flex-col grow border-divider md:border-x'>
+		<div class='flex flex-col'>
 			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
 				<p class='font-bold text-base'>Compose</p>
 			</div>

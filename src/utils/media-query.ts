@@ -1,40 +1,41 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { Accessor, createSignal, onCleanup } from 'solid-js';
 
 interface MediaStore {
-	c: number;
-	m: MediaQueryList;
+	/** State backing */
+	a: Accessor<boolean>;
+	/** Amount of subscriptions */
+	n: number;
+	/** Cleanup function */
+	c: () => void;
 }
 
 const map: Record<string, MediaStore> = {};
 
-const getMediaMatcher = (query: string) => {
+export const useMediaQuery = (query: string): Accessor<boolean> => {
 	let media = map[query];
 
 	if (!media) {
 		const matcher = window.matchMedia(query);
-		media = { m: matcher, c: 0 };
+		const [state, setState] = createSignal(matcher.matches);
+
+		const callback = () => setState(matcher.matches);
+
+		matcher.addEventListener('change', callback);
+
+		media = map[query] = {
+			n: 0,
+			a: state,
+			c: () => {
+				if (--media.n < 1) {
+					delete map[query];
+					matcher.removeEventListener('change', callback);
+				}
+			},
+		};
 	}
 
-	return media;
-};
+	media.n++;
+	onCleanup(media.c);
 
-export const useMediaQuery = (query: string): () => boolean => {
-	const media = getMediaMatcher(query);
-	const [state, setState] = createSignal(media.m.matches);
-
-	const callback = () => setState(media.m.matches);
-
-	callback();
-	onCleanup(() => {
-		media.m.removeEventListener('change', callback, false);
-
-		if (--media.c < 1) {
-			delete map[query];
-		}
-	});
-
-	media.m.addEventListener('change', callback, false);
-	media.c++;
-
-	return state;
+	return media.a;
 };

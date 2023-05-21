@@ -161,14 +161,14 @@ const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
 };
 
 export const mergeSignalizedPost = (post: BskyPost, key?: number) => {
-	let cid = post.cid;
+	let uri = post.uri;
 
-	let ref: Ref<SignalizedPost> | undefined = posts[cid];
+	let ref: Ref<SignalizedPost> | undefined = posts[uri];
 	let val: SignalizedPost;
 
 	if (!ref || !(val = ref.deref()!)) {
 		val = createSignalizedPost(post, key);
-		posts[cid] = new WeakRef(val);
+		posts[uri] = new WeakRef(val);
 	}
 	else if (!key || val._key !== key) {
 		val._key = key;

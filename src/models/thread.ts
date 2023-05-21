@@ -3,8 +3,10 @@ import { type BskyPost, type BskyThread, type LinearizedThread } from '~/api/typ
 
 import { Stack } from '~/utils/stack.ts';
 
-const calculatePostScore = (post: BskyPost) => {
-	return (post.replyCount * 0.5) + (post.repostCount * 1) + (post.likeCount * 1);
+const calculatePostScore = (post: BskyPost, parent: BskyPost) => {
+	const isSameAuthor = parent.author.did === post.author.did;
+
+	return ((post.replyCount * 0.5) + (post.repostCount * 1) + (post.likeCount * 1)) * (isSameAuthor ? 1.5 : 1);
 };
 
 const linearizeThread = (thread: BskyThread): LinearizedThread => {
@@ -33,9 +35,11 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 	while (node = stack.pop()) {
 		// skip any nodes that doesn't have a replies array, think this might be
 		// when we reach the depth limit? not certain.
+		const post = node.post;
+
 		if (!node.replies) {
 			if (node !== thread) {
-				descendants.push(node.post);
+				descendants.push(post);
 			}
 
 			continue;
@@ -46,15 +50,15 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 		if (node !== thread) {
 			const scores: Record<string, number> = {};
 
-			descendants.push(node.post);
+			descendants.push(post);
 
 			// sort replies by their score
 			replies.sort((a, b) => {
 				const aPost = a.post;
 				const bPost = b.post;
 
-				const aScore = scores[aPost.cid] ??= calculatePostScore(aPost);
-				const bScore = scores[bPost.cid] ??= calculatePostScore(bPost);
+				const aScore = scores[aPost.cid] ??= calculatePostScore(aPost, post);
+				const bScore = scores[bPost.cid] ??= calculatePostScore(bPost, post);
 
 				return bScore - aScore;
 			});

@@ -1,7 +1,7 @@
 {
 	"name": "Langit",
 	"description": "Alternative client for Bluesky social media",
-	"display": "minimal-ui",
+	"display": "standalone",
 	"id": "/?source=pwa",
 	"start_url": "/?source=pwa",
 	"scope": "/",

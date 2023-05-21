@@ -33,7 +33,7 @@ const AuthenticatedLayout = () => {
 	const profileQuery = createQuery({
 		queryKey: () => getProfileKey(params.uid, did()),
 		queryFn: getProfile,
-		staleTime: 60000,
+		staleTime: 60_000,
 		refetchOnMount: true,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,

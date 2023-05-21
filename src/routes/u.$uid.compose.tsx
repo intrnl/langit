@@ -72,6 +72,7 @@ const AuthenticatedComposePage = () => {
 			const signalized = postsCache[replyUri()];
 			return signalized?.deref();
 		},
+		staleTime: 10_000,
 		get enabled () {
 			return !!replyUri();
 		},
@@ -80,6 +81,10 @@ const AuthenticatedComposePage = () => {
 	const profileQuery = createQuery({
 		queryKey: () => getProfileKey(uid(), did()),
 		queryFn: getProfile,
+		staleTime: 10_000,
+		refetchOnMount: true,
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
 	});
 
 	const length = createMemo(() => {

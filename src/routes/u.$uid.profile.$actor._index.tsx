@@ -52,7 +52,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 	const latestQuery = createQuery({
 		queryKey: () => getProfileFeedLatestKey(params.uid, params.actor),
 		queryFn: getProfileFeedLatest,
-		staleTime: 10000,
+		staleTime: 10_000,
 		get enabled () {
 			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
 				return false;

@@ -34,6 +34,7 @@ const AuthenticatedHome = () => {
 			}
 
 			// check if the last page is empty because of its slices being filtered
+			// away, if so, fetch next page
 			if (length > 0) {
 				const last = pages[length - 1];
 
@@ -47,7 +48,7 @@ const AuthenticatedHome = () => {
 	const latestQuery = createQuery({
 		queryKey: () => getTimelineLatestKey(params.uid, DEFAULT_ALGORITHM),
 		queryFn: getTimelineLatest,
-		staleTime: 10000,
+		staleTime: 10_000,
 		get enabled () {
 			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
 				return false;

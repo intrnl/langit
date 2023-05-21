@@ -3,20 +3,7 @@ import { type JSONContent } from '@tiptap/core';
 import { graphemeLen } from '~/api/richtext/intl.ts';
 import { type Facet, type FacetLink } from '~/api/richtext/types.ts';
 
-const merge = (a: Uint8Array, b: Uint8Array) => {
-	const alen = a.length;
-	const blen = b.length;
-
-	const c = new Uint8Array(alen + blen);
-	c.set(a, 0);
-	c.set(b, alen);
-
-	return c;
-};
-
 const encoder = new TextEncoder();
-
-const NEWLINE = new Uint8Array([10]);
 
 type SerializedMarks = NonNullable<JSONContent['marks']>;
 
@@ -37,12 +24,27 @@ const findFeature = (marks?: SerializedMarks): FacetLink | undefined => {
 	return undefined;
 };
 
+const isAscii = (str: string) => {
+	for (let idx = 0, len = str.length; idx < len; idx++) {
+		const char = str.charCodeAt(idx);
+
+		if (char > 127) {
+			return false;
+		}
+	}
+
+	return true;
+};
+
 export const pm2rt = (json: JSONContent) => {
 	const facets: Facet[] = [];
 	const links: string[] = [];
 
-	let bytes = new Uint8Array(0);
 	let text = '';
+	let length = 0;
+
+	let leading = true;
+	let ascii = true;
 
 	const delve = (node: JSONContent, end: boolean) => {
 		const type = node.type;
@@ -57,21 +59,37 @@ export const pm2rt = (json: JSONContent) => {
 				}
 			}
 
-			if (!end && type === 'paragraph') {
+			if (!end && !leading && type === 'paragraph') {
 				text += '\n';
-				bytes = merge(bytes, NEWLINE);
+				length += 1;
 			}
 		}
 		else if (type === 'text') {
-			const value = node.text!;
 			const feature = findFeature(node.marks);
+			const start = length;
+			let value = node.text!;
+
+			if (leading) {
+				value = value.trimStart();
+
+				if (value.length === 0) {
+					return;
+				}
+
+				leading = false;
+			}
+
+			text += value;
+
+			if (isAscii(value)) {
+				length += value.length;
+			}
+			else {
+				length += encoder.encode(value).byteLength;
+				ascii = false;
+			}
 
 			if (feature) {
-				const start = bytes.byteLength;
-
-				bytes = merge(bytes, encoder.encode(value));
-				text += value;
-
 				if (feature.$type === 'app.bsky.richtext.facet#link') {
 					links.push(feature.uri);
 				}
@@ -80,30 +98,26 @@ export const pm2rt = (json: JSONContent) => {
 					$type: 'app.bsky.richtext.facet',
 					index: {
 						byteStart: start,
-						byteEnd: bytes.byteLength,
+						byteEnd: length,
 					},
 					features: [feature],
 				});
-			}
-			else {
-				bytes = merge(bytes, encoder.encode(value));
-				text += value;
 			}
 		}
 		else if (type === 'mention') {
 			const handle = `@${node.attrs!.label}`;
 			const did = node.attrs!.id;
 
-			const start = bytes.byteLength;
+			const start = length;
 
-			bytes = merge(bytes, encoder.encode(handle));
+			length += handle.length;
 			text += handle;
 
 			facets.push({
 				$type: 'app.bsky.richtext.facet',
 				index: {
 					byteStart: start,
-					byteEnd: bytes.byteLength,
+					byteEnd: length,
 				},
 				features: [
 					{
@@ -117,8 +131,14 @@ export const pm2rt = (json: JSONContent) => {
 
 	delve(json, true);
 
+	const trimmed = text.trimEnd();
+	const trailOffset = length - trimmed.length;
+
+	text = trimmed;
+	length -= trailOffset;
+
 	return {
-		length: graphemeLen(text),
+		length: ascii ? length : graphemeLen(text),
 		text,
 		facets: facets.length > 0 ? facets : undefined,
 		links: links.length > 0 ? links : undefined,

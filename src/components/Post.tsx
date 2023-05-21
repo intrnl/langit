@@ -160,7 +160,7 @@ const Post = (props: PostProps) => {
 										actor: author().did,
 										status: getPostId(post().uri),
 									}}
-									class='hover:underline'
+									class='hover:underline whitespace-nowrap'
 								>
 									{relformat.format(record().createdAt)}
 								</A>

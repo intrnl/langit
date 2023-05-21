@@ -63,7 +63,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 					@{author().handle}
 				</span>
 				<span class='px-1'>·</span>
-				<span>{relformat.format(val().createdAt)}</span>
+				<span class='whitespace-nowrap'>{relformat.format(val().createdAt)}</span>
 			</div>
 
 			<div class='flex items-start'>

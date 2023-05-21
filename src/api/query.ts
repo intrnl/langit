@@ -9,6 +9,7 @@ import * as cache from './cache.ts';
 
 import {
 	type BskyFollowersResponse,
+	type BskyGetPostsResponse,
 	type BskyProfile,
 	type BskyResolvedDidResponse,
 	type BskyThreadResponse,
@@ -163,6 +164,29 @@ export const getProfileFeedLatest = async (ctx: QueryFunctionContext<ReturnType<
 	return feed.length > 0 ? feed[0].post.cid : undefined;
 };
 
+export const getPostKey = (uid: UID, uri: string) => ['getPost', uid, uri] as const;
+export const getPost = async (ctx: QueryFunctionContext<ReturnType<typeof getPostKey>>) => {
+	const [, uid, uri] = ctx.queryKey;
+
+	const agent = await multiagent.connect(uid);
+
+	const response = await agent.rpc.get({
+		method: 'app.bsky.feed.getPosts',
+		signal: ctx.signal,
+		params: { uris: [uri] },
+	});
+
+	const data = response.data as BskyGetPostsResponse;
+	const posts = data.posts;
+
+	if (posts.length > 0) {
+		const signalized = cache.mergeSignalizedPost(posts[0]);
+		return signalized;
+	}
+
+	throw new Error(`Post not found`);
+};
+
 export const getPostThreadKey = (uid: UID, actor: string, post: string) => ['getPostThread', uid, actor, post] as const;
 export const getPostThread = async (ctx: QueryFunctionContext<ReturnType<typeof getPostThreadKey>>) => {
 	const [, uid, actor, post] = ctx.queryKey;
@@ -181,8 +205,6 @@ export const getPostThread = async (ctx: QueryFunctionContext<ReturnType<typeof 
 	const page = createThreadPage(data.thread);
 
 	return page;
-};
-export const createInitialPostThread = (uid: UID, actor: string, post: string) => {
 };
 
 export const getFollowersKey = (uid: UID, actor: string) => ['getFollowers', uid, actor] as const;

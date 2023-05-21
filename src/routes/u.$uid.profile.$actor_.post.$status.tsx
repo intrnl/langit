@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
-import { useLocation } from '@solidjs/router';
+import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { favoritePost, repostPost } from '~/api/mutation.ts';
@@ -196,9 +196,12 @@ const AuthenticatedPostPage = () => {
 									<hr class='border-divider' />
 
 									<div class='h-13 flex items-center justify-around text-muted-fg'>
-										<button class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'>
+										<UntypedAnchor
+											href={`/u/${uid()}/compose?reply=${encodeURIComponent(post.uri)}`}
+											class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'
+										>
 											<ChatBubbleOutlinedIcon />
-										</button>
+										</UntypedAnchor>
 
 										<button
 											class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'

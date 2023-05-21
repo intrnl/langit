@@ -1,7 +1,7 @@
-import { type Accessor, For, Show, createMemo, createSignal } from 'solid-js';
+import { type Accessor, For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 
-import { useBeforeLeave } from '@solidjs/router';
+import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { Extension } from '@tiptap/core';
@@ -14,18 +14,26 @@ import { Paragraph } from '@tiptap/extension-paragraph';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { Text } from '@tiptap/extension-text';
 
-import { type ComputePositionConfig, ComputePositionReturn, computePosition, size } from '@floating-ui/dom';
+import { type ComputePositionConfig, type ComputePositionReturn, computePosition, size } from '@floating-ui/dom';
 import { createTiptapEditor } from 'solid-tiptap';
 
+import { posts as postsCache } from '~/api/cache.ts';
 import { multiagent } from '~/api/global.ts';
 import { createPost } from '~/api/mutation.ts';
-import { getProfile, getProfileKey } from '~/api/query.ts';
-import { BskyPostRecord, type BskyProfileTypeaheadSearch, type BskySearchActorTypeaheadResponse } from '~/api/types.ts';
+import { getPost, getPostKey, getProfile, getProfileKey } from '~/api/query.ts';
+import {
+	type BskyPostRecord,
+	type BskyPostRecordReply,
+	type BskyProfileTypeaheadSearch,
+	type BskySearchActorTypeaheadResponse,
+} from '~/api/types.ts';
 import { getPostId } from '~/api/utils.ts';
 
 import { useNavigate, useParams } from '~/router.ts';
 
 import '~/styles/compose.css';
+import CircularProgress from '~/components/CircularProgress.tsx';
+import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import { pm2rt } from '~/utils/composer/pm2rt.ts';
@@ -44,9 +52,12 @@ const AuthenticatedComposePage = () => {
 	let ref: HTMLDivElement | undefined;
 
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const params = useParams('/u/:uid/compose');
 
 	const uid = () => params.uid;
+
+	const replyUri = () => searchParams.reply;
 
 	const [error, setError] = createSignal<string>();
 	const [state, setState] = createSignal(PostState.IDLE);
@@ -54,8 +65,20 @@ const AuthenticatedComposePage = () => {
 
 	const did = createMemo(() => multiagent.accounts[uid()].session.did);
 
+	const replyQuery = createQuery({
+		queryKey: () => getPostKey(uid(), replyUri()),
+		queryFn: getPost,
+		initialData () {
+			const signalized = postsCache[replyUri()];
+			return signalized?.deref();
+		},
+		get enabled () {
+			return !!replyUri();
+		},
+	});
+
 	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(params.uid, did()),
+		queryKey: () => getProfileKey(uid(), did()),
 		queryFn: getProfile,
 	});
 
@@ -66,7 +89,7 @@ const AuthenticatedComposePage = () => {
 
 	const isEnabled = createMemo(() => {
 		const len = length();
-		return state() === PostState.IDLE && (len > 0 && len <= 300);
+		return !replyQuery.isInitialLoading && state() === PostState.IDLE && (len > 0 && len <= 300);
 	});
 
 	const handleSubmit = async () => {
@@ -76,11 +99,30 @@ const AuthenticatedComposePage = () => {
 			return;
 		}
 
+		const reply = replyQuery.data;
+		let replyRecord: BskyPostRecord['reply'];
+
+		if (reply) {
+			const ref: BskyPostRecordReply = {
+				cid: reply.cid,
+				uri: reply.uri,
+			};
+
+			const parentRecord = reply.record.peek();
+			const parentReply = parentRecord.reply;
+
+			replyRecord = {
+				root: parentReply?.root || ref,
+				parent: ref,
+			};
+		}
+
 		const record: BskyPostRecord = {
 			$type: 'app.bsky.feed.post',
 			createdAt: new Date().toISOString(),
 			facets: rt.facets,
 			text: rt.text,
+			reply: replyRecord,
 		};
 
 		setError(undefined);
@@ -165,6 +207,18 @@ const AuthenticatedComposePage = () => {
 			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
 				<p class='font-bold text-base'>Compose</p>
 			</div>
+
+			<Switch>
+				<Match when={replyQuery.isInitialLoading}>
+					<div class='h-13 flex items-center justify-center border-divider'>
+						<CircularProgress />
+					</div>
+				</Match>
+
+				<Match when={replyQuery.data}>
+					{(reply) => <Post uid={uid()} post={reply()} next />}
+				</Match>
+			</Switch>
 
 			<div class='flex pb-4'>
 				<div class='shrink-0 p-4'>

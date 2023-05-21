@@ -234,3 +234,7 @@ export interface BskyCreateRecordResponse {
 export interface BskySearchActorTypeaheadResponse {
 	actors: BskyProfileTypeaheadSearch[];
 }
+
+export interface BskyGetPostsResponse {
+	posts: BskyPost[];
+}

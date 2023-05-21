@@ -1,5 +1,7 @@
 import { Show } from 'solid-js';
 
+import { A as UntypedAnchor } from '@solidjs/router';
+
 import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache.ts';
 import { favoritePost, repostPost } from '~/api/mutation.ts';
 import { getPostId } from '~/api/utils.ts';
@@ -33,6 +35,7 @@ const Post = (props: PostProps) => {
 	const uid = () => props.uid;
 	const post = () => props.post;
 	const parent = () => props.parent;
+	const interactive = () => props.interactive;
 
 	const author = () => post().author;
 	const record = () => post().record.value;
@@ -72,10 +75,10 @@ const Post = (props: PostProps) => {
 
 	return (
 		<div
-			tabindex={props.interactive ? 0 : undefined}
+			tabindex={interactive() ? 0 : undefined}
 			onClick={handleClick}
-			class='relative px-4 hover:bg-hinted border-divider'
-			classList={{ 'border-b': !props.next }}
+			class='relative px-4 border-divider'
+			classList={{ 'border-b': !props.next, 'hover:bg-hinted': interactive() }}
 		>
 			<div class='pt-3 flex flex-col gap-1'>
 				<Show when={props.reason && props.reason.$type === 'app.bsky.feed.defs#reasonRepost'}>
@@ -163,11 +166,14 @@ const Post = (props: PostProps) => {
 								</A>
 							</span>
 						</div>
-						<div class='shrink-0'>
-							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
-								<MoreHorizIcon />
-							</button>
-						</div>
+
+						<Show when={interactive()}>
+							<div class='shrink-0'>
+								<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
+									<MoreHorizIcon />
+								</button>
+							</div>
+						</Show>
 					</div>
 
 					<Show when={record().text}>
@@ -180,51 +186,52 @@ const Post = (props: PostProps) => {
 						{(embed) => <Embed uid={uid()} embed={embed()} />}
 					</Show>
 
-					<div class='flex mt-3 text-muted-fg'>
-						<div class='flex items-end grow gap-0.5'>
-							<A
-								href='/u/:uid/profile/:actor/post/:status'
-								params={{ uid: uid(), actor: author().did, status: getPostId(post().uri) }}
-								class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
-							>
-								<ChatBubbleOutlinedIcon />
-							</A>
-							<span class='text-[0.8125rem]'>{comformat.format(post().replyCount.value)}</span>
-						</div>
+					<Show when={interactive()}>
+						<div class='flex mt-3 text-muted-fg'>
+							<div class='flex items-end grow gap-0.5'>
+								<UntypedAnchor
+									href={`/u/${uid()}/compose?reply=${encodeURIComponent(post().uri)}`}
+									class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
+								>
+									<ChatBubbleOutlinedIcon />
+								</UntypedAnchor>
+								<span class='text-[0.8125rem]'>{comformat.format(post().replyCount.value)}</span>
+							</div>
 
-						<div
-							class='flex items-end grow gap-0.5'
-							classList={{ 'text-green-600': !!post().viewer.repost.value }}
-						>
-							<button
-								class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
-								onClick={() => repostPost(uid(), post())}
+							<div
+								class='flex items-end grow gap-0.5'
+								classList={{ 'text-green-600': !!post().viewer.repost.value }}
 							>
-								<RepeatIcon />
-							</button>
-							<span class='text-[0.8125rem]'>{comformat.format(post().repostCount.value)}</span>
-						</div>
+								<button
+									class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
+									onClick={() => repostPost(uid(), post())}
+								>
+									<RepeatIcon />
+								</button>
+								<span class='text-[0.8125rem]'>{comformat.format(post().repostCount.value)}</span>
+							</div>
 
-						<div
-							class='group flex items-end grow gap-0.5'
-							classList={{ 'is-active text-red-600': !!post().viewer.like.value }}
-						>
-							<button
-								class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
-								onClick={() => favoritePost(uid(), post())}
+							<div
+								class='group flex items-end grow gap-0.5'
+								classList={{ 'is-active text-red-600': !!post().viewer.like.value }}
 							>
-								<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
-								<FavoriteIcon class='hidden group-[.is-active]:block' />
-							</button>
-							<span class='text-[0.8125rem]'>{comformat.format(post().likeCount.value)}</span>
-						</div>
+								<button
+									class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
+									onClick={() => favoritePost(uid(), post())}
+								>
+									<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
+									<FavoriteIcon class='hidden group-[.is-active]:block' />
+								</button>
+								<span class='text-[0.8125rem]'>{comformat.format(post().likeCount.value)}</span>
+							</div>
 
-						<div class='shrink-0'>
-							<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base hover:bg-secondary'>
-								<ShareIcon />
-							</button>
+							<div class='shrink-0'>
+								<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base hover:bg-secondary'>
+									<ShareIcon />
+								</button>
+							</div>
 						</div>
-					</div>
+					</Show>
 				</div>
 			</div>
 		</div>

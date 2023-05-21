@@ -6,9 +6,16 @@ const WEEK = DAY * 7;
 const MONTH = WEEK * 4;
 const YEAR = MONTH * 12;
 
-export const format = (time: string | number, base = Date.now()) => {
-	const num = typeof time === 'number' ? time : new Date(time).getTime();
-	const delta = num - base;
+const dateFormat = new Intl.DateTimeFormat('en', { dateStyle: 'long' });
+
+export const format = (time: string | number, base = new Date()) => {
+	const date = new Date(time);
+	const num = date.getTime();
+	const delta = Math.abs(num - base.getTime());
+
+	if (delta > WEEK) {
+		return dateFormat.format(date);
+	}
 
 	const [value, unit] = lookup(delta);
 
@@ -16,33 +23,31 @@ export const format = (time: string | number, base = Date.now()) => {
 };
 
 export const lookup = (delta: number): [value: number, unit: Intl.RelativeTimeFormatUnit] => {
-	const abs = Math.abs(delta);
-
-	if (abs < SECOND) {
+	if (delta < SECOND) {
 		return [0, 'second'];
 	}
 
-	if (abs < MINUTE) {
+	if (delta < MINUTE) {
 		return [Math.trunc(delta / SECOND), 'second'];
 	}
 
-	if (abs < HOUR) {
+	if (delta < HOUR) {
 		return [Math.trunc(delta / MINUTE), 'minute'];
 	}
 
-	if (abs < DAY) {
+	if (delta < DAY) {
 		return [Math.trunc(delta / HOUR), 'hour'];
 	}
 
-	if (abs < WEEK) {
+	if (delta < WEEK) {
 		return [Math.trunc(delta / DAY), 'day'];
 	}
 
-	if (abs < MONTH) {
+	if (delta < MONTH) {
 		return [Math.trunc(delta / WEEK), 'week'];
 	}
 
-	if (abs < YEAR) {
+	if (delta < YEAR) {
 		return [Math.trunc(delta / MONTH), 'month'];
 	}
 

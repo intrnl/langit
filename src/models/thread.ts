@@ -46,23 +46,22 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 		}
 
 		const replies = node.replies.slice();
+		const scores: Record<string, number> = {};
 
 		if (node !== thread) {
-			const scores: Record<string, number> = {};
-
 			descendants.push(post);
-
-			// sort replies by their score
-			replies.sort((a, b) => {
-				const aPost = a.post;
-				const bPost = b.post;
-
-				const aScore = scores[aPost.cid] ??= calculatePostScore(aPost, post);
-				const bScore = scores[bPost.cid] ??= calculatePostScore(bPost, post);
-
-				return bScore - aScore;
-			});
 		}
+
+		// sort replies by their score
+		replies.sort((a, b) => {
+			const aPost = a.post;
+			const bPost = b.post;
+
+			const aScore = scores[aPost.cid] ??= calculatePostScore(aPost, post);
+			const bScore = scores[bPost.cid] ??= calculatePostScore(bPost, post);
+
+			return bScore - aScore;
+		});
 
 		// this is LIFO, and we want the first reply to be processed first, so we
 		// have to loop starting from the back and not the front.

@@ -4,7 +4,7 @@ import { type BskyPost, type BskyThread, type LinearizedThread } from '~/api/typ
 import { Stack } from '~/utils/stack.ts';
 
 const calculatePostScore = (post: BskyPost) => {
-	return (post.replyCount) + (post.repostCount) + (post.likeCount);
+	return (post.replyCount * 0.5) + (post.repostCount * 1) + (post.likeCount * 1);
 };
 
 const linearizeThread = (thread: BskyThread): LinearizedThread => {

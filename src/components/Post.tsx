@@ -89,7 +89,7 @@ const Post = (props: PostProps) => {
 			onAuxClick={handleClick}
 			onKeyDown={handleClick}
 			class='relative px-4 border-divider'
-			classList={{ 'border-b': !props.next, 'cursor-pointer hover:bg-hinted': interactive() }}
+			classList={{ 'border-b': !props.next, 'hover:bg-hinted': interactive() }}
 		>
 			<div class='pt-3 flex flex-col gap-1'>
 				<Show when={props.reason && props.reason.$type === 'app.bsky.feed.defs#reasonRepost'}>

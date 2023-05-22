@@ -8,6 +8,7 @@ import { getPostThread, getPostThreadKey } from '~/api/query.ts';
 import { getPostId } from '~/api/utils.ts';
 
 import { A, useParams } from '~/router.ts';
+import { XRPCError } from '~/utils/atproto/xrpc-utils';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -44,6 +45,7 @@ const AuthenticatedPostPage = () => {
 		refetchOnMount: true,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
+		retry: false,
 	});
 
 	const focusRef = (node: HTMLDivElement) => {
@@ -69,6 +71,18 @@ const AuthenticatedPostPage = () => {
 					<div class='h-13 flex items-center justify-center'>
 						<CircularProgress />
 					</div>
+				</Match>
+
+				<Match when={threadQuery.error} keyed>
+					{(error) => (
+						<Switch fallback={<div class='p-3 text-sm'>Something went wrong.</div>}>
+							<Match when={(error as XRPCError).error === 'NotFound'}>
+								<div class='p-3'>
+									<EmbedRecordNotFound />
+								</div>
+							</Match>
+						</Switch>
+					)}
 				</Match>
 
 				<Match when={threadQuery.data} keyed>

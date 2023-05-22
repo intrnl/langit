@@ -1,6 +1,6 @@
 import {
 	type Headers,
-	NewCallOptions,
+	type NewCallOptions,
 	ResponseType,
 	XRPCError,
 	XRPCResponse,

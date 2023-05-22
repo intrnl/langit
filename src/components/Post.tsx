@@ -3,7 +3,7 @@ import { Show } from 'solid-js';
 import { A as UntypedAnchor } from '@solidjs/router';
 
 import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache/posts.ts';
-import { getPostId } from '~/api/utils.ts';
+import { type DID, getPostId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
@@ -22,7 +22,7 @@ import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
 
 interface PostProps {
-	uid: string;
+	uid: DID;
 	post: SignalizedPost;
 	parent?: SignalizedPost;
 	reason?: SignalizedTimelinePost['reason'];

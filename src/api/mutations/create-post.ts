@@ -1,7 +1,8 @@
 import { multiagent } from '../global.ts';
 import { type BskyCreateRecordResponse, type BskyPostRecord } from '../types.ts';
+import { type DID } from '../utils.ts';
 
-export const createPost = async (uid: string, record: BskyPostRecord) => {
+export const createPost = async (uid: DID, record: BskyPostRecord) => {
 	const session = multiagent.accounts[uid].session;
 	const agent = await multiagent.connect(uid);
 

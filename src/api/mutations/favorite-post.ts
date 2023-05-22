@@ -1,11 +1,11 @@
 import { type SignalizedPost } from '../cache/posts.ts';
 import { multiagent } from '../global.ts';
 import { type BskyCreateRecordResponse } from '../types.ts';
-import { getPostId } from '../utils.ts';
+import { type DID, getPostId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
-export const favoritePost = (uid: string, post: SignalizedPost) => {
+export const favoritePost = (uid: DID, post: SignalizedPost) => {
 	return acquire(post, async () => {
 		const session = multiagent.accounts[uid].session;
 		const agent = await multiagent.connect(uid);

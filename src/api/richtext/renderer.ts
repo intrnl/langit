@@ -1,4 +1,4 @@
-import { RichTextSegment } from './types.ts';
+import { type RichTextSegment } from './types.ts';
 
 export const createRenderedRichText = (uid: string, segments: RichTextSegment[]) => {
 	const div = document.createElement('div');

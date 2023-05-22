@@ -1,31 +1,29 @@
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
-import { createProfileFeedQuery, getProfileFeedKey, getProfileFeedLatest, getProfileFeedLatestKey } from '~/api/query';
-import { type TimelinePage } from '~/models/timeline';
+import {
+	createProfileLikesQuery,
+	getProfileLikesKey,
+	getProfileLikesLatest,
+	getProfileLikesLatestKey,
+} from '~/api/query.ts';
+import { TimelinePage } from '~/models/timeline.ts';
 
-import { useParams } from '~/router';
+import { useParams } from '~/router.ts';
 
-import Timeline from '~/components/Timeline';
+import Timeline from '~/components/Timeline.tsx';
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 25;
 
-export interface AuthenticatedProfileTimelinePageProps {
-	replies?: boolean;
-}
-
-const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePageProps) => {
-	const params = useParams('/u/:uid/profile/:actor');
+const AuthenticatedProfileTimelineLikesPage = () => {
+	const params = useParams('/u/:uid/profile/:actor/likes');
 	const client = useQueryClient();
-
-	const withReplies = () => props.replies || false;
 
 	const uid = () => params.uid;
 	const actor = () => params.actor;
 
 	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getProfileFeedKey(uid(), actor(), withReplies()),
-		getNextPageParam: (last: TimelinePage) => last.cursor,
-		queryFn: createProfileFeedQuery(PAGE_SIZE),
+		queryKey: () => getProfileLikesKey(uid(), actor()),
+		queryFn: createProfileLikesQuery(PAGE_SIZE),
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
@@ -37,7 +35,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 			// fetch, or a refetch, since our refetch process involves truncating the
 			// timeline first.
 			if (length === 1) {
-				client.setQueryData(getProfileFeedLatestKey(uid(), actor()), pages[0].cid);
+				client.setQueryData(getProfileLikesLatestKey(uid(), actor()), pages[0].cid);
 			}
 
 			// check if the last page is empty because of its slices being filtered
@@ -53,8 +51,8 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 	});
 
 	const latestQuery = createQuery({
-		queryKey: () => getProfileFeedLatestKey(uid(), actor()),
-		queryFn: getProfileFeedLatest,
+		queryKey: () => getProfileLikesLatestKey(uid(), actor()),
+		queryFn: getProfileLikesLatest,
 		staleTime: 10_000,
 		get enabled () {
 			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
@@ -82,7 +80,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 				// but unfortunately that breaks the `hasNextPage` check down below
 				// and would also mean the user gets to see nothing for a bit.
 				client.setQueryData(
-					getProfileFeedKey(uid(), actor(), withReplies()),
+					getProfileLikesKey(uid(), actor()),
 					(prev?: InfiniteData<TimelinePage>) => {
 						if (prev) {
 							return {
@@ -101,4 +99,4 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 	);
 };
 
-export default AuthenticatedProfileTimelinePage;
+export default AuthenticatedProfileTimelineLikesPage;

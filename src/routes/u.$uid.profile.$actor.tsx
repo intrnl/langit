@@ -102,6 +102,9 @@ const AuthenticatedProfileLayout = () => {
 								<TabLink href='/u/:uid/profile/:actor/with_replies' params={params} replace>
 									Replies
 								</TabLink>
+								<TabLink href='/u/:uid/profile/:actor/likes' params={params} replace>
+									Likes
+								</TabLink>
 							</div>
 
 							<Outlet />

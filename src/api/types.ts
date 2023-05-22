@@ -238,3 +238,23 @@ export interface BskySearchActorTypeaheadResponse {
 export interface BskyGetPostsResponse {
 	posts: BskyPost[];
 }
+
+export interface BskyLikeRecord {
+	$type: 'app.bsky.feed.like';
+	subject: {
+		cid: string;
+		uri: string;
+	};
+	createdAt: string;
+}
+
+export interface BskyRecord<R extends {}> {
+	cid: string;
+	uri: string;
+	value: R;
+}
+
+export interface BskyListRecordsResponse<R extends {}> {
+	cursor: string;
+	records: BskyRecord<R>[];
+}

@@ -1,5 +1,5 @@
-import { type SignalizedTimelinePost, createSignalizedTimelinePost } from '~/api/cache.ts';
-import { type BskyTimelineResponse } from '~/api/types.ts';
+import { type SignalizedTimelinePost, createSignalizedTimelinePost, mergeSignalizedPost } from '~/api/cache.ts';
+import { type BskyPost, type BskyTimelineResponse } from '~/api/types.ts';
 
 export interface TimelineSlice {
 	items: SignalizedTimelinePost[];
@@ -113,5 +113,25 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 		cursor: data.cursor,
 		cid: len > 0 ? orig[0].post.cid : undefined,
 		slices,
+	};
+};
+
+export const createLikesTimelinePage = (cursor: string, posts: BskyPost[]): TimelinePage => {
+	const key = Date.now();
+
+	const len = posts.length;
+	const slices: TimelineSlice[] = [];
+
+	for (let idx = 0; idx < len; idx++) {
+		const post = posts[idx];
+		const signalized = mergeSignalizedPost(post, key);
+
+		slices.push({ items: [{ post: signalized, reason: undefined }] });
+	}
+
+	return {
+		cursor: cursor,
+		cid: len > 0 ? posts[0].cid : undefined,
+		slices: slices,
 	};
 };

@@ -38,6 +38,10 @@ const routes: RouteDefinition[] = [
             path: "/",
             component: lazy(() => import("./routes/u.$uid.profile.$actor._index.tsx")),
           },
+          {
+            path: "likes",
+            component: lazy(() => import("./routes/u.$uid.profile.$actor.likes.tsx")),
+          },
         ],
       },
       {

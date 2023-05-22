@@ -165,7 +165,7 @@ const AuthenticatedPostPage = () => {
 											class='flex flex-col text-sm'
 										>
 											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 hover:underline'>
-												{author.displayName.value}
+												{author.displayName.value || author.handle.value}
 											</span>
 											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
 												@{author.handle.value}

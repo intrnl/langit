@@ -60,7 +60,7 @@ const AuthenticatedProfileFollowersPage = () => {
 									<div class='flex items-center justify-between gap-3'>
 										<div class='flex flex-col text-sm'>
 											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1'>
-												{profile.displayName.value}
+												{profile.displayName.value || profile.handle.value}
 											</span>
 											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
 												@{profile.handle.value}

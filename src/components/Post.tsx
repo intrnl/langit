@@ -38,6 +38,7 @@ const Post = (props: PostProps) => {
 	const post = () => props.post;
 	const parent = () => props.parent;
 	const interactive = () => props.interactive;
+	const reason = () => props.reason;
 
 	const author = () => post().author;
 	const record = () => post().record.value;
@@ -97,7 +98,7 @@ const Post = (props: PostProps) => {
 			classList={{ 'border-b': !props.next, 'hover:bg-hinted': interactive() }}
 		>
 			<div class='pt-3 flex flex-col gap-1'>
-				<Show when={props.reason && props.reason.$type === 'app.bsky.feed.defs#reasonRepost'}>
+				<Show when={reason() && reason()!.$type === 'app.bsky.feed.defs#reasonRepost'}>
 					<div class='-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg'>
 						<div class='flex justify-end w-12 shrink-0'>
 							<RepeatIcon />
@@ -105,10 +106,10 @@ const Post = (props: PostProps) => {
 						<div>
 							<A
 								href='/u/:uid/profile/:actor'
-								params={{ uid: uid(), actor: props.reason!.by.did }}
+								params={{ uid: uid(), actor: reason()!.by.did }}
 								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
 							>
-								{props.reason!.by.displayName} Retweeted
+								{reason()!.by.displayName || reason()!.by.handle} Retweeted
 							</A>
 						</div>
 					</div>
@@ -158,8 +159,8 @@ const Post = (props: PostProps) => {
 									params={{ uid: uid(), actor: author().did }}
 									class='group flex gap-1'
 								>
-									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline empty:hidden'>
-										{author().displayName.value}
+									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline'>
+										{author().displayName.value || author().handle.value}
 									</span>
 									<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
 										@{author().handle.value}

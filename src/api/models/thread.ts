@@ -52,8 +52,11 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 			descendants.push(post);
 		}
 
-		// sort replies by their score
 		replies.sort((a, b) => {
+			if (a.$type === 'app.bsky.feed.defs#blockedPost' || b.$type === 'app.bsky.feed.defs#blockedPost') {
+				return 0;
+			}
+
 			const aPost = a.post;
 			const bPost = b.post;
 
@@ -67,6 +70,11 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 		// have to loop starting from the back and not the front.
 		for (let idx = replies.length - 1; idx >= 0; idx--) {
 			const child = replies[idx];
+
+			if (child.$type === 'app.bsky.feed.defs#blockedPost') {
+				continue;
+			}
+
 			stack.push(child);
 		}
 	}

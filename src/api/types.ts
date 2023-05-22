@@ -184,11 +184,17 @@ export interface BskyThreadNotFound {
 	uri: string;
 }
 
+export interface BskyThreadBlockedPost {
+	$type: 'app.bsky.feed.defs#blockedPost';
+	blocked: true;
+	uri: string;
+}
+
 export interface BskyThread {
 	$type: 'app.bsky.feed.defs#threadViewPost';
 	post: BskyPost;
 	parent?: BskyThread | BskyThreadNotFound;
-	replies: BskyThread[];
+	replies: Array<BskyThread | BskyThreadBlockedPost>;
 }
 
 export interface BskyThreadResponse {

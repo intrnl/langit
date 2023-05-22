@@ -45,6 +45,10 @@ const Post = (props: PostProps) => {
 			return;
 		}
 
+		if (ev.type === 'keydown' && (ev as KeyboardEvent).key !== 'Enter') {
+			return;
+		}
+
 		const path = ev.composedPath() as HTMLElement[];
 
 		for (let idx = 0, len = path.length; idx < len; idx++) {
@@ -64,21 +68,28 @@ const Post = (props: PostProps) => {
 			return;
 		}
 
-		navigate('/u/:uid/profile/:actor/post/:status', {
-			params: {
-				uid: uid(),
-				actor: author().did,
-				status: getPostId(post().uri),
-			},
-		});
+		if ((ev.type === 'auxclick' && ((ev as MouseEvent).button === 1)) || ev.ctrlKey) {
+			open(`/u/${uid()}/profile/${author().did}/post/${getPostId(post().uri)}`);
+		}
+		else {
+			navigate('/u/:uid/profile/:actor/post/:status', {
+				params: {
+					uid: uid(),
+					actor: author().did,
+					status: getPostId(post().uri),
+				},
+			});
+		}
 	};
 
 	return (
 		<div
 			tabindex={interactive() ? 0 : undefined}
 			onClick={handleClick}
+			onAuxClick={handleClick}
+			onKeyDown={handleClick}
 			class='relative px-4 border-divider'
-			classList={{ 'border-b': !props.next, 'hover:bg-hinted': interactive() }}
+			classList={{ 'border-b': !props.next, 'cursor-pointer hover:bg-hinted': interactive() }}
 		>
 			<div class='pt-3 flex flex-col gap-1'>
 				<Show when={props.reason && props.reason.$type === 'app.bsky.feed.defs#reasonRepost'}>

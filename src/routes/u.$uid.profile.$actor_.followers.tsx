@@ -55,7 +55,7 @@ const AuthenticatedProfileFollowersPage = () => {
 								</div>
 
 								<div class='grow flex flex-col gap-1 min-w-0'>
-									<div class='flex justify-between gap-3'>
+									<div class='flex items-center justify-between gap-3'>
 										<div class='flex flex-col text-sm'>
 											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1'>
 												{profile.displayName.value}

@@ -45,7 +45,10 @@ const Post = (props: PostProps) => {
 			return;
 		}
 
-		if (ev.type === 'keydown' && (ev as KeyboardEvent).key !== 'Enter') {
+		if (
+			(ev.type === 'keydown' && (ev as KeyboardEvent).key !== 'Enter') ||
+			(ev.type === 'auxclick' && (ev as MouseEvent).button !== 1)
+		) {
 			return;
 		}
 
@@ -68,7 +71,7 @@ const Post = (props: PostProps) => {
 			return;
 		}
 
-		if ((ev.type === 'auxclick' && ((ev as MouseEvent).button === 1)) || ev.ctrlKey) {
+		if (ev.type === 'auxclick' || ev.ctrlKey) {
 			open(`/u/${uid()}/profile/${author().did}/post/${getPostId(post().uri)}`);
 		}
 		else {

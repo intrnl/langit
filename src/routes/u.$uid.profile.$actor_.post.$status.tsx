@@ -3,7 +3,7 @@ import { For, Match, Show, Switch } from 'solid-js';
 import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
-import { getPostId } from '~/api/utils.ts';
+import { type DID, getPostId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
@@ -39,10 +39,10 @@ const AuthenticatedPostPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
 	const location = useLocation();
 
-	const uid = () => params.uid;
+	const uid = () => params.uid as DID;
 
 	const threadQuery = createQuery({
-		queryKey: () => getPostThreadKey(params.uid, params.actor, params.status),
+		queryKey: () => getPostThreadKey(uid(), params.actor, params.status),
 		queryFn: getPostThread,
 		refetchOnMount: true,
 		refetchOnReconnect: false,

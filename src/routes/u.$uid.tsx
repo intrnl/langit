@@ -1,9 +1,10 @@
-import { Show, createMemo } from 'solid-js';
+import { Show } from 'solid-js';
 
 import { Outlet } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { multiagent } from '~/api/global.ts';
+import { type DID } from '~/api/utils.ts';
 
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
@@ -21,18 +22,16 @@ import NotificationsOutlinedIcon from '~/icons/outline-notifications.tsx';
 const AuthenticatedLayout = () => {
 	const params = useParams('/u/:uid');
 
-	if (!multiagent.accounts || !multiagent.accounts[params.uid]) {
+	const uid = () => params.uid as DID;
+
+	if (!multiagent.accounts || !multiagent.accounts[uid()]) {
 		return <Navigate href='/' />;
 	}
 
 	const isDesktop = useMediaQuery('(width >= 640px)');
 
-	const did = createMemo(() => {
-		return multiagent.accounts[params.uid].session.did;
-	});
-
 	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(params.uid, did()),
+		queryKey: () => getProfileKey(uid(), uid()),
 		queryFn: getProfile,
 		staleTime: 60_000,
 		refetchOnMount: true,

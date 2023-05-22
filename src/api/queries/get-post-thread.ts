@@ -2,12 +2,12 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
 import { createThreadPage } from '../models/thread.ts';
-import { type UID } from '../multiagent.ts';
+import { type DID } from '../multiagent.ts';
 import { type BskyThreadResponse } from '../types.ts';
 
 import _getDid from './_did.ts';
 
-export const getPostThreadKey = (uid: UID, actor: string, post: string) => ['getPostThread', uid, actor, post] as const;
+export const getPostThreadKey = (uid: DID, actor: string, post: string) => ['getPostThread', uid, actor, post] as const;
 export const getPostThread = async (ctx: QueryFunctionContext<ReturnType<typeof getPostThreadKey>>) => {
 	const [, uid, actor, post] = ctx.queryKey;
 

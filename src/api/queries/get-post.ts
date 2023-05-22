@@ -2,10 +2,10 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { mergeSignalizedPost } from '../cache/posts.ts';
 import { multiagent } from '../global.ts';
-import { type UID } from '../multiagent.ts';
+import { type DID } from '../multiagent.ts';
 import { type BskyGetPostsResponse } from '../types.ts';
 
-export const getPostKey = (uid: UID, uri: string) => ['getPost', uid, uri] as const;
+export const getPostKey = (uid: DID, uri: string) => ['getPost', uid, uri] as const;
 export const getPost = async (ctx: QueryFunctionContext<ReturnType<typeof getPostKey>>) => {
 	const [, uid, uri] = ctx.queryKey;
 

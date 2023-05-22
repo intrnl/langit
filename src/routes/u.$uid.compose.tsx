@@ -19,7 +19,7 @@ import { createTiptapEditor } from 'solid-tiptap';
 
 import { posts as postsCache } from '~/api/cache/posts.ts';
 import { multiagent } from '~/api/global.ts';
-import { getPostId } from '~/api/utils.ts';
+import { type DID, getPostId } from '~/api/utils.ts';
 
 import {
 	type BskyPostRecord,
@@ -58,7 +58,7 @@ const AuthenticatedComposePage = () => {
 	const [searchParams] = useSearchParams();
 	const params = useParams('/u/:uid/compose');
 
-	const uid = () => params.uid;
+	const uid = () => params.uid as DID;
 
 	const replyUri = () => searchParams.reply;
 
@@ -271,7 +271,7 @@ export default AuthenticatedComposePage;
 
 // Mentions
 
-const createMentionSuggestion = (uid: Accessor<string>): MentionOptions['suggestion'] => {
+const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion'] => {
 	const lock = new Locker<void>(undefined);
 
 	let current = '';

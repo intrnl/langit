@@ -1,6 +1,8 @@
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
-import { TimelinePage } from '~/api/models/timeline.ts';
+import { type DID } from '~/api/utils.ts';
+
+import { type TimelinePage } from '~/api/models/timeline.ts';
 import {
 	createProfileLikesQuery,
 	getProfileLikesKey,
@@ -18,7 +20,7 @@ const AuthenticatedProfileTimelineLikesPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/likes');
 	const client = useQueryClient();
 
-	const uid = () => params.uid;
+	const uid = () => params.uid as DID;
 	const actor = () => params.actor;
 
 	const timelineQuery = createInfiniteQuery({

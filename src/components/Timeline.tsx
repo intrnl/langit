@@ -2,13 +2,15 @@ import { For, Match, Switch } from 'solid-js';
 
 import { type CreateInfiniteQueryResult, type CreateQueryResult } from '@tanstack/solid-query';
 
-import { type TimelinePage } from '~/api/models/timeline';
+import { type DID } from '~/api/utils.ts';
 
-import CircularProgress from '~/components/CircularProgress';
+import { type TimelinePage } from '~/api/models/timeline.ts';
+
+import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
 
 export interface TimelineProps {
-	uid: string;
+	uid: DID;
 	timelineQuery: CreateInfiniteQueryResult<TimelinePage, unknown>;
 	latestQuery: CreateQueryResult<string | undefined, unknown>;
 	onRefetch?: () => void;

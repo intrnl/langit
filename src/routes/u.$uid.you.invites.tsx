@@ -2,6 +2,8 @@ import { For, Match, Switch, createMemo } from 'solid-js';
 
 import { createQuery } from '@tanstack/solid-query';
 
+import { type DID } from '~/api/utils.ts';
+
 import { getInviteCodes, getInviteCodesKey } from '~/api/queries/get-invite-codes.ts';
 
 import { useParams } from '~/router.ts';
@@ -12,8 +14,10 @@ import ContentCopyIcon from '~/icons/baseline-content-copy.tsx';
 const AuthenticatedInviteCodesPage = () => {
 	const params = useParams('/u/:uid/you/invites');
 
+	const uid = () => params.uid as DID;
+
 	const inviteQuery = createQuery({
-		queryKey: () => getInviteCodesKey(params.uid),
+		queryKey: () => getInviteCodesKey(uid()),
 		queryFn: getInviteCodes,
 		staleTime: 5_000,
 	});

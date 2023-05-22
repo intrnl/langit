@@ -2,10 +2,10 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
 import { createTimelinePage } from '../models/timeline.ts';
-import { type UID } from '../multiagent.ts';
+import { type DID } from '../multiagent.ts';
 import { type BskyTimelineResponse } from '../types.ts';
 
-export const getTimelineKey = (uid: UID, algorithm: string) => ['getTimeline', uid, algorithm] as const;
+export const getTimelineKey = (uid: DID, algorithm: string) => ['getTimeline', uid, algorithm] as const;
 export const createTimelineQuery = (limit: number) => {
 	return async (ctx: QueryFunctionContext<ReturnType<typeof getTimelineKey>>) => {
 		const [, uid, algorithm] = ctx.queryKey;
@@ -42,7 +42,7 @@ export const createTimelineQuery = (limit: number) => {
 	};
 };
 
-export const getTimelineLatestKey = (uid: UID, algorithm: string) => ['getTimelineLatest', uid, algorithm] as const;
+export const getTimelineLatestKey = (uid: DID, algorithm: string) => ['getTimelineLatest', uid, algorithm] as const;
 export const getTimelineLatest = async (ctx: QueryFunctionContext<ReturnType<typeof getTimelineLatestKey>>) => {
 	const [, uid, algorithm] = ctx.queryKey;
 

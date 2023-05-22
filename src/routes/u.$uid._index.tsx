@@ -1,4 +1,6 @@
-import { InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
+import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
+
+import { type DID } from '~/api/utils.ts';
 
 import { type TimelinePage } from '~/api/models/timeline.ts';
 import {
@@ -18,10 +20,12 @@ const PAGE_SIZE = 30;
 const AuthenticatedHome = () => {
 	const params = useParams('/u/:uid');
 
+	const uid = () => params.uid as DID;
+
 	const client = useQueryClient();
 
 	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getTimelineKey(params.uid, DEFAULT_ALGORITHM),
+		queryKey: () => getTimelineKey(uid(), DEFAULT_ALGORITHM),
 		getNextPageParam: (last: TimelinePage) => last.cursor,
 		queryFn: createTimelineQuery(PAGE_SIZE),
 		refetchOnMount: false,
@@ -35,7 +39,7 @@ const AuthenticatedHome = () => {
 			// fetch, or a refetch, since our refetch process involves truncating the
 			// timeline first.
 			if (length === 1) {
-				client.setQueryData(getTimelineLatestKey(params.uid, DEFAULT_ALGORITHM), pages[0].cid);
+				client.setQueryData(getTimelineLatestKey(uid(), DEFAULT_ALGORITHM), pages[0].cid);
 			}
 
 			// check if the last page is empty because of its slices being filtered
@@ -51,7 +55,7 @@ const AuthenticatedHome = () => {
 	});
 
 	const latestQuery = createQuery({
-		queryKey: () => getTimelineLatestKey(params.uid, DEFAULT_ALGORITHM),
+		queryKey: () => getTimelineLatestKey(uid(), DEFAULT_ALGORITHM),
 		queryFn: getTimelineLatest,
 		staleTime: 10_000,
 		get enabled () {
@@ -70,7 +74,7 @@ const AuthenticatedHome = () => {
 			</div>
 
 			<Timeline
-				uid={params.uid}
+				uid={uid()}
 				timelineQuery={timelineQuery}
 				latestQuery={latestQuery}
 				onLoadMore={() => timelineQuery.fetchNextPage()}
@@ -85,7 +89,7 @@ const AuthenticatedHome = () => {
 					// but unfortunately that breaks the `hasNextPage` check down below
 					// and would also mean the user gets to see nothing for a bit.
 					client.setQueryData(
-						getTimelineKey(params.uid, DEFAULT_ALGORITHM),
+						getTimelineKey(uid(), DEFAULT_ALGORITHM),
 						(prev?: InfiniteData<TimelinePage>) => {
 							if (prev) {
 								return {

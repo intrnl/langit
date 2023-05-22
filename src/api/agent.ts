@@ -1,3 +1,5 @@
+import { type DID } from './utils.ts';
+
 import {
 	type Headers,
 	ResponseType,
@@ -14,7 +16,7 @@ export interface AtpSessionData {
 	refreshJwt: string;
 	accessJwt: string;
 	handle: string;
-	did: string;
+	did: DID;
 	email?: string;
 }
 

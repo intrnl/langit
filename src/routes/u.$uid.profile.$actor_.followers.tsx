@@ -2,19 +2,21 @@ import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import { createInfiniteQuery } from '@tanstack/solid-query';
 
+import { type DID } from '~/api/utils.ts';
+
 import { createProfileFollowersQuery, getProfileFollowersKey } from '~/api/queries/get-profile-followers.ts';
 
 import { useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
-import button from '~/styles/primitives/button';
+import button from '~/styles/primitives/button.ts';
 
 const PAGE_LIMIT = 30;
 
 const AuthenticatedProfileFollowersPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/followers');
 
-	const uid = () => params.uid;
+	const uid = () => params.uid as DID;
 
 	const followersQuery = createInfiniteQuery({
 		queryKey: () => getProfileFollowersKey(uid(), params.actor),

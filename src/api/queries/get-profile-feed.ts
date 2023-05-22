@@ -1,14 +1,14 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
-import { type UID } from '../multiagent.ts';
+import { type DID } from '../multiagent.ts';
 import { type BskyTimelineResponse } from '../types.ts';
 import { createTimelinePage } from '../models/timeline.ts';
 
 import _getDid from './_did.ts';
 
 
-export const getProfileFeedKey = (uid: UID, actor: string, replies: boolean) =>
+export const getProfileFeedKey = (uid: DID, actor: string, replies: boolean) =>
 	['getProfileFeed', uid, actor, replies] as const;
 export const createProfileFeedQuery = (limit: number) => {
 	return async (ctx: QueryFunctionContext<ReturnType<typeof getProfileFeedKey>>) => {
@@ -43,7 +43,7 @@ export const createProfileFeedQuery = (limit: number) => {
 	};
 };
 
-export const getProfileFeedLatestKey = (uid: UID, actor: string) => ['getProfileFieldLatest', uid, actor] as const;
+export const getProfileFeedLatestKey = (uid: DID, actor: string) => ['getProfileFieldLatest', uid, actor] as const;
 export const getProfileFeedLatest = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileFeedLatestKey>>) => {
 	const [, uid, actor] = ctx.queryKey;
 

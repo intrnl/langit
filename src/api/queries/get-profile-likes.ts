@@ -2,14 +2,14 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
 import { createLikesTimelinePage } from '../models/timeline.ts';
-import { type UID } from '../multiagent.ts';
+import { type DID } from '../multiagent.ts';
 import { type BskyGetPostsResponse, type BskyLikeRecord, type BskyListRecordsResponse } from '../types.ts';
 
 import _getDid from './_did.ts';
 
 import { chunked } from '~/utils/misc.ts';
 
-export const getProfileLikesKey = (uid: UID, actor: string) => ['getProfileLikes', uid, actor] as const;
+export const getProfileLikesKey = (uid: DID, actor: string) => ['getProfileLikes', uid, actor] as const;
 export const createProfileLikesQuery = (limit: number) => {
 	const MAX_POST_LIMIT = 25;
 
@@ -49,7 +49,7 @@ export const createProfileLikesQuery = (limit: number) => {
 	};
 };
 
-export const getProfileLikesLatestKey = (uid: UID, actor: string) => ['getProfileLikesLatest', uid, actor] as const;
+export const getProfileLikesLatestKey = (uid: DID, actor: string) => ['getProfileLikesLatest', uid, actor] as const;
 export const getProfileLikesLatest = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileLikesLatestKey>>) => {
 	const [, uid, actor] = ctx.queryKey;
 

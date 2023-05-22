@@ -1,33 +1,27 @@
-import { Show, createMemo } from 'solid-js';
+import { Show } from 'solid-js';
 
 import { createQuery } from '@tanstack/solid-query';
 
-import { multiagent } from '~/api/global.ts';
+import { type DID } from '~/api/utils.ts';
 
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { A, Navigate, useParams } from '~/router.ts';
+import { A, useParams } from '~/router.ts';
 
-import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number';
+import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
 
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');
 
-	if (!multiagent.accounts || !multiagent.accounts[params.uid]) {
-		return <Navigate href='/' />;
-	}
+	const uid = () => params.uid as DID;
 
-	const did = createMemo(() => {
-		return multiagent.accounts[params.uid].session.did;
-	});
-
-	const profileQuery = createQuery(() => getProfileKey(params.uid, did()), getProfile);
+	const profileQuery = createQuery(() => getProfileKey(uid(), uid()), getProfile);
 
 	return (
 		<div class='flex flex-col pb-4'>
 			<Show when={profileQuery.data}>
 				{(profile) => (
-					<A href='/u/:uid/profile/:actor' params={{ uid: params.uid, actor: did() }} class='hover:bg-hinted'>
+					<A href='/u/:uid/profile/:actor' params={{ uid: uid(), actor: uid() }} class='hover:bg-hinted'>
 						<div class='aspect-banner bg-muted-fg'>
 						</div>
 

@@ -1,5 +1,6 @@
 import { Agent, type AtpLoginOptions, type AtpSessionData } from './agent.ts';
 import { ReactiveLocalStorage } from './storage.ts';
+import { type DID } from './utils.ts';
 
 export enum MultiagentState {
 	PRISTINE,
@@ -12,8 +13,7 @@ export interface MultiagentLoginOptions extends AtpLoginOptions {
 	service: string;
 }
 
-/** Assigned account ID */
-export type UID = string;
+export { type DID };
 
 export interface MultiagentAccountData {
 	did: string;
@@ -22,9 +22,8 @@ export interface MultiagentAccountData {
 }
 
 interface MultiagentStorage {
-	counter: number;
-	active: UID | undefined;
-	accounts: Record<UID, MultiagentAccountData>;
+	active: DID | undefined;
+	accounts: Record<DID, MultiagentAccountData>;
 }
 
 const noop = () => {};
@@ -36,7 +35,7 @@ export class Multiagent {
 	/**
 	 * A record of connected agents
 	 */
-	public agents: Record<UID, Agent> = {};
+	public agents: Record<DID, Agent> = {};
 
 	constructor (name: string) {
 		this._storage = new ReactiveLocalStorage(name);
@@ -55,20 +54,17 @@ export class Multiagent {
 	get active () {
 		return this._storage.get('active');
 	}
-	set active (next: string | undefined) {
+	set active (next: DID | undefined) {
 		this._storage.set('active', next);
 	}
 
 	/**
 	 * Login with a new account
 	 */
-	async login ({ service, identifier, password }: MultiagentLoginOptions): Promise<UID> {
+	async login ({ service, identifier, password }: MultiagentLoginOptions): Promise<DID> {
 		await this._promise;
 
-		const count = this._storage.get('counter') || 0;
-		const uid = '' + count;
-
-		const agent = this._createAgent(uid, service);
+		const agent = this._createAgent(service);
 
 		try {
 			const promise = agent.login({ identifier, password });
@@ -83,28 +79,23 @@ export class Multiagent {
 
 			const accounts = this.accounts;
 
-			for (const aid in accounts) {
-				const account = accounts[aid];
-
-				if (did === account.did) {
-					this._storage.set('active', aid);
-					return aid;
-				}
+			if (accounts && did in accounts) {
+				this._storage.set('active', did);
+				return did;
 			}
 
-			this._storage.set('counter', count + 1);
-			this._storage.set('active', uid);
+			this._storage.set('active', did);
 			this._storage.set('accounts', {
 				...this._storage.get('accounts'),
-				[uid]: {
+				[did]: {
 					did: did,
 					service: service,
 					session: session,
 				},
 			});
 
-			this.agents[uid] = agent;
-			return uid;
+			this.agents[did] = agent;
+			return did;
 		}
 		catch (err) {
 			throw new Error(`Failed to login`, { cause: err });
@@ -114,28 +105,28 @@ export class Multiagent {
 	/**
 	 * Sign out from account
 	 */
-	async signout (uid: string): Promise<void> {
+	async signout (did: DID): Promise<void> {
 		// TODO: implement signout functionality
 	}
 
 	/**
 	 * Retrieve an agent associated with an account
 	 */
-	async connect (uid: string): Promise<Agent> {
+	async connect (did: DID): Promise<Agent> {
 		await this._promise;
 
-		if (uid in this.agents) {
-			return this.agents[uid];
+		if (did in this.agents) {
+			return this.agents[did];
 		}
 
 		const accounts = this._storage.get('accounts');
-		const data = accounts && accounts[uid];
+		const data = accounts && accounts[did];
 
 		if (!data) {
 			throw new Error(`Invalid account`);
 		}
 
-		const agent = this._createAgent(uid, data.service);
+		const agent = this._createAgent(data.service);
 
 		try {
 			const promise = agent.resumeSession(data.session);
@@ -143,7 +134,7 @@ export class Multiagent {
 
 			await promise;
 
-			this.agents[uid] = agent;
+			this.agents[did] = agent;
 			return agent;
 		}
 		catch (err) {
@@ -151,14 +142,16 @@ export class Multiagent {
 		}
 	}
 
-	private _createAgent (uid: string, serviceUri: string) {
+	private _createAgent (serviceUri: string) {
 		const agent = new Agent({
 			service: serviceUri,
 			persistSession: (type, session) => {
 				if (type === 'update') {
+					const did = session!.did;
+
 					this._storage.set('accounts', {
 						...this._storage.get('accounts'),
-						[uid]: {
+						[did]: {
 							did: session!.did,
 							service: serviceUri,
 							session: session!,

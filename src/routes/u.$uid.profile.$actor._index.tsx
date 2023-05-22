@@ -1,5 +1,7 @@
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
+import { type DID } from '~/api/utils.ts';
+
 import { type TimelinePage } from '~/api/models/timeline.ts';
 import {
 	createProfileFeedQuery,
@@ -8,9 +10,9 @@ import {
 	getProfileFeedLatestKey,
 } from '~/api/queries/get-profile-feed.ts';
 
-import { useParams } from '~/router';
+import { useParams } from '~/router.ts';
 
-import Timeline from '~/components/Timeline';
+import Timeline from '~/components/Timeline.tsx';
 
 const PAGE_SIZE = 30;
 
@@ -24,7 +26,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 
 	const withReplies = () => props.replies || false;
 
-	const uid = () => params.uid;
+	const uid = () => params.uid as DID;
 	const actor = () => params.actor;
 
 	const timelineQuery = createInfiniteQuery({

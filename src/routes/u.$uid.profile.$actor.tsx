@@ -3,6 +3,8 @@ import { Show } from 'solid-js';
 import { Outlet } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
+import { type DID } from '~/api/utils';
+
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, useParams } from '~/router.ts';
@@ -16,7 +18,7 @@ import TabLink from '~/components/TabLink.tsx';
 const AuthenticatedProfileLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor');
 
-	const uid = () => params.uid;
+	const uid = () => params.uid as DID;
 
 	const profileQuery = createQuery({
 		queryKey: () => getProfileKey(uid(), params.actor),

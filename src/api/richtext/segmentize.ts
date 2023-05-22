@@ -1,5 +1,5 @@
-import { type Facet, type FacetLink, type FacetMention, type RichTextSegment } from './types.js';
-import { UnicodeString } from './unicode.js';
+import { type Facet, type FacetLink, type FacetMention, type RichTextSegment } from './types.ts';
+import { UnicodeString } from './unicode.ts';
 
 export interface RichTextOptions {
 	text: string;

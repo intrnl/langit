@@ -19,5 +19,21 @@ export const getProfile = async (ctx: QueryFunctionContext<ReturnType<typeof get
 	const data = response.data as BskyProfile;
 	const profile = mergeSignalizedProfile(data);
 
+	if (profile.did === uid) {
+		const accounts = multiagent.storage.get('accounts');
+
+		multiagent.storage.set('accounts', {
+			...accounts,
+			[uid]: {
+				...accounts[uid],
+				profile: {
+					displayName: data.displayName,
+					handle: data.handle,
+					avatar: data.avatar,
+				},
+			},
+		});
+	}
+
 	return profile;
 };

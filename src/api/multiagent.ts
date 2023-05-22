@@ -15,10 +15,17 @@ export interface MultiagentLoginOptions extends AtpLoginOptions {
 
 export { type DID };
 
+export interface MultiagentProfileData {
+	displayName: string;
+	handle: string;
+	avatar?: string;
+}
+
 export interface MultiagentAccountData {
 	did: string;
 	service: string;
 	session: AtpSessionData;
+	profile?: MultiagentProfileData;
 }
 
 interface MultiagentStorage {
@@ -29,8 +36,9 @@ interface MultiagentStorage {
 const noop = () => {};
 
 export class Multiagent {
-	private _storage: ReactiveLocalStorage<MultiagentStorage>;
 	private _promise?: Promise<void>;
+
+	public storage: ReactiveLocalStorage<MultiagentStorage>;
 
 	/**
 	 * A record of connected agents
@@ -38,24 +46,24 @@ export class Multiagent {
 	public agents: Record<DID, Agent> = {};
 
 	constructor (name: string) {
-		this._storage = new ReactiveLocalStorage(name);
+		this.storage = new ReactiveLocalStorage(name);
 	}
 
 	/**
 	 * A record of registered accounts
 	 */
 	get accounts () {
-		return this._storage.get('accounts');
+		return this.storage.get('accounts');
 	}
 
 	/**
 	 * Active UID set as default
 	 */
 	get active () {
-		return this._storage.get('active');
+		return this.storage.get('active');
 	}
 	set active (next: DID | undefined) {
-		this._storage.set('active', next);
+		this.storage.set('active', next);
 	}
 
 	/**
@@ -80,13 +88,13 @@ export class Multiagent {
 			const accounts = this.accounts;
 
 			if (accounts && did in accounts) {
-				this._storage.set('active', did);
+				this.storage.set('active', did);
 				return did;
 			}
 
-			this._storage.set('active', did);
-			this._storage.set('accounts', {
-				...this._storage.get('accounts'),
+			this.storage.set('active', did);
+			this.storage.set('accounts', {
+				...this.storage.get('accounts'),
 				[did]: {
 					did: did,
 					service: service,
@@ -119,7 +127,7 @@ export class Multiagent {
 			return this.agents[did];
 		}
 
-		const accounts = this._storage.get('accounts');
+		const accounts = this.storage.get('accounts');
 		const data = accounts && accounts[did];
 
 		if (!data) {
@@ -149,8 +157,8 @@ export class Multiagent {
 				if (type === 'update') {
 					const did = session!.did;
 
-					this._storage.set('accounts', {
-						...this._storage.get('accounts'),
+					this.storage.set('accounts', {
+						...this.storage.get('accounts'),
 						[did]: {
 							did: session!.did,
 							service: serviceUri,

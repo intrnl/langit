@@ -8,6 +8,8 @@ import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, Navigate, useParams } from '~/router.ts';
 
+import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number';
+
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');
 
@@ -48,6 +50,12 @@ const AuthenticatedYouPage = () => {
 			</Show>
 
 			<hr class='border-divider mb-4' />
+
+			<A href='/u/:uid/you/invites' params={params} class='flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted'>
+				<ConfirmationNumberIcon class='text-base' />
+
+				<span>Invite codes</span>
+			</A>
 		</div>
 	);
 };

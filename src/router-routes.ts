@@ -49,6 +49,14 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.notifications.tsx")),
       },
       {
+        path: "you/invites",
+        component: lazy(() => import("./routes/u.$uid.you.invites.tsx")),
+      },
+      {
+        path: "you",
+        component: lazy(() => import("./routes/u.$uid.you._index.tsx")),
+      },
+      {
         path: "compose",
         component: lazy(() => import("./routes/u.$uid.compose.tsx")),
       },
@@ -59,10 +67,6 @@ const routes: RouteDefinition[] = [
       {
         path: "search",
         component: lazy(() => import("./routes/u.$uid.search.tsx")),
-      },
-      {
-        path: "you",
-        component: lazy(() => import("./routes/u.$uid.you.tsx")),
       },
     ],
   },

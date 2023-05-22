@@ -22,9 +22,10 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/with_replies"
 	| "/u/:uid/profile/:actor/likes"
 	| "/u/:uid/notifications"
+	| "/u/:uid/you/invites"
+	| "/u/:uid/you"
 	| "/u/:uid/compose"
-	| "/u/:uid/search"
-	| "/u/:uid/you";
+	| "/u/:uid/search";
 export type PathsWithoutParams = 
 	| "/"
 	| "/register"
@@ -40,9 +41,10 @@ export interface Params {
 	"/u/:uid/profile/:actor/with_replies": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/likes": { "uid": string, "actor": string };
 	"/u/:uid/notifications": { "uid": string };
+	"/u/:uid/you/invites": { "uid": string };
+	"/u/:uid/you": { "uid": string };
 	"/u/:uid/compose": { "uid": string };
 	"/u/:uid/search": { "uid": string };
-	"/u/:uid/you": { "uid": string };
 }
 
 type NavigateWithParamOptions<P> = P extends number

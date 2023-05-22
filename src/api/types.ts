@@ -264,3 +264,18 @@ export interface BskyListRecordsResponse<R extends {}> {
 	cursor: string;
 	records: BskyRecord<R>[];
 }
+
+export interface BskyGetInviteCodesResponse {
+	codes: Array<{
+		code: string;
+		available: number;
+		disabled: boolean;
+		forAccount: string;
+		createdBy: string;
+		createdAt: string;
+		uses: Array<{
+			usedBy: string;
+			usedAt: string;
+		}>;
+	}>;
+}

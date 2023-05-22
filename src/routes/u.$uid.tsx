@@ -123,8 +123,8 @@ const AuthenticatedLayout = () => {
 
 							<Show when={profileQuery.data}>
 								{(profile) => (
-									<span class='hidden text-base group-[.is-active]:font-medium xl:inline'>
-										{profile().displayName.value}
+									<span class='hidden text-base text-ellipsis overflow-hidden group-[.is-active]:font-medium xl:inline'>
+										{profile().displayName.value || '@' + profile().handle.value}
 									</span>
 								)}
 							</Show>

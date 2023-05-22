@@ -1,5 +1,5 @@
-import { type SignalizedProfile, mergeSignalizedProfile } from '~/api/cache.ts';
-import { type BskyProfileFollow } from '~/api/types.ts';
+import { type SignalizedProfile, mergeSignalizedProfile } from '../cache/profiles.ts';
+import { type BskyProfileFollow } from '../types.ts';
 
 export const createProfilesPage = (profiles: BskyProfileFollow[]) => {
 	const len = profiles.length;

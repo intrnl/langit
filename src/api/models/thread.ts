@@ -1,5 +1,5 @@
-import { type SignalizedPost, createSignalizedLinearThread } from '~/api/cache.ts';
-import { type BskyPost, type BskyThread, type LinearizedThread } from '~/api/types.ts';
+import { type SignalizedPost, createSignalizedLinearThread } from '../cache/posts.ts';
+import { type BskyPost, type BskyThread, type LinearizedThread } from '../types.ts';
 
 import { Stack } from '~/utils/stack.ts';
 

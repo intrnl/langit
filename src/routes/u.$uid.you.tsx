@@ -3,7 +3,9 @@ import { Show, createMemo } from 'solid-js';
 import { createQuery } from '@tanstack/solid-query';
 
 import { multiagent } from '~/api/global.ts';
-import { getProfile, getProfileKey } from '~/api/query.ts';
+
+import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
+
 import { A, Navigate, useParams } from '~/router.ts';
 
 const AuthenticatedYouPage = () => {

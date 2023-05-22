@@ -4,10 +4,11 @@ import { Outlet } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { multiagent } from '~/api/global.ts';
-import { getProfile, getProfileKey } from '~/api/query.ts';
+
+import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, Navigate, useParams } from '~/router.ts';
-import { useMediaQuery } from '~/utils/media-query';
+import { useMediaQuery } from '~/utils/media-query.ts';
 
 import AddBoxIcon from '~/icons/baseline-add-box.tsx';
 import HomeIcon from '~/icons/baseline-home.tsx';

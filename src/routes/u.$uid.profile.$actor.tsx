@@ -3,7 +3,7 @@ import { Show } from 'solid-js';
 import { Outlet } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
-import { getProfile, getProfileKey } from '~/api/query.ts';
+import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';

@@ -1,5 +1,5 @@
-import { type SignalizedTimelinePost, createSignalizedTimelinePost, mergeSignalizedPost } from '~/api/cache.ts';
-import { type BskyPost, type BskyTimelineResponse } from '~/api/types.ts';
+import { type SignalizedTimelinePost, createSignalizedTimelinePost, mergeSignalizedPost } from '../cache/posts.ts';
+import { type BskyPost, type BskyTimelineResponse } from '../types.ts';
 
 export interface TimelineSlice {
 	items: SignalizedTimelinePost[];

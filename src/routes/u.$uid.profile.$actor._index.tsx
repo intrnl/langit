@@ -1,7 +1,12 @@
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
-import { createProfileFeedQuery, getProfileFeedKey, getProfileFeedLatest, getProfileFeedLatestKey } from '~/api/query';
-import { type TimelinePage } from '~/models/timeline';
+import { type TimelinePage } from '~/api/models/timeline.ts';
+import {
+	createProfileFeedQuery,
+	getProfileFeedKey,
+	getProfileFeedLatest,
+	getProfileFeedLatestKey,
+} from '~/api/queries/get-profile-feed.ts';
 
 import { useParams } from '~/router';
 

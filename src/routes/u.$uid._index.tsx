@@ -1,11 +1,16 @@
 import { InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
-import { createTimelineQuery, getTimelineKey, getTimelineLatest, getTimelineLatestKey } from '~/api/query';
-import { type TimelinePage } from '~/models/timeline.ts';
+import { type TimelinePage } from '~/api/models/timeline.ts';
+import {
+	createTimelineQuery,
+	getTimelineKey,
+	getTimelineLatest,
+	getTimelineLatestKey,
+} from '~/api/queries/get-timeline.ts';
 
 import { useParams } from '~/router.ts';
 
-import Timeline from '~/components/Timeline';
+import Timeline from '~/components/Timeline.tsx';
 
 const DEFAULT_ALGORITHM = 'reverse-chronological';
 const PAGE_SIZE = 30;

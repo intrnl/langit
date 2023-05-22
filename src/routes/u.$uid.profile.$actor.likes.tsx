@@ -1,12 +1,12 @@
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
+import { TimelinePage } from '~/api/models/timeline.ts';
 import {
 	createProfileLikesQuery,
 	getProfileLikesKey,
 	getProfileLikesLatest,
 	getProfileLikesLatestKey,
-} from '~/api/query.ts';
-import { TimelinePage } from '~/models/timeline.ts';
+} from '~/api/queries/get-profile-likes.ts';
 
 import { useParams } from '~/router.ts';
 

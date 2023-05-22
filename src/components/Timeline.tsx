@@ -2,7 +2,7 @@ import { For, Match, Switch } from 'solid-js';
 
 import { type CreateInfiniteQueryResult, type CreateQueryResult } from '@tanstack/solid-query';
 
-import { type TimelinePage } from '~/models/timeline';
+import { type TimelinePage } from '~/api/models/timeline';
 
 import CircularProgress from '~/components/CircularProgress';
 import Post from '~/components/Post.tsx';

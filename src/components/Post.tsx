@@ -2,9 +2,11 @@ import { Show } from 'solid-js';
 
 import { A as UntypedAnchor } from '@solidjs/router';
 
-import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache.ts';
-import { favoritePost, repostPost } from '~/api/mutation.ts';
+import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache/posts.ts';
 import { getPostId } from '~/api/utils.ts';
+
+import { favoritePost } from '~/api/mutations/favorite-post.ts';
+import { repostPost } from '~/api/mutations/repost-post.ts';
 
 import { A, useNavigate } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';

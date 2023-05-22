@@ -3,9 +3,11 @@ import { For, Match, Show, Switch } from 'solid-js';
 import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
-import { favoritePost, repostPost } from '~/api/mutation.ts';
-import { getPostThread, getPostThreadKey } from '~/api/query.ts';
 import { getPostId } from '~/api/utils.ts';
+
+import { favoritePost } from '~/api/mutations/favorite-post.ts';
+import { repostPost } from '~/api/mutations/repost-post.ts';
+import { getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { A, useParams } from '~/router.ts';
 import { XRPCError } from '~/utils/atproto/xrpc-utils';

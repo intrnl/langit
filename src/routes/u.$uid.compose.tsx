@@ -17,17 +17,20 @@ import { Text } from '@tiptap/extension-text';
 import { type ComputePositionConfig, type ComputePositionReturn, computePosition, size } from '@floating-ui/dom';
 import { createTiptapEditor } from 'solid-tiptap';
 
-import { posts as postsCache } from '~/api/cache.ts';
+import { posts as postsCache } from '~/api/cache/posts.ts';
 import { multiagent } from '~/api/global.ts';
-import { createPost } from '~/api/mutation.ts';
-import { getPost, getPostKey, getProfile, getProfileKey } from '~/api/query.ts';
+import { getPostId } from '~/api/utils.ts';
+
 import {
 	type BskyPostRecord,
 	type BskyPostRecordReply,
 	type BskyProfileTypeaheadSearch,
 	type BskySearchActorTypeaheadResponse,
 } from '~/api/types.ts';
-import { getPostId } from '~/api/utils.ts';
+
+import { createPost } from '~/api/mutations/create-post.ts';
+import { getPost, getPostKey } from '~/api/queries/get-post.ts';
+import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { useNavigate, useParams } from '~/router.ts';
 

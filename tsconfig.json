@@ -12,6 +12,7 @@
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 
+		"incremental": true,
 		"strict": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,

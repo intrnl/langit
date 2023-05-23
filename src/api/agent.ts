@@ -4,8 +4,8 @@ import {
 	type Headers,
 	ResponseType,
 	httpResponseCodeToEnum,
-} from '~/utils/atproto/xrpc-utils.ts';
-import { type FetchHandlerResponse, XRPC, fetchHandler, isErrorResponse } from '~/utils/atproto/xrpc.ts';
+} from '~/api/rpc/xrpc-utils.ts';
+import { type FetchHandlerResponse, XRPC, fetchHandler, isErrorResponse } from '~/api/rpc/xrpc.ts';
 
 import { type Signal, signal } from '~/utils/signals.ts';
 

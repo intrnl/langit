@@ -3,6 +3,7 @@ import { For, Match, Show, Switch } from 'solid-js';
 import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
+import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID, getPostId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
@@ -10,7 +11,6 @@ import { repostPost } from '~/api/mutations/repost-post.ts';
 import { getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { A, useParams } from '~/router.ts';
-import { XRPCError } from '~/utils/atproto/xrpc-utils';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';

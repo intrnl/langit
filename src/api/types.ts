@@ -232,6 +232,12 @@ export interface BskyFollowersResponse {
 	followers: BskyProfileFollow[];
 }
 
+export interface BskyFollowsResponse {
+	cursor?: string;
+	subject: BskyProfileFollow;
+	follows: BskyProfileFollow[];
+}
+
 export interface BskyCreateRecordResponse {
 	uri: string;
 	cid: string;

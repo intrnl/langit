@@ -89,9 +89,9 @@ const AuthenticatedProfileLayout = () => {
 								</Show>
 
 								<div class='text-sm flex flex-wrap gap-4'>
-									<A href='/u/:uid/profile/:actor/following' params={params} class='hover:underline'>
+									<A href='/u/:uid/profile/:actor/follows' params={params} class='hover:underline'>
 										<span class='font-bold'>{comformat.format(profile().followsCount.value)}</span>{' '}
-										<span class='text-muted-fg'>Following</span>
+										<span class='text-muted-fg'>Follows</span>
 									</A>
 
 									<A href='/u/:uid/profile/:actor/followers' params={params} class='hover:underline'>

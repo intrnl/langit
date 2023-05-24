@@ -1,8 +1,7 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
-import { mergeSignalizedProfile } from '../cache/profiles.ts';
 import { multiagent } from '../global.ts';
-import { createProfilesPage } from '../models/profiles.ts';
+import { createProfilesListPage } from '../models/profiles-list.ts';
 import { type DID } from '../multiagent.ts';
 import { type BskyFollowersResponse } from '../types.ts';
 
@@ -20,12 +19,8 @@ export const createProfileFollowersQuery = (limit: number) => {
 		});
 
 		const data = response.data as BskyFollowersResponse;
-		const profiles = createProfilesPage(data.followers);
+		const page = createProfilesListPage(data.cursor, data.subject, data.followers);
 
-		return {
-			cursor: data.cursor,
-			subject: mergeSignalizedProfile(data.subject),
-			profiles: profiles,
-		};
+		return page;
 	};
 };

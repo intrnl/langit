@@ -1,7 +1,7 @@
 import { type SignalizedPost } from '../cache/posts.ts';
 import { multiagent } from '../global.ts';
 import { type BskyCreateRecordResponse } from '../types.ts';
-import { type DID, getPostId } from '../utils.ts';
+import { type DID, getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -17,7 +17,7 @@ export const favoritePost = (uid: DID, post: SignalizedPost) => {
 				data: {
 					collection: 'app.bsky.feed.like',
 					repo: uid,
-					rkey: getPostId(prev),
+					rkey: getRecordId(prev),
 				},
 			});
 

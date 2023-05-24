@@ -4,7 +4,7 @@ import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
-import { type DID, getPostId } from '~/api/utils.ts';
+import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
@@ -115,7 +115,7 @@ const AuthenticatedPostPage = () => {
 															params={{
 																uid: uid(),
 																actor: items[0].author.did,
-																status: getPostId(items[0].uri),
+																status: getRecordId(items[0].uri),
 															}}
 															class='h-10 flex items-center gap-3 px-4 hover:bg-hinted'
 														>
@@ -273,7 +273,7 @@ const AuthenticatedPostPage = () => {
 														params={{
 															uid: uid(),
 															actor: items[len - 1].author.did,
-															status: getPostId(items[len - 1].uri),
+															status: getRecordId(items[len - 1].uri),
 														}}
 														class='h-10 flex items-center gap-3 px-4 border-b border-divider hover:bg-hinted'
 													>

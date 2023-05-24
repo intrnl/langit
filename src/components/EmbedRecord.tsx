@@ -1,7 +1,7 @@
 import { Show, createMemo } from 'solid-js';
 
 import { type EmbeddedRecord } from '~/api/types.ts';
-import { getPostId } from '~/api/utils.ts';
+import { getRecordId } from '~/api/utils.ts';
 
 import { A } from '~/router';
 
@@ -46,7 +46,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 	return (
 		<A
 			href='/u/:uid/profile/:actor/post/:status'
-			params={{ uid: props.uid, actor: author().did, status: getPostId(record().uri) }}
+			params={{ uid: props.uid, actor: author().did, status: getRecordId(record().uri) }}
 			class='rounded-md border border-divider overflow-hidden hover:bg-secondary'
 		>
 			<div class='mx-3 mt-3 flex text-sm text-muted-fg'>

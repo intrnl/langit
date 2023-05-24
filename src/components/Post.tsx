@@ -3,7 +3,7 @@ import { Show } from 'solid-js';
 import { A as UntypedAnchor } from '@solidjs/router';
 
 import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache/posts.ts';
-import { type DID, getPostId } from '~/api/utils.ts';
+import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
@@ -75,14 +75,14 @@ const Post = (props: PostProps) => {
 		}
 
 		if (ev.type === 'auxclick' || ev.ctrlKey) {
-			open(`/u/${uid()}/profile/${author().did}/post/${getPostId(post().uri)}`);
+			open(`/u/${uid()}/profile/${author().did}/post/${getRecordId(post().uri)}`);
 		}
 		else {
 			navigate('/u/:uid/profile/:actor/post/:status', {
 				params: {
 					uid: uid(),
 					actor: author().did,
-					status: getPostId(post().uri),
+					status: getRecordId(post().uri),
 				},
 			});
 		}
@@ -123,7 +123,7 @@ const Post = (props: PostProps) => {
 						<div>
 							<A
 								href='/u/:uid/profile/:actor/post/:status'
-								params={{ uid: uid(), actor: parent()!.author.did, status: getPostId(parent()!.uri) }}
+								params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
 								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
 							>
 								Replying to {parent()!.author.displayName.value}
@@ -175,7 +175,7 @@ const Post = (props: PostProps) => {
 									params={{
 										uid: uid(),
 										actor: author().did,
-										status: getPostId(post().uri),
+										status: getRecordId(post().uri),
 									}}
 									class='hover:underline whitespace-nowrap'
 								>

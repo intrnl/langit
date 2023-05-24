@@ -79,6 +79,21 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		setHidden(!intersecting());
 	};
 
+	const listener = debounce((next: IntersectionObserverEntry) => {
+		entry = next;
+
+		batch(() => {
+			setIntersecting(next.isIntersecting);
+			setHidden(false);
+		});
+
+		scheduleIdleTask(calculateHeight);
+
+		if (intersecting() && !next.isIntersecting) {
+			scheduleIdleTask(hideElement);
+		}
+	}, 150);
+
 	createEffect(() => {
 		const observer = props.observer;
 		const id = props.id;
@@ -88,24 +103,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			return;
 		}
 
-		observer.observe(
-			id,
-			node,
-			debounce((next) => {
-				entry = next;
-
-				batch(() => {
-					setIntersecting(next.isIntersecting);
-					setHidden(false);
-				});
-
-				scheduleIdleTask(calculateHeight);
-
-				if (intersecting() && !next.isIntersecting) {
-					scheduleIdleTask(hideElement);
-				}
-			}, 150),
-		);
+		observer.observe(id, node, listener);
 
 		onCleanup(() => observer.unobserve(id, node));
 	});

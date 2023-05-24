@@ -22,7 +22,7 @@ export interface MultiagentProfileData {
 }
 
 export interface MultiagentAccountData {
-	did: string;
+	did: DID;
 	service: string;
 	session: AtpSessionData;
 	profile?: MultiagentProfileData;

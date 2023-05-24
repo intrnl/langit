@@ -1,6 +1,8 @@
 import forms from '@tailwindcss/forms';
 import colors from 'tailwindcss/colors';
 
+import kobalte from '@kobalte/tailwindcss';
+
 /** @type {import('tailwindcss').Config} */
 export default {
 	content: ['./src/**/*.{ts,tsx}'],
@@ -56,5 +58,6 @@ export default {
 	},
 	plugins: [
 		// forms(),
+		kobalte(),
 	],
 };

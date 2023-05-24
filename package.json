@@ -9,6 +9,7 @@
 	},
 	"dependencies": {
 		"@floating-ui/dom": "^1.2.8",
+		"@kobalte/core": "^0.9.6",
 		"@solidjs/router": "^0.8.2",
 		"@tanstack/solid-query": "^4.29.7",
 		"@tiptap/core": "^2.0.3",
@@ -28,6 +29,7 @@
 		"solid-tiptap": "^0.6.0"
 	},
 	"devDependencies": {
+		"@kobalte/tailwindcss": "^0.6.5",
 		"@tailwindcss/forms": "^0.5.3",
 		"@types/node": "^18.16.12",
 		"autoprefixer": "^10.4.14",

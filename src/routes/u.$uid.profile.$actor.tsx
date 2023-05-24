@@ -99,7 +99,7 @@ const AuthenticatedProfileLayout = () => {
 
 							<div class='flex overflow-x-auto border-b border-divider'>
 								<TabLink href='/u/:uid/profile/:actor' params={params} replace end>
-									Tweets
+									Posts
 								</TabLink>
 								<TabLink href='/u/:uid/profile/:actor/with_replies' params={params} replace>
 									Replies

@@ -109,7 +109,7 @@ const Post = (props: PostProps) => {
 								params={{ uid: uid(), actor: reason()!.by.did }}
 								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
 							>
-								{reason()!.by.displayName || reason()!.by.handle} Retweeted
+								{reason()!.by.displayName || reason()!.by.handle} Reposted
 							</A>
 						</div>
 					</div>

@@ -54,6 +54,14 @@ const AuthenticatedYouPage = () => {
 						navigate('/u/:uid', { params: { uid: account.did } });
 					};
 
+					const handleLogout = async () => {
+						await multiagent.logout(account.did);
+
+						if (uid() === account.did) {
+							navigate('/');
+						}
+					};
+
 					return (
 						<div
 							tabindex={0}
@@ -96,6 +104,7 @@ const AuthenticatedYouPage = () => {
 										<DropdownMenu.Content class='bg-background rounded-md shadow-md flex flex-col border border-divider'>
 											<DropdownMenu.Item
 												as='button'
+												onSelect={handleLogout}
 												class='px-4 py-2 text-left text-sm cursor-pointer hover:bg-hinted'
 											>
 												Sign out

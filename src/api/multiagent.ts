@@ -111,10 +111,36 @@ export class Multiagent {
 	}
 
 	/**
-	 * Sign out from account
+	 * Log out from account
 	 */
-	async signout (did: DID): Promise<void> {
-		// TODO: implement signout functionality
+	async logout (did: DID): Promise<void> {
+		await this._promise;
+
+		let shouldRedirect = false;
+
+		if (!(did in this.accounts)) {
+			return
+		}
+
+		if (this.active === did) {
+			let nextActiveId: DID | undefined;
+
+			for (nextActiveId in this.accounts) {
+				if (nextActiveId === did) {
+					nextActiveId = undefined;
+					continue;
+				}
+
+				break;
+			}
+
+			this.active = nextActiveId;
+		}
+
+		const next = { ...this.storage.get('accounts') };
+		delete next[did];
+
+		this.storage.set('accounts', next);
 	}
 
 	/**

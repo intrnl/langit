@@ -7,7 +7,6 @@ import { acquire } from './_locker.ts';
 
 export const favoritePost = (uid: DID, post: SignalizedPost) => {
 	return acquire(post, async () => {
-		const session = multiagent.accounts[uid].session;
 		const agent = await multiagent.connect(uid);
 
 		const prev = post.viewer.like.peek();
@@ -17,7 +16,7 @@ export const favoritePost = (uid: DID, post: SignalizedPost) => {
 				method: 'com.atproto.repo.deleteRecord',
 				data: {
 					collection: 'app.bsky.feed.like',
-					repo: session.did,
+					repo: uid,
 					rkey: getPostId(prev),
 				},
 			});
@@ -29,7 +28,7 @@ export const favoritePost = (uid: DID, post: SignalizedPost) => {
 			const response = await agent.rpc.post({
 				method: 'com.atproto.repo.createRecord',
 				data: {
-					repo: session.did,
+					repo: uid,
 					collection: 'app.bsky.feed.like',
 					record: {
 						$type: 'app.bsky.feed.like',

@@ -16,7 +16,6 @@ interface CachedHeightStore {
 const [store, setStore] = createStore<CachedHeightStore>({});
 const makeEmpty = reconcile({});
 
-(window as any)._cacheStore = store;
 window.addEventListener('resize', debounce(() => setStore(makeEmpty), 500, true));
 
 let hasBoundingRectBug: boolean | undefined;

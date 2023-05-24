@@ -1,4 +1,3 @@
-import { useLocation } from '@solidjs/router';
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils.ts';
@@ -23,7 +22,6 @@ export interface AuthenticatedProfileTimelinePageProps {
 
 const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePageProps) => {
 	const params = useParams('/u/:uid/profile/:actor');
-	const location = useLocation();
 	const client = useQueryClient();
 
 	const withReplies = () => props.replies || false;
@@ -77,7 +75,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 	return (
 		<Timeline
 			uid={uid()}
-			key={location.key}
+			key={`profile/${actor()}/${withReplies()}`}
 			timelineQuery={timelineQuery}
 			latestQuery={latestQuery}
 			onLoadMore={() => timelineQuery.fetchNextPage()}

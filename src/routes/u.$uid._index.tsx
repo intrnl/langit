@@ -1,4 +1,3 @@
-import { useLocation } from '@solidjs/router';
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils.ts';
@@ -20,7 +19,6 @@ const PAGE_SIZE = 30;
 
 const AuthenticatedHome = () => {
 	const params = useParams('/u/:uid');
-	const location = useLocation();
 
 	const uid = () => params.uid as DID;
 
@@ -77,7 +75,7 @@ const AuthenticatedHome = () => {
 
 			<Timeline
 				uid={uid()}
-				key={location.key}
+				key={`home/${DEFAULT_ALGORITHM}`}
 				timelineQuery={timelineQuery}
 				latestQuery={latestQuery}
 				onLoadMore={() => timelineQuery.fetchNextPage()}

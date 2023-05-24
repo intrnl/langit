@@ -5,6 +5,7 @@ import { createQuery } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils';
 
+import { followProfile } from '~/api/mutations/follow-profile.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, useParams } from '~/router.ts';
@@ -68,7 +69,10 @@ const AuthenticatedProfileLayout = () => {
 
 									<div class='grow' />
 
-									<button class={button({ color: isFollowing() ? 'outline' : 'primary' })}>
+									<button
+										onClick={() => followProfile(uid(), profile())}
+										class={button({ color: isFollowing() ? 'outline' : 'primary' })}
+									>
 										{isFollowing() ? 'Following' : 'Follow'}
 									</button>
 								</div>

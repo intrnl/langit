@@ -4,6 +4,7 @@ import { createInfiniteQuery } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils.ts';
 
+import { followProfile } from '~/api/mutations/follow-profile.ts';
 import { createProfileFollowersQuery, getProfileFollowersKey } from '~/api/queries/get-profile-followers.ts';
 
 import { useParams } from '~/router.ts';
@@ -68,7 +69,10 @@ const AuthenticatedProfileFollowersPage = () => {
 										</div>
 
 										<div>
-											<button class={button({ color: isFollowing() ? 'outline' : 'primary' })}>
+											<button
+												onClick={() => followProfile(uid(), profile)}
+												class={button({ color: isFollowing() ? 'outline' : 'primary' })}
+											>
 												{isFollowing() ? 'Following' : 'Follow'}
 											</button>
 										</div>

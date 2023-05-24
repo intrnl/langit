@@ -102,6 +102,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 				<article
 					ref={setRef}
 					data-id={props.id}
+					class='animate-in fade-in duration-150'
 				>
 					{props.children}
 				</article>

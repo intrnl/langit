@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch } from 'solid-js';
+import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
@@ -11,12 +11,14 @@ import { repostPost } from '~/api/mutations/repost-post.ts';
 import { getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { A, useParams } from '~/router.ts';
+import { IntersectionObserverWrapper } from '~/utils/intersection-observer.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
+import VirtualContainer from '~/components/VirtualContainer';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
@@ -40,14 +42,23 @@ const AuthenticatedPostPage = () => {
 	const location = useLocation();
 
 	const uid = () => params.uid as DID;
+	const status = () => params.status;
 
 	const threadQuery = createQuery({
-		queryKey: () => getPostThreadKey(uid(), params.actor, params.status),
+		queryKey: () => getPostThreadKey(uid(), params.actor, status()),
 		queryFn: getPostThread,
 		refetchOnMount: true,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 		retry: false,
+	});
+
+	const observer = createMemo(() => {
+		const observer = new IntersectionObserverWrapper();
+		observer.connect({ rootMargin: '125% 0px' });
+		status();
+
+		return observer;
 	});
 
 	const focusRef = (node: HTMLDivElement) => {
@@ -134,13 +145,19 @@ const AuthenticatedPostPage = () => {
 													: null}
 
 												{items.map((item, idx) => (
-													<Post
-														interactive
-														uid={uid()}
-														post={item}
-														prev={idx !== 0}
-														next
-													/>
+													<VirtualContainer
+														observer={observer()}
+														key={`thread/asc`}
+														id={item.cid}
+													>
+														<Post
+															interactive
+															uid={uid()}
+															post={item}
+															prev={idx !== 0}
+															next
+														/>
+													</VirtualContainer>
 												))}
 											</>
 										);
@@ -258,13 +275,19 @@ const AuthenticatedPostPage = () => {
 										return (
 											<>
 												{items.map((item, idx) => (
-													<Post
-														interactive
-														uid={uid()}
-														post={item}
-														prev={idx !== 0}
-														next={overflowing || idx !== len - 1}
-													/>
+													<VirtualContainer
+														observer={observer()}
+														key={`thread/desc`}
+														id={item.cid}
+													>
+														<Post
+															interactive
+															uid={uid()}
+															post={item}
+															prev={idx !== 0}
+															next={overflowing || idx !== len - 1}
+														/>
+													</VirtualContainer>
 												))}
 
 												{overflowing && (

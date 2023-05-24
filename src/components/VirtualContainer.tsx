@@ -16,7 +16,18 @@ interface CachedHeightStore {
 const [store, setStore] = createStore<CachedHeightStore>({});
 const makeEmpty = reconcile({});
 
-window.addEventListener('resize', debounce(() => setStore(makeEmpty), 500, true));
+let cachedWidth: number | undefined = undefined;
+
+const resizeListener = () => {
+	const next = window.innerWidth;
+
+	if (cachedWidth !== next) {
+		cachedWidth = next;
+		setStore(makeEmpty);
+	}
+};
+
+window.addEventListener('resize', debounce(resizeListener, 500, true));
 
 let hasBoundingRectBug: boolean | undefined;
 
@@ -77,20 +88,24 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			return;
 		}
 
-		observer.observe(id, node, debounce((next) => {
-			entry = next;
+		observer.observe(
+			id,
+			node,
+			debounce((next) => {
+				entry = next;
 
-			batch(() => {
-				setIntersecting(next.isIntersecting);
-				setHidden(false);
-			});
+				batch(() => {
+					setIntersecting(next.isIntersecting);
+					setHidden(false);
+				});
 
-			scheduleIdleTask(calculateHeight);
+				scheduleIdleTask(calculateHeight);
 
-			if (intersecting() && !next.isIntersecting) {
-				scheduleIdleTask(hideElement);
-			}
-		}, 150));
+				if (intersecting() && !next.isIntersecting) {
+					scheduleIdleTask(hideElement);
+				}
+			}, 150),
+		);
 
 		onCleanup(() => observer.unobserve(id, node));
 	});

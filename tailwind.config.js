@@ -1,5 +1,6 @@
 import colors from 'tailwindcss/colors';
 
+import kobalte from '@kobalte/tailwindcss';
 import animate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
@@ -57,5 +58,6 @@ export default {
 	},
 	plugins: [
 		animate,
+		kobalte(),
 	],
 };

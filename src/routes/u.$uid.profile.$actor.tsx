@@ -74,7 +74,7 @@ const AuthenticatedProfileLayout = () => {
 								</div>
 
 								<div>
-									<p class='text-xl font-bold'>{profile().displayName.value}</p>
+									<p class='text-xl font-bold'>{profile().displayName.value || profile().handle.value}</p>
 									<p class='text-sm text-muted-fg'>@{profile().handle.value}</p>
 								</div>
 

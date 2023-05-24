@@ -1,3 +1,9 @@
+let uid = 0;
+
+export const createId = (prefix = '_') => {
+	return prefix + uid++;
+};
+
 export const chunked = <T>(items: T[], size: number): T[][] => {
 	const chunks: T[][] = [];
 

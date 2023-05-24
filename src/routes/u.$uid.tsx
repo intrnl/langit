@@ -121,13 +121,11 @@ const AuthenticatedLayout = () => {
 								</div>
 							</div>
 
-							<Show when={profileQuery.data}>
-								{(profile) => (
-									<span class='hidden text-base text-ellipsis overflow-hidden group-[.is-active]:font-medium xl:inline'>
-										{profile().displayName.value || '@' + profile().handle.value}
-									</span>
-								)}
-							</Show>
+							<span class='hidden text-base text-ellipsis overflow-hidden group-[.is-active]:font-medium xl:inline'>
+								<Show when={profileQuery.data} fallback='You'>
+									{(profile) => <>{profile().displayName.value || '@' + profile().handle.value}</>}
+								</Show>
+							</span>
 						</A>
 					</div>
 				</div>

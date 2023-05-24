@@ -77,7 +77,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			return;
 		}
 
-		observer.observe(id, node, (next) => {
+		observer.observe(id, node, debounce((next) => {
 			entry = next;
 
 			batch(() => {
@@ -90,7 +90,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			if (intersecting() && !next.isIntersecting) {
 				scheduleIdleTask(hideElement);
 			}
-		});
+		}, 150));
 
 		onCleanup(() => observer.unobserve(id, node));
 	});

@@ -100,8 +100,12 @@ const AuthenticatedYouPage = () => {
 									</DropdownMenu.Trigger>
 
 									<DropdownMenu.Portal>
-										<DropdownMenu.Content class={dropdownMenu()}>
-											<DropdownMenu.Item as="button" onSelect={handleLogout} class={dropdownItem()}>
+										<DropdownMenu.Content class={/* @once */ dropdownMenu()}>
+											<DropdownMenu.Item
+												as="button"
+												onSelect={handleLogout}
+												class={/* @once */ dropdownItem()}
+											>
 												Sign out
 											</DropdownMenu.Item>
 
@@ -109,7 +113,7 @@ const AuthenticatedYouPage = () => {
 												as="button"
 												onSelect={() => (multiagent.active = did)}
 												disabled={did === asDefault()}
-												class={dropdownItem()}
+												class={/* @once */ dropdownItem()}
 											>
 												Set as default
 											</DropdownMenu.Item>

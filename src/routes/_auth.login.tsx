@@ -78,14 +78,28 @@ const AuthLoginPage = () => {
 					<label for="user" class="block text-sm font-medium leading-6 text-primary">
 						Identifier
 					</label>
-					<input type="text" name="user" id="user" required autocomplete="username" class={input()} />
+					<input
+						type="text"
+						name="user"
+						id="user"
+						required
+						autocomplete="username"
+						class={/* @once */ input()}
+					/>
 				</div>
 
 				<div class="flex flex-col gap-2">
 					<label for="pwd" class="block text-sm font-medium leading-6 text-primary">
 						Password
 					</label>
-					<input type="password" name="pwd" id="pwd" required autocomplete="password" class={input()} />
+					<input
+						type="password"
+						name="pwd"
+						id="pwd"
+						required
+						autocomplete="password"
+						class={/* @once */ input()}
+					/>
 				</div>
 
 				<Show when={error()}>{(error) => <p class="text-sm leading-6 text-red-600">{error()}</p>}</Show>

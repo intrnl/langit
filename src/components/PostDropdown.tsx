@@ -22,13 +22,13 @@ const PostDropdown = (props: PostDropdownProps) => {
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content class={dropdownMenu()}>
+				<DropdownMenu.Content class={/* @once */ dropdownMenu()}>
 					<DropdownMenu.Item
 						as="a"
 						onSelect={() =>
 							open(`https://bsky.app/profile/${author().did}/post/${getRecordId(post().uri)}`, '_blank')
 						}
-						class={dropdownItem()}
+						class={/* @once */ dropdownItem()}
 					>
 						Open in Bluesky web app
 					</DropdownMenu.Item>

@@ -14,7 +14,6 @@ import {
 } from '~/api/queries/get-notifications.ts';
 
 import { useParams } from '~/router.ts';
-import { IntersectionObserverWrapper } from '~/utils/intersection-observer.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import NotificationFollow from '~/components/NotificationFollow.tsx';
@@ -39,9 +38,6 @@ const AuthenticatedNotificationsPage = () => {
 	const [dispatching, setDispatching] = createSignal(false);
 
 	const client = useQueryClient();
-
-	const observer = new IntersectionObserverWrapper();
-	observer.connect({ rootMargin: '125% 0px' });
 
 	const notificationsQuery = createInfiniteQuery({
 		queryKey: () => getNotificationsKey(uid()),
@@ -185,7 +181,7 @@ const AuthenticatedNotificationsPage = () => {
 							}
 
 							return (
-								<VirtualContainer observer={observer} key='notifs' id={'' + slice.date}>
+								<VirtualContainer key='notifs' id={'' + slice.date}>
 									{/* @ts-expect-error */}
 									<Notification uid={uid()} data={slice} />
 								</VirtualContainer>

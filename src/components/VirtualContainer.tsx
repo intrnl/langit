@@ -2,11 +2,12 @@
 
 import { type JSX } from 'solid-js/jsx-runtime';
 
-import { Show, batch, createEffect, createSignal, onCleanup } from 'solid-js';
+import { Show, batch, createSignal } from 'solid-js';
+
 import { createStore, reconcile } from 'solid-js/store';
 
 import { scheduleIdleTask } from '~/utils/idle.ts';
-import { type IntersectionObserverWrapper } from '~/utils/intersection-observer.ts';
+import { scrollObserver } from '~/utils/intersection-observer.ts';
 import { debounce } from '~/utils/misc.ts';
 
 interface CachedHeightStore {
@@ -50,7 +51,7 @@ const getRectFromEntry = (entry: IntersectionObserverEntry) => {
 export interface VirtualContainerProps {
 	key: string;
 	id: string;
-	observer: IntersectionObserverWrapper;
+	observer?: IntersectionObserver;
 	children?: JSX.Element;
 }
 
@@ -61,22 +62,24 @@ export const createPostKey = (cid: string, parent: boolean, next: boolean) => {
 const VirtualContainer = (props: VirtualContainerProps) => {
 	const [intersecting, setIntersecting] = createSignal(false);
 	const [hidden, setHidden] = createSignal(false);
-	const [ref, setRef] = createSignal<HTMLElement>();
 
 	const cachedHeight = () => store[props.key]?.[props.id];
-	const observerKey = () => `${props.key}::${props.id}`;
 
 	let height: number | undefined;
 	let entry: IntersectionObserverEntry | undefined;
 
 	const calculateHeight = () => {
-		height = getRectFromEntry(entry!).height;
+		const next = getRectFromEntry(entry!).height;
 
-		if (props.key in store) {
-			setStore(props.key, props.id, height);
-		}
-		else {
-			setStore(props.key, { [props.id]: height });
+		if (next !== height) {
+			height = next;
+
+			if (props.key in store) {
+				setStore(props.key, props.id, height);
+			}
+			else {
+				setStore(props.key, { [props.id]: height });
+			}
 		}
 	};
 
@@ -99,19 +102,8 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		}
 	}, 150);
 
-	createEffect(() => {
-		const observer = props.observer;
-		const id = observerKey();
-		const node = ref();
-
-		if (!node) {
-			return;
-		}
-
-		observer.observe(id, node, listener);
-
-		onCleanup(() => observer.unobserve(id, node));
-	});
+	const observer = () => (props.observer || scrollObserver);
+	const setRef = (node: HTMLElement) => observer().observe(node);
 
 	return (
 		<Show
@@ -119,8 +111,8 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			fallback={
 				<article
 					ref={setRef}
-					data-id={observerKey()}
 					class='animate-in fade-in duration-100'
+					prop:$onintersect={listener}
 				>
 					{props.children}
 				</article>
@@ -129,7 +121,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			<article
 				ref={setRef}
 				style={{ height: `${height || cachedHeight()}px` }}
-				data-id={observerKey()}
+				prop:$onintersect={listener}
 			/>
 		</Show>
 	);

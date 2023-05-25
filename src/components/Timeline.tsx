@@ -1,12 +1,10 @@
-import { For, Match, Switch, createMemo } from 'solid-js';
+import { For, Match, Switch } from 'solid-js';
 
 import { type CreateInfiniteQueryResult, type CreateQueryResult } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils.ts';
 
 import { type TimelinePage } from '~/api/models/timeline.ts';
-
-import { IntersectionObserverWrapper } from '~/utils/intersection-observer.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
@@ -24,13 +22,6 @@ const Timeline = (props: TimelineProps) => {
 	// we're destructuring these props because we don't expect these to ever
 	// change, they shouldn't.
 	const { timelineQuery, latestQuery, onRefetch, onLoadMore } = props;
-
-	const observer = createMemo(() => {
-		const observer = new IntersectionObserverWrapper();
-		observer.connect({ rootMargin: '125% 0px' });
-
-		return observer;
-	});
 
 	const getLatestCid = () => {
 		return timelineQuery.data?.pages[0].cid;
@@ -67,7 +58,6 @@ const Timeline = (props: TimelineProps) => {
 
 							return items.map((item, idx) => (
 								<VirtualContainer
-									observer={observer()}
 									key='posts'
 									id={createPostKey(
 										item.post.cid,

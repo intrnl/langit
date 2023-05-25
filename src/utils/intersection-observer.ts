@@ -1,47 +1,25 @@
-type IntersectionCallback = (entry: IntersectionObserverEntry) => void;
+const callback: IntersectionObserverCallback = (entries, observer) => {
+	for (let idx = 0, len = entries.length; idx < len; idx++) {
+		const entry = entries[idx];
 
-export class IntersectionObserverWrapper {
-	public observer?: IntersectionObserver;
+		const target = entry.target as any;
+		const listener = target.$onintersect;
 
-	private callbacks: Record<string, IntersectionCallback> = {};
-	private backlog: Parameters<IntersectionObserverWrapper['observe']>[] = [];
-
-	connect (options?: IntersectionObserverInit) {
-		const backlog = this.backlog;
-
-		this.observer = new IntersectionObserver((entries) => {
-			for (let idx = 0, len = entries.length; idx < len; idx++) {
-				const entry = entries[idx];
-				const id = entry.target.getAttribute('data-id')!;
-
-				this.callbacks[id]?.(entry);
-			}
-		}, options);
-
-		if (backlog.length > 0) {
-			for (let idx = 0, len = backlog.length; idx < len; idx++) {
-				const params = backlog[idx];
-				this.observe(...params);
-			}
-
-			backlog.length = 0;
-		}
-	}
-
-	observe (id: string, node: Element, callback: IntersectionCallback) {
-		if (this.observer) {
-			this.callbacks[id] = callback;
-			this.observer.observe(node);
+		if (listener) {
+			listener(entry);
 		}
 		else {
-			this.backlog.push([id, node, callback]);
+			observer.unobserve(target);
 		}
 	}
+};
 
-	unobserve (id: string, node: Element) {
-		if (this.observer) {
-			delete this.callbacks[id];
-			this.observer.unobserve(node);
+export const scrollObserver = new IntersectionObserver(callback, { rootMargin: '125% 0px' });
+
+declare module 'solid-js' {
+	namespace JSX {
+		interface ExplicitProperties {
+			$onintersect: (entry: IntersectionObserverEntry) => void;
 		}
 	}
 }

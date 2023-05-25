@@ -11,7 +11,6 @@ import { repostPost } from '~/api/mutations/repost-post.ts';
 import { getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { A, useParams } from '~/router.ts';
-import { IntersectionObserverWrapper } from '~/utils/intersection-observer.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -51,14 +50,6 @@ const AuthenticatedPostPage = () => {
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 		retry: false,
-	});
-
-	const observer = createMemo(() => {
-		const observer = new IntersectionObserverWrapper();
-		observer.connect({ rootMargin: '125% 0px' });
-		status();
-
-		return observer;
 	});
 
 	const focusRef = (node: HTMLDivElement) => {
@@ -146,7 +137,6 @@ const AuthenticatedPostPage = () => {
 
 												{items.map((item, idx) => (
 													<VirtualContainer
-														observer={observer()}
 														key='posts'
 														id={createPostKey(item.cid, false, true)}
 													>
@@ -274,7 +264,6 @@ const AuthenticatedPostPage = () => {
 											<>
 												{items.map((item, idx) => (
 													<VirtualContainer
-														observer={observer()}
 														key='posts'
 														id={createPostKey(item.cid, false, overflowing || idx !== len - 1)}
 													>

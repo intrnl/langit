@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createMemo } from 'solid-js';
+import { For, Match, Show, Switch } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
 import { type CreateInfiniteQueryResult } from '@tanstack/solid-query';
@@ -8,7 +8,6 @@ import { type DID } from '~/api/utils.ts';
 
 import { followProfile } from '~/api/mutations/follow-profile.ts';
 
-import { IntersectionObserverWrapper } from '~/utils/intersection-observer.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -29,13 +28,6 @@ const ProfileList = (props: ProfileListProps) => {
 	const navigate = useNavigate();
 
 	const uid = () => props.uid;
-
-	const observer = createMemo(() => {
-		const observer = new IntersectionObserverWrapper();
-		observer.connect({ rootMargin: '125% 0px' });
-
-		return observer;
-	});
 
 	return (
 		<>
@@ -60,7 +52,7 @@ const ProfileList = (props: ProfileListProps) => {
 						};
 
 						return (
-							<VirtualContainer observer={observer()} key='profile' id={profile.did}>
+							<VirtualContainer key='profile' id={profile.did}>
 								<div
 									onClick={handleClick}
 									onAuxClick={handleClick}

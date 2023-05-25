@@ -1,10 +1,11 @@
-import { For, Match, Switch } from 'solid-js';
+import { For, Match, Switch, createSignal } from 'solid-js';
 
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
 import { type NotificationsPage } from '~/api/models/notifications.ts';
 import { type DID } from '~/api/utils.ts';
 
+import { updateNotificationsSeen } from '~/api/mutations/update-notifications-seen.ts';
 import {
 	createNotificationsQuery,
 	getNotificationsKey,
@@ -18,6 +19,7 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import NotificationFollow from '~/components/NotificationFollow.tsx';
 import NotificationLike from '~/components/NotificationLike.tsx';
 import NotificationReply from '~/components/NotificationReply.tsx';
+import button from '~/styles/primitives/button.ts';
 
 const PAGE_SIZE = 30;
 
@@ -31,6 +33,8 @@ const AuthenticatedNotificationsPage = () => {
 	const params = useParams('/u/:uid/notifications');
 
 	const uid = () => params.uid as DID;
+
+	const [dispatching, setDispatching] = createSignal(false);
 
 	const client = useQueryClient();
 
@@ -110,10 +114,54 @@ const AuthenticatedNotificationsPage = () => {
 		notificationsQuery.refetch();
 	};
 
+	const onMarkAsRead = async () => {
+		// Only mark read up to the last notifications we've seen, it's possible that
+		// new notifications might have arrived and we haven't refreshed yet.
+		const date = notificationsQuery.data?.pages[0]?.date;
+
+		if (dispatching() || !date) {
+			return;
+		}
+
+		setDispatching(true);
+
+		try {
+			await updateNotificationsSeen(uid(), new Date(date));
+
+			// Refetch pages that contain unread notifications
+			await notificationsQuery.refetch<NotificationsPage>({
+				refetchPage: (page) => {
+					const slices = page.slices;
+
+					for (let idx = 0, len = slices.length; idx < len; idx++) {
+						const slice = slices[idx];
+
+						if (!slice.read) {
+							return true;
+						}
+					}
+
+					return false;
+				},
+			});
+		}
+		finally {
+			setDispatching(false);
+		}
+	};
+
 	return (
 		<div class='flex flex-col grow'>
-			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
+			<div class='bg-background flex gap-4 justify-between items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
 				<p class='font-bold text-base'>Notifications</p>
+
+				<button
+					disabled={dispatching() || notificationsQuery.isInitialLoading}
+					onClick={onMarkAsRead}
+					class={button({ color: 'outline' })}
+				>
+					Mark as read
+				</button>
 			</div>
 
 			<Switch>
@@ -140,13 +188,13 @@ const AuthenticatedNotificationsPage = () => {
 				<For each={notificationsQuery.data ? notificationsQuery.data.pages : []}>
 					{(page) =>
 						page.slices.map((slice) => {
-							// @ts-expect-error
 							const Notification = componentMap[slice.type];
 
 							if (!Notification) {
 								return null;
 							}
 
+							// @ts-expect-error
 							return <Notification uid={uid()} data={slice} />;
 						})}
 				</For>

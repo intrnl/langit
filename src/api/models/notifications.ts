@@ -22,6 +22,7 @@ export interface LikeNotificationSlice {
 
 export interface ReplyNotificationSlice {
 	type: 'reply';
+	read: boolean;
 	date: number;
 	item: BskyReplyNotification;
 }
@@ -31,6 +32,7 @@ export type NotificationSlice = FollowNotificationSlice | LikeNotificationSlice 
 export interface NotificationsPage {
 	cursor?: string;
 	cid?: string;
+	date?: string;
 	slices: NotificationSlice[];
 }
 
@@ -121,6 +123,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 
 			slices.unshift({
 				type: reason,
+				read: item.isRead,
 				date: date,
 				item: item,
 			});
@@ -130,6 +133,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 	return {
 		cursor: cursor,
 		cid: notifications.length > 0 ? notifications[0].cid : undefined,
+		date: notifications.length > 0 ? notifications[0].indexedAt : undefined,
 		slices: slices,
 	};
 };

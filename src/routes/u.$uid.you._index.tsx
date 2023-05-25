@@ -10,7 +10,9 @@ import { type DID } from '~/api/utils.ts';
 import { A, useParams } from '~/router.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
-import AccountCircleIcon from '~/icons/baseline-account-circle';
+import { dropdownItem, dropdownMenu } from '~/styles/primitives/dropdown-menu.ts';
+
+import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import AddIcon from '~/icons/baseline-add.tsx';
 import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
@@ -103,11 +105,11 @@ const AuthenticatedYouPage = () => {
 									</DropdownMenu.Trigger>
 
 									<DropdownMenu.Portal>
-										<DropdownMenu.Content class='bg-background rounded-md shadow-md flex flex-col border border-divider'>
+										<DropdownMenu.Content class={dropdownMenu()}>
 											<DropdownMenu.Item
 												as='button'
 												onSelect={handleLogout}
-												class='px-4 py-2 text-left text-sm cursor-pointer hover:bg-hinted'
+												class={dropdownItem()}
 											>
 												Sign out
 											</DropdownMenu.Item>
@@ -116,7 +118,7 @@ const AuthenticatedYouPage = () => {
 												as='button'
 												onSelect={() => (multiagent.active = did)}
 												disabled={did === asDefault()}
-												class='px-4 py-2 text-left text-sm cursor-pointer hover:bg-hinted ui-disabled:opacity-50 ui-disabled:pointer-events-none'
+												class={dropdownItem()}
 											>
 												Set as default
 											</DropdownMenu.Item>

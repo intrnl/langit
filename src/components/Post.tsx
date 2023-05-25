@@ -14,9 +14,9 @@ import * as relformat from '~/utils/intl/relformatter.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import Embed from '~/components/Embed.tsx';
+import PostDropdown from '~/components/PostDropdown.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
-import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
@@ -157,9 +157,7 @@ const Post = (props: PostProps) => {
 
 						<Show when={interactive()}>
 							<div class='shrink-0'>
-								<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
-									<MoreHorizIcon />
-								</button>
+								<PostDropdown post={post()} />
 							</div>
 						</Show>
 					</div>

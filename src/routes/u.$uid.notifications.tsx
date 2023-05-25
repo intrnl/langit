@@ -14,11 +14,13 @@ import {
 } from '~/api/queries/get-notifications.ts';
 
 import { useParams } from '~/router.ts';
+import { IntersectionObserverWrapper } from '~/utils/intersection-observer.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import NotificationFollow from '~/components/NotificationFollow.tsx';
 import NotificationLike from '~/components/NotificationLike.tsx';
 import NotificationReply from '~/components/NotificationReply.tsx';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 const PAGE_SIZE = 30;
@@ -37,6 +39,9 @@ const AuthenticatedNotificationsPage = () => {
 	const [dispatching, setDispatching] = createSignal(false);
 
 	const client = useQueryClient();
+
+	const observer = new IntersectionObserverWrapper();
+	observer.connect({ rootMargin: '125% 0px' });
 
 	const notificationsQuery = createInfiniteQuery({
 		queryKey: () => getNotificationsKey(uid()),
@@ -179,8 +184,12 @@ const AuthenticatedNotificationsPage = () => {
 								return null;
 							}
 
-							// @ts-expect-error
-							return <Notification uid={uid()} data={slice} />;
+							return (
+								<VirtualContainer observer={observer} key='notifs' id={'' + slice.date}>
+									{/* @ts-expect-error */}
+									<Notification uid={uid()} data={slice} />
+								</VirtualContainer>
+							);
 						})}
 				</For>
 			</div>

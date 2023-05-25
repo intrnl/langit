@@ -39,8 +39,8 @@ export const createProfileLikesQuery = (limit: number) => {
 			chunkedUris.map((uris) =>
 				agent.rpc
 					.get({ method: 'app.bsky.feed.getPosts', signal: ctx.signal, params: { uris } })
-					.then((response) => (response.data as BskyGetPostsResponse).posts)
-			)
+					.then((response) => (response.data as BskyGetPostsResponse).posts),
+			),
 		);
 
 		const page = createLikesTimelinePage(data.cursor, chunkedPosts.flat());
@@ -52,7 +52,7 @@ export const createProfileLikesQuery = (limit: number) => {
 export const getProfileLikesLatestKey = (uid: DID, actor: string) =>
 	['getProfileLikesLatest', uid, actor] as const;
 export const getProfileLikesLatest = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getProfileLikesLatestKey>>
+	ctx: QueryFunctionContext<ReturnType<typeof getProfileLikesLatestKey>>,
 ) => {
 	const [, uid, actor] = ctx.queryKey;
 

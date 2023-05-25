@@ -49,7 +49,7 @@ export const createProfileFeedQuery = (limit: number) => {
 export const getProfileFeedLatestKey = (uid: DID, actor: string) =>
 	['getProfileFieldLatest', uid, actor] as const;
 export const getProfileFeedLatest = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getProfileFeedLatestKey>>
+	ctx: QueryFunctionContext<ReturnType<typeof getProfileFeedLatestKey>>,
 ) => {
 	const [, uid, actor] = ctx.queryKey;
 

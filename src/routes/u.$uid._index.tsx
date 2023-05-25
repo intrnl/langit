@@ -99,7 +99,7 @@ const AuthenticatedHome = () => {
 							}
 
 							return;
-						}
+						},
 					);
 
 					timelineQuery.refetch();

@@ -20,7 +20,9 @@ const RedirectPage = () => {
 
 	return (
 		<Navigate
-			href={/* @once */ activeId ? `/u/${activeId}/${path}` : `/login?to=${encodeURIComponent('@uid/' + path)}`}
+			href={
+				/* @once */ activeId ? `/u/${activeId}/${path}` : `/login?to=${encodeURIComponent('@uid/' + path)}`
+			}
 		/>
 	);
 };

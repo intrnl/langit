@@ -121,7 +121,7 @@ const shouldBreak = (
 	end: number,
 	startEmoji: number,
 	midEmoji: number[],
-	endEmoji: number
+	endEmoji: number,
 ): number => {
 	const all = [start].concat(mid).concat([end]);
 	const allEmoji = [startEmoji].concat(midEmoji).concat([endEmoji]);

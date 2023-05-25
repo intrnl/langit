@@ -99,7 +99,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 						}
 
 						return;
-					}
+					},
 				);
 
 				timelineQuery.refetch();

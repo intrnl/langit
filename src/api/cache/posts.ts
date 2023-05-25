@@ -93,7 +93,7 @@ export interface SignalizedTimelinePost {
 
 export const createSignalizedTimelinePost = (
 	item: BskyTimelinePost,
-	key?: number
+	key?: number,
 ): SignalizedTimelinePost => {
 	const reply = item.reply;
 
@@ -117,7 +117,7 @@ export interface SignalizedLinearThread {
 
 export const createSignalizedLinearThread = (
 	thread: LinearizedThread,
-	key?: number
+	key?: number,
 ): SignalizedLinearThread => {
 	const anc = thread.ancestors;
 	const dec = thread.descendants;

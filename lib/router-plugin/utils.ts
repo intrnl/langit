@@ -98,7 +98,7 @@ export interface DefineRouteFunction {
 		/**
 		 * A function for defining child routes.
 		 */
-		children?: DefineRouteChildren
+		children?: DefineRouteChildren,
 	): void;
 }
 
@@ -116,7 +116,7 @@ export const defineRoutes = (callback: (defineRoute: DefineRouteFunction) => voi
 			throw new Error(
 				'You tried to define routes asynchronously but started defining ' +
 					'routes before the async work was done. Please await all async ' +
-					'data before calling `defineRoutes()`'
+					'data before calling `defineRoutes()`',
 			);
 		}
 

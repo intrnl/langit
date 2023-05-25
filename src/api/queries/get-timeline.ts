@@ -42,7 +42,7 @@ export const createTimelineQuery = (limit: number) => {
 export const getTimelineLatestKey = (uid: DID, algorithm: string) =>
 	['getTimelineLatest', uid, algorithm] as const;
 export const getTimelineLatest = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getTimelineLatestKey>>
+	ctx: QueryFunctionContext<ReturnType<typeof getTimelineLatestKey>>,
 ) => {
 	const [, uid, algorithm] = ctx.queryKey;
 

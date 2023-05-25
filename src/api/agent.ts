@@ -109,7 +109,7 @@ export class Agent {
 		httpUri: string,
 		httpMethod: string,
 		httpHeaders: Headers,
-		httpReqBody: unknown
+		httpReqBody: unknown,
 	): Promise<FetchHandlerResponse> {
 		await this._refreshSessionPromise;
 
@@ -174,7 +174,7 @@ export class Agent {
 			{
 				authorization: `Bearer ${session.refreshJwt}`,
 			},
-			undefined
+			undefined,
 		);
 
 		if (isErrorResponse(res, ['ExpiredToken', 'InvalidToken'])) {

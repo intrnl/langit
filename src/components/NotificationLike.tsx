@@ -119,7 +119,7 @@ const NotificationLike = (props: NotificationLikeProps) => {
 					class="font-bold hover:underline"
 				>
 					{author.displayName || `@${author.handle}`}
-				</A>
+				</A>,
 			);
 		}
 

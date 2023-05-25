@@ -58,7 +58,7 @@ class PrefixLookupTrie {
 		values: string[],
 		node: PrefixLookupNode,
 		prefix: string,
-		filter: (nodeValue: string) => boolean
+		filter: (nodeValue: string) => boolean,
 	): string[] {
 		for (let char of Object.keys(node)) {
 			this._findAndRemoveRecursive(values, node[char], prefix + char, filter);
@@ -246,7 +246,7 @@ export function flatRoutesUniversal(dirname: string, routes: string[]): RouteMan
 const findRouteModuleForFile = (
 	dirname: string,
 	filename: string,
-	ignoredFileRegex: RegExp[]
+	ignoredFileRegex: RegExp[],
 ): string | null => {
 	const relativePath = path.relative(dirname, filename);
 	const isIgnored = ignoredFileRegex.some((regex) => regex.test(relativePath));
@@ -261,7 +261,7 @@ const findRouteModuleForFile = (
 const findRouteModuleForFolder = (
 	dirname: string,
 	filename: string,
-	ignoredFileRegex: RegExp[]
+	ignoredFileRegex: RegExp[],
 ): string | null => {
 	const relativePath = path.relative(dirname, filename);
 	const isIgnored = ignoredFileRegex.some((regex) => regex.test(relativePath));

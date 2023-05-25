@@ -39,7 +39,7 @@ interface BatchedFetchMap<Query, Id, Data> {
 }
 
 export const createBatchedFetch = <Query, Id extends QueryId, Data>(
-	options: BatchedFetchOptions<Query, Id, Data>
+	options: BatchedFetchOptions<Query, Id, Data>,
 ) => {
 	const { limit, timeout, fetch, key: _key, idFromData, idFromQuery } = options;
 
@@ -82,7 +82,7 @@ export const createBatchedFetch = <Query, Id extends QueryId, Data>(
 const perform = async <Query, Id extends QueryId, Data>(
 	map: BatchedFetchMap<Query, Id, Data>,
 	fetch: (queries: Query[]) => Promisable<Data[]>,
-	idFromData: (data: Data) => Id
+	idFromData: (data: Data) => Id,
 ) => {
 	const queries = map.queries;
 	const pending = map.pending;

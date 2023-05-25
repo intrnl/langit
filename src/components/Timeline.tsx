@@ -63,7 +63,7 @@ const Timeline = (props: TimelineProps) => {
 										/* @once */ createPostKey(
 											item.post.cid,
 											(!!item.reply?.parent && idx === 0) || !!item.reason,
-											idx !== len - 1
+											idx !== len - 1,
 										)
 									}
 								>

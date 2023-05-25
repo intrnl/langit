@@ -19,7 +19,7 @@ const button = cva(
 			size: 'sm',
 			color: 'secondary',
 		},
-	}
+	},
 );
 
 export default button;

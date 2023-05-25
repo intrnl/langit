@@ -34,7 +34,7 @@ export interface SignalizedProfile {
 
 const createSignalizedProfile = (
 	profile: BskyProfile | BskyProfileBasic | BskyProfileFollow,
-	key?: number
+	key?: number,
 ): SignalizedProfile => {
 	const isProfileFollow = 'description' in profile;
 	const isProfile = 'postsCount' in profile;
@@ -63,7 +63,7 @@ const createSignalizedProfile = (
 
 export const mergeSignalizedProfile = (
 	profile: BskyProfile | BskyProfileBasic | BskyProfileFollow,
-	key?: number
+	key?: number,
 ) => {
 	let did = profile.did;
 

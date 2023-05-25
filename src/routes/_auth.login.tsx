@@ -30,7 +30,7 @@ const AuthLoginPage = () => {
 			});
 
 			return res.data;
-		}
+		},
 	);
 
 	return (
@@ -66,7 +66,7 @@ const AuthLoginPage = () => {
 							const message = err.cause ? err.cause.message : err.message;
 							setError(message);
 							setDispatching(false);
-						}
+						},
 					);
 				}}
 				class="flex flex-col gap-4"

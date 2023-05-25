@@ -2,10 +2,13 @@ import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import { DropdownMenu } from '@kobalte/core';
 
+import { useNavigate } from '@solidjs/router';
+
 import { multiagent } from '~/api/global.ts';
 import { type DID } from '~/api/utils.ts';
 
-import { A, useNavigate, useParams } from '~/router.ts';
+import { A, useParams } from '~/router.ts';
+import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle';
 import AddIcon from '~/icons/baseline-add.tsx';
@@ -34,30 +37,27 @@ const AuthenticatedYouPage = () => {
 			<For each={accounts()}>
 				{(account) => {
 					const profile = account.profile;
+					const did = account.did;
 
-					const handleClick = (ev: MouseEvent) => {
-						const path = ev.composedPath() as HTMLElement[];
-
-						for (let idx = 0, len = path.length; idx < len; idx++) {
-							const node = path[idx];
-							const tag = node.localName;
-
-							if (node == ev.currentTarget) {
-								break;
-							}
-
-							if (tag === 'a' || tag === 'button') {
-								return;
-							}
+					const handleClick = (ev: MouseEvent | KeyboardEvent) => {
+						if (!isElementClicked(ev)) {
+							return;
 						}
 
-						navigate('/u/:uid', { params: { uid: account.did } });
+						const path = `/u/${did}`;
+
+						if (isElementAltClicked(ev)) {
+							open(path, '_blank');
+						}
+						else {
+							navigate(path);
+						}
 					};
 
 					const handleLogout = async () => {
-						await multiagent.logout(account.did);
+						await multiagent.logout(did);
 
-						if (uid() === account.did) {
+						if (uid() === did) {
 							navigate('/');
 						}
 					};
@@ -66,6 +66,8 @@ const AuthenticatedYouPage = () => {
 						<div
 							tabindex={0}
 							onClick={handleClick}
+							onAuxClick={handleClick}
+							onKeyDown={handleClick}
 							class='group text-left flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-hinted'
 						>
 							<div class='h-12 w-12 shrink-0 rounded-full bg-hinted-fg overflow-hidden'>
@@ -74,7 +76,7 @@ const AuthenticatedYouPage = () => {
 								</Show>
 							</div>
 
-							<Switch fallback={<div class='grow text-sm'>{account.did}</div>}>
+							<Switch fallback={<div class='grow text-sm'>{did}</div>}>
 								<Match when={profile}>
 									{(profile) => (
 										<div class='grow flex flex-col text-sm'>
@@ -84,7 +86,7 @@ const AuthenticatedYouPage = () => {
 											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
 												@{profile().handle}
 											</span>
-											<Show when={account.did === asDefault()}>
+											<Show when={did === asDefault()}>
 												<span class='text-muted-fg'>
 													Default account
 												</span>
@@ -112,8 +114,8 @@ const AuthenticatedYouPage = () => {
 
 											<DropdownMenu.Item
 												as='button'
-												onSelect={() => (multiagent.active = account.did)}
-												disabled={account.did === asDefault()}
+												onSelect={() => (multiagent.active = did)}
+												disabled={did === asDefault()}
 												class='px-4 py-2 text-left text-sm cursor-pointer hover:bg-hinted ui-disabled:opacity-50 ui-disabled:pointer-events-none'
 											>
 												Set as default

@@ -19,6 +19,7 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import NotificationFollow from '~/components/NotificationFollow.tsx';
 import NotificationLike from '~/components/NotificationLike.tsx';
 import NotificationReply from '~/components/NotificationReply.tsx';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 const PAGE_SIZE = 30;
@@ -179,8 +180,12 @@ const AuthenticatedNotificationsPage = () => {
 								return null;
 							}
 
-							// @ts-expect-error
-							return <Notification uid={uid()} data={slice} />;
+							return (
+								<VirtualContainer key='notifs' id={'' + slice.date}>
+									{/* @ts-expect-error */}
+									<Notification uid={uid()} data={slice} />
+								</VirtualContainer>
+							);
 						})}
 				</For>
 			</div>

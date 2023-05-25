@@ -75,6 +75,7 @@ const AuthenticatedHome = () => {
 
 			<Timeline
 				uid={uid()}
+				key={`home/${DEFAULT_ALGORITHM}`}
 				timelineQuery={timelineQuery}
 				latestQuery={latestQuery}
 				onLoadMore={() => timelineQuery.fetchNextPage()}

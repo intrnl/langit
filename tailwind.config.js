@@ -1,7 +1,7 @@
-import forms from '@tailwindcss/forms';
 import colors from 'tailwindcss/colors';
 
 import kobalte from '@kobalte/tailwindcss';
+import animate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -58,7 +58,7 @@ export default {
 		},
 	},
 	plugins: [
-		// forms(),
+		animate,
 		kobalte(),
 	],
 };

@@ -8,9 +8,11 @@ import { type DID } from '~/api/utils.ts';
 
 import { followProfile } from '~/api/mutations/follow-profile.ts';
 
+import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
+
 import CircularProgress from '~/components/CircularProgress.tsx';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
-import { isElementAltClicked, isElementClicked } from '~/utils/misc';
 
 export interface ProfileListProps {
 	uid: DID;
@@ -50,48 +52,50 @@ const ProfileList = (props: ProfileListProps) => {
 						};
 
 						return (
-							<div
-								onClick={handleClick}
-								onAuxClick={handleClick}
-								onKeyDown={handleClick}
-								role='button'
-								tabindex={0}
-								class='px-4 py-3 flex gap-3 hover:bg-hinted'
-							>
-								<div class='h-12 w-12 shrink-0 rounded-full bg-hinted-fg overflow-hidden'>
-									<Show when={profile.avatar.value}>
-										{(avatar) => <img src={avatar()} class='h-full w-full' />}
-									</Show>
-								</div>
-
-								<div class='grow flex flex-col gap-1 min-w-0'>
-									<div class='flex items-center justify-between gap-3'>
-										<div class='flex flex-col text-sm'>
-											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1'>
-												{profile.displayName.value || profile.handle.value}
-											</span>
-											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
-												@{profile.handle.value}
-											</span>
-										</div>
-
-										<div>
-											<button
-												onClick={() => followProfile(uid(), profile)}
-												class={button({ color: isFollowing() ? 'outline' : 'primary' })}
-											>
-												{isFollowing() ? 'Following' : 'Follow'}
-											</button>
-										</div>
+							<VirtualContainer key='profile' id={profile.did}>
+								<div
+									onClick={handleClick}
+									onAuxClick={handleClick}
+									onKeyDown={handleClick}
+									role='button'
+									tabindex={0}
+									class='px-4 py-3 flex gap-3 hover:bg-hinted'
+								>
+									<div class='h-12 w-12 shrink-0 rounded-full bg-hinted-fg overflow-hidden'>
+										<Show when={profile.avatar.value}>
+											{(avatar) => <img src={avatar()} class='h-full w-full' />}
+										</Show>
 									</div>
 
-									<Show when={profile.description.value}>
-										<div class='text-sm break-words line-clamp-3'>
-											{profile.$renderedDescription(uid())}
+									<div class='grow flex flex-col gap-1 min-w-0'>
+										<div class='flex items-center justify-between gap-3'>
+											<div class='flex flex-col text-sm'>
+												<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1'>
+													{profile.displayName.value || profile.handle.value}
+												</span>
+												<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
+													@{profile.handle.value}
+												</span>
+											</div>
+
+											<div>
+												<button
+													onClick={() => followProfile(uid(), profile)}
+													class={button({ color: isFollowing() ? 'outline' : 'primary' })}
+												>
+													{isFollowing() ? 'Following' : 'Follow'}
+												</button>
+											</div>
 										</div>
-									</Show>
+
+										<Show when={profile.description.value}>
+											<div class='text-sm break-words line-clamp-3'>
+												{profile.$renderedDescription(uid())}
+											</div>
+										</Show>
+									</div>
 								</div>
-							</div>
+							</VirtualContainer>
 						);
 					});
 				}}

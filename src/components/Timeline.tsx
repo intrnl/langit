@@ -8,6 +8,7 @@ import { type TimelinePage } from '~/api/models/timeline.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
+import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 
 export interface TimelineProps {
 	uid: DID;
@@ -56,15 +57,24 @@ const Timeline = (props: TimelineProps) => {
 							const len = items.length;
 
 							return items.map((item, idx) => (
-								<Post
-									interactive
-									uid={props.uid}
-									post={item.post}
-									parent={item.reply?.parent}
-									reason={item.reason}
-									prev={idx !== 0}
-									next={idx !== len - 1}
-								/>
+								<VirtualContainer
+									key='posts'
+									id={createPostKey(
+										item.post.cid,
+										(!!item.reply?.parent && idx === 0) || !!item.reason,
+										idx !== len - 1,
+									)}
+								>
+									<Post
+										interactive
+										uid={props.uid}
+										post={item.post}
+										parent={item.reply?.parent}
+										reason={item.reason}
+										prev={idx !== 0}
+										next={idx !== len - 1}
+									/>
+								</VirtualContainer>
 							));
 						})
 					)}

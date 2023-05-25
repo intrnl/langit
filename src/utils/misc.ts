@@ -15,6 +15,21 @@ export const chunked = <T>(items: T[], size: number): T[][] => {
 	return chunks;
 };
 
+export type VoidFunction = (...args: any[]) => void;
+
+export const debounce = <F extends VoidFunction>(fn: F, delay: number, leading = false) => {
+	let timeout: any;
+
+	return (...args: Parameters<F>) => {
+		if (leading && !timeout) {
+			fn(...args);
+		}
+
+		clearTimeout(timeout);
+		timeout = setTimeout(() => fn(...args), delay);
+	};
+};
+
 const EXCLUDED_TAGS = ['a', 'button', 'img', 'video'];
 
 export const isElementClicked = (ev: Event, excludedTags: string[] = EXCLUDED_TAGS) => {

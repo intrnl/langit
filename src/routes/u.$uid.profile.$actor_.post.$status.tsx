@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch } from 'solid-js';
+import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
@@ -18,6 +18,7 @@ import Embed from '~/components/Embed.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
 import PostDropdown from '~/components/PostDropdown.tsx';
+import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
@@ -40,9 +41,10 @@ const AuthenticatedPostPage = () => {
 	const location = useLocation();
 
 	const uid = () => params.uid as DID;
+	const status = () => params.status;
 
 	const threadQuery = createQuery({
-		queryKey: () => getPostThreadKey(uid(), params.actor, params.status),
+		queryKey: () => getPostThreadKey(uid(), params.actor, status()),
 		queryFn: getPostThread,
 		refetchOnMount: true,
 		refetchOnReconnect: false,
@@ -134,13 +136,18 @@ const AuthenticatedPostPage = () => {
 													: null}
 
 												{items.map((item, idx) => (
-													<Post
-														interactive
-														uid={uid()}
-														post={item}
-														prev={idx !== 0}
-														next
-													/>
+													<VirtualContainer
+														key='posts'
+														id={createPostKey(item.cid, false, true)}
+													>
+														<Post
+															interactive
+															uid={uid()}
+															post={item}
+															prev={idx !== 0}
+															next
+														/>
+													</VirtualContainer>
 												))}
 											</>
 										);
@@ -256,13 +263,18 @@ const AuthenticatedPostPage = () => {
 										return (
 											<>
 												{items.map((item, idx) => (
-													<Post
-														interactive
-														uid={uid()}
-														post={item}
-														prev={idx !== 0}
-														next={overflowing || idx !== len - 1}
-													/>
+													<VirtualContainer
+														key='posts'
+														id={createPostKey(item.cid, false, overflowing || idx !== len - 1)}
+													>
+														<Post
+															interactive
+															uid={uid()}
+															post={item}
+															prev={idx !== 0}
+															next={overflowing || idx !== len - 1}
+														/>
+													</VirtualContainer>
 												))}
 
 												{overflowing && (

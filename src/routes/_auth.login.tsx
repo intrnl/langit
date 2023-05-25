@@ -1,18 +1,18 @@
 import { Show, batch, createSignal } from 'solid-js';
 
+import { useSearchParams, useNavigate } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 import { multiagent } from '~/api/global.ts';
 import { XRPC } from '~/api/rpc/xrpc.ts';
 
-import { useNavigate } from '~/router.ts';
-
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input.ts';
 
 const AuthLoginPage = () => {
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams<{ to?: string }>();
 
 	const [service, setService] = createSignal(DEFAULT_DATA_SERVERS[0]);
 	const [dispatching, setDispatching] = createSignal(false);
@@ -54,7 +54,13 @@ const AuthLoginPage = () => {
 
 					multiagent.login({ service: url, identifier, password }).then(
 						(uid) => {
-							navigate(`/u/:uid`, { params: { uid } });
+							const to = searchParams.to;
+
+							if (to) {
+								navigate(to.replace(`@uid/`, `/u/${uid}/`));
+							} else {
+								navigate(`/u/${uid}`);
+							}
 						},
 						(err) => {
 							const message = err.cause ? err.cause.message : err.message;
@@ -65,6 +71,10 @@ const AuthLoginPage = () => {
 				}}
 				class="flex flex-col gap-4"
 			>
+				<Show when={searchParams.to}>
+					<div class="rounded bg-secondary p-3 text-sm text-secondary-fg">You need to login to continue</div>
+				</Show>
+
 				<div class="flex items-center gap-1 text-sm">
 					<span class="font-medium text-muted-fg">Connecting to</span>
 					<span class="grow font-medium text-primary">{service().name}</span>

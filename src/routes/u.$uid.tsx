@@ -1,6 +1,6 @@
 import { Show } from 'solid-js';
 
-import { Outlet } from '@solidjs/router';
+import { Navigate, Outlet, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { multiagent } from '~/api/global.ts';
@@ -8,7 +8,7 @@ import { type DID } from '~/api/utils.ts';
 
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { A, Navigate, useParams } from '~/router.ts';
+import { A, useParams } from '~/router.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 
 import AddBoxIcon from '~/icons/baseline-add-box.tsx';
@@ -20,12 +20,14 @@ import HomeOutlinedIcon from '~/icons/outline-home.tsx';
 import NotificationsOutlinedIcon from '~/icons/outline-notifications.tsx';
 
 const AuthenticatedLayout = () => {
+	const location = useLocation();
 	const params = useParams('/u/:uid');
 
 	const uid = () => params.uid as DID;
 
 	if (!multiagent.accounts || !multiagent.accounts[uid()]) {
-		return <Navigate href="/" />;
+		const path = location.pathname.slice(4 + params.uid.length);
+		return <Navigate href={`/login?to=${encodeURIComponent('@uid/' + path)}`} />;
 	}
 
 	const isDesktop = useMediaQuery('(width >= 640px)');

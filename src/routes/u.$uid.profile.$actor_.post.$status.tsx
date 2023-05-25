@@ -138,7 +138,7 @@ const AuthenticatedPostPage = () => {
 												{items.map((item, idx) => (
 													<VirtualContainer
 														key='posts'
-														id={createPostKey(item.cid, false, true)}
+														id={/* @once */ createPostKey(item.cid, false, true)}
 													>
 														<Post
 															interactive
@@ -265,7 +265,7 @@ const AuthenticatedPostPage = () => {
 												{items.map((item, idx) => (
 													<VirtualContainer
 														key='posts'
-														id={createPostKey(item.cid, false, overflowing || idx !== len - 1)}
+														id={/* @once */ createPostKey(item.cid, false, overflowing || idx !== len - 1)}
 													>
 														<Post
 															interactive

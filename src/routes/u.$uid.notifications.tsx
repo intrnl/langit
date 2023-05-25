@@ -144,7 +144,7 @@ const AuthenticatedNotificationsPage = () => {
 				<button
 					disabled={dispatching() || notificationsQuery.isInitialLoading || notificationsQuery.isRefetching}
 					onClick={onMarkAsRead}
-					class={button({ color: 'outline' })}
+					class={/* @once */ button({ color: 'outline' })}
 				>
 					Mark as read
 				</button>
@@ -181,7 +181,7 @@ const AuthenticatedNotificationsPage = () => {
 							}
 
 							return (
-								<VirtualContainer key='notifs' id={'' + slice.date}>
+								<VirtualContainer key='notifs' id={/* @once */ '' + slice.date}>
 									{/* @ts-expect-error */}
 									<Notification uid={uid()} data={slice} />
 								</VirtualContainer>

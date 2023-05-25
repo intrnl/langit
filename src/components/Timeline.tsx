@@ -59,7 +59,7 @@ const Timeline = (props: TimelineProps) => {
 							return items.map((item, idx) => (
 								<VirtualContainer
 									key='posts'
-									id={createPostKey(
+									id={/* @once */ createPostKey(
 										item.post.cid,
 										(!!item.reply?.parent && idx === 0) || !!item.reason,
 										idx !== len - 1,
@@ -68,9 +68,9 @@ const Timeline = (props: TimelineProps) => {
 									<Post
 										interactive
 										uid={props.uid}
-										post={item.post}
-										parent={item.reply?.parent}
-										reason={item.reason}
+										post={/* @once */ item.post}
+										parent={/* @once */ item.reply?.parent}
+										reason={/* @once */ item.reason}
 										prev={idx !== 0}
 										next={idx !== len - 1}
 									/>

@@ -66,7 +66,7 @@ const AuthLoginPage = () => {
 					<span class='font-medium text-muted-fg'>Connecting to</span>
 					<span class='font-medium text-primary grow'>{service().name}</span>
 
-					<button disabled type='button' class={button({ color: 'outline' })}>Change</button>
+					<button disabled type='button' class={/* @once */ button({ color: 'outline' })}>Change</button>
 				</div>
 
 				<div class='flex flex-col gap-2'>
@@ -119,7 +119,7 @@ const AuthLoginPage = () => {
 					<button
 						disabled={dispatching() || describeQuery.isLoading}
 						type='submit'
-						class={button({ color: 'primary' })}
+						class={/* @once */ button({ color: 'primary' })}
 					>
 						Login
 					</button>

@@ -257,7 +257,7 @@ const AuthenticatedComposePage = () => {
 							{GRAPHEME_LIMIT - length()}
 						</span>
 
-						<button disabled={!isEnabled()} onClick={handleSubmit} class={button({ color: 'primary' })}>
+						<button disabled={!isEnabled()} onClick={handleSubmit} class={/* @once */ button({ color: 'primary' })}>
 							Post
 						</button>
 					</div>

@@ -31,11 +31,11 @@ const IndexPage = () => {
 			<p>Alternative Bluesky client</p>
 
 			<div class='flex mt-8 gap-4'>
-				<A href='/login' class={button({ color: 'primary' })}>
+				<A href='/login' class={/* @once */ button({ color: 'primary' })}>
 					Log in
 				</A>
 
-				<A href='/register' class={button({ color: 'outline' })}>
+				<A href='/register' class={/* @once */ button({ color: 'outline' })}>
 					Sign up
 				</A>
 			</div>

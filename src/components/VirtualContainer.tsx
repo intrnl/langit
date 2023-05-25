@@ -109,20 +109,12 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		<Show
 			when={!intersecting() && (hidden() || cachedHeight())}
 			fallback={
-				<article
-					ref={setRef}
-					class='animate-in fade-in duration-100'
-					prop:$onintersect={listener}
-				>
+				<article ref={setRef} prop:$onintersect={listener}>
 					{props.children}
 				</article>
 			}
 		>
-			<article
-				ref={setRef}
-				style={{ height: `${height || cachedHeight()}px` }}
-				prop:$onintersect={listener}
-			/>
+			<article ref={setRef} style={{ height: `${height || cachedHeight()}px` }} prop:$onintersect={listener} />
 		</Show>
 	);
 };

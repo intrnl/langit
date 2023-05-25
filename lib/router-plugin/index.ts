@@ -123,6 +123,8 @@ const generateRouterTypes = (manifest: RouteManifest) => {
 
 						if (segment[0] === ':') {
 							params.push(segment.slice(1));
+						} else if (segment === '*') {
+							params.push('*');
 						}
 					}
 
@@ -281,10 +283,16 @@ const generateRouterRoutes = (dir: string, routeDist: string, manifest: RouteMan
 				continue;
 			}
 
+			let path = child.path || '/';
+
+			if (path.endsWith('/*')) {
+				path += '*';
+			}
+
 			hasChildren = true;
 			source += `${baseIndent}{\n`;
 
-			source += `${objIndent}path: ${JSON.stringify(child.path || '/')},\n`;
+			source += `${objIndent}path: ${JSON.stringify(path)},\n`;
 
 			if (child.file) {
 				const pathname = joinPath(rel, child.file);

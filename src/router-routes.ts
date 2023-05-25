@@ -84,6 +84,10 @@ const routes: RouteDefinition[] = [
       },
     ],
   },
+  {
+    path: "r/**",
+    component: lazy(() => import("./routes/r.$.tsx")),
+  },
 ];
 
 export default routes;

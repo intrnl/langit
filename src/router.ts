@@ -25,7 +25,8 @@ export type PathsWithParams =
 	| "/u/:uid/you/invites"
 	| "/u/:uid/you"
 	| "/u/:uid/compose"
-	| "/u/:uid/search";
+	| "/u/:uid/search"
+	| "/r/*";
 export type PathsWithoutParams = 
 	| "/"
 	| "/register"
@@ -45,6 +46,7 @@ export interface Params {
 	"/u/:uid/you": { "uid": string };
 	"/u/:uid/compose": { "uid": string };
 	"/u/:uid/search": { "uid": string };
+	"/r/*": { "*": string };
 }
 
 type NavigateWithParamOptions<P> = P extends number

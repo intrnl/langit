@@ -2,8 +2,8 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
 import { createThreadPage } from '../models/thread.ts';
-import { type DID } from '../multiagent.ts';
 import { type BskyThreadResponse } from '../types.ts';
+import { type DID } from '../utils.ts';
 
 import _getDid from './_did.ts';
 

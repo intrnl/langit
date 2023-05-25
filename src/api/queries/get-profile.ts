@@ -2,8 +2,8 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { mergeSignalizedProfile } from '../cache/profiles.ts';
 import { multiagent } from '../global.ts';
-import { type DID } from '../multiagent.ts';
 import { type BskyProfile } from '../types.ts';
+import { type DID } from '../utils.ts';
 
 export const getProfileKey = (uid: DID, actor: string) => ['getProfile', uid, actor] as const;
 export const getProfile = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileKey>>) => {

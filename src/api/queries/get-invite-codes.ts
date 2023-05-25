@@ -1,8 +1,8 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
-import { type DID } from '../multiagent.ts';
 import { type BskyGetInviteCodesResponse } from '../types.ts';
+import { type DID } from '../utils.ts';
 
 export const getInviteCodesKey = (uid: DID) => ['getInviteCodes', uid] as const;
 export const getInviteCodes = async (ctx: QueryFunctionContext<ReturnType<typeof getInviteCodesKey>>) => {

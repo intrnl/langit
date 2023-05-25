@@ -2,8 +2,8 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { mergeSignalizedPost } from '../cache/posts.ts';
 import { multiagent } from '../global.ts';
-import { type DID } from '../multiagent.ts';
 import { type BskyGetPostsResponse, type BskyPost } from '../types.ts';
+import { type DID } from '../utils.ts';
 
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 

@@ -1,9 +1,9 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
-import { multiagent } from '../global.js';
-import { createProfilesListPage } from '../models/profiles-list.js';
-import { type DID } from '../multiagent.js';
-import { type BskyFollowsResponse } from '../types.js';
+import { multiagent } from '../global.ts';
+import { createProfilesListPage } from '../models/profiles-list.ts';
+import { type BskyFollowsResponse } from '../types.ts';
+import { type DID } from '../utils.ts';
 
 export const getProfileFollowsKey = (uid: DID, actor: string) => ['getProfileFollows', uid, actor] as const;
 export const createProfileFollowsQuery = (limit: number) => {

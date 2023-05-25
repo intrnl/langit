@@ -1,9 +1,9 @@
-import { detectFacets } from '../richtext/detection.js';
-import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.js';
-import { segmentRichText } from '../richtext/segmentize.js';
-import { UnicodeString } from '../richtext/unicode.js';
+import { detectFacets } from '../richtext/detection.ts';
+import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
+import { segmentRichText } from '../richtext/segmentize.ts';
+import { UnicodeString } from '../richtext/unicode.ts';
 
-import { type BskyProfile, type BskyProfileBasic, type BskyProfileFollow } from '../types.js';
+import { type BskyProfile, type BskyProfileBasic, type BskyProfileFollow } from '../types.ts';
 
 import { type Signal, signal } from '~/utils/signals.ts';
 

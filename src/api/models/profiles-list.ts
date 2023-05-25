@@ -1,5 +1,5 @@
-import { type SignalizedProfile, mergeSignalizedProfile } from '../cache/profiles.js';
-import { type BskyProfileFollow } from '../types.js';
+import { type SignalizedProfile, mergeSignalizedProfile } from '../cache/profiles.ts';
+import { type BskyProfileFollow } from '../types.ts';
 
 export interface ProfilesListPage {
 	cursor?: string;

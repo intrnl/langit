@@ -1,9 +1,9 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
-import { type DID } from '../multiagent.ts';
-import { type BskyTimelineResponse } from '../types.ts';
 import { createTimelinePage } from '../models/timeline.ts';
+import { type BskyTimelineResponse } from '../types.ts';
+import { type DID } from '../utils.ts';
 
 import _getDid from './_did.ts';
 

@@ -2,8 +2,8 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
 import { createTimelinePage } from '../models/timeline.ts';
-import { type DID } from '../multiagent.ts';
 import { type BskyTimelineResponse } from '../types.ts';
+import { type DID } from '../utils.ts';
 
 export const getTimelineKey = (uid: DID, algorithm: string) => ['getTimeline', uid, algorithm] as const;
 export const createTimelineQuery = (limit: number) => {

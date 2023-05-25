@@ -2,7 +2,7 @@ import { Outlet } from '@solidjs/router';
 
 const AuthLayout = () => {
 	return (
-		<div class='max-w-xl mx-auto'>
+		<div class="mx-auto max-w-xl">
 			<Outlet />
 		</div>
 	);

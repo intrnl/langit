@@ -38,7 +38,9 @@ interface BatchedFetchMap<Query, Id, Data> {
 	pending: Map<Id, Deferred<Data>>;
 }
 
-export const createBatchedFetch = <Query, Id extends QueryId, Data>(options: BatchedFetchOptions<Query, Id, Data>) => {
+export const createBatchedFetch = <Query, Id extends QueryId, Data>(
+	options: BatchedFetchOptions<Query, Id, Data>
+) => {
 	const { limit, timeout, fetch, key: _key, idFromData, idFromQuery } = options;
 
 	let curr: BatchedFetchMap<Query, Id, Data> | undefined;
@@ -80,7 +82,7 @@ export const createBatchedFetch = <Query, Id extends QueryId, Data>(options: Bat
 const perform = async <Query, Id extends QueryId, Data>(
 	map: BatchedFetchMap<Query, Id, Data>,
 	fetch: (queries: Query[]) => Promisable<Data[]>,
-	idFromData: (data: Data) => Id,
+	idFromData: (data: Data) => Id
 ) => {
 	const queries = map.queries;
 	const pending = map.pending;
@@ -96,15 +98,13 @@ const perform = async <Query, Id extends QueryId, Data>(
 
 			deferred?.resolve(data);
 		}
-	}
-	catch (error) {
+	} catch (error) {
 		errored = true;
 
 		for (const deferred of pending.values()) {
 			deferred.reject(error);
 		}
-	}
-	finally {
+	} finally {
 		if (!errored) {
 			for (const deferred of pending.values()) {
 				deferred.reject(new Error('Requested batch does not contain specified resource'));

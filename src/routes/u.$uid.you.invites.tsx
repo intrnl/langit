@@ -23,14 +23,14 @@ const AuthenticatedInviteCodesPage = () => {
 	});
 
 	return (
-		<div class='flex flex-col'>
-			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
-				<p class='text-base leading-5 font-bold'>Invite codes</p>
+		<div class="flex flex-col">
+			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
+				<p class="text-base font-bold leading-5">Invite codes</p>
 			</div>
 
 			<Switch>
 				<Match when={inviteQuery.isLoading}>
-					<div class='h-13 flex items-center justify-center'>
+					<div class="flex h-13 items-center justify-center">
 						<CircularProgress />
 					</div>
 				</Match>
@@ -58,8 +58,8 @@ const AuthenticatedInviteCodesPage = () => {
 
 						return (
 							<div>
-								<p class='text-sm p-4 border-b border-divider'>
-									You have <span class='font-bold'>{availableCount()}</span> invite codes remaining.
+								<p class="border-b border-divider p-4 text-sm">
+									You have <span class="font-bold">{availableCount()}</span> invite codes remaining.
 								</p>
 
 								<For each={codes()}>
@@ -67,15 +67,21 @@ const AuthenticatedInviteCodesPage = () => {
 										const used = code.available - code.uses.length <= 0 || code.disabled;
 
 										return (
-											<div class='flex items-center gap-4 p-4 border-b border-divider'>
-												<div class='text-sm grow'>
-													<p class='font-bold' classList={{ 'line-through': used }}>{code.code}</p>
+											<div class="flex items-center gap-4 border-b border-divider p-4">
+												<div class="grow text-sm">
+													<p class="font-bold" classList={{ 'line-through': used }}>
+														{code.code}
+													</p>
 
 													<Switch
-														fallback={<p class='text-muted-fg'>Used {code.uses.length}/{code.available} times</p>}
+														fallback={
+															<p class="text-muted-fg">
+																Used {code.uses.length}/{code.available} times
+															</p>
+														}
 													>
 														<Match when={code.disabled}>
-															<p class='text-muted-fg'>Invite code disabled</p>
+															<p class="text-muted-fg">Invite code disabled</p>
 														</Match>
 													</Switch>
 												</div>
@@ -83,7 +89,7 @@ const AuthenticatedInviteCodesPage = () => {
 												<div>
 													<button
 														onClick={() => navigator.clipboard.writeText(code.code)}
-														class='flex items-center justify-center h-9 w-9 -mr-2 rounded-full text-xl hover:bg-secondary'
+														class="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 													>
 														<ContentCopyIcon />
 													</button>

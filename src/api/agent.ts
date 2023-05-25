@@ -30,7 +30,7 @@ export class Agent {
 	private _persistSession?: PersistSessionHandler;
 	private _refreshSessionPromise?: Promise<void>;
 
-	constructor (options: AgentOptions) {
+	constructor(options: AgentOptions) {
 		this.service = new URL(options.service);
 		this._persistSession = options.persistSession;
 
@@ -41,7 +41,7 @@ export class Agent {
 		this.rpc.fetch = this._fetch.bind(this);
 	}
 
-	public async login (options: AtpLoginOptions) {
+	public async login(options: AtpLoginOptions) {
 		try {
 			const res = await this.rpc.post({
 				method: 'com.atproto.server.createSession',
@@ -60,24 +60,21 @@ export class Agent {
 			};
 
 			return res;
-		}
-		catch (e) {
+		} catch (e) {
 			this.session.value = undefined;
 			throw e;
-		}
-		finally {
+		} finally {
 			const session = this.session.peek();
 
 			if (session) {
 				this._persistSession?.('create', session);
-			}
-			else {
+			} else {
 				this._persistSession?.('create-failed', undefined);
 			}
 		}
 	}
 
-	public async resumeSession (session: AtpSessionData) {
+	public async resumeSession(session: AtpSessionData) {
 		try {
 			this.session.value = session;
 
@@ -94,28 +91,25 @@ export class Agent {
 			};
 
 			return res;
-		}
-		catch (e) {
+		} catch (e) {
 			this.session.value = undefined;
 			throw e;
-		}
-		finally {
+		} finally {
 			const session = this.session.peek();
 
 			if (session) {
 				this._persistSession?.('create', session);
-			}
-			else {
+			} else {
 				this._persistSession?.('create-failed', undefined);
 			}
 		}
 	}
 
-	private async _fetch (
+	private async _fetch(
 		httpUri: string,
 		httpMethod: string,
 		httpHeaders: Headers,
-		httpReqBody: unknown,
+		httpReqBody: unknown
 	): Promise<FetchHandlerResponse> {
 		await this._refreshSessionPromise;
 
@@ -133,20 +127,20 @@ export class Agent {
 		return res;
 	}
 
-	private _addAuthHeader (httpHeaders: Headers) {
+	private _addAuthHeader(httpHeaders: Headers) {
 		const session = this.session.peek();
 
 		if (!httpHeaders['authorization'] && session?.accessJwt) {
 			return {
 				...httpHeaders,
-				'authorization': `Bearer ${session.accessJwt}`,
+				authorization: `Bearer ${session.accessJwt}`,
 			};
 		}
 
 		return httpHeaders;
 	}
 
-	private async _refreshSession () {
+	private async _refreshSession() {
 		if (this._refreshSessionPromise) {
 			return this._refreshSessionPromise;
 		}
@@ -155,13 +149,12 @@ export class Agent {
 
 		try {
 			await this._refreshSessionPromise;
-		}
-		finally {
+		} finally {
 			this._refreshSessionPromise = undefined;
 		}
 	}
 
-	private async _refreshSessionInner () {
+	private async _refreshSessionInner() {
 		const session = this.session.peek();
 
 		if (!session || !session.refreshJwt) {
@@ -181,15 +174,14 @@ export class Agent {
 			{
 				authorization: `Bearer ${session.refreshJwt}`,
 			},
-			undefined,
+			undefined
 		);
 
 		if (isErrorResponse(res, ['ExpiredToken', 'InvalidToken'])) {
 			// failed due to a bad refresh token
 			this.session.value = undefined;
 			this._persistSession?.('expired', undefined);
-		}
-		else if (httpResponseCodeToEnum(res.status) === ResponseType.Success) {
+		} else if (httpResponseCodeToEnum(res.status) === ResponseType.Success) {
 			// succeeded, update the session
 			this.session.value = {
 				accessJwt: res.body.accessJwt,

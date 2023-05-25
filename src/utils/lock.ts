@@ -14,32 +14,30 @@ export class Locker<T> {
 
 	private handle: LockHandle<T>;
 
-	constructor (private value: T) {
+	constructor(private value: T) {
 		const that = this;
 
-		const handle = this.handle = {
-			get value () {
+		const handle = (this.handle = {
+			get value() {
 				return that.value;
 			},
-			release () {
+			release() {
 				const next = that.pending.shift();
 
 				if (next) {
 					next.resolve(handle);
-				}
-				else {
+				} else {
 					that.locked = false;
 				}
 			},
-		};
+		});
 	}
 
-	public acquire (): Promise<LockHandle<T>> {
+	public acquire(): Promise<LockHandle<T>> {
 		return new Promise((resolve, reject) => {
 			if (this.locked) {
 				this.pending.push({ resolve, reject });
-			}
-			else {
+			} else {
 				this.locked = true;
 				resolve(this.handle);
 			}

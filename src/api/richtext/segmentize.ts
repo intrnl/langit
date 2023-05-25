@@ -19,8 +19,7 @@ const createSegment = (text: string, facet?: Facet) => {
 
 			if (feature.$type === 'app.bsky.richtext.facet#link') {
 				link = feature;
-			}
-			else if (feature.$type === 'app.bsky.richtext.facet#mention') {
+			} else if (feature.$type === 'app.bsky.richtext.facet#mention') {
 				mention = feature;
 			}
 		}
@@ -49,8 +48,7 @@ export const segmentRichText = (opts: RichTextOptions) => {
 
 		if (textCursor < index.byteStart) {
 			segments.push(createSegment(text.slice(textCursor, index.byteStart)));
-		}
-		else if (textCursor > index.byteStart) {
+		} else if (textCursor > index.byteStart) {
 			facetCursor++;
 			continue;
 		}
@@ -61,16 +59,14 @@ export const segmentRichText = (opts: RichTextOptions) => {
 			if (!subtext.trim()) {
 				// dont empty string entities
 				segments.push(createSegment(subtext));
-			}
-			else {
+			} else {
 				segments.push(createSegment(subtext, facet));
 			}
 		}
 
 		textCursor = index.byteEnd;
 		facetCursor++;
-	}
-	while (facetCursor < facets.length);
+	} while (facetCursor < facets.length);
 
 	if (textCursor < text.length) {
 		segments.push(createSegment(text.slice(textCursor, text.length)));

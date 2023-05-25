@@ -7,22 +7,22 @@ export class Signal<T> {
 	private g: Accessor<T>;
 	private s: Setter<T>;
 
-	constructor (value: T, options?: SignalOptions<T>) {
+	constructor(value: T, options?: SignalOptions<T>) {
 		const impl = createSignal(value, options);
 		this.g = impl[0];
 		this.s = impl[1];
 	}
 
-	get value () {
+	get value() {
 		return this.g();
 	}
 
-	set value (next: T) {
+	set value(next: T) {
 		// @ts-expect-error
 		this.s(typeof next === 'function' ? () => next : next);
 	}
 
-	peek () {
+	peek() {
 		return untrack(this.g);
 	}
 }

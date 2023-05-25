@@ -23,8 +23,7 @@ export const favoritePost = (uid: DID, post: SignalizedPost) => {
 
 			post.viewer.like.value = undefined;
 			post.likeCount.value--;
-		}
-		else {
+		} else {
 			const response = await agent.rpc.post({
 				method: 'com.atproto.repo.createRecord',
 				data: {

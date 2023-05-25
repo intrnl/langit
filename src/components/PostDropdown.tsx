@@ -16,16 +16,18 @@ const PostDropdown = (props: PostDropdownProps) => {
 	const author = () => post().author;
 
 	return (
-		<DropdownMenu.Root placement='bottom-end'>
-			<DropdownMenu.Trigger class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
+		<DropdownMenu.Root placement="bottom-end">
+			<DropdownMenu.Trigger class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base text-muted-fg hover:bg-secondary">
 				<MoreHorizIcon />
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
 				<DropdownMenu.Content class={dropdownMenu()}>
 					<DropdownMenu.Item
-						as='a'
-						onSelect={() => open(`https://bsky.app/profile/${author().did}/post/${getRecordId(post().uri)}`, '_blank')}
+						as="a"
+						onSelect={() =>
+							open(`https://bsky.app/profile/${author().did}/post/${getRecordId(post().uri)}`, '_blank')
+						}
 						class={dropdownItem()}
 					>
 						Open in Bluesky web app

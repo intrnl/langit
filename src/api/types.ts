@@ -298,7 +298,7 @@ export interface BskyNotification<T extends string, R extends {}> {
 	isRead: boolean;
 	author: BskyProfileBasic;
 	reason: T;
-	reasonSubject: T extends ('reply' | 'like') ? string : never;
+	reasonSubject: T extends 'reply' | 'like' ? string : never;
 	record: R;
 	labels: BskyLabel[];
 	indexedAt: string;
@@ -308,10 +308,7 @@ export type BskyFollowNotification = BskyNotification<'follow', BskyFollowRecord
 export type BskyReplyNotification = BskyNotification<'reply', BskyPostRecord>;
 export type BskyLikeNotification = BskyNotification<'like', BskyLikeRecord>;
 
-export type BskyNotificationType =
-	| BskyFollowNotification
-	| BskyReplyNotification
-	| BskyLikeNotification;
+export type BskyNotificationType = BskyFollowNotification | BskyReplyNotification | BskyLikeNotification;
 
 export interface BskyNotificationsResponse {
 	cursor?: string;

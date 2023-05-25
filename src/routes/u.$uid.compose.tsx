@@ -14,7 +14,12 @@ import { Paragraph } from '@tiptap/extension-paragraph';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { Text } from '@tiptap/extension-text';
 
-import { type ComputePositionConfig, type ComputePositionReturn, computePosition, size } from '@floating-ui/dom';
+import {
+	type ComputePositionConfig,
+	type ComputePositionReturn,
+	computePosition,
+	size,
+} from '@floating-ui/dom';
 import { createTiptapEditor } from 'solid-tiptap';
 
 import { posts as postsCache } from '~/api/cache/posts.ts';
@@ -71,12 +76,12 @@ const AuthenticatedComposePage = () => {
 	const replyQuery = createQuery({
 		queryKey: () => getPostKey(uid(), replyUri()),
 		queryFn: getPost,
-		initialData () {
+		initialData() {
 			const signalized = postsCache[replyUri()];
 			return signalized?.deref();
 		},
 		staleTime: 10_000,
-		get enabled () {
+		get enabled() {
 			return !!replyUri();
 		},
 	});
@@ -97,7 +102,7 @@ const AuthenticatedComposePage = () => {
 
 	const isEnabled = createMemo(() => {
 		const len = length();
-		return !replyQuery.isInitialLoading && state() === PostState.IDLE && (len > 0 && len <= 300);
+		return !replyQuery.isInitialLoading && state() === PostState.IDLE && len > 0 && len <= 300;
 	});
 
 	const handleSubmit = async () => {
@@ -150,8 +155,7 @@ const AuthenticatedComposePage = () => {
 					status: pid,
 				},
 			});
-		}
-		catch (err) {
+		} catch (err) {
 			setError('' + err);
 			setState(PostState.IDLE);
 		}
@@ -167,7 +171,7 @@ const AuthenticatedComposePage = () => {
 			History,
 
 			Placeholder.configure({
-				placeholder: 'What\'s happening?',
+				placeholder: "What's happening?",
 			}),
 
 			Link.configure({
@@ -180,7 +184,7 @@ const AuthenticatedComposePage = () => {
 			}),
 
 			Extension.create({
-				addKeyboardShortcuts () {
+				addKeyboardShortcuts() {
 					const submit = () => {
 						handleSubmit();
 						return true;
@@ -193,7 +197,7 @@ const AuthenticatedComposePage = () => {
 				},
 			}),
 		],
-		onUpdate ({ editor }) {
+		onUpdate({ editor }) {
 			const json = editor.getJSON();
 			const rt = pm2rt(json);
 			setRichtext(rt);
@@ -211,53 +215,51 @@ const AuthenticatedComposePage = () => {
 	});
 
 	return (
-		<div class='flex flex-col'>
-			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
-				<p class='font-bold text-base'>Compose</p>
+		<div class="flex flex-col">
+			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
+				<p class="text-base font-bold">Compose</p>
 			</div>
 
 			<Switch>
 				<Match when={replyQuery.isInitialLoading}>
-					<div class='h-13 flex items-center justify-center border-divider'>
+					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={replyQuery.data}>
-					{(reply) => <Post uid={uid()} post={reply()} next />}
-				</Match>
+				<Match when={replyQuery.data}>{(reply) => <Post uid={uid()} post={reply()} next />}</Match>
 			</Switch>
 
-			<div class='flex pb-4'>
-				<div class='shrink-0 p-4'>
-					<div class='h-12 w-12 rounded-full bg-muted-fg overflow-hidden'>
+			<div class="flex pb-4">
+				<div class="shrink-0 p-4">
+					<div class="h-12 w-12 overflow-hidden rounded-full bg-muted-fg">
 						<Show when={profileQuery.data?.avatar.value}>
-							{(avatar) => <img src={avatar()} class='h-full w-full' />}
+							{(avatar) => <img src={avatar()} class="h-full w-full" />}
 						</Show>
 					</div>
 				</div>
 
-				<div class='grow min-w-0'>
-					<div ref={ref} class='compose-editor' />
+				<div class="min-w-0 grow">
+					<div ref={ref} class="compose-editor" />
 
-					<div class='pr-3 pb-4 empty:hidden'>
+					<div class="pb-4 pr-3 empty:hidden">
 						<Show when={error()}>
-							{(msg) => (
-								<div class='text-sm rounded-md border border-divider'>
-									Failed to post: {msg()}
-								</div>
-							)}
+							{(msg) => <div class="rounded-md border border-divider text-sm">Failed to post: {msg()}</div>}
 						</Show>
 					</div>
 
-					<div class='flex items-center gap-3 px-3'>
-						<div class='grow' />
+					<div class="flex items-center gap-3 px-3">
+						<div class="grow" />
 
-						<span class='text-sm' classList={{ 'text-red-600': length() > GRAPHEME_LIMIT }}>
+						<span class="text-sm" classList={{ 'text-red-600': length() > GRAPHEME_LIMIT }}>
 							{GRAPHEME_LIMIT - length()}
 						</span>
 
-						<button disabled={!isEnabled()} onClick={handleSubmit} class={/* @once */ button({ color: 'primary' })}>
+						<button
+							disabled={!isEnabled()}
+							onClick={handleSubmit}
+							class={/* @once */ button({ color: 'primary' })}
+						>
 							Post
 						</button>
 					</div>
@@ -279,7 +281,7 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 
 	return {
 		char: '@',
-		async items ({ query }) {
+		async items({ query }) {
 			current = query;
 
 			const handle = await lock.acquire();
@@ -297,13 +299,12 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 				});
 
 				const data = response.data as BskySearchActorTypeaheadResponse;
-				return suggestions = data.actors;
-			}
-			finally {
+				return (suggestions = data.actors);
+			} finally {
 				handle.release();
 			}
 		},
-		render () {
+		render() {
 			let destroy: (() => void) | undefined;
 			let onKeyDownRef: ((ev: KeyboardEvent) => boolean) | undefined;
 			let popper: HTMLDivElement | undefined;
@@ -316,7 +317,7 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 				middleware: [
 					size({
 						padding: 12,
-						apply ({ availableWidth, availableHeight, elements }) {
+						apply({ availableWidth, availableHeight, elements }) {
 							Object.assign(elements.floating.style, {
 								maxWidth: `${availableWidth}px`,
 								maxHeight: `${availableHeight}px`,
@@ -334,14 +335,14 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 			};
 
 			return {
-				onKeyDown (props) {
+				onKeyDown(props) {
 					if (onKeyDownRef) {
 						return onKeyDownRef(props.event);
 					}
 
 					return false;
 				},
-				onExit () {
+				onExit() {
 					if (destroy) {
 						destroy();
 						popper!.remove();
@@ -351,7 +352,7 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 						destroy = undefined;
 					}
 				},
-				onUpdate (props) {
+				onUpdate(props) {
 					const getBoundingClientRect = props.clientRect as (() => DOMRect) | null;
 
 					setItems(props.items);
@@ -360,7 +361,7 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 						computePosition({ getBoundingClientRect }, popper, floatOptions).then(applyFloat);
 					}
 				},
-				onStart (props) {
+				onStart(props) {
 					const command = props.command;
 					const getBoundingClientRect = props.clientRect as (() => DOMRect) | null;
 
@@ -407,29 +408,29 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 						};
 
 						return (
-							<ul class='bg-background rounded-md overflow-hidden shadow-lg'>
+							<ul class="overflow-hidden rounded-md bg-background shadow-lg">
 								<For each={items()}>
 									{(item, index) => (
 										<li
-											role='option'
+											role="option"
 											tabindex={-1}
-											class='flex items-center gap-4 px-4 py-3 cursor-pointer'
+											class="flex cursor-pointer items-center gap-4 px-4 py-3"
 											classList={{ 'bg-hinted': selected() === index() }}
 											onMouseEnter={() => setSelected(index())}
 											onClick={() => handleSelected(index())}
 										>
-											<div class='shrink-0 h-9 w-9 bg-muted-fg rounded-full overflow-hidden'>
+											<div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted-fg">
 												<Show when={item.avatar} keyed>
-													{(avatar) => <img src={avatar} class='h-full w-full' />}
+													{(avatar) => <img src={avatar} class="h-full w-full" />}
 												</Show>
 											</div>
 
-											<div class='flex flex-col grow text-sm'>
-												<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1'>
+											<div class="flex grow flex-col text-sm">
+												<span class="line-clamp-1 whitespace-pre-wrap break-words break-all font-bold">
 													{item.displayName}
 												</span>
 
-												<span class='shrink-0 text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
+												<span class="line-clamp-1 shrink-0 whitespace-pre-wrap break-all text-muted-fg">
 													@{item.handle}
 												</span>
 											</div>

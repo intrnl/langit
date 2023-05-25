@@ -10,8 +10,7 @@ export const acquire = async (value: any, callback: () => Promise<void>) => {
 	try {
 		const result = await callback();
 		return result;
-	}
-	finally {
+	} finally {
 		locked.delete(value);
 	}
 };

@@ -7,8 +7,7 @@ const _getDid = async (agent: Agent, actor: string, signal?: AbortSignal) => {
 	let did: DID;
 	if (isDid(actor)) {
 		did = actor;
-	}
-	else {
+	} else {
 		const res = await agent.rpc.get({
 			method: 'com.atproto.identity.resolveHandle',
 			signal: signal,

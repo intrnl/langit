@@ -23,8 +23,7 @@ export const repostPost = (uid: DID, post: SignalizedPost) => {
 
 			post.viewer.repost.value = undefined;
 			post.repostCount.value--;
-		}
-		else {
+		} else {
 			const response = await agent.rpc.post({
 				method: 'com.atproto.repo.createRecord',
 				data: {

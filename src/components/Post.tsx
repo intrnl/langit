@@ -53,8 +53,7 @@ const Post = (props: PostProps) => {
 
 		if (isElementAltClicked(ev)) {
 			open(path, '_blank');
-		}
-		else {
+		} else {
 			navigate(path);
 		}
 	};
@@ -65,20 +64,20 @@ const Post = (props: PostProps) => {
 			onClick={handleClick}
 			onAuxClick={handleClick}
 			onKeyDown={handleClick}
-			class='relative px-4 border-divider'
+			class="relative border-divider px-4"
 			classList={{ 'border-b': !props.next, 'hover:bg-hinted': interactive() }}
 		>
-			<div class='pt-3 flex flex-col gap-1'>
+			<div class="flex flex-col gap-1 pt-3">
 				<Show when={reason() && reason()!.$type === 'app.bsky.feed.defs#reasonRepost'}>
-					<div class='-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg'>
-						<div class='flex justify-end w-12 shrink-0'>
+					<div class="-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg">
+						<div class="flex w-12 shrink-0 justify-end">
 							<RepeatIcon />
 						</div>
 						<div>
 							<A
-								href='/u/:uid/profile/:actor'
+								href="/u/:uid/profile/:actor"
 								params={{ uid: uid(), actor: reason()!.by.did }}
-								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
+								class="line-clamp-1 min-w-0 grow font-medium hover:underline"
 							>
 								{reason()!.by.displayName || reason()!.by.handle} Reposted
 							</A>
@@ -87,15 +86,15 @@ const Post = (props: PostProps) => {
 				</Show>
 
 				<Show when={parent() && !props.prev}>
-					<div class='-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg'>
-						<div class='flex justify-end w-12 shrink-0'>
+					<div class="-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg">
+						<div class="flex w-12 shrink-0 justify-end">
 							<ChatBubbleOutlinedIcon />
 						</div>
 						<div>
 							<A
-								href='/u/:uid/profile/:actor/post/:status'
+								href="/u/:uid/profile/:actor/post/:status"
 								params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
-								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
+								class="line-clamp-1 min-w-0 grow font-medium hover:underline"
 							>
 								Replying to {parent()!.author.displayName.value}
 							</A>
@@ -104,51 +103,51 @@ const Post = (props: PostProps) => {
 				</Show>
 			</div>
 
-			<div class='flex gap-3'>
-				<div class='flex flex-col items-center shrink-0'>
+			<div class="flex gap-3">
+				<div class="flex shrink-0 flex-col items-center">
 					<A
-						href='/u/:uid/profile/:actor'
+						href="/u/:uid/profile/:actor"
 						params={{ uid: uid(), actor: author().did }}
-						class='h-12 w-12 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
+						class="h-12 w-12 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 					>
 						<Show when={author().avatar.value}>
-							{(avatar) => <img src={avatar()} class='h-full w-full' />}
+							{(avatar) => <img src={avatar()} class="h-full w-full" />}
 						</Show>
 					</A>
 
 					<Show when={props.next}>
-						<div class='mt-3 grow border-l-2 border-divider' />
+						<div class="mt-3 grow border-l-2 border-divider" />
 					</Show>
 				</div>
 
-				<div class='grow min-w-0 pb-3'>
-					<div class='flex gap-4 items-center justify-between mb-0.5'>
-						<div class='flex items-center text-sm'>
+				<div class="min-w-0 grow pb-3">
+					<div class="mb-0.5 flex items-center justify-between gap-4">
+						<div class="flex items-center text-sm">
 							<div>
 								<A
-									href='/u/:uid/profile/:actor'
+									href="/u/:uid/profile/:actor"
 									params={{ uid: uid(), actor: author().did }}
-									class='group flex gap-1'
+									class="group flex gap-1"
 								>
-									<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline'>
+									<span class="line-clamp-1 whitespace-pre-wrap break-words break-all font-bold group-hover:underline">
 										{author().displayName.value || author().handle.value}
 									</span>
-									<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
+									<span class="line-clamp-1 whitespace-pre-wrap break-all text-muted-fg">
 										@{author().handle.value}
 									</span>
 								</A>
 							</div>
 
-							<span class='text-muted-fg'>
-								<span class='px-1'>·</span>
+							<span class="text-muted-fg">
+								<span class="px-1">·</span>
 								<A
-									href='/u/:uid/profile/:actor/post/:status'
+									href="/u/:uid/profile/:actor/post/:status"
 									params={{
 										uid: uid(),
 										actor: author().did,
 										status: getRecordId(post().uri),
 									}}
-									class='hover:underline whitespace-nowrap'
+									class="whitespace-nowrap hover:underline"
 								>
 									{relformat.format(record().createdAt)}
 								</A>
@@ -156,63 +155,59 @@ const Post = (props: PostProps) => {
 						</div>
 
 						<Show when={interactive()}>
-							<div class='shrink-0'>
+							<div class="shrink-0">
 								<PostDropdown post={post()} />
 							</div>
 						</Show>
 					</div>
 
 					<Show when={record().text}>
-						<div class='text-sm whitespace-pre-wrap break-words'>
-							{post().$renderedContent(uid())}
-						</div>
+						<div class="whitespace-pre-wrap break-words text-sm">{post().$renderedContent(uid())}</div>
 					</Show>
 
-					<Show when={post().embed.value}>
-						{(embed) => <Embed uid={uid()} embed={embed()} />}
-					</Show>
+					<Show when={post().embed.value}>{(embed) => <Embed uid={uid()} embed={embed()} />}</Show>
 
 					<Show when={interactive()}>
-						<div class='flex mt-3 text-muted-fg'>
-							<div class='flex items-end grow gap-0.5'>
+						<div class="mt-3 flex text-muted-fg">
+							<div class="flex grow items-end gap-0.5">
 								<UntypedAnchor
 									href={`/u/${uid()}/compose?reply=${encodeURIComponent(post().uri)}`}
-									class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
+									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
 								>
 									<ChatBubbleOutlinedIcon />
 								</UntypedAnchor>
-								<span class='text-[0.8125rem]'>{comformat.format(post().replyCount.value)}</span>
+								<span class="text-[0.8125rem]">{comformat.format(post().replyCount.value)}</span>
 							</div>
 
 							<div
-								class='flex items-end grow gap-0.5'
+								class="flex grow items-end gap-0.5"
 								classList={{ 'text-green-600': !!post().viewer.repost.value }}
 							>
 								<button
-									class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
+									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
 									onClick={() => repostPost(uid(), post())}
 								>
 									<RepeatIcon />
 								</button>
-								<span class='text-[0.8125rem]'>{comformat.format(post().repostCount.value)}</span>
+								<span class="text-[0.8125rem]">{comformat.format(post().repostCount.value)}</span>
 							</div>
 
 							<div
-								class='group flex items-end grow gap-0.5'
+								class="group flex grow items-end gap-0.5"
 								classList={{ 'is-active text-red-600': !!post().viewer.like.value }}
 							>
 								<button
-									class='flex items-center justify-center h-8 w-8 -my-1.5 -ml-2 rounded-full text-base hover:bg-secondary'
+									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
 									onClick={() => favoritePost(uid(), post())}
 								>
-									<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
-									<FavoriteIcon class='hidden group-[.is-active]:block' />
+									<FavoriteOutlinedIcon class="group-[.is-active]:hidden" />
+									<FavoriteIcon class="hidden group-[.is-active]:block" />
 								</button>
-								<span class='text-[0.8125rem]'>{comformat.format(post().likeCount.value)}</span>
+								<span class="text-[0.8125rem]">{comformat.format(post().likeCount.value)}</span>
 							</div>
 
-							<div class='shrink-0'>
-								<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base hover:bg-secondary'>
+							<div class="shrink-0">
+								<button class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary">
 									<ShareIcon />
 								</button>
 							</div>

@@ -73,7 +73,7 @@ const AuthenticatedNotificationsPage = () => {
 		queryKey: () => getNotificationsLatestKey(uid()),
 		queryFn: getNotificationsLatest,
 		staleTime: 10_000,
-		get enabled () {
+		get enabled() {
 			const data = notificationsQuery.data;
 
 			if (!data || data.pages.length < 1 || !data.pages[0].cid) {
@@ -98,19 +98,16 @@ const AuthenticatedNotificationsPage = () => {
 		// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
 		// but unfortunately that breaks the `hasNextPage` check down below
 		// and would also mean the user gets to see nothing for a bit.
-		client.setQueryData(
-			getNotificationsKey(uid()),
-			(prev?: InfiniteData<NotificationsPage>) => {
-				if (prev) {
-					return {
-						pages: prev.pages.slice(0, 1),
-						pageParams: prev.pageParams.slice(0, 1),
-					};
-				}
+		client.setQueryData(getNotificationsKey(uid()), (prev?: InfiniteData<NotificationsPage>) => {
+			if (prev) {
+				return {
+					pages: prev.pages.slice(0, 1),
+					pageParams: prev.pageParams.slice(0, 1),
+				};
+			}
 
-				return;
-			},
-		);
+			return;
+		});
 
 		notificationsQuery.refetch();
 	};
@@ -130,16 +127,15 @@ const AuthenticatedNotificationsPage = () => {
 			await updateNotificationsSeen(uid(), new Date(date));
 
 			onRefetch();
-		}
-		finally {
+		} finally {
 			setDispatching(false);
 		}
 	};
 
 	return (
-		<div class='flex flex-col grow'>
-			<div class='bg-background flex gap-4 justify-between items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
-				<p class='font-bold text-base'>Notifications</p>
+		<div class="flex grow flex-col">
+			<div class="sticky top-0 z-10 flex h-13 items-center justify-between gap-4 border-b border-divider bg-background px-4">
+				<p class="text-base font-bold">Notifications</p>
 
 				<button
 					disabled={dispatching() || notificationsQuery.isInitialLoading || notificationsQuery.isRefetching}
@@ -153,7 +149,7 @@ const AuthenticatedNotificationsPage = () => {
 			<Switch>
 				<Match when={notificationsQuery.isInitialLoading || notificationsQuery.isRefetching}>
 					<div
-						class='h-13 flex items-center justify-center border-divider'
+						class="flex h-13 items-center justify-center border-divider"
 						classList={{ 'border-b': notificationsQuery.isRefetching }}
 					>
 						<CircularProgress />
@@ -163,7 +159,7 @@ const AuthenticatedNotificationsPage = () => {
 				<Match when={latestQuery.data && latestQuery.data !== getLatestCid()}>
 					<button
 						onClick={onRefetch}
-						class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
+						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"
 					>
 						Show new notifications
 					</button>
@@ -181,18 +177,19 @@ const AuthenticatedNotificationsPage = () => {
 							}
 
 							return (
-								<VirtualContainer key='notifs' id={/* @once */ '' + slice.date}>
+								<VirtualContainer key="notifs" id={/* @once */ '' + slice.date}>
 									{/* @ts-expect-error */}
 									<Notification uid={uid()} data={slice} />
 								</VirtualContainer>
 							);
-						})}
+						})
+					}
 				</For>
 			</div>
 
 			<Switch>
 				<Match when={notificationsQuery.isFetchingNextPage}>
-					<div class='h-13 flex items-center justify-center'>
+					<div class="flex h-13 items-center justify-center">
 						<CircularProgress />
 					</div>
 				</Match>
@@ -201,7 +198,7 @@ const AuthenticatedNotificationsPage = () => {
 					<button
 						onClick={() => notificationsQuery.fetchNextPage()}
 						disabled={notificationsQuery.isRefetching}
-						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
+						class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
 					>
 						Show more notifications
 					</button>

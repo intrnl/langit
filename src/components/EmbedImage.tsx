@@ -15,10 +15,10 @@ const EmbedImage = (props: EmbedImageProps) => {
 	const images = () => props.images;
 
 	return (
-		<div class={!props.borderless ? ' rounded-md border border-divider overflow-hidden' : ''}>
+		<div class={!props.borderless ? ' overflow-hidden rounded-md border border-divider' : ''}>
 			<Switch>
 				<Match when={images().length >= 4}>
-					<div class='max-h-50vh grid grid-cols-2 grid-rows-2 gap-0.5'>
+					<div class="grid max-h-50vh grid-cols-2 grid-rows-2 gap-0.5">
 						{renderImg(images()[0], 'h-full w-full object-cover')}
 						{renderImg(images()[1], 'h-full w-full object-cover')}
 						{renderImg(images()[2], 'h-full w-full object-cover')}
@@ -27,7 +27,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 				</Match>
 
 				<Match when={images().length >= 3}>
-					<div class='max-h-50vh grid grid-flow-col grid-rows-2 gap-0.5'>
+					<div class="grid max-h-50vh grid-flow-col grid-rows-2 gap-0.5">
 						{renderImg(images()[0], 'h-full w-full object-cover')}
 						{renderImg(images()[1], 'h-full w-full object-cover')}
 						{renderImg(images()[2], 'h-full w-full row-span-2 object-cover')}
@@ -35,15 +35,13 @@ const EmbedImage = (props: EmbedImageProps) => {
 				</Match>
 
 				<Match when={images().length >= 2}>
-					<div class='max-h-50vh grid grid-cols-2 gap-0.5'>
+					<div class="grid max-h-50vh grid-cols-2 gap-0.5">
 						{renderImg(images()[0], 'h-full object-cover')}
 						{renderImg(images()[1], 'h-full object-cover')}
 					</div>
 				</Match>
 
-				<Match when={images().length === 1}>
-					{renderImg(images()[0], 'max-h-50vh w-full object-cover')}
-				</Match>
+				<Match when={images().length === 1}>{renderImg(images()[0], 'max-h-50vh w-full object-cover')}</Match>
 			</Switch>
 		</div>
 	);

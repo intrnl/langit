@@ -34,7 +34,7 @@ export interface SignalizedProfile {
 
 const createSignalizedProfile = (
 	profile: BskyProfile | BskyProfileBasic | BskyProfileFollow,
-	key?: number,
+	key?: number
 ): SignalizedProfile => {
 	const isProfileFollow = 'description' in profile;
 	const isProfile = 'postsCount' in profile;
@@ -61,7 +61,10 @@ const createSignalizedProfile = (
 	};
 };
 
-export const mergeSignalizedProfile = (profile: BskyProfile | BskyProfileBasic | BskyProfileFollow, key?: number) => {
+export const mergeSignalizedProfile = (
+	profile: BskyProfile | BskyProfileBasic | BskyProfileFollow,
+	key?: number
+) => {
 	let did = profile.did;
 
 	let ref: WeakRef<SignalizedProfile> | undefined = profiles[did];
@@ -70,8 +73,7 @@ export const mergeSignalizedProfile = (profile: BskyProfile | BskyProfileBasic |
 	if (!ref || !(val = ref.deref()!)) {
 		val = createSignalizedProfile(profile, key);
 		profiles[did] = new WeakRef(val);
-	}
-	else if (!key || val._key !== key) {
+	} else if (!key || val._key !== key) {
 		val._key = key;
 
 		val.handle.value = profile.handle;
@@ -120,8 +122,7 @@ const createProfileDescriptionRenderer = () => {
 				const div = createRenderedRichText(uid, segments);
 
 				template = div;
-			}
-			else {
+			} else {
 				template = undefined;
 			}
 		}
@@ -133,8 +134,7 @@ const createProfileDescriptionRenderer = () => {
 			}
 
 			return template.cloneNode(true);
-		}
-		else {
+		} else {
 			return description;
 		}
 	};

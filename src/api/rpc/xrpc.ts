@@ -30,9 +30,11 @@ export const isErrorResponse = (value: any, names?: string[]): value is ErrorRes
 	const errType = typeof value.error;
 	const msgType = typeof value.message;
 
-	return (errType === 'undefined' || errType === 'string') &&
+	return (
+		(errType === 'undefined' || errType === 'string') &&
 		(msgType === 'undefined' || msgType === 'string') &&
-		(!names || names.includes(value.error));
+		(!names || names.includes(value.error))
+	);
 };
 
 export const fetchHandler = async (
@@ -40,7 +42,7 @@ export const fetchHandler = async (
 	httpMethod: string,
 	httpHeaders: Headers,
 	httpReqBody: unknown,
-	signal?: AbortSignal,
+	signal?: AbortSignal
 ): Promise<FetchHandlerResponse> => {
 	try {
 		// The duplex field is now required for streaming bodies, but not yet reflected
@@ -61,8 +63,7 @@ export const fetchHandler = async (
 			headers: Object.fromEntries(res.headers.entries()),
 			body: httpResponseBodyParse(res.headers.get('content-type'), resBody),
 		};
-	}
-	catch (e) {
+	} catch (e) {
 		throw new XRPCError(ResponseType.Unknown, String(e));
 	}
 };
@@ -72,19 +73,19 @@ export class XRPC {
 	public headers: Headers = {};
 	public fetch = fetchHandler;
 
-	constructor (serviceUri: string | URL) {
+	constructor(serviceUri: string | URL) {
 		this.service = serviceUri instanceof URL ? serviceUri : new URL(serviceUri);
 	}
 
-	public get (options: Omit<NewCallOptions, 'type'>) {
+	public get(options: Omit<NewCallOptions, 'type'>) {
 		return this.call({ type: 'get', ...options });
 	}
 
-	public post (options: Omit<NewCallOptions, 'type'>) {
+	public post(options: Omit<NewCallOptions, 'type'>) {
 		return this.call({ type: 'post', ...options });
 	}
 
-	public async call (options: NewCallOptions) {
+	public async call(options: NewCallOptions) {
 		const { type, method, params, data, encoding, headers, signal } = options;
 
 		const httpUri = constructMethodCallUri(method, this.service, params);
@@ -96,24 +97,16 @@ export class XRPC {
 			},
 		});
 
-		const res = await this.fetch(
-			httpUri,
-			type,
-			httpHeaders,
-			data,
-			signal,
-		);
+		const res = await this.fetch(httpUri, type, httpHeaders, data, signal);
 
 		const resCode = httpResponseCodeToEnum(res.status);
 
 		if (resCode === ResponseType.Success) {
 			return new XRPCResponse(res.body, res.headers);
-		}
-		else {
+		} else {
 			if (res.body && isErrorResponse(res.body)) {
 				throw new XRPCError(resCode, res.body.error, res.body.message);
-			}
-			else {
+			} else {
 				throw new XRPCError(resCode);
 			}
 		}

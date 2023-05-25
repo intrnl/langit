@@ -1,4 +1,8 @@
-import { type SignalizedTimelinePost, createSignalizedTimelinePost, mergeSignalizedPost } from '../cache/posts.ts';
+import {
+	type SignalizedTimelinePost,
+	createSignalizedTimelinePost,
+	mergeSignalizedPost,
+} from '../cache/posts.ts';
 import { type BskyPost, type BskyTimelineResponse } from '../types.ts';
 
 export interface TimelineSlice {
@@ -11,7 +15,7 @@ const isNextInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
 
 	const reply = item.reply;
 
-	return !!reply && (last.post.cid == reply.parent.cid);
+	return !!reply && last.post.cid == reply.parent.cid;
 };
 
 const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
@@ -20,7 +24,7 @@ const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => 
 
 	const reply = first.reply;
 
-	return !!reply && (reply.parent.cid === item.post.cid);
+	return !!reply && reply.parent.cid === item.post.cid;
 };
 
 export interface TimelinePage {
@@ -49,8 +53,7 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 	let jlen = 0;
 
 	// arrange the posts into connected slices
-	loop:
-	for (let i = feed.length - 1; i >= 0; i--) {
+	loop: for (let i = feed.length - 1; i >= 0; i--) {
 		const item = feed[i];
 		const cid = item.post.cid;
 
@@ -78,8 +81,7 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 				}
 
 				continue loop;
-			}
-			else if (isFirstInThread(slice, item)) {
+			} else if (isFirstInThread(slice, item)) {
 				slice.items.unshift(item);
 
 				if (j !== 0) {

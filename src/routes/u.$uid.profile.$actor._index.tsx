@@ -63,7 +63,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 		queryKey: () => getProfileFeedLatestKey(uid(), actor()),
 		queryFn: getProfileFeedLatest,
 		staleTime: 10_000,
-		get enabled () {
+		get enabled() {
 			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
 				return false;
 			}
@@ -99,7 +99,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 						}
 
 						return;
-					},
+					}
 				);
 
 				timelineQuery.refetch();

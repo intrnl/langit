@@ -14,16 +14,16 @@ export class UnicodeString {
 	utf16: string;
 	utf8: Uint8Array;
 
-	constructor (utf16: string) {
+	constructor(utf16: string) {
 		this.utf16 = utf16;
 		this.utf8 = encoder.encode(utf16);
 	}
 
-	get length () {
+	get length() {
 		return this.utf8.byteLength;
 	}
 
-	slice (start?: number, end?: number): string {
+	slice(start?: number, end?: number): string {
 		return decoder.decode(this.utf8.slice(start, end));
 	}
 }

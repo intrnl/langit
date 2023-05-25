@@ -20,12 +20,7 @@ export type JsonBlobRef = TypedJsonBlobRef | UntypedJsonBlobRef;
 export class BlobRef {
 	public original: JsonBlobRef;
 
-	constructor (
-		public ref: any,
-		public mimeType: string,
-		public size: number,
-		original?: JsonBlobRef,
-	) {
+	constructor(public ref: any, public mimeType: string, public size: number, original?: JsonBlobRef) {
 		this.original = original ?? {
 			$type: 'blob',
 			ref,
@@ -34,7 +29,7 @@ export class BlobRef {
 		};
 	}
 
-	static asBlobRef (obj: any): BlobRef | null {
+	static asBlobRef(obj: any): BlobRef | null {
 		if (isTypedJsonBlobRef(obj) || isUntypedJsonBlobRef(obj)) {
 			return BlobRef.fromJsonRef(obj);
 		}
@@ -42,11 +37,10 @@ export class BlobRef {
 		return null;
 	}
 
-	static fromJsonRef (json: JsonBlobRef): BlobRef {
+	static fromJsonRef(json: JsonBlobRef): BlobRef {
 		if (isTypedJsonBlobRef(json)) {
 			return new BlobRef(json.ref.$link, json.mimeType, json.size);
-		}
-		else {
+		} else {
 			return new BlobRef(json.cid, json.mimeType, -1, json);
 		}
 	}

@@ -25,7 +25,7 @@ class PrefixLookupTrie {
 		[PrefixLookupTrieEndSymbol]: false,
 	};
 
-	add (value: string) {
+	add(value: string) {
 		if (!value) {
 			throw new Error('Cannot add empty string to PrefixLookupTrie');
 		}
@@ -42,10 +42,7 @@ class PrefixLookupTrie {
 		node[PrefixLookupTrieEndSymbol] = true;
 	}
 
-	findAndRemove (
-		prefix: string,
-		filter: (nodeValue: string) => boolean,
-	): string[] {
+	findAndRemove(prefix: string, filter: (nodeValue: string) => boolean): string[] {
 		let node = this.root;
 		for (let char of prefix) {
 			if (!node[char]) {
@@ -57,11 +54,11 @@ class PrefixLookupTrie {
 		return this._findAndRemoveRecursive([], node, prefix, filter);
 	}
 
-	_findAndRemoveRecursive (
+	_findAndRemoveRecursive(
 		values: string[],
 		node: PrefixLookupNode,
 		prefix: string,
-		filter: (nodeValue: string) => boolean,
+		filter: (nodeValue: string) => boolean
 	): string[] {
 		for (let char of Object.keys(node)) {
 			this._findAndRemoveRecursive(values, node[char], prefix + char, filter);
@@ -76,10 +73,7 @@ class PrefixLookupTrie {
 	}
 }
 
-export const flatRoutes = (
-	routesDir: string,
-	ignoredFilePatterns: string[] = [],
-) => {
+export const flatRoutes = (routesDir: string, ignoredFilePatterns: string[] = []) => {
 	const ignoredFileRegex = ignoredFilePatterns.map((pattern) => {
 		return globToRegex(pattern);
 	});
@@ -99,8 +93,7 @@ export const flatRoutes = (
 		// If it's a directory, don't recurse into it, instead just look for a route module
 		if (entry.isDirectory()) {
 			route = findRouteModuleForFolder(routesDir, filepath, ignoredFileRegex);
-		}
-		else if (entry.isFile()) {
+		} else if (entry.isFile()) {
 			route = findRouteModuleForFile(routesDir, filepath, ignoredFileRegex);
 		}
 
@@ -113,10 +106,7 @@ export const flatRoutes = (
 	return routeManifest;
 };
 
-export function flatRoutesUniversal (
-	dirname: string,
-	routes: string[],
-): RouteManifest {
+export function flatRoutesUniversal(dirname: string, routes: string[]): RouteManifest {
 	const normalizedDirname = normalizeSlashes(dirname);
 
 	const urlConflicts = new Map<string, ConfigRoute[]>();
@@ -133,11 +123,10 @@ export function flatRoutesUniversal (
 		const routeExt = path.extname(normalizedFile);
 		const routeDir = path.dirname(normalizedFile);
 
-		const routeId = routeDir === normalizedDirname
-			? path.posix
-				.relative(normalizedDirname, normalizedFile)
-				.slice(0, -routeExt.length)
-			: path.posix.relative(normalizedDirname, routeDir);
+		const routeId =
+			routeDir === normalizedDirname
+				? path.posix.relative(normalizedDirname, normalizedFile).slice(0, -routeExt.length)
+				: path.posix.relative(normalizedDirname, routeDir);
 
 		const conflict = routeIds.get(routeId);
 
@@ -157,9 +146,7 @@ export function flatRoutesUniversal (
 		routeIds.set(routeId, normalizedFile);
 	}
 
-	const sortedRouteIds = Array.from(routeIds).sort(
-		([a], [b]) => b.length - a.length,
-	);
+	const sortedRouteIds = Array.from(routeIds).sort(([a], [b]) => b.length - a.length);
 
 	for (const [routeId, file] of sortedRouteIds) {
 		const index = routeId.endsWith('_index');
@@ -210,10 +197,7 @@ export function flatRoutesUniversal (
 		let pathname = config.path;
 
 		if (parentConfig?.path && pathname) {
-			pathname = pathname
-				.slice(parentConfig.path.length)
-				.replace(/^\//, '')
-				.replace(/\/$/, '');
+			pathname = pathname.slice(parentConfig.path.length).replace(/^\//, '').replace(/\/$/, '');
 		}
 
 		const conflictRouteId = originalPathname + (config.index ? '?index' : '');
@@ -262,7 +246,7 @@ export function flatRoutesUniversal (
 const findRouteModuleForFile = (
 	dirname: string,
 	filename: string,
-	ignoredFileRegex: RegExp[],
+	ignoredFileRegex: RegExp[]
 ): string | null => {
 	const relativePath = path.relative(dirname, filename);
 	const isIgnored = ignoredFileRegex.some((regex) => regex.test(relativePath));
@@ -277,7 +261,7 @@ const findRouteModuleForFile = (
 const findRouteModuleForFolder = (
 	dirname: string,
 	filename: string,
-	ignoredFileRegex: RegExp[],
+	ignoredFileRegex: RegExp[]
 ): string | null => {
 	const relativePath = path.relative(dirname, filename);
 	const isIgnored = ignoredFileRegex.some((regex) => regex.test(relativePath));
@@ -372,8 +356,7 @@ export const getRouteSegments = (routeId: string): [string[], string[]] => {
 					if (index === routeId.length) {
 						routeSegment += '*';
 						rawRouteSegment += char;
-					}
-					else {
+					} else {
 						routeSegment += ':';
 						rawRouteSegment += char;
 					}
@@ -413,8 +396,7 @@ export const getRouteSegments = (routeId: string): [string[], string[]] => {
 					if (index === routeId.length) {
 						routeSegment += '*';
 						rawRouteSegment += char;
-					}
-					else {
+					} else {
 						routeSegment += ':';
 						rawRouteSegment += char;
 					}
@@ -444,11 +426,7 @@ export const getRouteSegments = (routeId: string): [string[], string[]] => {
 	return [routeSegments, rawRouteSegments];
 };
 
-export const createRoutePath = (
-	routeSegments: string[],
-	rawRouteSegments: string[],
-	isIndex?: boolean,
-) => {
+export const createRoutePath = (routeSegments: string[], rawRouteSegments: string[], isIndex?: boolean) => {
 	let result: string[] = [];
 
 	if (isIndex) {
@@ -475,10 +453,7 @@ export const createRoutePath = (
 	return result.length ? result.join('/') : undefined;
 };
 
-export const getRoutePathConflictErrorMessage = (
-	pathname: string,
-	routes: string[],
-) => {
+export const getRoutePathConflictErrorMessage = (pathname: string, routes: string[]) => {
 	let [taken, ...others] = routes;
 
 	if (!pathname.startsWith('/')) {
@@ -494,10 +469,7 @@ export const getRoutePathConflictErrorMessage = (
 	);
 };
 
-export const getRouteIdConflictErrorMessage = (
-	routeId: string,
-	files: string[],
-) => {
+export const getRouteIdConflictErrorMessage = (routeId: string, files: string[]) => {
 	let [taken, ...others] = files;
 
 	return (

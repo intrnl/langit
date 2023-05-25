@@ -37,7 +37,8 @@ const getRectFromEntry = (entry: IntersectionObserverEntry) => {
 		const boundingRect = entry.target.getBoundingClientRect();
 		const observerRect = entry.boundingClientRect;
 
-		hasBoundingRectBug = boundingRect.height !== observerRect.height ||
+		hasBoundingRectBug =
+			boundingRect.height !== observerRect.height ||
 			boundingRect.top !== observerRect.top ||
 			boundingRect.width !== observerRect.width ||
 			boundingRect.bottom !== observerRect.bottom ||
@@ -76,8 +77,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 
 			if (props.key in store) {
 				setStore(props.key, props.id, height);
-			}
-			else {
+			} else {
 				setStore(props.key, { [props.id]: height });
 			}
 		}
@@ -102,7 +102,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		}
 	}, 150);
 
-	const observer = () => (props.observer || scrollObserver);
+	const observer = () => props.observer || scrollObserver;
 	const setRef = (node: HTMLElement) => observer().observe(node);
 
 	return (
@@ -114,7 +114,11 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 				</article>
 			}
 		>
-			<article ref={setRef} style={{ height: `${height || cachedHeight()}px` }} prop:$onintersect={listener} />
+			<article
+				ref={setRef}
+				style={{ height: `${height || cachedHeight()}px` }}
+				prop:$onintersect={listener}
+			/>
 		</Show>
 	);
 };

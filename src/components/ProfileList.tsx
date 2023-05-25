@@ -45,35 +45,34 @@ const ProfileList = (props: ProfileListProps) => {
 
 							if (isElementAltClicked(ev)) {
 								open(path, '_blank');
-							}
-							else {
+							} else {
 								navigate(path);
 							}
 						};
 
 						return (
-							<VirtualContainer key='profile' id={profile.did}>
+							<VirtualContainer key="profile" id={profile.did}>
 								<div
 									onClick={handleClick}
 									onAuxClick={handleClick}
 									onKeyDown={handleClick}
-									role='button'
+									role="button"
 									tabindex={0}
-									class='px-4 py-3 flex gap-3 hover:bg-hinted'
+									class="flex gap-3 px-4 py-3 hover:bg-hinted"
 								>
-									<div class='h-12 w-12 shrink-0 rounded-full bg-hinted-fg overflow-hidden'>
+									<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-hinted-fg">
 										<Show when={profile.avatar.value}>
-											{(avatar) => <img src={avatar()} class='h-full w-full' />}
+											{(avatar) => <img src={avatar()} class="h-full w-full" />}
 										</Show>
 									</div>
 
-									<div class='grow flex flex-col gap-1 min-w-0'>
-										<div class='flex items-center justify-between gap-3'>
-											<div class='flex flex-col text-sm'>
-												<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1'>
+									<div class="flex min-w-0 grow flex-col gap-1">
+										<div class="flex items-center justify-between gap-3">
+											<div class="flex flex-col text-sm">
+												<span class="line-clamp-1 whitespace-pre-wrap break-words break-all font-bold">
 													{profile.displayName.value || profile.handle.value}
 												</span>
-												<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
+												<span class="line-clamp-1 whitespace-pre-wrap break-all text-muted-fg">
 													@{profile.handle.value}
 												</span>
 											</div>
@@ -89,7 +88,7 @@ const ProfileList = (props: ProfileListProps) => {
 										</div>
 
 										<Show when={profile.description.value}>
-											<div class='text-sm break-words line-clamp-3'>
+											<div class="line-clamp-3 break-words text-sm">
 												{profile.$renderedDescription(uid())}
 											</div>
 										</Show>
@@ -103,7 +102,7 @@ const ProfileList = (props: ProfileListProps) => {
 
 			<Switch>
 				<Match when={listQuery.isFetching}>
-					<div class='h-13 flex items-center justify-center border-divider'>
+					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />
 					</div>
 				</Match>
@@ -112,7 +111,7 @@ const ProfileList = (props: ProfileListProps) => {
 					<button
 						onClick={onLoadMore}
 						disabled={listQuery.isRefetching}
-						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
+						class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
 					>
 						Show more
 					</button>

@@ -6,11 +6,11 @@ interface StackNode<T> {
 export class Stack<T> {
 	private n?: StackNode<T>;
 
-	push (value: T) {
+	push(value: T) {
 		this.n = { v: value, n: this.n };
 	}
 
-	pop (): T | undefined {
+	pop(): T | undefined {
 		const node = this.n;
 
 		if (node) {
@@ -31,14 +31,13 @@ export class Queue<T> {
 
 	public size = 0;
 
-	push (value: T) {
+	push(value: T) {
 		const node: QueueNode<T> = { v: value, n: undefined };
 
 		if (this.h) {
 			this.t!.n = node;
 			this.t = node;
-		}
-		else {
+		} else {
 			this.h = node;
 			this.t = node;
 		}
@@ -46,7 +45,7 @@ export class Queue<T> {
 		this.size++;
 	}
 
-	shift (): T | undefined {
+	shift(): T | undefined {
 		const curr = this.h;
 
 		if (!curr) {

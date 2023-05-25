@@ -57,7 +57,7 @@ const AuthenticatedProfileTimelineLikesPage = () => {
 		queryKey: () => getProfileLikesLatestKey(uid(), actor()),
 		queryFn: getProfileLikesLatest,
 		staleTime: 10_000,
-		get enabled () {
+		get enabled() {
 			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
 				return false;
 			}
@@ -82,19 +82,16 @@ const AuthenticatedProfileTimelineLikesPage = () => {
 				// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
 				// but unfortunately that breaks the `hasNextPage` check down below
 				// and would also mean the user gets to see nothing for a bit.
-				client.setQueryData(
-					getProfileLikesKey(uid(), actor()),
-					(prev?: InfiniteData<TimelinePage>) => {
-						if (prev) {
-							return {
-								pages: prev.pages.slice(0, 1),
-								pageParams: prev.pageParams.slice(0, 1),
-							};
-						}
+				client.setQueryData(getProfileLikesKey(uid(), actor()), (prev?: InfiniteData<TimelinePage>) => {
+					if (prev) {
+						return {
+							pages: prev.pages.slice(0, 1),
+							pageParams: prev.pageParams.slice(0, 1),
+						};
+					}
 
-						return;
-					},
-				);
+					return;
+				});
 
 				timelineQuery.refetch();
 			}}

@@ -39,7 +39,10 @@ export const jsonToIpld = (val: JsonValue): IpldValue => {
 		const _val = val as any;
 
 		// check for dag json values
-		if ((typeof _val['$link'] === 'string' || typeof _val['$bytes'] === 'string') && Object.keys(_val).length === 1) {
+		if (
+			(typeof _val['$link'] === 'string' || typeof _val['$bytes'] === 'string') &&
+			Object.keys(_val).length === 1
+		) {
 			return _val;
 		}
 

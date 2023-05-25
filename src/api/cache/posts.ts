@@ -61,8 +61,7 @@ export const mergeSignalizedPost = (post: BskyPost, key?: number) => {
 	if (!ref || !(val = ref.deref()!)) {
 		val = createSignalizedPost(post, key);
 		posts[uri] = new WeakRef(val);
-	}
-	else if (!key || val._key !== key) {
+	} else if (!key || val._key !== key) {
 		val._key = key;
 
 		val.author = mergeSignalizedProfile(post.author, key);
@@ -92,7 +91,10 @@ export interface SignalizedTimelinePost {
 	reason: BskyTimelinePost['reason'];
 }
 
-export const createSignalizedTimelinePost = (item: BskyTimelinePost, key?: number): SignalizedTimelinePost => {
+export const createSignalizedTimelinePost = (
+	item: BskyTimelinePost,
+	key?: number
+): SignalizedTimelinePost => {
 	const reply = item.reply;
 
 	return {
@@ -113,7 +115,10 @@ export interface SignalizedLinearThread {
 	descendants: SignalizedPost[];
 }
 
-export const createSignalizedLinearThread = (thread: LinearizedThread, key?: number): SignalizedLinearThread => {
+export const createSignalizedLinearThread = (
+	thread: LinearizedThread,
+	key?: number
+): SignalizedLinearThread => {
 	const anc = thread.ancestors;
 	const dec = thread.descendants;
 
@@ -159,8 +164,7 @@ const createPostRenderer = () => {
 				const div = createRenderedRichText(uid, segments);
 
 				template = div;
-			}
-			else {
+			} else {
 				template = undefined;
 			}
 		}
@@ -172,8 +176,7 @@ const createPostRenderer = () => {
 			}
 
 			return template.cloneNode(true);
-		}
-		else {
+		} else {
 			return record.text;
 		}
 	};

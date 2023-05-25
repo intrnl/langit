@@ -25,17 +25,17 @@ const IndexPage = () => {
 	});
 
 	return (
-		<div class='max-w-xl mx-auto px-4 py-8 flex flex-col justify-center'>
-			<h1 class='text-lg font-bold'>Langit</h1>
+		<div class="mx-auto flex max-w-xl flex-col justify-center px-4 py-8">
+			<h1 class="text-lg font-bold">Langit</h1>
 
 			<p>Alternative Bluesky client</p>
 
-			<div class='flex mt-8 gap-4'>
-				<A href='/login' class={/* @once */ button({ color: 'primary' })}>
+			<div class="mt-8 flex gap-4">
+				<A href="/login" class={/* @once */ button({ color: 'primary' })}>
 					Log in
 				</A>
 
-				<A href='/register' class={/* @once */ button({ color: 'outline' })}>
+				<A href="/register" class={/* @once */ button({ color: 'outline' })}>
 					Sign up
 				</A>
 			</div>

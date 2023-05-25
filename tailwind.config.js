@@ -57,8 +57,5 @@ export default {
 			mono: `"JetBrains Mono NL", ui-monospace, monospace`,
 		},
 	},
-	plugins: [
-		animate,
-		kobalte(),
-	],
+	plugins: [animate, kobalte()],
 };

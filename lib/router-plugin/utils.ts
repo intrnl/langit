@@ -98,7 +98,7 @@ export interface DefineRouteFunction {
 		/**
 		 * A function for defining child routes.
 		 */
-		children?: DefineRouteChildren,
+		children?: DefineRouteChildren
 	): void;
 }
 
@@ -106,24 +106,17 @@ export interface DefineRouteFunction {
  * A function for defining routes programmatically, instead of using the
  * filesystem convention.
  */
-export const defineRoutes = (
-	callback: (defineRoute: DefineRouteFunction) => void,
-): RouteManifest => {
+export const defineRoutes = (callback: (defineRoute: DefineRouteFunction) => void): RouteManifest => {
 	let routes: RouteManifest = Object.create(null);
 	let parentRoutes: ConfigRoute[] = [];
 	let alreadyReturned = false;
 
-	let defineRoute: DefineRouteFunction = (
-		path,
-		file,
-		optionsOrChildren,
-		children,
-	) => {
+	let defineRoute: DefineRouteFunction = (path, file, optionsOrChildren, children) => {
 		if (alreadyReturned) {
 			throw new Error(
 				'You tried to define routes asynchronously but started defining ' +
 					'routes before the async work was done. Please await all async ' +
-					'data before calling `defineRoutes()`',
+					'data before calling `defineRoutes()`'
 			);
 		}
 
@@ -132,8 +125,7 @@ export const defineRoutes = (
 			// route(path, file, children)
 			options = {};
 			children = optionsOrChildren;
-		}
-		else {
+		} else {
 			// route(path, file, options, children)
 			// route(path, file, options)
 			options = optionsOrChildren || {};
@@ -144,16 +136,12 @@ export const defineRoutes = (
 			index: options.index ? true : undefined,
 			caseSensitive: options.caseSensitive ? true : undefined,
 			id: options.id || createRouteId(file),
-			parentId: parentRoutes.length > 0
-				? parentRoutes[parentRoutes.length - 1].id
-				: 'root',
+			parentId: parentRoutes.length > 0 ? parentRoutes[parentRoutes.length - 1].id : 'root',
 			file,
 		};
 
 		if (route.id in routes) {
-			throw new Error(
-				`Unable to define routes with duplicate route id: "${route.id}"`,
-			);
+			throw new Error(`Unable to define routes with duplicate route id: "${route.id}"`);
 		}
 
 		routes[route.id] = route;

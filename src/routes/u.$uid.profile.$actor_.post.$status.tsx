@@ -65,23 +65,23 @@ const AuthenticatedPostPage = () => {
 	};
 
 	return (
-		<div class='flex flex-col'>
-			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
-				<p class='font-bold text-base'>Post</p>
+		<div class="flex flex-col">
+			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
+				<p class="text-base font-bold">Post</p>
 			</div>
 
 			<Switch>
 				<Match when={threadQuery.isLoading}>
-					<div class='h-13 flex items-center justify-center'>
+					<div class="flex h-13 items-center justify-center">
 						<CircularProgress />
 					</div>
 				</Match>
 
 				<Match when={threadQuery.error} keyed>
 					{(error) => (
-						<Switch fallback={<div class='p-3 text-sm'>Something went wrong.</div>}>
+						<Switch fallback={<div class="p-3 text-sm">Something went wrong.</div>}>
 							<Match when={(error as XRPCError).error === 'NotFound'}>
-								<div class='p-3'>
+								<div class="p-3">
 									<EmbedRecordNotFound />
 								</div>
 							</Match>
@@ -110,43 +110,30 @@ const AuthenticatedPostPage = () => {
 
 										return (
 											<>
-												{overflowing
-													? (
-														<A
-															href='/u/:uid/profile/:actor/post/:status'
-															params={{
-																uid: uid(),
-																actor: items[0].author.did,
-																status: getRecordId(items[0].uri),
-															}}
-															class='h-10 flex items-center gap-3 px-4 hover:bg-hinted'
-														>
-															<div class='w-12 h-full flex justify-center'>
-																<div class='border-l-2 border-divider border-dashed mt-3' />
-															</div>
-															<span class='text-accent text-sm'>Show parent post</span>
-														</A>
-													)
-													: data.parentNotFound
-													? (
-														<div class='p-3'>
-															<EmbedRecordNotFound />
+												{overflowing ? (
+													<A
+														href="/u/:uid/profile/:actor/post/:status"
+														params={{
+															uid: uid(),
+															actor: items[0].author.did,
+															status: getRecordId(items[0].uri),
+														}}
+														class="flex h-10 items-center gap-3 px-4 hover:bg-hinted"
+													>
+														<div class="flex h-full w-12 justify-center">
+															<div class="mt-3 border-l-2 border-dashed border-divider" />
 														</div>
-													)
-													: null}
+														<span class="text-sm text-accent">Show parent post</span>
+													</A>
+												) : data.parentNotFound ? (
+													<div class="p-3">
+														<EmbedRecordNotFound />
+													</div>
+												) : null}
 
 												{items.map((item, idx) => (
-													<VirtualContainer
-														key='posts'
-														id={/* @once */ createPostKey(item.cid, false, true)}
-													>
-														<Post
-															interactive
-															uid={uid()}
-															post={item}
-															prev={idx !== 0}
-															next
-														/>
+													<VirtualContainer key="posts" id={/* @once */ createPostKey(item.cid, false, true)}>
+														<Post interactive uid={uid()} post={item} prev={idx !== 0} next />
 													</VirtualContainer>
 												))}
 											</>
@@ -154,38 +141,38 @@ const AuthenticatedPostPage = () => {
 									}}
 								</Show>
 
-								<div ref={focusRef} class='px-4 pt-3 scroll-m-13'>
-									<div class='flex items-center gap-3 mb-1'>
+								<div ref={focusRef} class="scroll-m-13 px-4 pt-3">
+									<div class="mb-1 flex items-center gap-3">
 										<A
-											href='/u/:uid/profile/:actor'
+											href="/u/:uid/profile/:actor"
 											params={{ uid: uid(), actor: author.did }}
-											class='h-12 w-12 shrink-0 rounded-full bg-muted-fg overflow-hidden hover:opacity-80'
+											class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 										>
 											<Show when={author.avatar.value}>
-												{(avatar) => <img src={avatar()} class='h-full w-full' />}
+												{(avatar) => <img src={avatar()} class="h-full w-full" />}
 											</Show>
 										</A>
 
 										<A
-											href='/u/:uid/profile/:actor'
+											href="/u/:uid/profile/:actor"
 											params={{ uid: uid(), actor: author.did }}
-											class='flex flex-col text-sm'
+											class="flex flex-col text-sm"
 										>
-											<span class='font-bold break-all whitespace-pre-wrap break-words line-clamp-1 hover:underline'>
+											<span class="line-clamp-1 whitespace-pre-wrap break-words break-all font-bold hover:underline">
 												{author.displayName.value || author.handle.value}
 											</span>
-											<span class='text-muted-fg break-all whitespace-pre-wrap line-clamp-1'>
+											<span class="line-clamp-1 whitespace-pre-wrap break-all text-muted-fg">
 												@{author.handle.value}
 											</span>
 										</A>
 
-										<div class='flex justify-end grow shrink-0'>
+										<div class="flex shrink-0 grow justify-end">
 											<PostDropdown post={post} />
 										</div>
 									</div>
 
 									<Show when={record().text}>
-										<div class='text-base whitespace-pre-wrap break-words mt-3'>
+										<div class="mt-3 whitespace-pre-wrap break-words text-base">
 											{post.$renderedContent(uid())}
 										</div>
 									</Show>
@@ -194,37 +181,37 @@ const AuthenticatedPostPage = () => {
 										{(embed) => <Embed uid={uid()} embed={embed()} large />}
 									</Show>
 
-									<div class='my-3'>
-										<span class='text-muted-fg text-sm'>
+									<div class="my-3">
+										<span class="text-sm text-muted-fg">
 											{formatter.format(new Date(record().createdAt))}
 										</span>
 									</div>
 
-									<hr class='border-divider' />
+									<hr class="border-divider" />
 
-									<div class='flex flex-wrap gap-4 py-4 text-sm'>
+									<div class="flex flex-wrap gap-4 py-4 text-sm">
 										<div>
-											<span class='font-bold'>{comformat.format(post.repostCount.value)}</span>{' '}
-											<span class='text-muted-fg'>Reposts</span>
+											<span class="font-bold">{comformat.format(post.repostCount.value)}</span>{' '}
+											<span class="text-muted-fg">Reposts</span>
 										</div>
 										<div>
-											<span class='font-bold'>{comformat.format(post.likeCount.value)}</span>{' '}
-											<span class='text-muted-fg'>Likes</span>
+											<span class="font-bold">{comformat.format(post.likeCount.value)}</span>{' '}
+											<span class="text-muted-fg">Likes</span>
 										</div>
 									</div>
 
-									<hr class='border-divider' />
+									<hr class="border-divider" />
 
-									<div class='h-13 flex items-center justify-around text-muted-fg'>
+									<div class="flex h-13 items-center justify-around text-muted-fg">
 										<UntypedAnchor
 											href={`/u/${uid()}/compose?reply=${encodeURIComponent(post.uri)}`}
-											class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'
+											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 										>
 											<ChatBubbleOutlinedIcon />
 										</UntypedAnchor>
 
 										<button
-											class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'
+											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 											classList={{ 'text-green-600': !!post.viewer.repost.value }}
 											onClick={() => repostPost(uid(), post)}
 										>
@@ -232,21 +219,21 @@ const AuthenticatedPostPage = () => {
 										</button>
 
 										<button
-											class='group flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'
+											class="group flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 											classList={{ 'is-active text-red-600': !!post.viewer.like.value }}
 											onClick={() => favoritePost(uid(), post)}
 										>
-											<FavoriteOutlinedIcon class='group-[.is-active]:hidden' />
-											<FavoriteIcon class='hidden group-[.is-active]:block' />
+											<FavoriteOutlinedIcon class="group-[.is-active]:hidden" />
+											<FavoriteIcon class="hidden group-[.is-active]:block" />
 										</button>
 
-										<button class='flex items-center justify-center h-9 w-9 rounded-full text-xl hover:bg-secondary'>
+										<button class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary">
 											<ShareIcon />
 										</button>
 									</div>
 								</div>
 
-								<hr class='border-divider' />
+								<hr class="border-divider" />
 
 								<For each={data.descendants}>
 									{(slice) => {
@@ -264,7 +251,7 @@ const AuthenticatedPostPage = () => {
 											<>
 												{items.map((item, idx) => (
 													<VirtualContainer
-														key='posts'
+														key="posts"
 														id={/* @once */ createPostKey(item.cid, false, overflowing || idx !== len - 1)}
 													>
 														<Post
@@ -279,18 +266,18 @@ const AuthenticatedPostPage = () => {
 
 												{overflowing && (
 													<A
-														href='/u/:uid/profile/:actor/post/:status'
+														href="/u/:uid/profile/:actor/post/:status"
 														params={{
 															uid: uid(),
 															actor: items[len - 1].author.did,
 															status: getRecordId(items[len - 1].uri),
 														}}
-														class='h-10 flex items-center gap-3 px-4 border-b border-divider hover:bg-hinted'
+														class="flex h-10 items-center gap-3 border-b border-divider px-4 hover:bg-hinted"
 													>
-														<div class='w-12 h-full flex justify-center'>
-															<div class='border-l-2 border-divider border-dashed mb-3' />
+														<div class="flex h-full w-12 justify-center">
+															<div class="mb-3 border-l-2 border-dashed border-divider" />
 														</div>
-														<span class='text-accent text-sm'>Continue thread</span>
+														<span class="text-sm text-accent">Continue thread</span>
 													</A>
 												)}
 											</>

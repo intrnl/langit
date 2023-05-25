@@ -7,8 +7,7 @@ if (Intl.Segmenter) {
 		const segments = Array.from(segmenter.segment(text));
 		return segments.length;
 	};
-}
-else {
+} else {
 	console.log('Intl.Segmenter API not available, falling back to polyfill...');
 
 	const { countGraphemes } = await import('./graphemer.ts');

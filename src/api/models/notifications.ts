@@ -46,8 +46,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 	const slices: NotificationSlice[] = [];
 	let slen = 0;
 
-	loop:
-	for (let i = notifications.length - 1; i >= 0; i--) {
+	loop: for (let i = notifications.length - 1; i >= 0; i--) {
 		const item = notifications[i];
 		const reason = item.reason;
 
@@ -61,7 +60,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 					continue;
 				}
 
-				if ((date - slice.date) <= MAX_MERGE_TIME) {
+				if (date - slice.date <= MAX_MERGE_TIME) {
 					slice.items.push(item);
 
 					if (!item.isRead) {
@@ -83,8 +82,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 				date: date,
 				items: [item],
 			});
-		}
-		else if (reason === 'like') {
+		} else if (reason === 'like') {
 			const key = item.reasonSubject;
 
 			for (let j = 0; j < slen; j++) {
@@ -94,7 +92,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 					continue;
 				}
 
-				if ((date - slice.date) <= MAX_MERGE_TIME) {
+				if (date - slice.date <= MAX_MERGE_TIME) {
 					slice.items.push(item);
 
 					if (!item.isRead) {
@@ -117,8 +115,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 				date: date,
 				items: [item],
 			});
-		}
-		else if (reason === 'reply') {
+		} else if (reason === 'reply') {
 			slen++;
 
 			slices.unshift({

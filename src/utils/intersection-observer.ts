@@ -7,8 +7,7 @@ const callback: IntersectionObserverCallback = (entries, observer) => {
 
 		if (listener) {
 			listener(entry);
-		}
-		else {
+		} else {
 			observer.unobserve(target);
 		}
 	}

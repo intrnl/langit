@@ -20,8 +20,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			anchor.setAttribute('data-mention', did);
 
 			div.appendChild(anchor);
-		}
-		else if (link) {
+		} else if (link) {
 			const uri = link.uri;
 			const anchor = document.createElement('a');
 
@@ -32,8 +31,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			anchor.textContent = toShortUrl(uri);
 
 			div.appendChild(anchor);
-		}
-		else {
+		} else {
 			div.appendChild(document.createTextNode(segment.text));
 		}
 	}
@@ -66,8 +64,7 @@ export const toShortUrl = (uri: string): string => {
 		}
 
 		return short;
-	}
-	catch (e) {
+	} catch (e) {
 		return uri;
 	}
 };

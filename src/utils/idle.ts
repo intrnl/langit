@@ -19,8 +19,7 @@ const runTasks = (deadline: IdleDeadline) => {
 
 	if (queue.size > 0) {
 		requestIdleCallback(runTasks);
-	}
-	else {
+	} else {
 		running = false;
 	}
 };

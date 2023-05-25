@@ -63,8 +63,7 @@ export const pm2rt = (json: JSONContent) => {
 				text += '\n';
 				length += 1;
 			}
-		}
-		else if (type === 'text') {
+		} else if (type === 'text') {
 			const feature = findFeature(node.marks);
 			const start = length;
 			let value = node.text!;
@@ -83,8 +82,7 @@ export const pm2rt = (json: JSONContent) => {
 
 			if (isAscii(value)) {
 				length += value.length;
-			}
-			else {
+			} else {
 				length += encoder.encode(value).byteLength;
 				ascii = false;
 			}
@@ -103,8 +101,7 @@ export const pm2rt = (json: JSONContent) => {
 					features: [feature],
 				});
 			}
-		}
-		else if (type === 'mention') {
+		} else if (type === 'mention') {
 			const handle = `@${node.attrs!.label}`;
 			const did = node.attrs!.id;
 

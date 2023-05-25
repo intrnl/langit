@@ -10,7 +10,7 @@ export const detectFacets = (text: UnicodeString): Facet[] | undefined => {
 	const facets: Facet[] = [];
 	let match: RegExpExecArray | null;
 
-	while (match = MENTION_RE.exec(text.utf16)) {
+	while ((match = MENTION_RE.exec(text.utf16))) {
 		if (INVALID_TLD_RE.test(match[3])) {
 			continue;
 		}
@@ -32,7 +32,7 @@ export const detectFacets = (text: UnicodeString): Facet[] | undefined => {
 		});
 	}
 
-	while (match = LINK_RE.exec(text.utf16)) {
+	while ((match = LINK_RE.exec(text.utf16))) {
 		let uri = match[2];
 
 		if (!uri.startsWith('http')) {

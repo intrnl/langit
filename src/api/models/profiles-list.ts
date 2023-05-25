@@ -10,7 +10,7 @@ export interface ProfilesListPage {
 export const createProfilesListPage = (
 	cursor: string | undefined,
 	subject: BskyProfileFollow,
-	profiles: BskyProfileFollow[],
+	profiles: BskyProfileFollow[]
 ): ProfilesListPage => {
 	const len = profiles.length;
 	const arr: SignalizedProfile[] = new Array(len);

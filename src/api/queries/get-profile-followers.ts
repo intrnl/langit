@@ -5,7 +5,8 @@ import { createProfilesListPage } from '../models/profiles-list.ts';
 import { type DID } from '../multiagent.ts';
 import { type BskyFollowersResponse } from '../types.ts';
 
-export const getProfileFollowersKey = (uid: DID, actor: string) => ['getProfileFollowers', uid, actor] as const;
+export const getProfileFollowersKey = (uid: DID, actor: string) =>
+	['getProfileFollowers', uid, actor] as const;
 export const createProfileFollowersQuery = (limit: number) => {
 	return async (ctx: QueryFunctionContext<ReturnType<typeof getProfileFollowersKey>>) => {
 		const [, uid, actor] = ctx.queryKey;

@@ -27,7 +27,7 @@ export const createNotificationsQuery = (limit: number) => {
 
 export const getNotificationsLatestKey = (uid: DID) => ['getNotificationsLatest', uid] as const;
 export const getNotificationsLatest = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getNotificationsLatestKey>>,
+	ctx: QueryFunctionContext<ReturnType<typeof getNotificationsLatestKey>>
 ) => {
 	const [, uid] = ctx.queryKey;
 

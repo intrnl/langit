@@ -23,7 +23,7 @@ const routerPlugin = (options: RouterPluginOptions): Plugin => {
 	return {
 		name: '@intrnl/vite-solid-router',
 		enforce: 'pre',
-		configResolved (config) {
+		configResolved(config) {
 			const root = config.root;
 
 			resolvedOptions = {
@@ -33,7 +33,7 @@ const routerPlugin = (options: RouterPluginOptions): Plugin => {
 				routes,
 			};
 		},
-		configureServer (server) {
+		configureServer(server) {
 			const listener = (path: string) => {
 				if (path.startsWith(resolvedOptions.dir)) {
 					generate();
@@ -43,7 +43,7 @@ const routerPlugin = (options: RouterPluginOptions): Plugin => {
 			server.watcher.on('add', listener);
 			server.watcher.on('unlink', listener);
 		},
-		buildStart () {
+		buildStart() {
 			generate();
 		},
 	};
@@ -129,15 +129,13 @@ const generateRouterTypes = (manifest: RouteManifest) => {
 					if (params.length > 0) {
 						pathsWParams.push(pathname);
 						pathsParams[pathname] = params;
-					}
-					else {
+					} else {
 						pathsWOParams.push(pathname);
 					}
 				}
 
 				recurseRoute(child.id, relname);
-			}
-			else {
+			} else {
 				recurseRoute(child.id, prefix);
 			}
 		}

@@ -19,20 +19,23 @@ const AuthLoginPage = () => {
 
 	const [error, setError] = createSignal<string>('');
 
-	const describeQuery = createQuery(() => ['describeServer', service().url], async (query) => {
-		const rpc = new XRPC(service().url);
+	const describeQuery = createQuery(
+		() => ['describeServer', service().url],
+		async (query) => {
+			const rpc = new XRPC(service().url);
 
-		const res = await rpc.get({
-			method: 'com.atproto.server.describeServer',
-			signal: query.signal,
-		});
+			const res = await rpc.get({
+				method: 'com.atproto.server.describeServer',
+				signal: query.signal,
+			});
 
-		return res.data;
-	});
+			return res.data;
+		}
+	);
 
 	return (
-		<div class='max-w-xl mx-auto px-4 py-8'>
-			<h1 class='mb-8 text-lg font-bold'>Login</h1>
+		<div class="mx-auto max-w-xl px-4 py-8">
+			<h1 class="mb-8 text-lg font-bold">Login</h1>
 
 			<form
 				onSubmit={(ev) => {
@@ -57,60 +60,48 @@ const AuthLoginPage = () => {
 							const message = err.cause ? err.cause.message : err.message;
 							setError(message);
 							setDispatching(false);
-						},
+						}
 					);
 				}}
-				class='flex flex-col gap-4'
+				class="flex flex-col gap-4"
 			>
-				<div class='flex gap-1 items-center text-sm'>
-					<span class='font-medium text-muted-fg'>Connecting to</span>
-					<span class='font-medium text-primary grow'>{service().name}</span>
+				<div class="flex items-center gap-1 text-sm">
+					<span class="font-medium text-muted-fg">Connecting to</span>
+					<span class="grow font-medium text-primary">{service().name}</span>
 
-					<button disabled type='button' class={/* @once */ button({ color: 'outline' })}>Change</button>
+					<button disabled type="button" class={/* @once */ button({ color: 'outline' })}>
+						Change
+					</button>
 				</div>
 
-				<div class='flex flex-col gap-2'>
-					<label for='user' class='block text-sm font-medium leading-6 text-primary'>
+				<div class="flex flex-col gap-2">
+					<label for="user" class="block text-sm font-medium leading-6 text-primary">
 						Identifier
 					</label>
-					<input
-						type='text'
-						name='user'
-						id='user'
-						required
-						autocomplete='username'
-						class={input()}
-					/>
+					<input type="text" name="user" id="user" required autocomplete="username" class={input()} />
 				</div>
 
-				<div class='flex flex-col gap-2'>
-					<label for='pwd' class='block text-sm font-medium leading-6 text-primary'>
+				<div class="flex flex-col gap-2">
+					<label for="pwd" class="block text-sm font-medium leading-6 text-primary">
 						Password
 					</label>
-					<input
-						type='password'
-						name='pwd'
-						id='pwd'
-						required
-						autocomplete='password'
-						class={input()}
-					/>
+					<input type="password" name="pwd" id="pwd" required autocomplete="password" class={input()} />
 				</div>
 
-				<Show when={error()}>
-					{(error) => (
-						<p class='leading-6 text-red-600 text-sm'>
-							{error()}
-						</p>
-					)}
-				</Show>
+				<Show when={error()}>{(error) => <p class="text-sm leading-6 text-red-600">{error()}</p>}</Show>
 
 				<Show when={describeQuery.data}>
 					{(data) => (
-						<p class='leading-6 text-muted-fg text-xs'>
+						<p class="text-xs leading-6 text-muted-fg">
 							By continuing, you agree to the service's{' '}
-							<a href={data().links.termsOfService} class='hover:underline text-primary'>Terms of Service</a> and{' '}
-							<a href={data().links.privacyPolicy} class='hover:underline text-primary'>Privacy Policy</a>.
+							<a href={data().links.termsOfService} class="text-primary hover:underline">
+								Terms of Service
+							</a>{' '}
+							and{' '}
+							<a href={data().links.privacyPolicy} class="text-primary hover:underline">
+								Privacy Policy
+							</a>
+							.
 						</p>
 					)}
 				</Show>
@@ -118,7 +109,7 @@ const AuthLoginPage = () => {
 				<div>
 					<button
 						disabled={dispatching() || describeQuery.isLoading}
-						type='submit'
+						type="submit"
 						class={/* @once */ button({ color: 'primary' })}
 					>
 						Login

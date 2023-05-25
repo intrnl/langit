@@ -32,7 +32,7 @@ const Timeline = (props: TimelineProps) => {
 			<Switch>
 				<Match when={timelineQuery.isInitialLoading || timelineQuery.isRefetching}>
 					<div
-						class='h-13 flex items-center justify-center border-divider'
+						class="flex h-13 items-center justify-center border-divider"
 						classList={{ 'border-b': timelineQuery.isRefetching }}
 					>
 						<CircularProgress />
@@ -42,7 +42,7 @@ const Timeline = (props: TimelineProps) => {
 				<Match when={latestQuery.data && latestQuery.data !== getLatestCid()}>
 					<button
 						onClick={onRefetch}
-						class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
+						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"
 					>
 						Show new posts
 					</button>
@@ -51,19 +51,21 @@ const Timeline = (props: TimelineProps) => {
 
 			<div>
 				<For each={timelineQuery.data ? timelineQuery.data.pages : []}>
-					{(page) => (
+					{(page) =>
 						page.slices.map((slice) => {
 							const items = slice.items;
 							const len = items.length;
 
 							return items.map((item, idx) => (
 								<VirtualContainer
-									key='posts'
-									id={/* @once */ createPostKey(
-										item.post.cid,
-										(!!item.reply?.parent && idx === 0) || !!item.reason,
-										idx !== len - 1,
-									)}
+									key="posts"
+									id={
+										/* @once */ createPostKey(
+											item.post.cid,
+											(!!item.reply?.parent && idx === 0) || !!item.reason,
+											idx !== len - 1
+										)
+									}
 								>
 									<Post
 										interactive
@@ -77,13 +79,13 @@ const Timeline = (props: TimelineProps) => {
 								</VirtualContainer>
 							));
 						})
-					)}
+					}
 				</For>
 			</div>
 
 			<Switch>
 				<Match when={timelineQuery.isFetchingNextPage}>
-					<div class='h-13 flex items-center justify-center'>
+					<div class="flex h-13 items-center justify-center">
 						<CircularProgress />
 					</div>
 				</Match>
@@ -92,7 +94,7 @@ const Timeline = (props: TimelineProps) => {
 					<button
 						onClick={onLoadMore}
 						disabled={timelineQuery.isRefetching}
-						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
+						class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
 					>
 						Show more posts
 					</button>

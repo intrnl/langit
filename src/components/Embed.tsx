@@ -1,11 +1,6 @@
 import { Match, Show, Switch, createMemo } from 'solid-js';
 
-import {
-	type BskyPost,
-	type EmbeddedImage,
-	type EmbeddedLink,
-	type EmbeddedRecord,
-} from '~/api/types.ts';
+import { type BskyPost, type EmbeddedImage, type EmbeddedLink, type EmbeddedRecord } from '~/api/types.ts';
 
 import EmbedImage from '~/components/EmbedImage.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';
@@ -30,21 +25,17 @@ const Embed = (props: EmbedProps) => {
 
 		if (type === 'app.bsky.embed.external#view') {
 			link = embed.external;
-		}
-		else if (type === 'app.bsky.embed.images#view') {
+		} else if (type === 'app.bsky.embed.images#view') {
 			images = embed.images;
-		}
-		else if (type === 'app.bsky.embed.record#view') {
+		} else if (type === 'app.bsky.embed.record#view') {
 			const rec = embed.record;
 
 			if (rec.$type === 'app.bsky.embed.record#viewRecord') {
 				record = rec;
-			}
-			else {
+			} else {
 				record = false;
 			}
-		}
-		else if (type === 'app.bsky.embed.recordWithMedia#view') {
+		} else if (type === 'app.bsky.embed.recordWithMedia#view') {
 			const rec = embed.record.record;
 
 			const media = embed.media;
@@ -52,15 +43,13 @@ const Embed = (props: EmbedProps) => {
 
 			if (rec.$type === 'app.bsky.embed.record#viewRecord') {
 				record = rec;
-			}
-			else {
+			} else {
 				record = false;
 			}
 
 			if (mediatype === 'app.bsky.embed.external#view') {
 				link = media.external;
-			}
-			else if (mediatype === 'app.bsky.embed.images#view') {
+			} else if (mediatype === 'app.bsky.embed.images#view') {
 				images = media.images;
 			}
 		}
@@ -69,14 +58,10 @@ const Embed = (props: EmbedProps) => {
 	});
 
 	return (
-		<div class='flex flex-col gap-3 mt-3'>
-			<Show when={val().link}>
-				{(link) => <EmbedLink link={link()} />}
-			</Show>
+		<div class="mt-3 flex flex-col gap-3">
+			<Show when={val().link}>{(link) => <EmbedLink link={link()} />}</Show>
 
-			<Show when={val().images}>
-				{(images) => <EmbedImage images={images()} />}
-			</Show>
+			<Show when={val().images}>{(images) => <EmbedImage images={images()} />}</Show>
 
 			<Switch>
 				<Match when={val().record === false}>

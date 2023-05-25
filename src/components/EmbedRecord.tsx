@@ -32,8 +32,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 
 			if (val.$type === 'app.bsky.embed.images#view') {
 				return val.images;
-			}
-			else if (val.$type === 'app.bsky.embed.recordWithMedia#view') {
+			} else if (val.$type === 'app.bsky.embed.recordWithMedia#view') {
 				const media = val.media;
 
 				if (media.$type === 'app.bsky.embed.images#view') {
@@ -45,36 +44,32 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 
 	return (
 		<A
-			href='/u/:uid/profile/:actor/post/:status'
+			href="/u/:uid/profile/:actor/post/:status"
 			params={{ uid: props.uid, actor: author().did, status: getRecordId(record().uri) }}
-			class='rounded-md border border-divider overflow-hidden hover:bg-secondary'
+			class="overflow-hidden rounded-md border border-divider hover:bg-secondary"
 		>
-			<div class='mx-3 mt-3 flex text-sm text-muted-fg'>
-				<div class='h-5 w-5 mr-1 rounded-full overflow-hidden bg-muted-fg shrink-0'>
-					<Show when={author().avatar}>
-						{(avatar) => <img src={avatar()} class='h-full w-full' />}
-					</Show>
+			<div class="mx-3 mt-3 flex text-sm text-muted-fg">
+				<div class="mr-1 h-5 w-5 shrink-0 overflow-hidden rounded-full bg-muted-fg">
+					<Show when={author().avatar}>{(avatar) => <img src={avatar()} class="h-full w-full" />}</Show>
 				</div>
 
-				<span class='text-primary font-bold break-all whitespace-pre-wrap break-words line-clamp-1 group-hover:underline'>
+				<span class="line-clamp-1 whitespace-pre-wrap break-words break-all font-bold text-primary group-hover:underline">
 					{author().displayName}
 				</span>
-				<span class='ml-1 break-all whitespace-pre-wrap line-clamp-1'>
-					@{author().handle}
-				</span>
-				<span class='px-1'>·</span>
-				<span class='whitespace-nowrap'>{relformat.format(val().createdAt)}</span>
+				<span class="ml-1 line-clamp-1 whitespace-pre-wrap break-all">@{author().handle}</span>
+				<span class="px-1">·</span>
+				<span class="whitespace-nowrap">{relformat.format(val().createdAt)}</span>
 			</div>
 
 			<Show when={val().text}>
-				<div class='flex items-start'>
+				<div class="flex items-start">
 					<Show when={!large() && images()}>
-						<div class='grow basis-0 ml-3 mt-2 mb-3'>
+						<div class="mb-3 ml-3 mt-2 grow basis-0">
 							<EmbedImage images={images()!} />
 						</div>
 					</Show>
 
-					<div class='min-w-0 grow-4 basis-0 mx-3 mt-1 mb-3 text-sm whitespace-pre-wrap break-words empty:hidden'>
+					<div class="mx-3 mb-3 mt-1 min-w-0 grow-4 basis-0 whitespace-pre-wrap break-words text-sm empty:hidden">
 						{val().text}
 					</div>
 				</div>
@@ -82,7 +77,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 
 			<Show when={(large() || !val().text) && images()}>
 				<Show when={!val().text}>
-					<div class='mt-3' />
+					<div class="mt-3" />
 				</Show>
 
 				<EmbedImage images={images()!} borderless />

@@ -23,8 +23,7 @@ export const followProfile = (uid: DID, profile: SignalizedProfile) => {
 
 			profile.viewer.following.value = undefined;
 			profile.followersCount.value--;
-		}
-		else {
+		} else {
 			const response = await agent.rpc.post({
 				method: 'com.atproto.repo.createRecord',
 				data: {

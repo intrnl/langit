@@ -51,7 +51,7 @@ const NotificationReply = (props: NotificationReplyProps) => {
 	return (
 		<Switch>
 			<Match when={replyQuery.isLoading || parentQuery.isLoading}>
-				<div class='flex justify-center p-3 border-b border-divider'>
+				<div class="flex justify-center border-b border-divider p-3">
 					<CircularProgress />
 				</div>
 			</Match>
@@ -62,14 +62,7 @@ const NotificationReply = (props: NotificationReplyProps) => {
 					const reply = replyQuery.data!;
 					const parent = parentQuery.data!;
 
-					return (
-						<Post
-							interactive
-							uid={uid()}
-							post={reply}
-							parent={parent}
-						/>
-					);
+					return <Post interactive uid={uid()} post={reply} parent={parent} />;
 				}}
 			</Match>
 		</Switch>

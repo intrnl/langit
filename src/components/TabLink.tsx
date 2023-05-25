@@ -9,12 +9,12 @@ const TabLink = <P extends Paths>(props: AnchorWithParamProps<P>) => {
 		// @ts-expect-error
 		<A
 			{...b}
-			class='group grow flex justify-center text-sm text-muted-fg font-bold min-w-14 h-13 px-4 hover:bg-hinted'
-			activeClass='text-primary is-active'
+			class="group flex h-13 min-w-14 grow justify-center px-4 text-sm font-bold text-muted-fg hover:bg-hinted"
+			activeClass="text-primary is-active"
 		>
-			<div class='relative w-max h-full flex items-center'>
+			<div class="relative flex h-full w-max items-center">
 				<span>{a.children}</span>
-				<div class='hidden group-[.is-active]:block h-1 bg-accent absolute bottom-0 -inset-x-1 rounded' />
+				<div class="absolute -inset-x-1 bottom-0 hidden h-1 rounded bg-accent group-[.is-active]:block" />
 			</div>
 		</A>
 	);

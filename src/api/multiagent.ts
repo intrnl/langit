@@ -45,31 +45,31 @@ export class Multiagent {
 	 */
 	public agents: Record<DID, Agent> = {};
 
-	constructor (name: string) {
+	constructor(name: string) {
 		this.storage = new ReactiveLocalStorage(name);
 	}
 
 	/**
 	 * A record of registered accounts
 	 */
-	get accounts () {
+	get accounts() {
 		return this.storage.get('accounts');
 	}
 
 	/**
 	 * Active UID set as default
 	 */
-	get active () {
+	get active() {
 		return this.storage.get('active');
 	}
-	set active (next: DID | undefined) {
+	set active(next: DID | undefined) {
 		this.storage.set('active', next);
 	}
 
 	/**
 	 * Login with a new account
 	 */
-	async login ({ service, identifier, password }: MultiagentLoginOptions): Promise<DID> {
+	async login({ service, identifier, password }: MultiagentLoginOptions): Promise<DID> {
 		await this._promise;
 
 		const agent = this._createAgent(service);
@@ -104,8 +104,7 @@ export class Multiagent {
 
 			this.agents[did] = agent;
 			return did;
-		}
-		catch (err) {
+		} catch (err) {
 			throw new Error(`Failed to login`, { cause: err });
 		}
 	}
@@ -113,13 +112,13 @@ export class Multiagent {
 	/**
 	 * Log out from account
 	 */
-	async logout (did: DID): Promise<void> {
+	async logout(did: DID): Promise<void> {
 		await this._promise;
 
 		let shouldRedirect = false;
 
 		if (!(did in this.accounts)) {
-			return
+			return;
 		}
 
 		if (this.active === did) {
@@ -146,7 +145,7 @@ export class Multiagent {
 	/**
 	 * Retrieve an agent associated with an account
 	 */
-	async connect (did: DID): Promise<Agent> {
+	async connect(did: DID): Promise<Agent> {
 		await this._promise;
 
 		if (did in this.agents) {
@@ -170,13 +169,12 @@ export class Multiagent {
 
 			this.agents[did] = agent;
 			return agent;
-		}
-		catch (err) {
+		} catch (err) {
 			throw new Error(`Failed to resume session`, { cause: err });
 		}
 	}
 
-	private _createAgent (serviceUri: string) {
+	private _createAgent(serviceUri: string) {
 		const agent = new Agent({
 			service: serviceUri,
 			persistSession: (type, session) => {

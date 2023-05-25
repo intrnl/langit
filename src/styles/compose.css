@@ -3,7 +3,7 @@
 }
 
 .compose-editor .ProseMirror {
-	@apply pr-3 pt-6 pb-4 outline-none;
+	@apply pb-4 pr-3 pt-6 outline-none;
 }
 
 .compose-editor .ProseMirror p {
@@ -11,7 +11,7 @@
 }
 
 .compose-editor .ProseMirror p.is-editor-empty:first-child::before {
-	@apply text-muted-fg float-left h-0 pointer-events-none;
+	@apply pointer-events-none float-left h-0 text-muted-fg;
 	content: attr(data-placeholder);
 }
 

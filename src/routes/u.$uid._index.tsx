@@ -58,7 +58,7 @@ const AuthenticatedHome = () => {
 		queryKey: () => getTimelineLatestKey(uid(), DEFAULT_ALGORITHM),
 		queryFn: getTimelineLatest,
 		staleTime: 10_000,
-		get enabled () {
+		get enabled() {
 			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
 				return false;
 			}
@@ -68,9 +68,9 @@ const AuthenticatedHome = () => {
 	});
 
 	return (
-		<div class='flex flex-col grow'>
-			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
-				<p class='font-bold text-base'>Home</p>
+		<div class="flex grow flex-col">
+			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
+				<p class="text-base font-bold">Home</p>
 			</div>
 
 			<Timeline
@@ -99,7 +99,7 @@ const AuthenticatedHome = () => {
 							}
 
 							return;
-						},
+						}
 					);
 
 					timelineQuery.refetch();

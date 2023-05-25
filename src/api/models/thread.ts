@@ -6,7 +6,7 @@ import { Stack } from '~/utils/stack.ts';
 const calculatePostScore = (post: BskyPost, parent: BskyPost) => {
 	const isSameAuthor = parent.author.did === post.author.did;
 
-	return ((post.replyCount * 0.5) + (post.repostCount * 1) + (post.likeCount * 1)) * (isSameAuthor ? 1.5 : 1);
+	return (post.replyCount * 0.5 + post.repostCount * 1 + post.likeCount * 1) * (isSameAuthor ? 1.5 : 1);
 };
 
 const linearizeThread = (thread: BskyThread): LinearizedThread => {
@@ -32,7 +32,7 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 		parent = parent.parent;
 	}
 
-	while (node = stack.pop()) {
+	while ((node = stack.pop())) {
 		// skip any nodes that doesn't have a replies array, think this might be
 		// when we reach the depth limit? not certain.
 		const post = node.post;
@@ -60,8 +60,8 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 			const aPost = a.post;
 			const bPost = b.post;
 
-			const aScore = scores[aPost.cid] ??= calculatePostScore(aPost, post);
-			const bScore = scores[bPost.cid] ??= calculatePostScore(bPost, post);
+			const aScore = (scores[aPost.cid] ??= calculatePostScore(aPost, post));
+			const bScore = (scores[bPost.cid] ??= calculatePostScore(bPost, post));
 
 			return bScore - aScore;
 		});
@@ -96,7 +96,7 @@ export interface ThreadSlice {
 const isChildOf = (cid: string, child: SignalizedPost) => {
 	const reply = child.record.peek().reply;
 
-	return !!reply && (reply.parent.cid === cid);
+	return !!reply && reply.parent.cid === cid;
 };
 
 const isNextInThread = (slice: ThreadSlice, child: SignalizedPost) => {
@@ -105,7 +105,7 @@ const isNextInThread = (slice: ThreadSlice, child: SignalizedPost) => {
 	const items = slice.items;
 	const last = items[items.length - 1];
 
-	return !!reply && (last.cid == reply.parent.cid);
+	return !!reply && last.cid == reply.parent.cid;
 };
 
 export interface ThreadPage {

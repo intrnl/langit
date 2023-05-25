@@ -7,15 +7,15 @@ export type StorageType = Record<string, any>;
 export class ReactiveStorage<T extends StorageType> extends Signal<T> {
 	private _keys: Record<keyof T, Signal<any>> = Object.create(null);
 
-	constructor (value?: T) {
+	constructor(value?: T) {
 		super(value || ({} as T));
 	}
 
-	private _key (key: keyof T) {
-		return this._keys[key] ||= signal(this.peek()[key]);
+	private _key(key: keyof T) {
+		return (this._keys[key] ||= signal(this.peek()[key]));
 	}
 
-	set<K extends keyof T> (key: K, value: T[K]) {
+	set<K extends keyof T>(key: K, value: T[K]) {
 		const next = { ...this.peek(), [key]: value };
 
 		batch(() => {
@@ -24,11 +24,11 @@ export class ReactiveStorage<T extends StorageType> extends Signal<T> {
 		});
 	}
 
-	get<K extends keyof T> (key: K): T[K] {
+	get<K extends keyof T>(key: K): T[K] {
 		return this._key(key).value;
 	}
 
-	clear () {
+	clear() {
 		this.value = null as any;
 		this._keys = Object.create(null);
 	}
@@ -37,7 +37,7 @@ export class ReactiveStorage<T extends StorageType> extends Signal<T> {
 export class ReactiveLocalStorage<T extends StorageType> extends ReactiveStorage<T> {
 	dispose: () => void;
 
-	constructor (name: string, value?: T) {
+	constructor(name: string, value?: T) {
 		super(value);
 
 		try {
@@ -46,8 +46,7 @@ export class ReactiveLocalStorage<T extends StorageType> extends ReactiveStorage
 			if (persisted != null) {
 				this.value = persisted;
 			}
-		}
-		catch {}
+		} catch {}
 
 		this.dispose = createRoot((dispose) => {
 			createEffect(() => {
@@ -55,8 +54,7 @@ export class ReactiveLocalStorage<T extends StorageType> extends ReactiveStorage
 
 				if (value != null) {
 					localStorage.setItem(name, JSON.stringify(value));
-				}
-				else {
+				} else {
 					localStorage.removeItem(name);
 				}
 			});

@@ -28,13 +28,13 @@ const AuthenticatedProfileLayout = () => {
 	});
 
 	return (
-		<div class='flex flex-col'>
-			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
-				<Show when={profileQuery.data} fallback={<p class='font-bold text-base'>Profile</p>}>
+		<div class="flex flex-col">
+			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
+				<Show when={profileQuery.data} fallback={<p class="text-base font-bold">Profile</p>}>
 					{(profile) => (
-						<div class='flex flex-col gap-0.5'>
-							<p class='text-base leading-5 font-bold'>{profile().displayName.value}</p>
-							<p class='text-xs text-muted-fg'>{profile().postsCount.value} posts</p>
+						<div class="flex flex-col gap-0.5">
+							<p class="text-base font-bold leading-5">{profile().displayName.value}</p>
+							<p class="text-xs text-muted-fg">{profile().postsCount.value} posts</p>
 						</div>
 					)}
 				</Show>
@@ -43,7 +43,7 @@ const AuthenticatedProfileLayout = () => {
 			<Show
 				when={profileQuery.data}
 				fallback={
-					<div class='h-13 flex items-center justify-center'>
+					<div class="flex h-13 items-center justify-center">
 						<CircularProgress />
 					</div>
 				}
@@ -53,21 +53,21 @@ const AuthenticatedProfileLayout = () => {
 
 					return (
 						<>
-							<div class='aspect-banner bg-muted-fg'>
+							<div class="aspect-banner bg-muted-fg">
 								<Show when={profile().banner.value}>
-									{(banner) => <img src={banner()} class='h-full w-full' />}
+									{(banner) => <img src={banner()} class="h-full w-full" />}
 								</Show>
 							</div>
 
-							<div class='flex flex-col gap-3 p-4'>
-								<div class='flex gap-2'>
-									<div class='shrink-0 h-20 w-20 -mt-11 bg-muted-fg rounded-full overflow-hidden ring-2 ring-background'>
+							<div class="flex flex-col gap-3 p-4">
+								<div class="flex gap-2">
+									<div class="-mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted-fg ring-2 ring-background">
 										<Show when={profile().avatar.value}>
-											{(avatar) => <img src={avatar()} class='h-full w-full' />}
+											{(avatar) => <img src={avatar()} class="h-full w-full" />}
 										</Show>
 									</div>
 
-									<div class='grow' />
+									<div class="grow" />
 
 									<button
 										onClick={() => followProfile(uid(), profile())}
@@ -78,37 +78,37 @@ const AuthenticatedProfileLayout = () => {
 								</div>
 
 								<div>
-									<p class='text-xl font-bold'>{profile().displayName.value || profile().handle.value}</p>
-									<p class='text-sm text-muted-fg'>@{profile().handle.value}</p>
+									<p class="text-xl font-bold">{profile().displayName.value || profile().handle.value}</p>
+									<p class="text-sm text-muted-fg">@{profile().handle.value}</p>
 								</div>
 
 								<Show when={profile().description.value}>
-									<div class='text-sm whitespace-pre-wrap break-words'>
+									<div class="whitespace-pre-wrap break-words text-sm">
 										{profile().$renderedDescription(uid())}
 									</div>
 								</Show>
 
-								<div class='text-sm flex flex-wrap gap-4'>
-									<A href='/u/:uid/profile/:actor/follows' params={params} class='hover:underline'>
-										<span class='font-bold'>{comformat.format(profile().followsCount.value)}</span>{' '}
-										<span class='text-muted-fg'>Follows</span>
+								<div class="flex flex-wrap gap-4 text-sm">
+									<A href="/u/:uid/profile/:actor/follows" params={params} class="hover:underline">
+										<span class="font-bold">{comformat.format(profile().followsCount.value)}</span>{' '}
+										<span class="text-muted-fg">Follows</span>
 									</A>
 
-									<A href='/u/:uid/profile/:actor/followers' params={params} class='hover:underline'>
-										<span class='font-bold'>{comformat.format(profile().followersCount.value)}</span>{' '}
-										<span class='text-muted-fg'>Followers</span>
+									<A href="/u/:uid/profile/:actor/followers" params={params} class="hover:underline">
+										<span class="font-bold">{comformat.format(profile().followersCount.value)}</span>{' '}
+										<span class="text-muted-fg">Followers</span>
 									</A>
 								</div>
 							</div>
 
-							<div class='flex overflow-x-auto border-b border-divider'>
-								<TabLink href='/u/:uid/profile/:actor' params={params} replace end>
+							<div class="flex overflow-x-auto border-b border-divider">
+								<TabLink href="/u/:uid/profile/:actor" params={params} replace end>
 									Posts
 								</TabLink>
-								<TabLink href='/u/:uid/profile/:actor/with_replies' params={params} replace>
+								<TabLink href="/u/:uid/profile/:actor/with_replies" params={params} replace>
 									Replies
 								</TabLink>
-								<TabLink href='/u/:uid/profile/:actor/likes' params={params} replace>
+								<TabLink href="/u/:uid/profile/:actor/likes" params={params} replace>
 									Likes
 								</TabLink>
 							</div>

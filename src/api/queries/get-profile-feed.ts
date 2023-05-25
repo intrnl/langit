@@ -7,7 +7,6 @@ import { createTimelinePage } from '../models/timeline.ts';
 
 import _getDid from './_did.ts';
 
-
 export const getProfileFeedKey = (uid: DID, actor: string, replies: boolean) =>
 	['getProfileFeed', uid, actor, replies] as const;
 export const createProfileFeedQuery = (limit: number) => {
@@ -28,7 +27,11 @@ export const createProfileFeedQuery = (limit: number) => {
 			const items = slice.items;
 			const first = items[0];
 
-			if (!replies && first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+			if (
+				!replies &&
+				first.reply &&
+				(!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')
+			) {
 				const parent = first.reply.parent;
 
 				if (parent.author.did !== did) {
@@ -43,8 +46,11 @@ export const createProfileFeedQuery = (limit: number) => {
 	};
 };
 
-export const getProfileFeedLatestKey = (uid: DID, actor: string) => ['getProfileFieldLatest', uid, actor] as const;
-export const getProfileFeedLatest = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileFeedLatestKey>>) => {
+export const getProfileFeedLatestKey = (uid: DID, actor: string) =>
+	['getProfileFieldLatest', uid, actor] as const;
+export const getProfileFeedLatest = async (
+	ctx: QueryFunctionContext<ReturnType<typeof getProfileFeedLatestKey>>
+) => {
 	const [, uid, actor] = ctx.queryKey;
 
 	const agent = await multiagent.connect(uid);

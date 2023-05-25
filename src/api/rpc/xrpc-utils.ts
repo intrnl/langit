@@ -41,26 +41,18 @@ export enum ResponseType {
 export class XRPCResponse {
 	success = true;
 
-	constructor (public data: any, public headers: Headers) {}
+	constructor(public data: any, public headers: Headers) {}
 }
 
 export class XRPCError extends Error {
 	success = false;
 
-	constructor (
-		public status: ResponseType,
-		public error?: string,
-		message?: string,
-	) {
+	constructor(public status: ResponseType, public error?: string, message?: string) {
 		super(message || error);
 	}
 }
 
-export const constructMethodCallUri = (
-	nsid: string,
-	serviceUri: URL,
-	params?: QueryParams,
-): string => {
+export const constructMethodCallUri = (nsid: string, serviceUri: URL, params?: QueryParams): string => {
 	const uri = new URL(`/xrpc/${nsid}`, serviceUri);
 
 	// given parameters
@@ -74,8 +66,7 @@ export const constructMethodCallUri = (
 						const val = value[idx];
 						uri.searchParams.append(key, val);
 					}
-				}
-				else {
+				} else {
 					uri.searchParams.set(key, value);
 				}
 			}
@@ -85,11 +76,7 @@ export const constructMethodCallUri = (
 	return uri.toString();
 };
 
-export function constructMethodCallHeaders (
-	method: 'post' | 'get',
-	data?: any,
-	opts?: CallOptions,
-): Headers {
+export function constructMethodCallHeaders(method: 'post' | 'get', data?: any, opts?: CallOptions): Headers {
 	const headers: Headers = opts?.headers || {};
 
 	if (method === 'post') {
@@ -110,10 +97,7 @@ export function constructMethodCallHeaders (
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-export const encodeMethodCallBody = (
-	headers: Headers,
-	data?: any,
-): ArrayBuffer | undefined => {
+export const encodeMethodCallBody = (headers: Headers, data?: any): ArrayBuffer | undefined => {
 	if (!headers['Content-Type'] || typeof data === 'undefined') {
 		return undefined;
 	}
@@ -134,33 +118,22 @@ export const encodeMethodCallBody = (
 	return data;
 };
 
-export const httpResponseBodyParse = (
-	mimeType: string | null,
-	data: ArrayBuffer | undefined,
-): any => {
+export const httpResponseBodyParse = (mimeType: string | null, data: ArrayBuffer | undefined): any => {
 	if (mimeType) {
 		if (mimeType.includes('application/json') && data?.byteLength) {
 			try {
 				const str = decoder.decode(data);
 				return jsonStringToLex(str);
-			}
-			catch (e) {
-				throw new XRPCError(
-					ResponseType.InvalidResponse,
-					`Failed to parse response body: ${String(e)}`,
-				);
+			} catch (e) {
+				throw new XRPCError(ResponseType.InvalidResponse, `Failed to parse response body: ${String(e)}`);
 			}
 		}
 
 		if (mimeType.startsWith('text/') && data?.byteLength) {
 			try {
 				return decoder.decode(data);
-			}
-			catch (e) {
-				throw new XRPCError(
-					ResponseType.InvalidResponse,
-					`Failed to parse response body: ${String(e)}`,
-				);
+			} catch (e) {
+				throw new XRPCError(ResponseType.InvalidResponse, `Failed to parse response body: ${String(e)}`);
 			}
 		}
 	}
@@ -175,20 +148,15 @@ export const httpResponseBodyParse = (
 export const httpResponseCodeToEnum = (status: number): ResponseType => {
 	if (status in ResponseType) {
 		return status;
-	}
-	else if (status >= 100 && status < 200) {
+	} else if (status >= 100 && status < 200) {
 		return ResponseType.XRPCNotSupported;
-	}
-	else if (status >= 200 && status < 300) {
+	} else if (status >= 200 && status < 300) {
 		return ResponseType.Success;
-	}
-	else if (status >= 300 && status < 400) {
+	} else if (status >= 300 && status < 400) {
 		return ResponseType.XRPCNotSupported;
-	}
-	else if (status >= 400 && status < 500) {
+	} else if (status >= 400 && status < 500) {
 		return ResponseType.InvalidRequest;
-	}
-	else {
+	} else {
 		return ResponseType.InternalServerError;
 	}
 };

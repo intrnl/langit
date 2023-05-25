@@ -16,7 +16,11 @@ const routes: RouteDefinition[] = [
     children: [
       {
         path: "profile/:actor/post/:status",
-        component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status.tsx")),
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status._index.tsx")),
+      },
+      {
+        path: "profile/:actor/post/:status/likes",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status.likes.tsx")),
       },
       {
         path: "profile/:actor/followers",

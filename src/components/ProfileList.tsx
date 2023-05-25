@@ -3,7 +3,7 @@ import { For, Match, Show, Switch } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { type CreateInfiniteQueryResult } from '@tanstack/solid-query';
 
-import { type ProfilesListPage } from '~/api/models/profiles-list.ts';
+import { type PostProfilesListPage } from '~/api/models/profiles-list.ts';
 import { type DID } from '~/api/utils.ts';
 
 import { followProfile } from '~/api/mutations/follow-profile.ts';
@@ -16,7 +16,7 @@ import button from '~/styles/primitives/button.ts';
 
 export interface ProfileListProps {
 	uid: DID;
-	listQuery: CreateInfiniteQueryResult<ProfilesListPage, unknown>;
+	listQuery: CreateInfiniteQueryResult<PostProfilesListPage, unknown>;
 	onLoadMore?: () => void;
 }
 

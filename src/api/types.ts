@@ -314,3 +314,13 @@ export interface BskyNotificationsResponse {
 	cursor?: string;
 	notifications: Array<BskyNotificationType>;
 }
+
+export interface BskyLikedByResponse {
+	uri: string;
+	cursor?: string;
+	likes: Array<{
+		createdAt: string;
+		indexedAt: string;
+		actor: BskyProfileFollow;
+	}>;
+}

@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createMemo } from 'solid-js';
+import { For, Match, Show, Switch } from 'solid-js';
 
 import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
@@ -194,10 +194,14 @@ const AuthenticatedPostPage = () => {
 											<span class="font-bold">{comformat.format(post.repostCount.value)}</span>{' '}
 											<span class="text-muted-fg">Reposts</span>
 										</div>
-										<div>
+										<A
+											href="/u/:uid/profile/:actor/post/:status/likes"
+											params={params}
+											class="hover:underline"
+										>
 											<span class="font-bold">{comformat.format(post.likeCount.value)}</span>{' '}
 											<span class="text-muted-fg">Likes</span>
-										</div>
+										</A>
 									</div>
 
 									<hr class="border-divider" />

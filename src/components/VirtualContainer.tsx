@@ -60,6 +60,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const [ref, setRef] = createSignal<HTMLElement>();
 
 	const cachedHeight = () => store[props.key]?.[props.id];
+	const observerKey = () => `${props.key}::${props.id}`;
 
 	let height: number | undefined;
 	let entry: IntersectionObserverEntry | undefined;
@@ -96,7 +97,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 
 	createEffect(() => {
 		const observer = props.observer;
-		const id = props.id;
+		const id = observerKey();
 		const node = ref();
 
 		if (!node) {
@@ -114,7 +115,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			fallback={
 				<article
 					ref={setRef}
-					data-id={props.id}
+					data-id={observerKey()}
 					class='animate-in fade-in duration-100'
 				>
 					{props.children}
@@ -124,7 +125,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			<article
 				ref={setRef}
 				style={{ height: `${height || cachedHeight()}px` }}
-				data-id={props.id}
+				data-id={observerKey()}
 			/>
 		</Show>
 	);

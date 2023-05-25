@@ -105,21 +105,16 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const observer = () => props.observer || scrollObserver;
 	const setRef = (node: HTMLElement) => observer().observe(node);
 
+	const shouldHide = () => !intersecting() && (hidden() || cachedHeight());
+
 	return (
-		<Show
-			when={!intersecting() && (hidden() || cachedHeight())}
-			fallback={
-				<article ref={setRef} prop:$onintersect={listener}>
-					{props.children}
-				</article>
-			}
+		<article
+			ref={setRef}
+			style={{ height: shouldHide() ? `${height || cachedHeight()}px` : undefined }}
+			prop:$onintersect={listener}
 		>
-			<article
-				ref={setRef}
-				style={{ height: `${height || cachedHeight()}px` }}
-				prop:$onintersect={listener}
-			/>
-		</Show>
+			<Show when={!shouldHide()}>{props.children}</Show>
+		</article>
 	);
 };
 

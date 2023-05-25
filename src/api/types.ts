@@ -285,3 +285,35 @@ export interface BskyGetInviteCodesResponse {
 		}>;
 	}>;
 }
+
+export interface BskyFollowRecord {
+	$type: 'app.bsky.graph.follow';
+	createdAt: string;
+	subject: string;
+}
+
+export interface BskyNotification<T extends string, R extends {}> {
+	uri: string;
+	cid: string;
+	isRead: boolean;
+	author: BskyProfileBasic;
+	reason: T;
+	reasonSubject: T extends ('reply' | 'like') ? string : never;
+	record: R;
+	labels: BskyLabel[];
+	indexedAt: string;
+}
+
+export type BskyFollowNotification = BskyNotification<'follow', BskyFollowRecord>;
+export type BskyReplyNotification = BskyNotification<'reply', BskyPostRecord>;
+export type BskyLikeNotification = BskyNotification<'like', BskyLikeRecord>;
+
+export type BskyNotificationType =
+	| BskyFollowNotification
+	| BskyReplyNotification
+	| BskyLikeNotification;
+
+export interface BskyNotificationsResponse {
+	cursor?: string;
+	notifications: Array<BskyNotificationType>;
+}

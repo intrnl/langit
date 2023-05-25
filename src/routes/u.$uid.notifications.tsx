@@ -1,5 +1,176 @@
+import { For, Match, Switch } from 'solid-js';
+
+import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
+
+import { type NotificationsPage } from '~/api/models/notifications.ts';
+import { type DID } from '~/api/utils.ts';
+
+import {
+	createNotificationsQuery,
+	getNotificationsKey,
+	getNotificationsLatest,
+	getNotificationsLatestKey,
+} from '~/api/queries/get-notifications.ts';
+
+import { useParams } from '~/router.ts';
+
+import CircularProgress from '~/components/CircularProgress.tsx';
+import NotificationFollow from '~/components/NotificationFollow.tsx';
+import NotificationLike from '~/components/NotificationLike.tsx';
+import NotificationReply from '~/components/NotificationReply.tsx';
+
+const PAGE_SIZE = 30;
+
+const componentMap = {
+	follow: NotificationFollow,
+	like: NotificationLike,
+	reply: NotificationReply,
+};
+
 const AuthenticatedNotificationsPage = () => {
-	return <div>authenticated notifications page</div>;
+	const params = useParams('/u/:uid/notifications');
+
+	const uid = () => params.uid as DID;
+
+	const client = useQueryClient();
+
+	const notificationsQuery = createInfiniteQuery({
+		queryKey: () => getNotificationsKey(uid()),
+		queryFn: createNotificationsQuery(PAGE_SIZE),
+		getNextPageParam: (page) => page.cursor,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		refetchOnReconnect: false,
+		onSuccess: (data) => {
+			const pages = data.pages;
+			const length = pages.length;
+
+			// if the page size is 1, that means we've just went through an initial
+			// fetch, or a refetch, since our refetch process involves truncating the
+			// timeline first.
+			if (length === 1) {
+				client.setQueryData(getNotificationsLatestKey(uid()), pages[0].cid);
+			}
+
+			// check if the last page is empty because of its slices being filtered
+			// away, if so, fetch next page
+			if (length > 0) {
+				const last = pages[length - 1];
+
+				if (last.cid && last.slices.length === 0) {
+					notificationsQuery.fetchNextPage();
+				}
+			}
+		},
+	});
+
+	const latestQuery = createQuery({
+		queryKey: () => getNotificationsLatestKey(uid()),
+		queryFn: getNotificationsLatest,
+		staleTime: 10_000,
+		get enabled () {
+			const data = notificationsQuery.data;
+
+			if (!data || data.pages.length < 1 || !data.pages[0].cid) {
+				return false;
+			}
+
+			return true;
+		},
+	});
+
+	const getLatestCid = () => {
+		return notificationsQuery.data?.pages[0].cid;
+	};
+
+	const onRefetch = () => {
+		// we want to truncate the notifications here so that the refetch doesn't
+		// also refetching however many pages of notifications that the user has
+		// gone through.
+
+		// this is the only way we can do that in tanstack query
+
+		// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
+		// but unfortunately that breaks the `hasNextPage` check down below
+		// and would also mean the user gets to see nothing for a bit.
+		client.setQueryData(
+			getNotificationsKey(uid()),
+			(prev?: InfiniteData<NotificationsPage>) => {
+				if (prev) {
+					return {
+						pages: prev.pages.slice(0, 1),
+						pageParams: prev.pageParams.slice(0, 1),
+					};
+				}
+
+				return;
+			},
+		);
+
+		notificationsQuery.refetch();
+	};
+
+	return (
+		<div class='flex flex-col grow'>
+			<div class='bg-background flex items-center h-13 px-4 border-b border-divider sticky top-0 z-10'>
+				<p class='font-bold text-base'>Notifications</p>
+			</div>
+
+			<Switch>
+				<Match when={notificationsQuery.isInitialLoading || notificationsQuery.isRefetching}>
+					<div
+						class='h-13 flex items-center justify-center border-divider'
+						classList={{ 'border-b': notificationsQuery.isRefetching }}
+					>
+						<CircularProgress />
+					</div>
+				</Match>
+
+				<Match when={latestQuery.data && latestQuery.data !== getLatestCid()}>
+					<button
+						onClick={onRefetch}
+						class='text-sm text-accent flex items-center justify-center h-13 border-b border-divider hover:bg-hinted'
+					>
+						Show new notifications
+					</button>
+				</Match>
+			</Switch>
+
+			<div>
+				<For each={notificationsQuery.data ? notificationsQuery.data.pages : []}>
+					{(page) =>
+						page.slices.map((slice) => {
+							// @ts-expect-error
+							const Notification = componentMap[slice.type];
+
+							if (!Notification) {
+								return null;
+							}
+
+							return <Notification uid={uid()} data={slice} />;
+						})}
+				</For>
+			</div>
+
+			<Switch>
+				<Match when={notificationsQuery.isFetchingNextPage}>
+					<div class='h-13 flex items-center justify-center'>
+						<CircularProgress />
+					</div>
+				</Match>
+
+				<Match when={notificationsQuery.hasNextPage}>
+					<button
+						onClick={() => notificationsQuery.fetchNextPage()}
+						disabled={notificationsQuery.isRefetching}
+						class='text-sm text-accent flex items-center justify-center h-13 hover:bg-hinted disabled:pointer-events-none'
+					>
+						Show more notifications
+					</button>
+				</Match>
+			</Switch>
+		</div>
+	);
 };
 
 export default AuthenticatedNotificationsPage;

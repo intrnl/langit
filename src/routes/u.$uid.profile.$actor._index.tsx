@@ -31,8 +31,8 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 
 	const timelineQuery = createInfiniteQuery({
 		queryKey: () => getProfileFeedKey(uid(), actor(), withReplies()),
-		getNextPageParam: (last: TimelinePage) => last.cursor,
 		queryFn: createProfileFeedQuery(PAGE_SIZE),
+		getNextPageParam: (last) => last.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

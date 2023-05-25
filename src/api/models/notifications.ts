@@ -33,6 +33,7 @@ export interface NotificationsPage {
 	cursor?: string;
 	cid?: string;
 	date?: string;
+	length: number;
 	slices: NotificationSlice[];
 }
 
@@ -42,11 +43,12 @@ const MAX_MERGE_TIME = 6 * 60 * 60 * 1_000;
 export const createNotificationsPage = (data: BskyNotificationsResponse): NotificationsPage => {
 	const cursor = data.cursor;
 	const notifications = data.notifications;
+	const len = notifications.length;
 
 	const slices: NotificationSlice[] = [];
 	let slen = 0;
 
-	loop: for (let i = notifications.length - 1; i >= 0; i--) {
+	loop: for (let i = len - 1; i >= 0; i--) {
 		const item = notifications[i];
 		const reason = item.reason;
 
@@ -129,8 +131,9 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 
 	return {
 		cursor: cursor,
-		cid: notifications.length > 0 ? notifications[0].cid : undefined,
-		date: notifications.length > 0 ? notifications[0].indexedAt : undefined,
+		cid: len > 0 ? notifications[0].cid : undefined,
+		date: len > 0 ? notifications[0].indexedAt : undefined,
+		length: len,
 		slices: slices,
 	};
 };

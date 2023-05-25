@@ -30,6 +30,7 @@ const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => 
 export interface TimelinePage {
 	cursor?: string;
 	cid?: string;
+	length: number;
 	slices: TimelineSlice[];
 }
 
@@ -114,6 +115,7 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 	return {
 		cursor: data.cursor,
 		cid: len > 0 ? orig[0].post.cid : undefined,
+		length: len,
 		slices,
 	};
 };
@@ -134,6 +136,7 @@ export const createLikesTimelinePage = (cursor: string, posts: BskyPost[]): Time
 	return {
 		cursor: cursor,
 		cid: len > 0 ? posts[0].cid : undefined,
+		length: len,
 		slices: slices,
 	};
 };

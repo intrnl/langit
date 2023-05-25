@@ -42,7 +42,7 @@ const AuthenticatedNotificationsPage = () => {
 	const notificationsQuery = createInfiniteQuery({
 		queryKey: () => getNotificationsKey(uid()),
 		queryFn: createNotificationsQuery(PAGE_SIZE),
-		getNextPageParam: (page) => page.cursor,
+		getNextPageParam: (page) => page.length >= PAGE_SIZE && page.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

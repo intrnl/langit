@@ -18,7 +18,7 @@ const AuthenticatedProfileFollowersPage = () => {
 	const likesQuery = createInfiniteQuery({
 		queryKey: () => getPostLikedByKey(uid(), params.actor, params.status),
 		queryFn: createPostLikedByQuery(PAGE_LIMIT),
-		getNextPageParam: (last) => last.cursor,
+		getNextPageParam: (last) => last.profiles.length >= PAGE_LIMIT && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

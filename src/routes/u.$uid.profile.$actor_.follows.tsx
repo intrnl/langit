@@ -10,7 +10,7 @@ import { useParams } from '~/router.ts';
 
 import ProfileList from '~/components/ProfileList';
 
-const PAGE_LIMIT = 30;
+const PAGE_SIZE = 30;
 
 const AuthenticatedProfileFollowersPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/follows');
@@ -19,8 +19,8 @@ const AuthenticatedProfileFollowersPage = () => {
 
 	const followsQuery = createInfiniteQuery({
 		queryKey: () => getProfileFollowsKey(uid(), params.actor),
-		queryFn: createProfileFollowsQuery(PAGE_LIMIT),
-		getNextPageParam: (last) => last.cursor,
+		queryFn: createProfileFollowsQuery(PAGE_SIZE),
+		getNextPageParam: (last) => last.profiles.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

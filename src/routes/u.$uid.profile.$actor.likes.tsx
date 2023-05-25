@@ -26,7 +26,7 @@ const AuthenticatedProfileTimelineLikesPage = () => {
 	const timelineQuery = createInfiniteQuery({
 		queryKey: () => getProfileLikesKey(uid(), actor()),
 		queryFn: createProfileLikesQuery(PAGE_SIZE),
-		getNextPageParam: (last: TimelinePage) => last.cursor,
+		getNextPageParam: (last) => last.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

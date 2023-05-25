@@ -69,7 +69,6 @@ const AuthenticatedProfileTimelineLikesPage = () => {
 	return (
 		<Timeline
 			uid={uid()}
-			key={`profile/${actor()}/likes`}
 			timelineQuery={timelineQuery}
 			latestQuery={latestQuery}
 			onLoadMore={() => timelineQuery.fetchNextPage()}

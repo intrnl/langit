@@ -75,7 +75,6 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 	return (
 		<Timeline
 			uid={uid()}
-			key={`profile/${actor()}/${withReplies()}`}
 			timelineQuery={timelineQuery}
 			latestQuery={latestQuery}
 			onLoadMore={() => timelineQuery.fetchNextPage()}

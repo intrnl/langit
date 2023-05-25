@@ -69,7 +69,11 @@ const Timeline = (props: TimelineProps) => {
 								<VirtualContainer
 									observer={observer()}
 									key='posts'
-									id={createPostKey(item.post.cid, !!item.reply?.parent && idx === 0, idx !== len - 1)}
+									id={createPostKey(
+										item.post.cid,
+										(!!item.reply?.parent && idx === 0) || !!item.reason,
+										idx !== len - 1,
+									)}
 								>
 									<Post
 										interactive

@@ -66,19 +66,25 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 				<span class='whitespace-nowrap'>{relformat.format(val().createdAt)}</span>
 			</div>
 
-			<div class='flex items-start'>
-				<Show when={!large() && images()}>
-					<div class='grow basis-0 ml-3 mt-2 mb-3'>
-						<EmbedImage images={images()!} />
+			<Show when={val().text}>
+				<div class='flex items-start'>
+					<Show when={!large() && images()}>
+						<div class='grow basis-0 ml-3 mt-2 mb-3'>
+							<EmbedImage images={images()!} />
+						</div>
+					</Show>
+
+					<div class='min-w-0 grow-4 basis-0 mx-3 mt-1 mb-3 text-sm whitespace-pre-wrap break-words empty:hidden'>
+						{val().text}
 					</div>
+				</div>
+			</Show>
+
+			<Show when={(large() || !val().text) && images()}>
+				<Show when={!val().text}>
+					<div class='mt-3' />
 				</Show>
 
-				<div class='min-w-0 grow-4 basis-0 mx-3 mt-1 mb-3 text-sm whitespace-pre-wrap break-words empty:hidden'>
-					{val().text}
-				</div>
-			</div>
-
-			<Show when={large() && images()}>
 				<EmbedImage images={images()!} borderless />
 			</Show>
 		</A>

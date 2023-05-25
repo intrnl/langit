@@ -5,7 +5,8 @@
 	"packageManager": "pnpm@8.5.1",
 	"scripts": {
 		"dev": "vite",
-		"build": "vite build"
+		"build": "vite build",
+		"fmt": "prettier --cache --write ."
 	},
 	"dependencies": {
 		"@floating-ui/dom": "^1.2.8",

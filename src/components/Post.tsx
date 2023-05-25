@@ -1,6 +1,6 @@
 import { Show } from 'solid-js';
 
-import { A as UntypedAnchor } from '@solidjs/router';
+import { A as UntypedAnchor, useNavigate } from '@solidjs/router';
 
 import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache/posts.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
@@ -8,9 +8,10 @@ import { type DID, getRecordId } from '~/api/utils.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
 
-import { A, useNavigate } from '~/router.ts';
+import { A } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
+import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import Embed from '~/components/Embed.tsx';
 
@@ -44,47 +45,17 @@ const Post = (props: PostProps) => {
 	const record = () => post().record.value;
 
 	const handleClick = (ev: MouseEvent | KeyboardEvent) => {
-		if (!props.interactive) {
+		if (!props.interactive || !isElementClicked(ev)) {
 			return;
 		}
 
-		if (
-			(ev.type === 'keydown' && (ev as KeyboardEvent).key !== 'Enter') ||
-			(ev.type === 'auxclick' && (ev as MouseEvent).button !== 1)
-		) {
-			return;
-		}
+		const path = `/u/${uid()}/profile/${author().did}/post/${getRecordId(post().uri)}`;
 
-		const path = ev.composedPath() as HTMLElement[];
-
-		for (let idx = 0, len = path.length; idx < len; idx++) {
-			const node = path[idx];
-			const tag = node.localName;
-
-			if (node == ev.currentTarget) {
-				break;
-			}
-
-			if (tag === 'a' || tag === 'button' || tag === 'img' || tag === 'video') {
-				return;
-			}
-		}
-
-		if (window.getSelection()?.toString()) {
-			return;
-		}
-
-		if (ev.type === 'auxclick' || ev.ctrlKey) {
-			open(`/u/${uid()}/profile/${author().did}/post/${getRecordId(post().uri)}`);
+		if (isElementAltClicked(ev)) {
+			open(path, '_blank');
 		}
 		else {
-			navigate('/u/:uid/profile/:actor/post/:status', {
-				params: {
-					uid: uid(),
-					actor: author().did,
-					status: getRecordId(post().uri),
-				},
-			});
+			navigate(path);
 		}
 	};
 

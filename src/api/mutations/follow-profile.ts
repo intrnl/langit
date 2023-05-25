@@ -1,50 +1,47 @@
-import { type SignalizedPost } from '../cache/posts.ts';
+import { type SignalizedProfile } from '../cache/profiles.ts';
 import { multiagent } from '../global.ts';
 import { type BskyCreateRecordResponse } from '../types.ts';
 import { type DID, getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
-export const favoritePost = (uid: DID, post: SignalizedPost) => {
-	return acquire(post, async () => {
+export const followProfile = (uid: DID, profile: SignalizedProfile) => {
+	return acquire(profile, async () => {
 		const agent = await multiagent.connect(uid);
 
-		const prev = post.viewer.like.peek();
+		const prev = profile.viewer.following.peek();
 
 		if (prev) {
 			await agent.rpc.post({
 				method: 'com.atproto.repo.deleteRecord',
 				data: {
-					collection: 'app.bsky.feed.like',
+					collection: 'app.bsky.graph.follow',
 					repo: uid,
 					rkey: getRecordId(prev),
 				},
 			});
 
-			post.viewer.like.value = undefined;
-			post.likeCount.value--;
+			profile.viewer.following.value = undefined;
+			profile.followersCount.value--;
 		}
 		else {
 			const response = await agent.rpc.post({
 				method: 'com.atproto.repo.createRecord',
 				data: {
 					repo: uid,
-					collection: 'app.bsky.feed.like',
+					collection: 'app.bsky.graph.follow',
 					record: {
-						$type: 'app.bsky.feed.like',
+						$type: 'app.bsky.graph.follow',
 						createdAt: new Date(),
-						subject: {
-							cid: post.cid,
-							uri: post.uri,
-						},
+						subject: profile.did,
 					},
 				},
 			});
 
 			const data = response.data as BskyCreateRecordResponse;
 
-			post.viewer.like.value = data.uri;
-			post.likeCount.value++;
+			profile.viewer.following.value = data.uri;
+			profile.followersCount.value++;
 		}
 	});
 };

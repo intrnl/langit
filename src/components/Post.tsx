@@ -1,21 +1,22 @@
 import { Show } from 'solid-js';
 
-import { A as UntypedAnchor } from '@solidjs/router';
+import { A as UntypedAnchor, useNavigate } from '@solidjs/router';
 
 import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache/posts.ts';
-import { type DID, getPostId } from '~/api/utils.ts';
+import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
 
-import { A, useNavigate } from '~/router.ts';
+import { A } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
+import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import Embed from '~/components/Embed.tsx';
+import PostDropdown from '~/components/PostDropdown.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
-import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
@@ -44,47 +45,17 @@ const Post = (props: PostProps) => {
 	const record = () => post().record.value;
 
 	const handleClick = (ev: MouseEvent | KeyboardEvent) => {
-		if (!props.interactive) {
+		if (!props.interactive || !isElementClicked(ev)) {
 			return;
 		}
 
-		if (
-			(ev.type === 'keydown' && (ev as KeyboardEvent).key !== 'Enter') ||
-			(ev.type === 'auxclick' && (ev as MouseEvent).button !== 1)
-		) {
-			return;
-		}
+		const path = `/u/${uid()}/profile/${author().did}/post/${getRecordId(post().uri)}`;
 
-		const path = ev.composedPath() as HTMLElement[];
-
-		for (let idx = 0, len = path.length; idx < len; idx++) {
-			const node = path[idx];
-			const tag = node.localName;
-
-			if (node == ev.currentTarget) {
-				break;
-			}
-
-			if (tag === 'a' || tag === 'button' || tag === 'img' || tag === 'video') {
-				return;
-			}
-		}
-
-		if (window.getSelection()?.toString()) {
-			return;
-		}
-
-		if (ev.type === 'auxclick' || ev.ctrlKey) {
-			open(`/u/${uid()}/profile/${author().did}/post/${getPostId(post().uri)}`);
+		if (isElementAltClicked(ev)) {
+			open(path, '_blank');
 		}
 		else {
-			navigate('/u/:uid/profile/:actor/post/:status', {
-				params: {
-					uid: uid(),
-					actor: author().did,
-					status: getPostId(post().uri),
-				},
-			});
+			navigate(path);
 		}
 	};
 
@@ -109,7 +80,7 @@ const Post = (props: PostProps) => {
 								params={{ uid: uid(), actor: reason()!.by.did }}
 								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
 							>
-								{reason()!.by.displayName || reason()!.by.handle} Retweeted
+								{reason()!.by.displayName || reason()!.by.handle} Reposted
 							</A>
 						</div>
 					</div>
@@ -123,7 +94,7 @@ const Post = (props: PostProps) => {
 						<div>
 							<A
 								href='/u/:uid/profile/:actor/post/:status'
-								params={{ uid: uid(), actor: parent()!.author.did, status: getPostId(parent()!.uri) }}
+								params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
 								class='grow line-clamp-1 min-w-0 font-medium hover:underline'
 							>
 								Replying to {parent()!.author.displayName.value}
@@ -175,7 +146,7 @@ const Post = (props: PostProps) => {
 									params={{
 										uid: uid(),
 										actor: author().did,
-										status: getPostId(post().uri),
+										status: getRecordId(post().uri),
 									}}
 									class='hover:underline whitespace-nowrap'
 								>
@@ -186,9 +157,7 @@ const Post = (props: PostProps) => {
 
 						<Show when={interactive()}>
 							<div class='shrink-0'>
-								<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
-									<MoreHorizIcon />
-								</button>
+								<PostDropdown post={post()} />
 							</div>
 						</Show>
 					</div>

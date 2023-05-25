@@ -5,6 +5,7 @@ import { createQuery } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils';
 
+import { followProfile } from '~/api/mutations/follow-profile.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, useParams } from '~/router.ts';
@@ -68,7 +69,10 @@ const AuthenticatedProfileLayout = () => {
 
 									<div class='grow' />
 
-									<button class={button({ color: isFollowing() ? 'outline' : 'primary' })}>
+									<button
+										onClick={() => followProfile(uid(), profile())}
+										class={button({ color: isFollowing() ? 'outline' : 'primary' })}
+									>
 										{isFollowing() ? 'Following' : 'Follow'}
 									</button>
 								</div>
@@ -85,9 +89,9 @@ const AuthenticatedProfileLayout = () => {
 								</Show>
 
 								<div class='text-sm flex flex-wrap gap-4'>
-									<A href='/u/:uid/profile/:actor/following' params={params} class='hover:underline'>
+									<A href='/u/:uid/profile/:actor/follows' params={params} class='hover:underline'>
 										<span class='font-bold'>{comformat.format(profile().followsCount.value)}</span>{' '}
-										<span class='text-muted-fg'>Following</span>
+										<span class='text-muted-fg'>Follows</span>
 									</A>
 
 									<A href='/u/:uid/profile/:actor/followers' params={params} class='hover:underline'>
@@ -99,7 +103,7 @@ const AuthenticatedProfileLayout = () => {
 
 							<div class='flex overflow-x-auto border-b border-divider'>
 								<TabLink href='/u/:uid/profile/:actor' params={params} replace end>
-									Tweets
+									Posts
 								</TabLink>
 								<TabLink href='/u/:uid/profile/:actor/with_replies' params={params} replace>
 									Replies

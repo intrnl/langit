@@ -19,7 +19,7 @@ import { createTiptapEditor } from 'solid-tiptap';
 
 import { posts as postsCache } from '~/api/cache/posts.ts';
 import { multiagent } from '~/api/global.ts';
-import { type DID, getPostId } from '~/api/utils.ts';
+import { type DID, getRecordId } from '~/api/utils.ts';
 
 import {
 	type BskyPostRecord,
@@ -138,7 +138,7 @@ const AuthenticatedComposePage = () => {
 
 		try {
 			const response = await createPost(uid(), record);
-			const pid = getPostId(response.uri);
+			const pid = getRecordId(response.uri);
 
 			setState(PostState.SENT);
 

@@ -10,10 +10,7 @@ export const createTimelineQuery = (limit: number) => {
 	return async (ctx: QueryFunctionContext<ReturnType<typeof getTimelineKey>>) => {
 		const [, uid, algorithm] = ctx.queryKey;
 
-		const session = multiagent.accounts[uid].session;
 		const agent = await multiagent.connect(uid);
-
-		const selfdid = session.did;
 
 		const response = await agent.rpc.get({
 			method: 'app.bsky.feed.getTimeline',
@@ -30,7 +27,7 @@ export const createTimelineQuery = (limit: number) => {
 			if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
 				const parent = first.reply.parent;
 
-				if (parent.author.did !== selfdid && !parent.author.viewer.following.peek()) {
+				if (parent.author.did !== uid && !parent.author.viewer.following.peek()) {
 					return false;
 				}
 			}

@@ -4,7 +4,7 @@ import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
-import { type DID, getPostId } from '~/api/utils.ts';
+import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
@@ -18,10 +18,10 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
-import VirtualContainer from '~/components/VirtualContainer';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
+import PostDropdown from '~/components/PostDropdown.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
-import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
@@ -126,7 +126,7 @@ const AuthenticatedPostPage = () => {
 															params={{
 																uid: uid(),
 																actor: items[0].author.did,
-																status: getPostId(items[0].uri),
+																status: getRecordId(items[0].uri),
 															}}
 															class='h-10 flex items-center gap-3 px-4 hover:bg-hinted'
 														>
@@ -190,9 +190,7 @@ const AuthenticatedPostPage = () => {
 										</A>
 
 										<div class='flex justify-end grow shrink-0'>
-											<button class='flex items-center justify-center h-8 w-8 -my-1.5 -mx-2 rounded-full text-base text-muted-fg hover:bg-secondary'>
-												<MoreHorizIcon />
-											</button>
+											<PostDropdown post={post} />
 										</div>
 									</div>
 
@@ -296,7 +294,7 @@ const AuthenticatedPostPage = () => {
 														params={{
 															uid: uid(),
 															actor: items[len - 1].author.did,
-															status: getPostId(items[len - 1].uri),
+															status: getRecordId(items[len - 1].uri),
 														}}
 														class='h-10 flex items-center gap-3 px-4 border-b border-divider hover:bg-hinted'
 													>

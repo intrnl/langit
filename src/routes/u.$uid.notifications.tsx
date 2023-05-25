@@ -128,22 +128,7 @@ const AuthenticatedNotificationsPage = () => {
 		try {
 			await updateNotificationsSeen(uid(), new Date(date));
 
-			// Refetch pages that contain unread notifications
-			await notificationsQuery.refetch<NotificationsPage>({
-				refetchPage: (page) => {
-					const slices = page.slices;
-
-					for (let idx = 0, len = slices.length; idx < len; idx++) {
-						const slice = slices[idx];
-
-						if (!slice.read) {
-							return true;
-						}
-					}
-
-					return false;
-				},
-			});
+			onRefetch();
 		}
 		finally {
 			setDispatching(false);

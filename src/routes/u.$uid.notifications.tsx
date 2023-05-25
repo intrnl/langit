@@ -141,7 +141,7 @@ const AuthenticatedNotificationsPage = () => {
 				<p class='font-bold text-base'>Notifications</p>
 
 				<button
-					disabled={dispatching() || notificationsQuery.isInitialLoading}
+					disabled={dispatching() || notificationsQuery.isInitialLoading || notificationsQuery.isRefetching}
 					onClick={onMarkAsRead}
 					class={button({ color: 'outline' })}
 				>

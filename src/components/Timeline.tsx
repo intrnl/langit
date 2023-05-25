@@ -10,11 +10,10 @@ import { IntersectionObserverWrapper } from '~/utils/intersection-observer.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
-import VirtualContainer from '~/components/VirtualContainer.tsx';
+import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 
 export interface TimelineProps {
 	uid: DID;
-	key: string;
 	timelineQuery: CreateInfiniteQueryResult<TimelinePage, unknown>;
 	latestQuery: CreateQueryResult<string | undefined, unknown>;
 	onRefetch?: () => void;
@@ -28,9 +27,7 @@ const Timeline = (props: TimelineProps) => {
 
 	const observer = createMemo(() => {
 		const observer = new IntersectionObserverWrapper();
-
 		observer.connect({ rootMargin: '125% 0px' });
-		props.key;
 
 		return observer;
 	});
@@ -63,7 +60,7 @@ const Timeline = (props: TimelineProps) => {
 
 			<div>
 				<For each={timelineQuery.data ? timelineQuery.data.pages : []}>
-					{(page, index) => (
+					{(page) => (
 						page.slices.map((slice) => {
 							const items = slice.items;
 							const len = items.length;
@@ -71,8 +68,8 @@ const Timeline = (props: TimelineProps) => {
 							return items.map((item, idx) => (
 								<VirtualContainer
 									observer={observer()}
-									key={props.key}
-									id={`${index()}/${item.post.cid}`}
+									key='posts'
+									id={createPostKey(item.post.cid, !!item.reply?.parent && idx === 0, idx !== len - 1)}
 								>
 									<Post
 										interactive

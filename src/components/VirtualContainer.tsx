@@ -54,6 +54,10 @@ export interface VirtualContainerProps {
 	children?: JSX.Element;
 }
 
+export const createPostKey = (cid: string, parent: boolean, next: boolean) => {
+	return `${cid}:${+parent}${+next}`;
+};
+
 const VirtualContainer = (props: VirtualContainerProps) => {
 	const [intersecting, setIntersecting] = createSignal(false);
 	const [hidden, setHidden] = createSignal(false);

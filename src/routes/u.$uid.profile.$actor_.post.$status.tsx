@@ -18,8 +18,8 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
-import VirtualContainer from '~/components/VirtualContainer.tsx';
 import PostDropdown from '~/components/PostDropdown.tsx';
+import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
@@ -147,8 +147,8 @@ const AuthenticatedPostPage = () => {
 												{items.map((item, idx) => (
 													<VirtualContainer
 														observer={observer()}
-														key={`thread/asc`}
-														id={item.cid}
+														key='posts'
+														id={createPostKey(item.cid, false, true)}
 													>
 														<Post
 															interactive
@@ -275,8 +275,8 @@ const AuthenticatedPostPage = () => {
 												{items.map((item, idx) => (
 													<VirtualContainer
 														observer={observer()}
-														key={`thread/desc`}
-														id={item.cid}
+														key='posts'
+														id={createPostKey(item.cid, false, overflowing || idx !== len - 1)}
 													>
 														<Post
 															interactive

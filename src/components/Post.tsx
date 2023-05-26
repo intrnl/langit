@@ -30,6 +30,7 @@ interface PostProps {
 	prev?: boolean;
 	next?: boolean;
 	interactive?: boolean;
+	highlight?: boolean;
 }
 
 const Post = (props: PostProps) => {
@@ -65,7 +66,11 @@ const Post = (props: PostProps) => {
 			onAuxClick={handleClick}
 			onKeyDown={handleClick}
 			class="relative border-divider px-4"
-			classList={{ 'border-b': !props.next, 'hover:bg-hinted': interactive() }}
+			classList={{
+				'border-b': !props.next,
+				'hover:bg-hinted': interactive(),
+				'bg-accent/20': props.highlight,
+			}}
 		>
 			<div class="flex flex-col gap-1 pt-3">
 				<Show when={reason() && reason()!.$type === 'app.bsky.feed.defs#reasonRepost'}>

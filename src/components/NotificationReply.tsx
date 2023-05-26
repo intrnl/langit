@@ -59,10 +59,10 @@ const NotificationReply = (props: NotificationReplyProps) => {
 			<Match when={replyQuery.data && parentQuery.data} keyed>
 				{/* @ts-expect-error: not sure what's up with this one*/}
 				{() => {
-					const reply = replyQuery.data!;
+					const post = replyQuery.data!;
 					const parent = parentQuery.data!;
 
-					return <Post interactive uid={uid()} post={reply} parent={parent} />;
+					return <Post interactive uid={uid()} post={post} parent={parent} highlight={!reply().isRead} />;
 				}}
 			</Match>
 		</Switch>

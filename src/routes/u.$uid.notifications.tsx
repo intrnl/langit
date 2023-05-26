@@ -16,19 +16,11 @@ import {
 import { useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
-import NotificationFollow from '~/components/NotificationFollow.tsx';
-import NotificationLike from '~/components/NotificationLike.tsx';
-import NotificationReply from '~/components/NotificationReply.tsx';
+import Notification from '~/components/Notification.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 const PAGE_SIZE = 30;
-
-const componentMap = {
-	follow: NotificationFollow,
-	like: NotificationLike,
-	reply: NotificationReply,
-};
 
 const AuthenticatedNotificationsPage = () => {
 	const params = useParams('/u/:uid/notifications');
@@ -175,15 +167,8 @@ const AuthenticatedNotificationsPage = () => {
 				<For each={notificationsQuery.data ? notificationsQuery.data.pages : []}>
 					{(page) =>
 						page.slices.map((slice) => {
-							const Notification = componentMap[slice.type];
-
-							if (!Notification) {
-								return null;
-							}
-
 							return (
 								<VirtualContainer key="notifs" id={/* @once */ '' + slice.date}>
-									{/* @ts-expect-error */}
 									<Notification uid={uid()} data={slice} />
 								</VirtualContainer>
 							);

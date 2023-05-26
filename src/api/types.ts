@@ -290,6 +290,15 @@ export interface BskyFollowRecord {
 	subject: string;
 }
 
+export interface BskyRepostRecord {
+	$type: 'app.bsky.feed.repost';
+	createdAt: string;
+	subject: {
+		cid: string;
+		uri: string;
+	};
+}
+
 export interface BskyNotification<T extends string, R extends {}> {
 	uri: string;
 	cid: string;
@@ -304,9 +313,14 @@ export interface BskyNotification<T extends string, R extends {}> {
 
 export type BskyFollowNotification = BskyNotification<'follow', BskyFollowRecord>;
 export type BskyReplyNotification = BskyNotification<'reply', BskyPostRecord>;
+export type BskyRepostNotification = BskyNotification<'repost', BskyRepostRecord>;
 export type BskyLikeNotification = BskyNotification<'like', BskyLikeRecord>;
 
-export type BskyNotificationType = BskyFollowNotification | BskyReplyNotification | BskyLikeNotification;
+export type BskyNotificationType =
+	| BskyFollowNotification
+	| BskyReplyNotification
+	| BskyRepostNotification
+	| BskyLikeNotification;
 
 export interface BskyNotificationsResponse {
 	cursor?: string;
@@ -328,6 +342,6 @@ export interface BskyBlob {
 	mimeType: string;
 	ref: {
 		$link: string;
-	}
+	};
 	size: number;
 }

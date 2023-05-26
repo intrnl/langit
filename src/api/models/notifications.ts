@@ -3,6 +3,7 @@ import {
 	type BskyLikeNotification,
 	type BskyNotificationsResponse,
 	type BskyReplyNotification,
+	type BskyRepostNotification,
 } from '../types.ts';
 
 export interface FollowNotificationSlice {
@@ -27,7 +28,19 @@ export interface ReplyNotificationSlice {
 	item: BskyReplyNotification;
 }
 
-export type NotificationSlice = FollowNotificationSlice | LikeNotificationSlice | ReplyNotificationSlice;
+export interface RepostNotificationSlice {
+	type: 'repost';
+	read: boolean;
+	key: string;
+	date: number;
+	items: BskyRepostNotification[];
+}
+
+export type NotificationSlice =
+	| FollowNotificationSlice
+	| LikeNotificationSlice
+	| ReplyNotificationSlice
+	| RepostNotificationSlice;
 
 export interface NotificationsPage {
 	cursor?: string;
@@ -84,7 +97,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 				date: date,
 				items: [item],
 			});
-		} else if (reason === 'like') {
+		} else if (reason === 'like' || reason === 'repost') {
 			const key = item.reasonSubject;
 
 			for (let j = 0; j < slen; j++) {
@@ -95,6 +108,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 				}
 
 				if (date - slice.date <= MAX_MERGE_TIME) {
+					// @ts-expect-error this won't mix up, as we already filter by type
 					slice.items.push(item);
 
 					if (!item.isRead) {

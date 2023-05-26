@@ -54,7 +54,12 @@ const AuthenticatedNotificationsPage = () => {
 			// fetch, or a refetch, since our refetch process involves truncating the
 			// timeline first.
 			if (length === 1) {
-				client.setQueryData(getNotificationsLatestKey(uid()), pages[0].cid);
+				const page = pages[0];
+
+				client.setQueryData(getNotificationsLatestKey(uid()), {
+					cid: page.cid,
+					read: page.slices[0]?.read ?? true,
+				});
 			}
 
 			// check if the last page is empty because of its slices being filtered
@@ -156,7 +161,7 @@ const AuthenticatedNotificationsPage = () => {
 					</div>
 				</Match>
 
-				<Match when={latestQuery.data && latestQuery.data !== getLatestCid()}>
+				<Match when={latestQuery.data && latestQuery.data.cid !== getLatestCid()}>
 					<button
 						onClick={onRefetch}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"

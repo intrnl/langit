@@ -6,6 +6,7 @@ import { createQuery } from '@tanstack/solid-query';
 import { multiagent } from '~/api/global.ts';
 import { type DID } from '~/api/utils.ts';
 
+import { getNotificationsLatest, getNotificationsLatestKey } from '~/api/queries/get-notifications.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, useParams } from '~/router.ts';
@@ -39,6 +40,12 @@ const AuthenticatedLayout = () => {
 		refetchOnMount: true,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
+	});
+
+	const notificationsQuery = createQuery({
+		queryKey: () => getNotificationsLatestKey(uid()),
+		queryFn: getNotificationsLatest,
+		staleTime: 10_000,
 	});
 
 	return (
@@ -83,9 +90,13 @@ const AuthenticatedLayout = () => {
 							class="group flex items-center rounded-md hover:bg-hinted"
 							activeClass="is-active"
 						>
-							<div class="p-2">
+							<div class="relative p-2">
 								<NotificationsOutlinedIcon class="text-2xl group-[.is-active]:hidden" />
 								<NotificationsIcon class="hidden text-2xl group-[.is-active]:block" />
+
+								<Show when={notificationsQuery.data && !notificationsQuery.data.read}>
+									<div class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
+								</Show>
 							</div>
 
 							<span class="hidden text-base group-[.is-active]:font-medium xl:inline">Notifications</span>
@@ -178,8 +189,14 @@ const AuthenticatedLayout = () => {
 						class="group flex grow basis-0 items-center justify-center text-2xl"
 						activeClass="is-active"
 					>
-						<NotificationsOutlinedIcon class="group-[.is-active]:hidden" />
-						<NotificationsIcon class="hidden group-[.is-active]:block" />
+						<div class="relative">
+							<NotificationsOutlinedIcon class="group-[.is-active]:hidden" />
+							<NotificationsIcon class="hidden group-[.is-active]:block" />
+
+							<Show when={notificationsQuery.data && !notificationsQuery.data.read}>
+								<div class="absolute right-0 top-0 h-2 w-2 rounded-full bg-red-500" />
+							</Show>
+						</div>
 					</A>
 					<A
 						href="/u/:uid/you"

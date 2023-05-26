@@ -41,5 +41,11 @@ export const getNotificationsLatest = async (
 	const data = response.data as BskyNotificationsResponse;
 	const notifications = data.notifications;
 
-	return notifications.length > 0 ? notifications[0].cid : undefined;
+	if (notifications.length > 0) {
+		const notif = notifications[0];
+
+		return { cid: notif.cid, read: notif.isRead };
+	}
+
+	return undefined;
 };

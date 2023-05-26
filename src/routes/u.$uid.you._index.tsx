@@ -1,15 +1,18 @@
-import { For, Match, Show, Switch, createMemo } from 'solid-js';
+import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
-import { DropdownMenu } from '@kobalte/core';
+import { Dialog, DropdownMenu } from '@kobalte/core';
 
 import { useNavigate } from '@solidjs/router';
 
 import { multiagent } from '~/api/global.ts';
+import { type MultiagentAccountData } from '~/api/multiagent.ts';
 import { type DID } from '~/api/utils.ts';
 
 import { A, useParams } from '~/router.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
+import button from '~/styles/primitives/button.ts';
+import * as dialog from '~/styles/primitives/dialog.ts';
 import { dropdownItem, dropdownMenu } from '~/styles/primitives/dropdown-menu.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
@@ -20,6 +23,8 @@ import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');
 	const navigate = useNavigate();
+
+	const [toLogout, setToLogout] = createSignal<MultiagentAccountData>();
 
 	const uid = () => params.uid as DID;
 
@@ -52,14 +57,6 @@ const AuthenticatedYouPage = () => {
 							open(path, '_blank');
 						} else {
 							navigate(path);
-						}
-					};
-
-					const handleLogout = async () => {
-						await multiagent.logout(did);
-
-						if (uid() === did) {
-							navigate('/');
 						}
 					};
 
@@ -103,7 +100,7 @@ const AuthenticatedYouPage = () => {
 										<DropdownMenu.Content class={/* @once */ dropdownMenu()}>
 											<DropdownMenu.Item
 												as="button"
-												onSelect={handleLogout}
+												onSelect={() => setToLogout(account)}
 												class={/* @once */ dropdownItem()}
 											>
 												Sign out
@@ -150,6 +147,49 @@ const AuthenticatedYouPage = () => {
 				<ConfirmationNumberIcon class="text-2xl" />
 				<span>Invite codes</span>
 			</A>
+
+			<Dialog.Root open={toLogout() !== undefined}>
+				<Dialog.Portal>
+					<Dialog.Overlay class={/* @once */ dialog.overlay()} />
+
+					<div class={/* @once */ dialog.positioner()}>
+						<Dialog.Content class={/* @once */ dialog.content()}>
+							<Dialog.Title class={/* @once */ dialog.title()}>Sign out?</Dialog.Title>
+
+							<p class="mt-3 text-sm">
+								This will sign you out of{' '}
+								{toLogout() && (toLogout()!.profile ? `@${toLogout()!.profile!.handle}` : toLogout()!.did)},
+								and you'll still be signed in to other accounts.
+							</p>
+
+							<div class={/* @once */ dialog.actions()}>
+								<button
+									onClick={() => {
+										setToLogout(undefined);
+									}}
+									class={/* @once */ button({ color: 'ghost' })}
+								>
+									Cancel
+								</button>
+								<button
+									onClick={async () => {
+										const did = toLogout()!.did;
+
+										await multiagent.logout(did);
+
+										if (uid() === did) {
+											navigate('/');
+										}
+									}}
+									class={/* @once */ button({ color: 'primary' })}
+								>
+									Sign out
+								</button>
+							</div>
+						</Dialog.Content>
+					</div>
+				</Dialog.Portal>
+			</Dialog.Root>
 		</div>
 	);
 };

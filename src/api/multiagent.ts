@@ -115,8 +115,6 @@ export class Multiagent {
 	async logout(did: DID): Promise<void> {
 		await this._promise;
 
-		let shouldRedirect = false;
-
 		if (!(did in this.accounts)) {
 			return;
 		}
@@ -137,7 +135,9 @@ export class Multiagent {
 		}
 
 		const next = { ...this.storage.get('accounts') };
+
 		delete next[did];
+		delete this.agents[did];
 
 		this.storage.set('accounts', next);
 	}

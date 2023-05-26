@@ -6,7 +6,7 @@ const WEEK = DAY * 7;
 const MONTH = WEEK * 4;
 const YEAR = MONTH * 12;
 
-const dateFormat = new Intl.DateTimeFormat('en', { dateStyle: 'long' });
+const dateFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
 
 export const format = (time: string | number, base = new Date()) => {
 	const date = new Date(time);
@@ -19,7 +19,7 @@ export const format = (time: string | number, base = new Date()) => {
 
 	const [value, unit] = lookup(delta);
 
-	return Math.abs(value).toLocaleString('en', { style: 'unit', unit, unitDisplay: 'narrow' });
+	return Math.abs(value).toLocaleString('en-US', { style: 'unit', unit, unitDisplay: 'narrow' });
 };
 
 export const lookup = (delta: number): [value: number, unit: Intl.RelativeTimeFormatUnit] => {

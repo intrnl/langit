@@ -31,7 +31,7 @@ const seen = new Set<string>();
 const MAX_ANCESTORS = 10;
 const MAX_DESCENDANTS = 4;
 
-const formatter = new Intl.DateTimeFormat('en', {
+const formatter = new Intl.DateTimeFormat('en-US', {
 	dateStyle: 'long',
 	timeStyle: 'short',
 });

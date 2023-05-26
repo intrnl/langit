@@ -1,4 +1,4 @@
-const formatter = new Intl.NumberFormat('en', {
+const formatter = new Intl.NumberFormat('en-US', {
 	notation: 'compact',
 });
 

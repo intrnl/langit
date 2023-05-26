@@ -97,12 +97,12 @@ export function constructMethodCallHeaders(method: 'post' | 'get', data?: any, o
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-export const encodeMethodCallBody = (headers: Headers, data?: any): ArrayBuffer | undefined => {
+export const encodeMethodCallBody = (headers: Headers, data?: any): ArrayBuffer | Blob | undefined => {
 	if (!headers['Content-Type'] || typeof data === 'undefined') {
 		return undefined;
 	}
 
-	if (data instanceof ArrayBuffer) {
+	if (data instanceof ArrayBuffer || data instanceof Blob) {
 		return data;
 	}
 

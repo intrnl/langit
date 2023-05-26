@@ -1,6 +1,7 @@
-import { type Accessor, For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
+import { type Accessor, For, Match, Show, Switch, createMemo, createSignal, batch } from 'solid-js';
 import { render } from 'solid-js/web';
 
+import { Dialog } from '@kobalte/core';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
@@ -27,28 +28,40 @@ import { multiagent } from '~/api/global.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import {
+	type BskyBlob,
 	type BskyPostRecord,
+	type BskyPostRecordEmbedImage,
 	type BskyPostRecordReply,
 	type BskyProfileTypeaheadSearch,
 	type BskySearchActorTypeaheadResponse,
 } from '~/api/types.ts';
 
 import { createPost } from '~/api/mutations/create-post.ts';
+import { uploadBlob } from '~/api/mutations/upload-blob.ts';
 import { getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { useNavigate, useParams } from '~/router.ts';
 
 import '~/styles/compose.css';
+import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
+import * as dialog from '~/styles/primitives/dialog.ts';
 
+import CloseIcon from '~/icons/baseline-close.tsx';
+import ImageIcon from '~/icons/baseline-image.tsx';
+
+import { formatSize } from '~/utils/intl/relformatter.ts';
 import { pm2rt } from '~/utils/composer/pm2rt.ts';
+import { compress } from '~/utils/image.ts';
 import { Locker } from '~/utils/lock.ts';
+import { type Signal, signal } from '~/utils/signals.ts';
 
 const MENTION_SUGGESTION_LIMIT = 6;
 const GRAPHEME_LIMIT = 300;
+const MAX_IMAGE = 4;
 
 const enum PostState {
 	IDLE,
@@ -56,8 +69,18 @@ const enum PostState {
 	SENT,
 }
 
+interface ComposedImage {
+	blob: Blob;
+	alt: Signal<string>;
+	failed: Signal<boolean>;
+	record?: BskyBlob | undefined;
+}
+
+type PendingImage = Awaited<ReturnType<typeof compress>> & { name: string };
+
 const AuthenticatedComposePage = () => {
-	let ref: HTMLDivElement | undefined;
+	let editorRef: HTMLDivElement | undefined;
+	let fileInputRef: HTMLInputElement | undefined;
 
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
@@ -67,7 +90,11 @@ const AuthenticatedComposePage = () => {
 
 	const replyUri = () => searchParams.reply;
 
-	const [error, setError] = createSignal<string>();
+	const [imageProcessing, setImageProcessing] = createSignal(0);
+	const [images, setImages] = createSignal<ComposedImage[]>([]);
+	const [pendingImages, setPendingImages] = createSignal<PendingImage[]>([]);
+
+	const [message, setMessage] = createSignal<string>();
 	const [state, setState] = createSignal(PostState.IDLE);
 	const [richtext, setRichtext] = createSignal<ReturnType<typeof pm2rt>>();
 
@@ -102,18 +129,28 @@ const AuthenticatedComposePage = () => {
 
 	const isEnabled = createMemo(() => {
 		const len = length();
-		return !replyQuery.isInitialLoading && state() === PostState.IDLE && len > 0 && len <= 300;
+		const image = images();
+		return (
+			!replyQuery.isInitialLoading &&
+			state() === PostState.IDLE &&
+			((len > 0 && len <= 300) || image.length > 0)
+		);
 	});
 
 	const handleSubmit = async () => {
 		const rt = richtext();
 
-		if (!rt || state() !== PostState.IDLE) {
+		if (state() !== PostState.IDLE || !(rt || images().length > 0)) {
 			return;
 		}
 
+		setState(PostState.DISPATCHING);
+
 		const reply = replyQuery.data;
-		let replyRecord: BskyPostRecord['reply'];
+		const image = images();
+
+		let replyRecord: BskyPostRecord['reply'] | undefined;
+		let embedRecord: BskyPostRecordEmbedImage | undefined;
 
 		if (reply) {
 			const ref: BskyPostRecordReply = {
@@ -130,16 +167,47 @@ const AuthenticatedComposePage = () => {
 			};
 		}
 
+		if (image.length > 0) {
+			// iterate through images, upload ones that haven't been uploaded,
+			// they're marked by whether or not it has the blob record saved.
+			for (let idx = 0, len = image.length; idx < len; idx++) {
+				const img = image[idx];
+
+				if (img.record) {
+					continue;
+				}
+
+				setMessage(`Uploading image #${idx + 1}`);
+
+				try {
+					const blob = await uploadBlob(uid(), img.blob);
+
+					img.record = blob;
+				} catch (err) {
+					console.error(`Failed to upload image`, err);
+
+					setMessage(`Failed to upload image #${idx + 1}`);
+					setState(PostState.IDLE);
+					return;
+				}
+			}
+
+			embedRecord = {
+				$type: 'app.bsky.embed.images',
+				images: image.map((img) => ({ alt: img.alt.value, image: img.record! })),
+			};
+		}
+
+		setMessage(undefined);
+
 		const record: BskyPostRecord = {
 			$type: 'app.bsky.feed.post',
 			createdAt: new Date().toISOString(),
-			facets: rt.facets,
-			text: rt.text,
+			facets: rt ? rt.facets : undefined,
+			text: rt ? rt.text : '',
 			reply: replyRecord,
+			embed: embedRecord,
 		};
-
-		setError(undefined);
-		setState(PostState.DISPATCHING);
 
 		try {
 			const response = await createPost(uid(), record);
@@ -156,13 +224,88 @@ const AuthenticatedComposePage = () => {
 				},
 			});
 		} catch (err) {
-			setError('' + err);
+			setMessage(`Failed to post: ${err}`);
 			setState(PostState.IDLE);
 		}
 	};
 
+	const addImagesUncompressed = (files: (Blob | File)[]) => {
+		const next: ComposedImage[] = [];
+
+		for (let idx = 0, len = files.length; idx < len; idx++) {
+			const file = files[idx];
+
+			next.push({
+				blob: file,
+				alt: signal(''),
+				failed: signal(false),
+				record: undefined,
+			});
+		}
+
+		setImages(images().concat(next));
+	};
+
+	const addImages = async (files: (Blob | File)[]) => {
+		const pending: PendingImage[] = [];
+		const next: (Blob | File)[] = [];
+		let errored = false;
+
+		setImageProcessing(imageProcessing() + 1);
+
+		for (let idx = 0, len = files.length; idx < len; idx++) {
+			const file = files[idx];
+
+			if (!file.type.startsWith('image/')) {
+				continue;
+			}
+
+			try {
+				const compressed = await compress(file);
+
+				const blob = compressed.blob;
+				const before = compressed.before;
+				const after = compressed.after;
+
+				if (after.size !== before.size) {
+					pending.push({ ...compressed, name: file.name });
+				} else {
+					next.push(blob);
+				}
+			} catch (err) {
+				console.error(`Failed to compress image`, err);
+				errored = true;
+			}
+		}
+
+		batch(() => {
+			setImageProcessing(imageProcessing() - 1);
+			setPendingImages(pendingImages().concat(pending));
+			addImagesUncompressed(next);
+
+			if (errored) {
+				setMessage(`Failed to add some of your images, please try again.`);
+			}
+		});
+	};
+
+	const handleFileInput = async (ev: Event) => {
+		const target = ev.currentTarget as HTMLInputElement;
+		const files = Array.from(target.files!);
+
+		target.value = '';
+		editor()!.view.focus();
+
+		if (images().length + files.length > MAX_IMAGE) {
+			setMessage(`You can only add up to 4 images in a single post`);
+		} else {
+			setMessage('');
+			addImages(files);
+		}
+	};
+
 	const editor = createTiptapEditor(() => ({
-		element: ref!,
+		element: editorRef!,
 		extensions: [
 			Document,
 			Paragraph,
@@ -197,6 +340,28 @@ const AuthenticatedComposePage = () => {
 				},
 			}),
 		],
+		editorProps: {
+			handlePaste(view, event) {
+				const items = event.clipboardData?.items;
+
+				if (!items) {
+					return;
+				}
+
+				for (let idx = 0, len = items.length; idx < len; idx++) {
+					const item = items[idx];
+					const kind = item.kind;
+					const type = item.type;
+
+					if (kind === 'file') {
+						const blob = item.getAsFile();
+
+						if (blob) {
+						}
+					}
+				}
+			},
+		},
 		onUpdate({ editor }) {
 			const json = editor.getJSON();
 			const rt = pm2rt(json);
@@ -205,7 +370,7 @@ const AuthenticatedComposePage = () => {
 	}));
 
 	useBeforeLeave((ev) => {
-		if (state() < PostState.SENT && length() > 0) {
+		if (state() < PostState.SENT && (length() > 0 || images().length > 0)) {
 			ev.preventDefault();
 
 			if (window.confirm('Discard post?')) {
@@ -219,6 +384,15 @@ const AuthenticatedComposePage = () => {
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Compose</p>
 			</div>
+
+			<input
+				ref={fileInputRef}
+				type="file"
+				multiple
+				accept="image/*"
+				onChange={handleFileInput}
+				class="hidden"
+			/>
 
 			<Switch>
 				<Match when={replyQuery.isInitialLoading}>
@@ -240,15 +414,56 @@ const AuthenticatedComposePage = () => {
 				</div>
 
 				<div class="min-w-0 grow">
-					<div ref={ref} class="compose-editor" />
+					<div ref={editorRef} class="compose-editor" />
 
 					<div class="pb-4 pr-3 empty:hidden">
-						<Show when={error()}>
-							{(msg) => <div class="rounded-md border border-divider text-sm">Failed to post: {msg()}</div>}
+						<Show when={message()}>
+							{(msg) => <div class="rounded-md border border-divider px-3 py-2 text-sm">{msg()}</div>}
 						</Show>
 					</div>
 
-					<div class="flex items-center gap-3 px-3">
+					<div class="flex flex-wrap gap-3 pb-4 pr-3 empty:hidden">
+						<For each={images()}>
+							{(image, idx) => (
+								<div class="relative">
+									<BlobImage src={image.blob} class="h-32 w-32 rounded-md object-cover" />
+
+									<button
+										title="Remove image"
+										disabled={!isEnabled()}
+										onClick={() => {
+											const next = images().slice();
+											next.splice(idx(), 1);
+
+											setImages(next);
+										}}
+										class="absolute right-1 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-fg"
+									>
+										<CloseIcon />
+									</button>
+								</div>
+							)}
+						</For>
+					</div>
+
+					<div class="flex items-center gap-3 pr-3">
+						<Show
+							when={imageProcessing() < 1}
+							fallback={
+								<div class="flex h-9 w-9 items-center justify-center">
+									<CircularProgress />
+								</div>
+							}
+						>
+							<button
+								title="Add image"
+								onClick={() => fileInputRef!.click()}
+								class="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-secondary"
+							>
+								<ImageIcon />
+							</button>
+						</Show>
+
 						<div class="grow" />
 
 						<span class="text-sm" classList={{ 'text-red-600': length() > GRAPHEME_LIMIT }}>
@@ -265,6 +480,80 @@ const AuthenticatedComposePage = () => {
 					</div>
 				</div>
 			</div>
+
+			<Dialog.Root open={pendingImages().length > 0}>
+				<Dialog.Portal>
+					<Dialog.Overlay class={/* @once */ dialog.overlay()} />
+
+					<div class={/* @once */ dialog.positioner()}>
+						<Dialog.Content class={/* @once */ dialog.content()}>
+							<Dialog.Title class={/* @once */ dialog.title()}>Image has been adjusted</Dialog.Title>
+
+							<p class="mt-3 text-sm">
+								The images you tried inserting has been adjusted to fit within the upload limits, would you
+								like to proceed?
+							</p>
+
+							<div class="mt-6 flex flex-col gap-3">
+								<For each={pendingImages()}>
+									{(image) => {
+										const before = image.before;
+										const after = image.after;
+
+										return (
+											<div class="flex items-center gap-3">
+												<BlobImage src={image.blob} class="h-20 w-20 shrink-0 rounded-md object-cover" />
+
+												<div class="flex min-w-0 flex-col gap-0.5 text-sm">
+													<p class="line-clamp-1 break-words font-bold">{image.name}</p>
+													<p>
+														{before.width}x{before.height} → {after.width}x{after.height}
+													</p>
+													<p>
+														<span>
+															{formatSize(before.size)} → {formatSize(after.size)}
+														</span>{' '}
+														<span class="whitespace-nowrap text-muted-fg">({image.quality}% quality)</span>
+													</p>
+												</div>
+											</div>
+										);
+									}}
+								</For>
+							</div>
+
+							<div class={/* @once */ dialog.actions()}>
+								<button
+									onClick={() => {
+										setPendingImages([]);
+										editor()!.view.focus();
+									}}
+									class={/* @once */ button({ color: 'ghost' })}
+								>
+									Cancel
+								</button>
+								<button
+									onClick={() => {
+										batch(() => {
+											const next = pendingImages().map((img) => img.blob);
+
+											batch(() => {
+												setPendingImages([]);
+												addImagesUncompressed(next);
+											});
+
+											editor()!.view.focus();
+										});
+									}}
+									class={/* @once */ button({ color: 'primary' })}
+								>
+									Confirm
+								</button>
+							</div>
+						</Dialog.Content>
+					</div>
+				</Dialog.Portal>
+			</Dialog.Root>
 		</div>
 	);
 };

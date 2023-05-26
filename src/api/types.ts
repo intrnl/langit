@@ -69,18 +69,16 @@ export interface BskyProfileTypeaheadSearch {
 	};
 }
 
-export interface BskyPostRecordEmbed {
+export interface BskyPostRecordEmbedImage {
+	$type: 'app.bsky.embed.images';
 	images: Array<{
 		alt: string;
-		image: {
-			$type: 'blob';
-			ref: {
-				$link: string;
-			};
-			mimeType: string;
-			size: number;
-		};
+		image: BskyBlob;
 	}>;
+}
+
+export interface BskyPostRecordEmbedRecord {
+	$type: 'app.bsky.embed.record';
 	record: {
 		cid: string;
 		uri: string;
@@ -101,7 +99,7 @@ export interface BskyPostRecord {
 		root: BskyPostRecordReply;
 		parent: BskyPostRecordReply;
 	};
-	embed?: BskyPostRecordEmbed;
+	embed?: BskyPostRecordEmbedImage | BskyPostRecordEmbedRecord;
 }
 
 export interface EmbeddedLink {
@@ -323,4 +321,13 @@ export interface BskyLikedByResponse {
 		indexedAt: string;
 		actor: BskyProfileFollow;
 	}>;
+}
+
+export interface BskyBlob {
+	$type: 'blob';
+	mimeType: string;
+	ref: {
+		$link: string;
+	}
+	size: number;
 }

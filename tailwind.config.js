@@ -49,6 +49,7 @@ export default {
 			input: 'rgb(var(--input))',
 			divider: 'rgb(var(--divider))',
 
+			black: colors.black,
 			red: colors.red,
 			green: colors.green,
 		},

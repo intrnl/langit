@@ -24,7 +24,7 @@
 		--divider: 209 213 219; /* gray-300 */
 	}
 
-	html {
-		scrollbar-gutter: stable;
+	body {
+		overflow-y: scroll;
 	}
 }

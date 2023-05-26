@@ -129,6 +129,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 				read: item.isRead,
 				key: key,
 				date: date,
+				// @ts-expect-error
 				items: [item],
 			});
 		} else if (reason === 'reply') {

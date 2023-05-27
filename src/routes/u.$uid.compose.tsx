@@ -522,7 +522,6 @@ const AuthenticatedComposePage = () => {
 						<button
 							onClick={() => {
 								setPendingImages([]);
-								editor()!.view.focus();
 							}}
 							class={/* @once */ button({ color: 'ghost' })}
 						>
@@ -537,8 +536,6 @@ const AuthenticatedComposePage = () => {
 										setPendingImages([]);
 										addImagesUncompressed(next);
 									});
-
-									editor()!.view.focus();
 								});
 							}}
 							class={/* @once */ button({ color: 'primary' })}

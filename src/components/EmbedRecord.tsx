@@ -53,10 +53,10 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 					<Show when={author().avatar}>{(avatar) => <img src={avatar()} class="h-full w-full" />}</Show>
 				</div>
 
-				<span class="line-clamp-1 whitespace-pre-wrap break-words break-all font-bold text-primary group-hover:underline">
+				<span class="line-clamp-1 break-all font-bold text-primary group-hover:underline">
 					{author().displayName}
 				</span>
-				<span class="ml-1 line-clamp-1 whitespace-pre-wrap break-all">@{author().handle}</span>
+				<span class="ml-1 line-clamp-1 break-all">@{author().handle}</span>
 				<span class="px-1">·</span>
 				<span class="whitespace-nowrap">{relformat.format(val().createdAt)}</span>
 			</div>

@@ -715,11 +715,11 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 											</div>
 
 											<div class="flex grow flex-col text-sm">
-												<span class="line-clamp-1 whitespace-pre-wrap break-words break-all font-bold">
+												<span class="line-clamp-1 break-all font-bold">
 													{item.displayName}
 												</span>
 
-												<span class="line-clamp-1 shrink-0 whitespace-pre-wrap break-all text-muted-fg">
+												<span class="line-clamp-1 shrink-0 break-all text-muted-fg">
 													@{item.handle}
 												</span>
 											</div>

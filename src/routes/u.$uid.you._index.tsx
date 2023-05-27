@@ -76,10 +76,10 @@ const AuthenticatedYouPage = () => {
 								<Match when={profile}>
 									{(profile) => (
 										<div class="flex grow flex-col text-sm">
-											<span class="line-clamp-1 whitespace-pre-wrap break-words break-all font-bold">
+											<span class="line-clamp-1 break-all font-bold">
 												{profile().displayName || profile().handle}
 											</span>
-											<span class="line-clamp-1 whitespace-pre-wrap break-all text-muted-fg">
+											<span class="line-clamp-1 break-all text-muted-fg">
 												@{profile().handle}
 											</span>
 											<Show when={did === asDefault()}>

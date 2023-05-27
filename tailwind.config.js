@@ -1,9 +1,6 @@
 import colors from 'tailwindcss/colors';
 import plugin from 'tailwindcss/plugin';
 
-import kobalte from '@kobalte/tailwindcss';
-import animate from 'tailwindcss-animate';
-
 /** @type {import('tailwindcss').Config} */
 export default {
 	content: ['./src/**/*.{ts,tsx}'],
@@ -61,7 +58,6 @@ export default {
 		},
 	},
 	plugins: [
-		kobalte(),
 		plugin(({ addVariant }) => {
 			addVariant('modal', '&:modal');
 		}),

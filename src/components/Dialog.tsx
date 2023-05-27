@@ -6,6 +6,8 @@ export interface DialogProps extends Pick<ComponentProps<'svg'>, 'children'> {
 	onClose?: () => void;
 }
 
+let checked = false;
+
 const Dialog = (props: DialogProps) => {
 	let dialog: HTMLDialogElement | undefined;
 
@@ -34,10 +36,17 @@ const Dialog = (props: DialogProps) => {
 				}
 			}
 
-			const doc = getOwnerDocument(dialog);
-			const scrollbarSize = getScrollbarSize(doc);
+			const body = document.body;
 
-			doc.documentElement.style.setProperty('--sb-width', `${scrollbarSize}px`);
+			if (
+				!checked &&
+				(body.scrollHeight > body.clientHeight || getComputedStyle(body).overflowY === 'scroll')
+			) {
+				const scrollbarSize = getScrollbarSize(document);
+
+				checked = true;
+				document.documentElement.style.setProperty('--sb-width', `${scrollbarSize}px`);
+			}
 
 			dialog.returnValue = '';
 			dialog.showModal();

@@ -23,12 +23,24 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status.likes.tsx")),
       },
       {
+        path: "profile/:actor/feed/:feed",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.feed.$feed.tsx")),
+      },
+      {
         path: "profile/:actor/followers",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.followers.tsx")),
       },
       {
         path: "profile/:actor/follows",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.follows.tsx")),
+      },
+      {
+        path: "settings/explore",
+        component: lazy(() => import("./routes/u.$uid.settings.explore._index.tsx")),
+      },
+      {
+        path: "settings/explore/add",
+        component: lazy(() => import("./routes/u.$uid.settings.explore.add.tsx")),
       },
       {
         path: "profile/:actor",
@@ -65,12 +77,12 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.compose.tsx")),
       },
       {
-        path: "/",
-        component: lazy(() => import("./routes/u.$uid._index.tsx")),
+        path: "explore",
+        component: lazy(() => import("./routes/u.$uid.explore.tsx")),
       },
       {
-        path: "search",
-        component: lazy(() => import("./routes/u.$uid.search.tsx")),
+        path: "/",
+        component: lazy(() => import("./routes/u.$uid._index.tsx")),
       },
     ],
   },

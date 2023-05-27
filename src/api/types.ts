@@ -345,3 +345,23 @@ export interface BskyBlob {
 	};
 	size: number;
 }
+
+export interface BskyFeedGenerator {
+	uri: string;
+	cid: string;
+	did?: string;
+	creator: BskyProfileBasic;
+	displayName: string;
+	description?: string;
+	descriptionFacets?: Facet[];
+	avatar?: string;
+	likeCount?: number;
+	indexedAt: string;
+	viewer?: {
+		like?: string;
+	};
+}
+
+export interface BskyGetFeedGeneratorsResponse {
+	feeds: BskyFeedGenerator[];
+}

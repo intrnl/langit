@@ -13,10 +13,11 @@ import { A, useParams } from '~/router.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 
 import AddBoxIcon from '~/icons/baseline-add-box.tsx';
+import ExploreIcon from '~/icons/baseline-explore.tsx';
 import HomeIcon from '~/icons/baseline-home.tsx';
 import NotificationsIcon from '~/icons/baseline-notifications.tsx';
-import SearchIcon from '~/icons/baseline-search.tsx';
 import AddBoxOutlinedIcon from '~/icons/outline-add-box.tsx';
+import ExploreOutlinedIcon from '~/icons/outline-explore.tsx';
 import HomeOutlinedIcon from '~/icons/outline-home.tsx';
 import NotificationsOutlinedIcon from '~/icons/outline-notifications.tsx';
 
@@ -70,17 +71,18 @@ const AuthenticatedLayout = () => {
 						</A>
 
 						<A
-							href="/u/:uid/search"
+							href="/u/:uid/explore"
 							params={{ uid: params.uid }}
 							title="Search"
 							class="group flex items-center rounded-md hover:bg-hinted"
 							activeClass="is-active"
 						>
 							<div class="p-2">
-								<SearchIcon class="text-2xl group-[.is-active]:stroke-primary" />
+								<ExploreOutlinedIcon class="text-2xl group-[.is-active]:hidden" />
+								<ExploreIcon class="hidden text-2xl group-[.is-active]:block" />
 							</div>
 
-							<span class="hidden text-base group-[.is-active]:font-medium xl:inline">Search</span>
+							<span class="hidden text-base group-[.is-active]:font-medium xl:inline">Explore</span>
 						</A>
 
 						<A
@@ -164,13 +166,14 @@ const AuthenticatedLayout = () => {
 						<HomeIcon class="hidden group-[.is-active]:block" />
 					</A>
 					<A
-						href="/u/:uid/search"
+						href="/u/:uid/explore"
 						params={{ uid: params.uid }}
-						title="Search"
+						title="Explore"
 						class="group flex grow basis-0 items-center justify-center text-2xl"
 						activeClass="is-active"
 					>
-						<SearchIcon class="group-[.is-active]:stroke-primary" />
+						<ExploreOutlinedIcon class="group-[.is-active]:hidden" />
+						<ExploreIcon class="hidden group-[.is-active]:block" />
 					</A>
 					<A
 						href="/u/:uid/compose"

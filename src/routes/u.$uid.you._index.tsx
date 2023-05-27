@@ -1,6 +1,4 @@
-import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
-
-import { DropdownMenu } from '@kobalte/core';
+import { For, Show, createMemo, createSignal } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
 
@@ -14,7 +12,7 @@ import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 import Dialog from '~/components/Dialog.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
-import { dropdownItem, dropdownMenu } from '~/styles/primitives/dropdown-menu.ts';
+import * as menu from '~/styles/primitives/menu.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import AddIcon from '~/icons/baseline-add.tsx';
@@ -47,6 +45,8 @@ const AuthenticatedYouPage = () => {
 					const profile = account.profile;
 					const did = account.did;
 
+					const [open, setOpen] = createSignal(false);
+
 					const handleClick = (ev: MouseEvent | KeyboardEvent) => {
 						if (!isElementClicked(ev)) {
 							return;
@@ -55,26 +55,28 @@ const AuthenticatedYouPage = () => {
 						const path = `/u/${did}`;
 
 						if (isElementAltClicked(ev)) {
-							open(path, '_blank');
+							window.open(path, '_blank');
 						} else {
 							navigate(path);
 						}
 					};
 
 					return (
-						<div
-							tabindex={0}
-							onClick={handleClick}
-							onAuxClick={handleClick}
-							onKeyDown={handleClick}
-							class="group flex cursor-pointer items-center gap-4 px-4 py-3 text-left hover:bg-hinted"
-						>
-							<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-hinted-fg">
-								<Show when={profile?.avatar}>{(avatar) => <img src={avatar()} class="h-full w-full" />}</Show>
-							</div>
+						<>
+							<div
+								tabindex={0}
+								onClick={handleClick}
+								onAuxClick={handleClick}
+								onKeyDown={handleClick}
+								class="group flex cursor-pointer items-center gap-4 px-4 py-3 text-left hover:bg-hinted"
+							>
+								<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-hinted-fg">
+									<Show when={profile?.avatar}>
+										{(avatar) => <img src={avatar()} class="h-full w-full" />}
+									</Show>
+								</div>
 
-							<Switch fallback={<div class="grow text-sm">{did}</div>}>
-								<Match when={profile}>
+								<Show when={profile} fallback={<div class="grow text-sm">{did}</div>}>
 									{(profile) => (
 										<div class="flex grow flex-col text-sm">
 											<span class="line-clamp-1 break-all font-bold">
@@ -86,38 +88,54 @@ const AuthenticatedYouPage = () => {
 											</Show>
 										</div>
 									)}
-								</Match>
-							</Switch>
+								</Show>
 
-							<div>
-								<DropdownMenu.Root placement="bottom-end">
-									<DropdownMenu.Trigger class="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary">
+								<div>
+									<button
+										onClick={() => setOpen(true)}
+										class="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
+									>
 										<MoreHorizIcon />
-									</DropdownMenu.Trigger>
-
-									<DropdownMenu.Portal>
-										<DropdownMenu.Content class={/* @once */ dropdownMenu()}>
-											<DropdownMenu.Item
-												as="button"
-												onSelect={() => setToLogout(account)}
-												class={/* @once */ dropdownItem()}
-											>
-												Sign out
-											</DropdownMenu.Item>
-
-											<DropdownMenu.Item
-												as="button"
-												onSelect={() => (multiagent.active = did)}
-												disabled={did === asDefault()}
-												class={/* @once */ dropdownItem()}
-											>
-												Set as default
-											</DropdownMenu.Item>
-										</DropdownMenu.Content>
-									</DropdownMenu.Portal>
-								</DropdownMenu.Root>
+									</button>
+								</div>
 							</div>
-						</div>
+
+							<Dialog open={open()} onClose={() => setOpen(false)}>
+								<div class={/* @once */ menu.content()}>
+									<div class={/* @once */ menu.title()}>{profile ? `@${profile.handle}` : did}</div>
+
+									<button
+										onClick={() => {
+											setToLogout(account);
+											setOpen(false);
+										}}
+										class={/* @once */ menu.item()}
+									>
+										Sign out
+									</button>
+
+									<button
+										disabled={did === asDefault()}
+										onClick={() => {
+											multiagent.active = did;
+											setOpen(false);
+										}}
+										class={/* @once */ menu.item()}
+									>
+										Set as default
+									</button>
+
+									<button
+										onClick={() => {
+											setOpen(false);
+										}}
+										class={/* @once */ menu.cancel()}
+									>
+										Cancel
+									</button>
+								</div>
+							</Dialog>
+						</>
 					);
 				}}
 			</For>

@@ -33,11 +33,7 @@ interface MultiagentStorage {
 	accounts: Record<DID, MultiagentAccountData>;
 }
 
-const noop = () => {};
-
 export class Multiagent {
-	private _promise?: Promise<void>;
-
 	public storage: ReactiveLocalStorage<MultiagentStorage>;
 
 	/**
@@ -70,15 +66,10 @@ export class Multiagent {
 	 * Login with a new account
 	 */
 	async login({ service, identifier, password }: MultiagentLoginOptions): Promise<DID> {
-		await this._promise;
-
 		const agent = this._createAgent(service);
 
 		try {
-			const promise = agent.login({ identifier, password });
-			this._promise = promise.then(noop, noop);
-
-			await promise;
+			await agent.login({ identifier, password });
 
 			// check if there are existing accounts that shares the same account,
 			// if so, use that instead.
@@ -112,9 +103,7 @@ export class Multiagent {
 	/**
 	 * Log out from account
 	 */
-	async logout(did: DID): Promise<void> {
-		await this._promise;
-
+	logout(did: DID): void {
 		if (!(did in this.accounts)) {
 			return;
 		}
@@ -146,8 +135,6 @@ export class Multiagent {
 	 * Retrieve an agent associated with an account
 	 */
 	async connect(did: DID): Promise<Agent> {
-		await this._promise;
-
 		if (did in this.agents) {
 			return this.agents[did];
 		}
@@ -162,14 +149,12 @@ export class Multiagent {
 		const agent = this._createAgent(data.service);
 
 		try {
-			const promise = agent.resumeSession(data.session);
-			this._promise = promise.then(noop, noop);
-
-			await promise;
-
 			this.agents[did] = agent;
+			await agent.resumeSession(data.session);
+
 			return agent;
 		} catch (err) {
+			delete this.agents[did];
 			throw new Error(`Failed to resume session`, { cause: err });
 		}
 	}

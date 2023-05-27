@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
-import { Dialog, DropdownMenu } from '@kobalte/core';
+import { DropdownMenu } from '@kobalte/core';
 
 import { useNavigate } from '@solidjs/router';
 
@@ -11,6 +11,7 @@ import { type DID } from '~/api/utils.ts';
 import { A, useParams } from '~/router.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
+import Dialog from '~/components/Dialog.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
 import { dropdownItem, dropdownMenu } from '~/styles/primitives/dropdown-menu.ts';
@@ -79,9 +80,7 @@ const AuthenticatedYouPage = () => {
 											<span class="line-clamp-1 break-all font-bold">
 												{profile().displayName || profile().handle}
 											</span>
-											<span class="line-clamp-1 break-all text-muted-fg">
-												@{profile().handle}
-											</span>
+											<span class="line-clamp-1 break-all text-muted-fg">@{profile().handle}</span>
 											<Show when={did === asDefault()}>
 												<span class="text-muted-fg">Default account</span>
 											</Show>
@@ -148,48 +147,42 @@ const AuthenticatedYouPage = () => {
 				<span>Invite codes</span>
 			</A>
 
-			<Dialog.Root open={toLogout() !== undefined}>
-				<Dialog.Portal>
-					<Dialog.Overlay class={/* @once */ dialog.overlay()} />
+			<Dialog open={toLogout() !== undefined}>
+				<div class={/* @once */ dialog.content()}>
+					<h1 class={/* @once */ dialog.title()}>Sign out?</h1>
 
-					<div class={/* @once */ dialog.positioner()}>
-						<Dialog.Content class={/* @once */ dialog.content()}>
-							<Dialog.Title class={/* @once */ dialog.title()}>Sign out?</Dialog.Title>
+					<p class="mt-3 text-sm">
+						This will sign you out of{' '}
+						{toLogout()!.profile ? `@${toLogout()!.profile!.handle}` : toLogout()!.did}, and you'll still be
+						signed in to other accounts.
+					</p>
 
-							<p class="mt-3 text-sm">
-								This will sign you out of{' '}
-								{toLogout() && (toLogout()!.profile ? `@${toLogout()!.profile!.handle}` : toLogout()!.did)},
-								and you'll still be signed in to other accounts.
-							</p>
+					<div class={/* @once */ dialog.actions()}>
+						<button
+							onClick={() => {
+								setToLogout(undefined);
+							}}
+							class={/* @once */ button({ color: 'ghost' })}
+						>
+							Cancel
+						</button>
+						<button
+							onClick={() => {
+								const did = toLogout()!.did;
 
-							<div class={/* @once */ dialog.actions()}>
-								<button
-									onClick={() => {
-										setToLogout(undefined);
-									}}
-									class={/* @once */ button({ color: 'ghost' })}
-								>
-									Cancel
-								</button>
-								<button
-									onClick={async () => {
-										const did = toLogout()!.did;
+								multiagent.logout(did);
 
-										await multiagent.logout(did);
-
-										if (uid() === did) {
-											navigate('/');
-										}
-									}}
-									class={/* @once */ button({ color: 'primary' })}
-								>
-									Sign out
-								</button>
-							</div>
-						</Dialog.Content>
+								if (uid() === did) {
+									navigate('/');
+								}
+							}}
+							class={/* @once */ button({ color: 'primary' })}
+						>
+							Sign out
+						</button>
 					</div>
-				</Dialog.Portal>
-			</Dialog.Root>
+				</div>
+			</Dialog>
 		</div>
 	);
 };

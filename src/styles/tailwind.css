@@ -25,6 +25,14 @@
 	}
 
 	body {
-		overflow-y: scroll;
+		@apply overflow-y-scroll bg-background text-primary;
+	}
+
+	dialog {
+		@apply text-left text-base font-normal text-primary;
+	}
+
+	body:has(dialog[data-modal][open]) {
+		@apply overflow-hidden pr-[--sb-width];
 	}
 }

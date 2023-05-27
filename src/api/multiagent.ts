@@ -71,17 +71,8 @@ export class Multiagent {
 		try {
 			await agent.login({ identifier, password });
 
-			// check if there are existing accounts that shares the same account,
-			// if so, use that instead.
 			const session = agent.session.value!;
 			const did = session.did;
-
-			const accounts = this.accounts;
-
-			if (accounts && did in accounts) {
-				this.storage.set('active', did);
-				return did;
-			}
 
 			this.storage.set('active', did);
 			this.storage.set('accounts', {

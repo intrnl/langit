@@ -36,7 +36,7 @@ const PostDropdown = (props: PostDropdownProps) => {
 						}}
 						class={/* @once */ menu.item()}
 					>
-						Sign out
+						Open in Bluesky app
 					</button>
 
 					<button

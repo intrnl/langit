@@ -31,7 +31,7 @@ const AuthenticatedExplorePage = () => {
 
 	return (
 		<div class="flex flex-col pb-4">
-			<div class="sticky top-0 z-10 flex h-13 items-center gap-4 border-b border-divider bg-background px-4">
+			<div class="sticky top-0 z-20 flex h-13 items-center gap-4 border-b border-divider bg-background px-4">
 				{/* <input placeholder="Search Bluesky" class={input()} /> */}
 				<p class="grow text-base font-bold">Explore</p>
 
@@ -45,9 +45,14 @@ const AuthenticatedExplorePage = () => {
 			</div>
 
 			<SuspenseList revealOrder="forwards" tail="collapsed">
-				<For each={savedFeeds()} fallback={<div>
-					<p class='p-4 text-sm text-muted-fg'>It's empty, how about adding some feeds here?</p>
-				</div>}>
+				<For
+					each={savedFeeds()}
+					fallback={
+						<div>
+							<p class="p-4 text-sm text-muted-fg">It's empty, how about adding some feeds here?</p>
+						</div>
+					}
+				>
 					{(feedUri) => {
 						const feedQuery = createQuery({
 							queryKey: () => getFeedGeneratorKey(uid(), feedUri),
@@ -78,7 +83,7 @@ const AuthenticatedExplorePage = () => {
 								}
 							>
 								<div>
-									<div class="flex h-13 items-center gap-4 px-4">
+									<div class="sticky top-13 z-10 flex h-13 items-center gap-4 bg-background px-4">
 										<div class="h-6 w-6 overflow-hidden rounded-md bg-hinted-fg">
 											<Show when={feed()?.avatar.value}>
 												{(avatar) => <img src={avatar()} class="h-full w-full" />}

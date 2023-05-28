@@ -153,7 +153,7 @@ const AuthenticatedLayout = () => {
 			<div class="hidden basis-1/4 xl:block"></div>
 
 			<Show when={!isDesktop()}>
-				<div class="sticky bottom-0 flex h-13 border-t border-divider bg-background text-primary">
+				<div class="sticky bottom-0 z-30 flex h-13 border-t border-divider bg-background text-primary">
 					<A
 						href="/u/:uid"
 						params={{ uid: params.uid }}

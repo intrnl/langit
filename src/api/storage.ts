@@ -28,6 +28,13 @@ export class ReactiveStorage<T extends StorageType> extends Signal<T> {
 		return this._key(key).value;
 	}
 
+	merge<K extends keyof T>(key: K, value: T[K] extends Record<string, any> | undefined ? Partial<T[K]> : never) {
+		this.set(key, {
+			...this.get(key),
+			...value,
+		});
+	}
+
 	clear() {
 		this.value = null as any;
 		this._keys = Object.create(null);

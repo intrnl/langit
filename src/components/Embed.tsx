@@ -1,6 +1,6 @@
 import { Match, Show, Switch, createMemo } from 'solid-js';
 
-import { type BskyPost, type EmbeddedImage, type EmbeddedLink, type EmbeddedRecord } from '~/api/types.ts';
+import { type BskyPost, type EmbeddedImage, type EmbeddedLink, type EmbeddedPostRecord } from '~/api/types.ts';
 
 import EmbedImage from '~/components/EmbedImage.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';
@@ -21,7 +21,7 @@ const Embed = (props: EmbedProps) => {
 
 		let images: EmbeddedImage[] | undefined;
 		let link: EmbeddedLink | undefined;
-		let record: EmbeddedRecord | false | undefined;
+		let post: EmbeddedPostRecord | false | undefined;
 
 		if (type === 'app.bsky.embed.external#view') {
 			link = embed.external;
@@ -31,9 +31,9 @@ const Embed = (props: EmbedProps) => {
 			const rec = embed.record;
 
 			if (rec.$type === 'app.bsky.embed.record#viewRecord') {
-				record = rec;
+				post = rec;
 			} else {
-				record = false;
+				post = false;
 			}
 		} else if (type === 'app.bsky.embed.recordWithMedia#view') {
 			const rec = embed.record.record;
@@ -42,9 +42,9 @@ const Embed = (props: EmbedProps) => {
 			const mediatype = media.$type;
 
 			if (rec.$type === 'app.bsky.embed.record#viewRecord') {
-				record = rec;
+				post = rec;
 			} else {
-				record = false;
+				post = false;
 			}
 
 			if (mediatype === 'app.bsky.embed.external#view') {
@@ -54,7 +54,7 @@ const Embed = (props: EmbedProps) => {
 			}
 		}
 
-		return { images, link, record };
+		return { images, link, post };
 	});
 
 	return (
@@ -64,10 +64,10 @@ const Embed = (props: EmbedProps) => {
 			<Show when={val().images}>{(images) => <EmbedImage images={images()} />}</Show>
 
 			<Switch>
-				<Match when={val().record === false}>
+				<Match when={val().post === false}>
 					<EmbedRecordNotFound />
 				</Match>
-				<Match when={val().record}>
+				<Match when={val().post}>
 					{(record) => <EmbedRecord uid={props.uid} record={record()} large={props.large} />}
 				</Match>
 			</Switch>

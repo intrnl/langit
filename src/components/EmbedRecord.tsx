@@ -1,6 +1,6 @@
 import { Show, createMemo } from 'solid-js';
 
-import { type EmbeddedRecord } from '~/api/types.ts';
+import { type EmbeddedPostRecord } from '~/api/types.ts';
 import { getRecordId } from '~/api/utils.ts';
 
 import { A } from '~/router';
@@ -11,7 +11,7 @@ import * as relformat from '~/utils/intl/relformatter.ts';
 
 export interface EmbedRecordProps {
 	uid: string;
-	record: EmbeddedRecord;
+	record: EmbeddedPostRecord;
 	/** Whether it should show a large UI for image embeds */
 	large?: boolean;
 }

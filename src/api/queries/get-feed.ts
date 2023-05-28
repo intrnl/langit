@@ -5,24 +5,22 @@ import { createTimelinePage } from '../models/timeline.ts';
 import { type BskyTimelineResponse } from '../types.ts';
 import { type DID } from '../utils.ts';
 
-export const getFeedKey = (uid: DID, uri: string) => ['getFeed', uid, uri] as const;
-export const createFeedQuery = (limit: number) => {
-	return async (ctx: QueryFunctionContext<ReturnType<typeof getFeedKey>, string>) => {
-		const [, uid, uri] = ctx.queryKey;
+export const getFeedKey = (uid: DID, uri: string, limit: number) => ['getFeed', uid, uri, limit] as const;
+export const getFeed = async (ctx: QueryFunctionContext<ReturnType<typeof getFeedKey>, string>) => {
+	const [, uid, uri, limit] = ctx.queryKey;
 
-		const agent = await multiagent.connect(uid);
+	const agent = await multiagent.connect(uid);
 
-		const response = await agent.rpc.get({
-			method: 'app.bsky.feed.getFeed',
-			signal: ctx.signal,
-			params: { feed: uri, cursor: ctx.pageParam, limit },
-		});
+	const response = await agent.rpc.get({
+		method: 'app.bsky.feed.getFeed',
+		signal: ctx.signal,
+		params: { feed: uri, cursor: ctx.pageParam, limit },
+	});
 
-		const data = response.data as BskyTimelineResponse;
-		const page = createTimelinePage(data);
+	const data = response.data as BskyTimelineResponse;
+	const page = createTimelinePage(data);
 
-		return page;
-	};
+	return page;
 };
 
 export const getFeedLatestKey = (uid: DID, uri: string) => ['getTimelineLatest', uid, uri] as const;

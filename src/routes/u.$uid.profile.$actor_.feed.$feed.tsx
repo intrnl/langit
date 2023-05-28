@@ -1,8 +1,9 @@
-import { Match, Show, Switch } from 'solid-js';
+import { Match, Show, Switch, createMemo } from 'solid-js';
 
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
+import { preferences } from '~/api/global.ts';
 import { type TimelinePage } from '~/api/models/timeline.ts';
 import { type DID } from '~/api/utils.ts';
 
@@ -11,15 +12,15 @@ import {
 	getFeedGenerator,
 	getFeedGeneratorKey,
 } from '~/api/queries/get-feed-generator.ts';
-import { createFeedQuery, getFeedKey, getFeedLatest, getFeedLatestKey } from '~/api/queries/get-feed.ts';
+import { getFeed, getFeedKey, getFeedLatest, getFeedLatestKey } from '~/api/queries/get-feed.ts';
 import { getProfileDid, getProfileDidKey } from '~/api/queries/get-profile-did.ts';
 
 import { useParams } from '~/router.ts';
 
-import CircularProgress from '~/components/CircularProgress.tsx';
+import Timeline from '~/components/Timeline.tsx';
 
 import AddIcon from '~/icons/baseline-add.tsx';
-import Timeline from '~/components/Timeline';
+import DeleteIcon from '~/icons/baseline-delete.tsx';
 
 const PAGE_SIZE = 30;
 
@@ -56,8 +57,8 @@ const AuthenticatedFeedPage = () => {
 	});
 
 	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getFeedKey(uid(), feedUri()),
-		queryFn: createFeedQuery(PAGE_SIZE),
+		queryKey: () => getFeedKey(uid(), feedUri(), PAGE_SIZE),
+		queryFn: getFeed,
 		getNextPageParam: (last) => last.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
@@ -101,6 +102,32 @@ const AuthenticatedFeedPage = () => {
 		},
 	});
 
+	const isSaved = createMemo(() => {
+		const prefs = preferences.get(uid());
+		const saved = prefs?.savedFeeds;
+
+		return !!saved && saved.includes(feedUri());
+	});
+
+	const toggleSave = () => {
+		const prefs = preferences.get(uid());
+		const saved = prefs?.savedFeeds;
+
+		const uri = feedUri();
+
+		if (isSaved()) {
+			const idx = saved!.indexOf(uri);
+			const next = saved!.slice();
+
+			next.splice(idx, 1);
+			preferences.merge(uid(), { savedFeeds: next });
+		} else {
+			const next = saved ? saved.concat(uri) : [uri];
+
+			preferences.merge(uid(), { savedFeeds: next });
+		}
+	};
+
 	return (
 		<div class="flex flex-col">
 			<div
@@ -113,8 +140,12 @@ const AuthenticatedFeedPage = () => {
 					</Match>
 
 					<Match when={infoQuery.data}>
-						<button class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base hover:bg-secondary">
-							<AddIcon />
+						<button
+							title={isSaved() ? `Remove feed` : 'Add feed'}
+							onClick={toggleSave}
+							class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base hover:bg-secondary"
+						>
+							{isSaved() ? <DeleteIcon /> : <AddIcon />}
 						</button>
 					</Match>
 				</Switch>
@@ -149,7 +180,7 @@ const AuthenticatedFeedPage = () => {
 								<p class="text-sm text-muted-fg">Liked by {feed().likeCount.value} users</p>
 							</div>
 
-							<hr class="sticky top-13 -mt-px border-divider" />
+							<hr class="sticky z-10 border-divider" style={{ top: `calc(3.25rem - 1px)` }} />
 						</>
 					);
 				}}
@@ -171,7 +202,7 @@ const AuthenticatedFeedPage = () => {
 						// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
 						// but unfortunately that breaks the `hasNextPage` check down below
 						// and would also mean the user gets to see nothing for a bit.
-						client.setQueryData(getFeedKey(uid(), feedUri()), (prev?: InfiniteData<TimelinePage>) => {
+						client.setQueryData(getFeedKey(uid(), feedUri(), PAGE_SIZE), (prev?: InfiniteData<TimelinePage>) => {
 							if (prev) {
 								return {
 									pages: prev.pages.slice(0, 1),

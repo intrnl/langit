@@ -32,9 +32,10 @@ export const createProfileFeedQuery = (limit: number) => {
 				first.reply &&
 				(!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')
 			) {
+				const root = first.reply.root;
 				const parent = first.reply.parent;
 
-				if (parent.author.did !== did) {
+				if (root.author.did !== did || parent.author.did !== did) {
 					return false;
 				}
 			}

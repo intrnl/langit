@@ -25,9 +25,13 @@ export const createTimelineQuery = (limit: number) => {
 
 			// skip any posts that are in reply to non-followed
 			if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+				const root = first.reply.root;
 				const parent = first.reply.parent;
 
-				if (parent.author.did !== uid && !parent.author.viewer.following.peek()) {
+				if (
+					(root.author.did !== uid && !root.author.viewer.following.peek()) ||
+					(parent.author.did !== uid && !parent.author.viewer.following.peek())
+				) {
 					return false;
 				}
 			}

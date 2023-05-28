@@ -2,13 +2,23 @@ import { Match, Switch } from 'solid-js';
 
 import { type EmbeddedImage } from '~/api/types.ts';
 
+import { getCachedAspectRatio, onImageLoad } from '~/utils/image-cache.ts';
+
 export interface EmbedImageProps {
 	images: EmbeddedImage[];
 	borderless?: boolean;
 }
 
 const renderImg = (image: EmbeddedImage, className?: string) => {
-	return <img src={image.thumb} alt={image.alt} class={className} />;
+	return (
+		<img
+			src={image.thumb}
+			alt={image.alt}
+			class={className}
+			style={{ 'aspect-ratio': getCachedAspectRatio(image.thumb) }}
+			onLoad={onImageLoad}
+		/>
+	);
 };
 
 const EmbedImage = (props: EmbedImageProps) => {

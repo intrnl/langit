@@ -2,6 +2,8 @@ import { Show } from 'solid-js';
 
 import { type EmbeddedLink } from '~/api/types.ts';
 
+import { getCachedAspectRatio, onImageLoad } from '~/utils/image-cache.ts';
+
 export interface EmbedLinkProps {
 	link: EmbeddedLink;
 }
@@ -22,7 +24,14 @@ const EmbedLink = (props: EmbedLinkProps) => {
 			class="overflow-hidden rounded-md border border-divider hover:bg-secondary"
 		>
 			<Show when={link().thumb}>
-				{(thumb) => <img src={thumb()} class="max-h-141 w-full border-b border-divider bg-muted-fg" />}
+				{(thumb) => (
+					<img
+						src={thumb()}
+						class="max-h-141 w-full border-b border-divider bg-muted-fg"
+						style={{ 'aspect-ratio': getCachedAspectRatio(thumb()) }}
+						onLoad={onImageLoad}
+					/>
+				)}
 			</Show>
 
 			<div class="flex flex-col gap-0.5 p-3 text-sm">

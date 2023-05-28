@@ -30,7 +30,7 @@ export const debounce = <F extends VoidFunction>(fn: F, delay: number, leading =
 	};
 };
 
-const EXCLUDED_TAGS = ['a', 'button', 'img', 'video'];
+const EXCLUDED_TAGS = ['a', 'button', 'img', 'video', 'dialog'];
 
 export const isElementClicked = (ev: Event, excludedTags: string[] = EXCLUDED_TAGS) => {
 	const node = ev.currentTarget as HTMLElement;

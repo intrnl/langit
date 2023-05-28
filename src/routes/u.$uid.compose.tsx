@@ -1,7 +1,6 @@
 import { type Accessor, For, Match, Show, Switch, createMemo, createSignal, batch } from 'solid-js';
 import { render } from 'solid-js/web';
 
-import { Dialog } from '@kobalte/core';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
@@ -46,6 +45,7 @@ import { useNavigate, useParams } from '~/router.ts';
 import '~/styles/compose.css';
 import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
+import Dialog from '~/components/Dialog.tsx';
 import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
@@ -481,79 +481,70 @@ const AuthenticatedComposePage = () => {
 				</div>
 			</div>
 
-			<Dialog.Root open={pendingImages().length > 0}>
-				<Dialog.Portal>
-					<Dialog.Overlay class={/* @once */ dialog.overlay()} />
+			<Dialog open={pendingImages().length > 0}>
+				<div class={/* @once */ dialog.content()}>
+					<h1 class={/* @once */ dialog.title()}>Image has been adjusted</h1>
 
-					<div class={/* @once */ dialog.positioner()}>
-						<Dialog.Content class={/* @once */ dialog.content()}>
-							<Dialog.Title class={/* @once */ dialog.title()}>Image has been adjusted</Dialog.Title>
+					<p class="mt-3 text-sm">
+						The images you tried inserting has been adjusted to fit within the upload limits, would you like
+						to proceed?
+					</p>
 
-							<p class="mt-3 text-sm">
-								The images you tried inserting has been adjusted to fit within the upload limits, would you
-								like to proceed?
-							</p>
+					<div class="mt-6 flex flex-col gap-3">
+						<For each={pendingImages()}>
+							{(image) => {
+								const before = image.before;
+								const after = image.after;
 
-							<div class="mt-6 flex flex-col gap-3">
-								<For each={pendingImages()}>
-									{(image) => {
-										const before = image.before;
-										const after = image.after;
+								return (
+									<div class="flex items-center gap-3">
+										<BlobImage src={image.blob} class="h-20 w-20 shrink-0 rounded-md object-cover" />
 
-										return (
-											<div class="flex items-center gap-3">
-												<BlobImage src={image.blob} class="h-20 w-20 shrink-0 rounded-md object-cover" />
-
-												<div class="flex min-w-0 flex-col gap-0.5 text-sm">
-													<p class="line-clamp-1 break-words font-bold">{image.name}</p>
-													<p>
-														{before.width}x{before.height} → {after.width}x{after.height}
-													</p>
-													<p>
-														<span>
-															{formatSize(before.size)} → {formatSize(after.size)}
-														</span>{' '}
-														<span class="whitespace-nowrap text-muted-fg">({image.quality}% quality)</span>
-													</p>
-												</div>
-											</div>
-										);
-									}}
-								</For>
-							</div>
-
-							<div class={/* @once */ dialog.actions()}>
-								<button
-									onClick={() => {
-										setPendingImages([]);
-										editor()!.view.focus();
-									}}
-									class={/* @once */ button({ color: 'ghost' })}
-								>
-									Cancel
-								</button>
-								<button
-									onClick={() => {
-										batch(() => {
-											const next = pendingImages().map((img) => img.blob);
-
-											batch(() => {
-												setPendingImages([]);
-												addImagesUncompressed(next);
-											});
-
-											editor()!.view.focus();
-										});
-									}}
-									class={/* @once */ button({ color: 'primary' })}
-								>
-									Confirm
-								</button>
-							</div>
-						</Dialog.Content>
+										<div class="flex min-w-0 flex-col gap-0.5 text-sm">
+											<p class="line-clamp-1 break-words font-bold">{image.name}</p>
+											<p>
+												{before.width}x{before.height} → {after.width}x{after.height}
+											</p>
+											<p>
+												<span>
+													{formatSize(before.size)} → {formatSize(after.size)}
+												</span>{' '}
+												<span class="whitespace-nowrap text-muted-fg">({image.quality}% quality)</span>
+											</p>
+										</div>
+									</div>
+								);
+							}}
+						</For>
 					</div>
-				</Dialog.Portal>
-			</Dialog.Root>
+
+					<div class={/* @once */ dialog.actions()}>
+						<button
+							onClick={() => {
+								setPendingImages([]);
+							}}
+							class={/* @once */ button({ color: 'ghost' })}
+						>
+							Cancel
+						</button>
+						<button
+							onClick={() => {
+								batch(() => {
+									const next = pendingImages().map((img) => img.blob);
+
+									batch(() => {
+										setPendingImages([]);
+										addImagesUncompressed(next);
+									});
+								});
+							}}
+							class={/* @once */ button({ color: 'primary' })}
+						>
+							Confirm
+						</button>
+					</div>
+				</div>
+			</Dialog>
 		</div>
 	);
 };
@@ -715,13 +706,9 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 											</div>
 
 											<div class="flex grow flex-col text-sm">
-												<span class="line-clamp-1 break-all font-bold">
-													{item.displayName}
-												</span>
+												<span class="line-clamp-1 break-all font-bold">{item.displayName}</span>
 
-												<span class="line-clamp-1 shrink-0 break-all text-muted-fg">
-													@{item.handle}
-												</span>
+												<span class="line-clamp-1 shrink-0 break-all text-muted-fg">@{item.handle}</span>
 											</div>
 										</li>
 									)}

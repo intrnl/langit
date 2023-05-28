@@ -1,7 +1,5 @@
 import colors from 'tailwindcss/colors';
-
-import kobalte from '@kobalte/tailwindcss';
-import animate from 'tailwindcss-animate';
+import plugin from 'tailwindcss/plugin';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -49,6 +47,7 @@ export default {
 			input: 'rgb(var(--input))',
 			divider: 'rgb(var(--divider))',
 
+			transparent: 'transparent',
 			black: colors.black,
 			red: colors.red,
 			green: colors.green,
@@ -58,5 +57,9 @@ export default {
 			mono: `"JetBrains Mono NL", ui-monospace, monospace`,
 		},
 	},
-	plugins: [animate, kobalte()],
+	plugins: [
+		plugin(({ addVariant }) => {
+			addVariant('modal', '&:modal');
+		}),
+	],
 };

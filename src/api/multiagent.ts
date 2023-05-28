@@ -71,17 +71,8 @@ export class Multiagent {
 		try {
 			await agent.login({ identifier, password });
 
-			// check if there are existing accounts that shares the same account,
-			// if so, use that instead.
 			const session = agent.session.value!;
 			const did = session.did;
-
-			const accounts = this.accounts;
-
-			if (accounts && did in accounts) {
-				this.storage.set('active', did);
-				return did;
-			}
 
 			this.storage.set('active', did);
 			this.storage.set('accounts', {
@@ -165,10 +156,12 @@ export class Multiagent {
 			persistSession: (type, session) => {
 				if (type === 'update') {
 					const did = session!.did;
+					const prev = this.storage.get('accounts');
 
 					this.storage.set('accounts', {
-						...this.storage.get('accounts'),
+						...prev,
 						[did]: {
+							...prev[did],
 							did: session!.did,
 							service: serviceUri,
 							session: session!,

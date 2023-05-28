@@ -84,7 +84,7 @@ const AuthenticatedExplorePage = () => {
 							>
 								<div class="border-b border-divider">
 									<div class="sticky top-13 z-10 flex h-13 items-center gap-4 bg-background px-4">
-										<div class="h-6 w-6 overflow-hidden rounded-md bg-hinted-fg">
+										<div class="h-6 w-6 overflow-hidden rounded-md bg-muted-fg">
 											<Show when={feed()?.avatar.value}>
 												{(avatar) => <img src={avatar()} class="h-full w-full" />}
 											</Show>

@@ -82,7 +82,7 @@ const AuthenticatedExplorePage = () => {
 									</div>
 								}
 							>
-								<div>
+								<div class="border-b border-divider">
 									<div class="sticky top-13 z-10 flex h-13 items-center gap-4 bg-background px-4">
 										<div class="h-6 w-6 overflow-hidden rounded-md bg-hinted-fg">
 											<Show when={feed()?.avatar.value}>
@@ -139,8 +139,6 @@ const AuthenticatedExplorePage = () => {
 											Show more
 										</A>
 									</Show>
-
-									<hr class="border-divider" />
 								</div>
 							</Suspense>
 						);

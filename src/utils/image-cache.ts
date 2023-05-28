@@ -6,7 +6,9 @@ export const onImageLoad = (ev: Event & { currentTarget: HTMLImageElement }) => 
 	const img = ev.currentTarget;
 	const src = img.src;
 
-	setThumbSizeCache(src, { w: img.naturalWidth, h: img.naturalHeight });
+	if (!(src in thumbSizeCache)) {
+		setThumbSizeCache(src, { w: img.naturalWidth, h: img.naturalHeight });
+	}
 };
 
 export const getCachedAspectRatio = (src: string) => {

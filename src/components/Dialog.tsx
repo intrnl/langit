@@ -85,10 +85,6 @@ const Dialog = (props: DialogProps) => {
 
 export default Dialog;
 
-const getOwnerDocument = (node: Node | null | undefined) => {
-	return (node && node.ownerDocument) || document;
-};
-
 const getScrollbarSize = (document: Document) => {
 	const documentWidth = document.documentElement.clientWidth;
 	return Math.abs(window.innerWidth - documentWidth);

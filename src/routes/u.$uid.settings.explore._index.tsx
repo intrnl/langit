@@ -1,7 +1,7 @@
 import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
-import { createQueries, createQuery } from '@tanstack/solid-query';
+import { createQuery } from '@tanstack/solid-query';
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
 import { preferences } from '~/api/global.ts';
@@ -29,16 +29,6 @@ const AuthenticatedExploreSettingsPage = () => {
 
 	const pinnedFeeds = createMemo(() => {
 		return preferences.get(uid())?.pinnedFeeds || [];
-	});
-
-	const feedQueries = createQueries({
-		get queries() {
-			return savedFeeds().map((feedUri) => ({
-				queryKey: () => getFeedGeneratorKey(uid(), feedUri),
-				queryFn: getFeedGenerator,
-				staleTime: 30_000,
-			}));
-		},
 	});
 
 	return (

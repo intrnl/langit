@@ -9,7 +9,7 @@ import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 
 type Query = ReturnType<typeof getPostKey>;
 
-const fetchPost = createBatchedFetch<Query, string, BskyPost>({
+export const fetchPost = createBatchedFetch<Query, string, BskyPost>({
 	limit: 25,
 	timeout: 0,
 	key: (query) => query[1],

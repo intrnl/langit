@@ -2,14 +2,11 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '../global.ts';
 import { createLikesTimelinePage } from '../models/timeline.ts';
-import { type BskyGetPostsResponse, type BskyLikeRecord, type BskyListRecordsResponse } from '../types.ts';
+import { type BskyLikeRecord, type BskyListRecordsResponse } from '../types.ts';
 import { type DID } from '../utils.ts';
 
 import _getDid from './_did.ts';
-
-import { chunked } from '~/utils/misc.ts';
-
-const MAX_POST_LIMIT = 25;
+import { fetchPost, getPostKey } from './get-post.ts';
 
 export const getProfileLikesKey = (uid: DID, actor: string, limit: number) =>
 	['getProfileLikes', uid, actor, limit] as const;
@@ -33,17 +30,9 @@ export const getProfileLikes = async (ctx: QueryFunctionContext<ReturnType<typeo
 	const data = response.data as BskyListRecordsResponse<BskyLikeRecord>;
 
 	const postUris = data.records.map((record) => record.value.subject.uri);
-	const chunkedUris = chunked(postUris, MAX_POST_LIMIT);
+	const posts = await Promise.all(postUris.map((uri) => fetchPost(getPostKey(uid, uri))));
 
-	const chunkedPosts = await Promise.all(
-		chunkedUris.map((uris) =>
-			agent.rpc
-				.get({ method: 'app.bsky.feed.getPosts', signal: ctx.signal, params: { uris } })
-				.then((response) => (response.data as BskyGetPostsResponse).posts),
-		),
-	);
-
-	const page = createLikesTimelinePage(data.cursor, chunkedPosts.flat());
+	const page = createLikesTimelinePage(data.cursor, posts.flat());
 
 	return page;
 };

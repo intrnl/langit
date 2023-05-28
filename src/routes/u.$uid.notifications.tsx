@@ -7,7 +7,7 @@ import { type DID } from '~/api/utils.ts';
 
 import { updateNotificationsSeen } from '~/api/mutations/update-notifications-seen.ts';
 import {
-	createNotificationsQuery,
+	getNotifications,
 	getNotificationsKey,
 	getNotificationsLatest,
 	getNotificationsLatestKey,
@@ -32,8 +32,8 @@ const AuthenticatedNotificationsPage = () => {
 	const client = useQueryClient();
 
 	const notificationsQuery = createInfiniteQuery({
-		queryKey: () => getNotificationsKey(uid()),
-		queryFn: createNotificationsQuery(PAGE_SIZE),
+		queryKey: () => getNotificationsKey(uid(), PAGE_SIZE),
+		queryFn: getNotifications,
 		getNextPageParam: (page) => page.length >= PAGE_SIZE && page.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,

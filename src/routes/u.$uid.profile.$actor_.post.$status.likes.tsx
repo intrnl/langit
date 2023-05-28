@@ -2,13 +2,13 @@ import { createInfiniteQuery } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils.ts';
 
-import { createPostLikedByQuery, getPostLikedByKey } from '~/api/queries/get-post-liked-by.ts';
+import { getPostLikedBy, getPostLikedByKey } from '~/api/queries/get-post-liked-by.ts';
 
 import { useParams } from '~/router.ts';
 
 import ProfileList from '~/components/ProfileList';
 
-const PAGE_LIMIT = 30;
+const PAGE_SIZE = 30;
 
 const AuthenticatedProfileFollowersPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status/likes');
@@ -16,9 +16,9 @@ const AuthenticatedProfileFollowersPage = () => {
 	const uid = () => params.uid as DID;
 
 	const likesQuery = createInfiniteQuery({
-		queryKey: () => getPostLikedByKey(uid(), params.actor, params.status),
-		queryFn: createPostLikedByQuery(PAGE_LIMIT),
-		getNextPageParam: (last) => last.profiles.length >= PAGE_LIMIT && last.cursor,
+		queryKey: () => getPostLikedByKey(uid(), params.actor, params.status, PAGE_SIZE),
+		queryFn: getPostLikedBy,
+		getNextPageParam: (last) => last.profiles.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

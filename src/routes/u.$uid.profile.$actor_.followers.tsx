@@ -4,7 +4,7 @@ import { createInfiniteQuery } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils.ts';
 
-import { createProfileFollowersQuery, getProfileFollowersKey } from '~/api/queries/get-profile-followers.ts';
+import { getProfileFollowers, getProfileFollowersKey } from '~/api/queries/get-profile-followers.ts';
 
 import { useParams } from '~/router.ts';
 
@@ -18,8 +18,8 @@ const AuthenticatedProfileFollowersPage = () => {
 	const uid = () => params.uid as DID;
 
 	const followersQuery = createInfiniteQuery({
-		queryKey: () => getProfileFollowersKey(uid(), params.actor),
-		queryFn: createProfileFollowersQuery(PAGE_SIZE),
+		queryKey: () => getProfileFollowersKey(uid(), params.actor, PAGE_SIZE),
+		queryFn: getProfileFollowers,
 		getNextPageParam: (last) => last.profiles.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,

@@ -4,7 +4,7 @@ import { type DID } from '~/api/utils.ts';
 
 import { type TimelinePage } from '~/api/models/timeline.ts';
 import {
-	createProfileLikesQuery,
+	getProfileLikes,
 	getProfileLikesKey,
 	getProfileLikesLatest,
 	getProfileLikesLatestKey,
@@ -24,8 +24,8 @@ const AuthenticatedProfileTimelineLikesPage = () => {
 	const actor = () => params.actor;
 
 	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getProfileLikesKey(uid(), actor()),
-		queryFn: createProfileLikesQuery(PAGE_SIZE),
+		queryKey: () => getProfileLikesKey(uid(), actor(), PAGE_SIZE),
+		queryFn: getProfileLikes,
 		getNextPageParam: (last) => last.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,

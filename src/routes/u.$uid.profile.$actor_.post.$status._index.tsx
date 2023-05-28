@@ -8,7 +8,7 @@ import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
-import { createPostThreadQuery, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
+import { getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
@@ -44,8 +44,8 @@ const AuthenticatedPostPage = () => {
 	const status = () => params.status;
 
 	const threadQuery = createQuery({
-		queryKey: () => getPostThreadKey(uid(), params.actor, status()),
-		queryFn: createPostThreadQuery(MAX_DESCENDANTS + 1, MAX_ANCESTORS + 1),
+		queryKey: () => getPostThreadKey(uid(), params.actor, status(), MAX_DESCENDANTS + 1, MAX_ANCESTORS + 1),
+		queryFn: getPostThread,
 		refetchOnMount: true,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,

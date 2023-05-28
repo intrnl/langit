@@ -4,7 +4,7 @@ import { type DID } from '~/api/utils.ts';
 
 import { type TimelinePage } from '~/api/models/timeline.ts';
 import {
-	createTimelineQuery,
+	getTimeline,
 	getTimelineKey,
 	getTimelineLatest,
 	getTimelineLatestKey,
@@ -25,8 +25,8 @@ const AuthenticatedHome = () => {
 	const client = useQueryClient();
 
 	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getTimelineKey(uid(), DEFAULT_ALGORITHM),
-		queryFn: createTimelineQuery(PAGE_SIZE),
+		queryKey: () => getTimelineKey(uid(), DEFAULT_ALGORITHM, PAGE_SIZE),
+		queryFn: getTimeline,
 		getNextPageParam: (last) => last.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
@@ -89,7 +89,7 @@ const AuthenticatedHome = () => {
 					// but unfortunately that breaks the `hasNextPage` check down below
 					// and would also mean the user gets to see nothing for a bit.
 					client.setQueryData(
-						getTimelineKey(uid(), DEFAULT_ALGORITHM),
+						getTimelineKey(uid(), DEFAULT_ALGORITHM, PAGE_SIZE),
 						(prev?: InfiniteData<TimelinePage>) => {
 							if (prev) {
 								return {

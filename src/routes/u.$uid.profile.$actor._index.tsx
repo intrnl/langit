@@ -4,7 +4,7 @@ import { type DID } from '~/api/utils.ts';
 
 import { type TimelinePage } from '~/api/models/timeline.ts';
 import {
-	createProfileFeedQuery,
+	getProfileFeed,
 	getProfileFeedKey,
 	getProfileFeedLatest,
 	getProfileFeedLatestKey,
@@ -30,8 +30,8 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 	const actor = () => params.actor;
 
 	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getProfileFeedKey(uid(), actor(), withReplies()),
-		queryFn: createProfileFeedQuery(PAGE_SIZE),
+		queryKey: () => getProfileFeedKey(uid(), actor(), withReplies(), PAGE_SIZE),
+		queryFn: getProfileFeed,
 		getNextPageParam: (last) => last.length >= PAGE_SIZE && last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
@@ -89,7 +89,7 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 				// but unfortunately that breaks the `hasNextPage` check down below
 				// and would also mean the user gets to see nothing for a bit.
 				client.setQueryData(
-					getProfileFeedKey(uid(), actor(), withReplies()),
+					getProfileFeedKey(uid(), actor(), withReplies(), PAGE_SIZE),
 					(prev?: InfiniteData<TimelinePage>) => {
 						if (prev) {
 							return {

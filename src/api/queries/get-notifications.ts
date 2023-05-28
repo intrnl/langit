@@ -6,23 +6,23 @@ import { type DID } from '../utils.ts';
 
 import { createNotificationsPage } from '../models/notifications.ts';
 
-export const getNotificationsKey = (uid: DID) => ['getNotifications', uid] as const;
-export const createNotificationsQuery = (limit: number) => {
-	return async (ctx: QueryFunctionContext<ReturnType<typeof getNotificationsKey>, string>) => {
-		const [, uid] = ctx.queryKey;
+export const getNotificationsKey = (uid: DID, limit: number) => ['getNotifications', uid, limit] as const;
+export const getNotifications = async (
+	ctx: QueryFunctionContext<ReturnType<typeof getNotificationsKey>, string>,
+) => {
+	const [, uid, limit] = ctx.queryKey;
 
-		const agent = await multiagent.connect(uid);
+	const agent = await multiagent.connect(uid);
 
-		const response = await agent.rpc.get({
-			method: 'app.bsky.notification.listNotifications',
-			params: { limit: limit, cursor: ctx.pageParam },
-		});
+	const response = await agent.rpc.get({
+		method: 'app.bsky.notification.listNotifications',
+		params: { limit: limit, cursor: ctx.pageParam },
+	});
 
-		const data = response.data as BskyNotificationsResponse;
-		const page = createNotificationsPage(data);
+	const data = response.data as BskyNotificationsResponse;
+	const page = createNotificationsPage(data);
 
-		return page;
-	};
+	return page;
 };
 
 export const getNotificationsLatestKey = (uid: DID) => ['getNotificationsLatest', uid] as const;

@@ -5,42 +5,41 @@ import { createTimelinePage } from '../models/timeline.ts';
 import { type BskyTimelineResponse } from '../types.ts';
 import { type DID } from '../utils.ts';
 
-export const getTimelineKey = (uid: DID, algorithm: string) => ['getTimeline', uid, algorithm] as const;
-export const createTimelineQuery = (limit: number) => {
-	return async (ctx: QueryFunctionContext<ReturnType<typeof getTimelineKey>>) => {
-		const [, uid, algorithm] = ctx.queryKey;
+export const getTimelineKey = (uid: DID, algorithm: string, limit: number) =>
+	['getTimeline', uid, algorithm, limit] as const;
+export const getTimeline = async (ctx: QueryFunctionContext<ReturnType<typeof getTimelineKey>>) => {
+	const [, uid, algorithm, limit] = ctx.queryKey;
 
-		const agent = await multiagent.connect(uid);
+	const agent = await multiagent.connect(uid);
 
-		const response = await agent.rpc.get({
-			method: 'app.bsky.feed.getTimeline',
-			signal: ctx.signal,
-			params: { algorithm, cursor: ctx.pageParam, limit },
-		});
+	const response = await agent.rpc.get({
+		method: 'app.bsky.feed.getTimeline',
+		signal: ctx.signal,
+		params: { algorithm, cursor: ctx.pageParam, limit },
+	});
 
-		const data = response.data as BskyTimelineResponse;
-		const page = createTimelinePage(data, (slice) => {
-			const items = slice.items;
-			const first = items[0];
+	const data = response.data as BskyTimelineResponse;
+	const page = createTimelinePage(data, (slice) => {
+		const items = slice.items;
+		const first = items[0];
 
-			// skip any posts that are in reply to non-followed
-			if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
-				const root = first.reply.root;
-				const parent = first.reply.parent;
+		// skip any posts that are in reply to non-followed
+		if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+			const root = first.reply.root;
+			const parent = first.reply.parent;
 
-				if (
-					(root.author.did !== uid && !root.author.viewer.following.peek()) ||
-					(parent.author.did !== uid && !parent.author.viewer.following.peek())
-				) {
-					return false;
-				}
+			if (
+				(root.author.did !== uid && !root.author.viewer.following.peek()) ||
+				(parent.author.did !== uid && !parent.author.viewer.following.peek())
+			) {
+				return false;
 			}
+		}
 
-			return true;
-		});
+		return true;
+	});
 
-		return page;
-	};
+	return page;
 };
 
 export const getTimelineLatestKey = (uid: DID, algorithm: string) =>

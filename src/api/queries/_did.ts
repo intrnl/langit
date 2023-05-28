@@ -3,6 +3,7 @@ import { type DID, isDid } from '../utils.ts';
 
 import { type BskyResolvedDidResponse } from '../types.ts';
 
+/** @deprecated use getProfileDid in a separate query instead. */
 const _getDid = async (agent: Agent, actor: string, signal?: AbortSignal) => {
 	let did: DID;
 	if (isDid(actor)) {

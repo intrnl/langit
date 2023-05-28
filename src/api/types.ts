@@ -127,7 +127,7 @@ export interface BskyPostEmbedImage {
 	images: EmbeddedImage[];
 }
 
-export interface EmbeddedRecord {
+export interface EmbeddedPostRecord {
 	$type: 'app.bsky.embed.record#viewRecord';
 	uri: string;
 	cid: string;
@@ -136,6 +136,10 @@ export interface EmbeddedRecord {
 	labels?: BskyLabel[];
 	embeds?: Array<BskyPostEmbedLink | BskyPostEmbedImage | BskyPostEmbedRecord | BskyPostEmbedRecordWithMedia>;
 	indexedAt?: string;
+}
+
+export interface EmbeddedGeneratorRecord extends BskyFeedGenerator {
+	$type: 'app.bsky.feed.defs#generatorView';
 }
 
 export interface EmbeddedRecordNotFound {
@@ -150,7 +154,7 @@ export interface EmbeddedRecordBlocked {
 
 export interface BskyPostEmbedRecord {
 	$type: 'app.bsky.embed.record#view';
-	record: EmbeddedRecord | EmbeddedRecordNotFound | EmbeddedRecordBlocked;
+	record: EmbeddedGeneratorRecord | EmbeddedPostRecord | EmbeddedRecordNotFound | EmbeddedRecordBlocked;
 }
 
 export interface BskyPostEmbedRecordWithMedia {
@@ -344,4 +348,24 @@ export interface BskyBlob {
 		$link: string;
 	};
 	size: number;
+}
+
+export interface BskyFeedGenerator {
+	uri: string;
+	cid: string;
+	did?: string;
+	creator: BskyProfileBasic;
+	displayName: string;
+	description?: string;
+	descriptionFacets?: Facet[];
+	avatar?: string;
+	likeCount?: number;
+	indexedAt: string;
+	viewer?: {
+		like?: string;
+	};
+}
+
+export interface BskyGetFeedGeneratorsResponse {
+	feeds: BskyFeedGenerator[];
 }

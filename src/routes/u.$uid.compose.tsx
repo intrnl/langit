@@ -458,7 +458,7 @@ const AuthenticatedComposePage = () => {
 							<button
 								title="Add image"
 								onClick={() => fileInputRef!.click()}
-								class="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-secondary"
+								class="-ml-2 flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-secondary"
 							>
 								<ImageIcon />
 							</button>

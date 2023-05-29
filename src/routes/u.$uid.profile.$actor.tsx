@@ -5,15 +5,13 @@ import { createQuery } from '@tanstack/solid-query';
 
 import { type DID } from '~/api/utils';
 
-import { followProfile } from '~/api/mutations/follow-profile.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
-import button from '~/styles/primitives/button.ts';
-
 import CircularProgress from '~/components/CircularProgress.tsx';
+import FollowButton from '~/components/FollowButton.tsx';
 import TabLink from '~/components/TabLink.tsx';
 
 const AuthenticatedProfileLayout = () => {
@@ -69,12 +67,7 @@ const AuthenticatedProfileLayout = () => {
 
 									<div class="grow" />
 
-									<button
-										onClick={() => followProfile(uid(), profile())}
-										class={button({ color: isFollowing() ? 'outline' : 'primary' })}
-									>
-										{isFollowing() ? 'Following' : 'Follow'}
-									</button>
+									<FollowButton uid={uid()} profile={profile()} />
 								</div>
 
 								<div>

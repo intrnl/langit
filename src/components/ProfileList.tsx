@@ -6,13 +6,11 @@ import { type CreateInfiniteQueryResult } from '@tanstack/solid-query';
 import { type PostProfilesListPage } from '~/api/models/profiles-list.ts';
 import { type DID } from '~/api/utils.ts';
 
-import { followProfile } from '~/api/mutations/follow-profile.ts';
-
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
+import FollowButton from '~/components/FollowButton.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
-import button from '~/styles/primitives/button.ts';
 
 export interface ProfileListProps {
 	uid: DID;
@@ -77,12 +75,7 @@ const ProfileList = (props: ProfileListProps) => {
 
 											<div>
 												<Show when={profile.did !== uid()}>
-													<button
-														onClick={() => followProfile(uid(), profile)}
-														class={button({ color: isFollowing() ? 'outline' : 'primary' })}
-													>
-														{isFollowing() ? 'Following' : 'Follow'}
-													</button>
+													<FollowButton uid={uid()} profile={profile} />
 												</Show>
 											</div>
 										</div>

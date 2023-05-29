@@ -33,7 +33,6 @@ export type PathsWithParams =
 	| "/r/*";
 export type PathsWithoutParams = 
 	| "/"
-	| "/register"
 	| "/login";
 export type Paths = PathsWithParams | PathsWithoutParams;
 

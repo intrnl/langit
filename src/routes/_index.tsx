@@ -34,10 +34,6 @@ const IndexPage = () => {
 				<A href="/login" class={/* @once */ button({ color: 'primary' })}>
 					Log in
 				</A>
-
-				<A href="/register" class={/* @once */ button({ color: 'outline' })}>
-					Sign up
-				</A>
 			</div>
 		</div>
 	);

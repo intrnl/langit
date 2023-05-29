@@ -91,10 +91,6 @@ const routes: RouteDefinition[] = [
     component: lazy(() => import("./routes/_auth.tsx")),
     children: [
       {
-        path: "register",
-        component: lazy(() => import("./routes/_auth.register.tsx")),
-      },
-      {
         path: "login",
         component: lazy(() => import("./routes/_auth.login.tsx")),
       },

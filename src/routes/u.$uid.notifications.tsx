@@ -95,7 +95,7 @@ const AuthenticatedNotificationsPage = () => {
 		// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
 		// but unfortunately that breaks the `hasNextPage` check down below
 		// and would also mean the user gets to see nothing for a bit.
-		client.setQueryData(getNotificationsKey(uid()), (prev?: InfiniteData<NotificationsPage>) => {
+		client.setQueryData(getNotificationsKey(uid(), PAGE_SIZE), (prev?: InfiniteData<NotificationsPage>) => {
 			if (prev) {
 				return {
 					pages: prev.pages.slice(0, 1),

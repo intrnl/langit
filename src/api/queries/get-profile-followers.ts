@@ -10,7 +10,7 @@ export const getProfileFollowersKey = (uid: DID, actor: string, limit: number) =
 export const getProfileFollowers = async (
 	ctx: QueryFunctionContext<ReturnType<typeof getProfileFollowersKey>>,
 ) => {
-	const [, uid, actor] = ctx.queryKey;
+	const [, uid, actor, limit] = ctx.queryKey;
 
 	const agent = await multiagent.connect(uid);
 

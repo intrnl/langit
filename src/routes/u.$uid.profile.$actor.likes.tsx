@@ -82,7 +82,7 @@ const AuthenticatedProfileTimelineLikesPage = () => {
 				// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
 				// but unfortunately that breaks the `hasNextPage` check down below
 				// and would also mean the user gets to see nothing for a bit.
-				client.setQueryData(getProfileLikesKey(uid(), actor()), (prev?: InfiniteData<TimelinePage>) => {
+				client.setQueryData(getProfileLikesKey(uid(), actor(), PAGE_SIZE), (prev?: InfiniteData<TimelinePage>) => {
 					if (prev) {
 						return {
 							pages: prev.pages.slice(0, 1),

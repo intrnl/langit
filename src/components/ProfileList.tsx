@@ -72,18 +72,18 @@ const ProfileList = (props: ProfileListProps) => {
 												<span class="line-clamp-1 break-all font-bold">
 													{profile.displayName.value || profile.handle.value}
 												</span>
-												<span class="line-clamp-1 break-all text-muted-fg">
-													@{profile.handle.value}
-												</span>
+												<span class="line-clamp-1 break-all text-muted-fg">@{profile.handle.value}</span>
 											</div>
 
 											<div>
-												<button
-													onClick={() => followProfile(uid(), profile)}
-													class={button({ color: isFollowing() ? 'outline' : 'primary' })}
-												>
-													{isFollowing() ? 'Following' : 'Follow'}
-												</button>
+												<Show when={profile.did !== uid()}>
+													<button
+														onClick={() => followProfile(uid(), profile)}
+														class={button({ color: isFollowing() ? 'outline' : 'primary' })}
+													>
+														{isFollowing() ? 'Following' : 'Follow'}
+													</button>
+												</Show>
 											</div>
 										</div>
 

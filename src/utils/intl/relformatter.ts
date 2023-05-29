@@ -46,11 +46,11 @@ export const formatSize = (size: number) => {
 	}
 
 	if (num > 100) {
-		fractions = 1;
+		fractions = 0;
 	} else if (num > 10) {
-		fractions = 2;
+		fractions = 1;
 	} else if (num > 1) {
-		fractions = 3;
+		fractions = 2;
 	}
 
 	return num.toLocaleString('en-US', {

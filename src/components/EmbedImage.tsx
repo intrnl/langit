@@ -35,9 +35,9 @@ const EmbedImage = (props: EmbedImageProps) => {
 				</Match>
 
 				<Match when={images().length >= 2}>
-					<div class="grid aspect-video grid-cols-2 gap-0.5">
-						{renderImg(images()[0], 'h-full object-cover')}
-						{renderImg(images()[1], 'h-full object-cover')}
+					<div class="flex aspect-video gap-0.5">
+						{renderImg(images()[0], 'grow h-full object-cover')}
+						{renderImg(images()[1], 'grow h-full object-cover')}
 					</div>
 				</Match>
 

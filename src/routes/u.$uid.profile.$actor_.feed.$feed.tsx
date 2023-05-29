@@ -3,8 +3,8 @@ import { Match, Show, Switch, createMemo } from 'solid-js';
 import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
-import { preferences } from '~/api/global.ts';
 import { type TimelinePage } from '~/api/models/timeline.ts';
+import { preferences } from '~/api/preferences.ts';
 import { type DID } from '~/api/utils.ts';
 
 import {

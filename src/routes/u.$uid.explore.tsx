@@ -2,7 +2,7 @@ import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
 import { createQuery } from '@tanstack/solid-query';
 
-import { preferences } from '~/api/global.ts';
+import { preferences } from '~/api/preferences.ts';
 import { getRecordId, getRepoId, type DID } from '~/api/utils.ts';
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';

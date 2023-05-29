@@ -1,9 +1,12 @@
-import { lazy } from 'solid-js';
+import { createRenderEffect, createRoot, lazy } from 'solid-js';
 import { render } from 'solid-js/web';
 
 import { Router, useRoutes } from '@solidjs/router';
 
-import routes from './router-routes.ts';
+import { type LocalSettings, preferences } from '~/api/preferences.ts';
+
+import routes from '~/router-routes.ts';
+import { useMediaQuery } from '~/utils/media-query.ts';
 
 import '~/styles/tailwind.css';
 
@@ -22,5 +25,30 @@ const App = () => {
 		</Router>
 	);
 };
+
+createRoot(() => {
+	createRenderEffect((prev: LocalSettings['theme']) => {
+		const prefs = preferences.get('local');
+		const theme = prefs?.theme ?? 'auto';
+
+		if (prev === theme) {
+			return theme;
+		}
+
+		const cl = document.documentElement.classList;
+
+		if (theme === 'auto') {
+			const isDark = useMediaQuery('(prefers-color-scheme: dark)');
+
+			createRenderEffect(() => {
+				cl.toggle('dark', isDark());
+			});
+		} else {
+			cl.toggle('dark', theme === 'dark');
+		}
+
+		return theme;
+	});
+});
 
 render(() => <App />, document.body);

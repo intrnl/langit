@@ -4,6 +4,7 @@ import { useNavigate } from '@solidjs/router';
 
 import { multiagent } from '~/api/global.ts';
 import { type MultiagentAccountData } from '~/api/multiagent.ts';
+import { type LocalSettings, preferences } from '~/api/preferences.ts';
 import { type DID } from '~/api/utils.ts';
 
 import { A, useParams } from '~/router.ts';
@@ -16,6 +17,8 @@ import * as menu from '~/styles/primitives/menu.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import AddIcon from '~/icons/baseline-add.tsx';
+import BrightnessMediumIcon from '~/icons/baseline-brightness-medium.tsx';
+import CheckIcon from '~/icons/baseline-check.tsx';
 import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
@@ -24,6 +27,7 @@ const AuthenticatedYouPage = () => {
 	const navigate = useNavigate();
 
 	const [toLogout, setToLogout] = createSignal<MultiagentAccountData>();
+	const [isThemeOpen, setIsThemeOpen] = createSignal(false);
 
 	const uid = () => params.uid as DID;
 
@@ -33,6 +37,15 @@ const AuthenticatedYouPage = () => {
 		const store = multiagent.accounts;
 		return Object.values(store).sort((account) => (account.did === uid() ? -1 : 1));
 	});
+
+	const theme = createMemo(() => {
+		const prefs = preferences.get('local');
+		return prefs?.theme ?? 'auto';
+	});
+
+	const setTheme = (next: NonNullable<LocalSettings['theme']>) => {
+		preferences.merge('local', { theme: next });
+	};
 
 	return (
 		<div class="flex flex-col pb-4">
@@ -164,6 +177,54 @@ const AuthenticatedYouPage = () => {
 				<ConfirmationNumberIcon class="text-2xl" />
 				<span>Invite codes</span>
 			</A>
+
+			<button
+				onClick={() => setIsThemeOpen(true)}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
+				<BrightnessMediumIcon class="text-2xl" />
+				<span>Application theme</span>
+			</button>
+
+			<Dialog open={isThemeOpen()} onClose={() => setIsThemeOpen(false)}>
+				<div class={/* @once */ menu.content()}>
+					<h1 class={/* @once */ menu.title()}>Application theme</h1>
+
+					<button
+						onClick={() => setTheme('light')}
+						class={/* @once */ menu.item()}
+						classList={{ 'group is-active': theme() === 'light' }}
+					>
+						<span class="grow">Light theme</span>
+						<CheckIcon class="hidden text-xl text-accent group-[.is-active]:block" />
+					</button>
+					<button
+						onClick={() => setTheme('dark')}
+						class={/* @once */ menu.item()}
+						classList={{ 'group is-active': theme() === 'dark' }}
+					>
+						<span class="grow">Dark theme</span>
+						<CheckIcon class="hidden text-xl text-accent group-[.is-active]:block" />
+					</button>
+					<button
+						onClick={() => setTheme('auto')}
+						class={/* @once */ menu.item()}
+						classList={{ 'group is-active': theme() === 'auto' }}
+					>
+						<span class="grow">Automatic</span>
+						<CheckIcon class="hidden text-xl text-accent group-[.is-active]:block" />
+					</button>
+
+					<button
+						onClick={() => {
+							setIsThemeOpen(false);
+						}}
+						class={/* @once */ menu.cancel()}
+					>
+						Cancel
+					</button>
+				</div>
+			</Dialog>
 
 			<Dialog open={toLogout() !== undefined}>
 				<div class={/* @once */ dialog.content()}>

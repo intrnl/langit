@@ -24,6 +24,29 @@
 		--divider: 209 213 219; /* gray-300 */
 	}
 
+	.dark {
+		color-scheme: dark;
+
+		--background: 0 0 0; /* black */
+
+		--accent: 59 130 246; /* blue-500 */
+
+		--primary: 249 250 251; /* gray-50 */
+		--primary-fg: 3 7 18; /* gray-950 */
+
+		--secondary: 55 65 81; /* gray-700 */
+		--secondary-fg: 249 250 251; /* gray-50 */
+
+		--hinted: 17 24 39; /* gray-900 */
+		--hinted-fg: 249 250 251; /* gray-50 */
+
+		--muted: 55 65 81; /* gray-900 */
+		--muted-fg: 156 163 175; /* gray-400 */
+
+		--input: 75 85 99; /* gray-600 */
+		--divider: 55 65 81; /* gray-700 */
+	}
+
 	body {
 		@apply overflow-y-scroll bg-background text-primary;
 	}

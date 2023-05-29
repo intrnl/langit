@@ -3,7 +3,7 @@ import { For, Match, Show, Switch, createMemo } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
-import { preferences } from '~/api/global.ts';
+import { preferences } from '~/api/preferences.ts';
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { getPopularFeedGenerators, getPopularFeedGeneratorsKey } from '~/api/queries/get-feed-generator.ts';

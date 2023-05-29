@@ -60,6 +60,7 @@ export default {
 	plugins: [
 		plugin(({ addVariant }) => {
 			addVariant('modal', '&:modal');
+			addVariant('dark', '.dark:where(&)');
 		}),
 	],
 };

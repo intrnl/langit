@@ -4,7 +4,7 @@ import { useNavigate } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
-import { preferences } from '~/api/global.ts';
+import { preferences } from '~/api/preferences.ts';
 import { getRepoId, type DID, getRecordId } from '~/api/utils.ts';
 
 import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';

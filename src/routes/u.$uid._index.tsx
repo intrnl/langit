@@ -58,6 +58,7 @@ const AuthenticatedHome = () => {
 		queryKey: () => getTimelineLatestKey(uid(), DEFAULT_ALGORITHM),
 		queryFn: getTimelineLatest,
 		staleTime: 10_000,
+		refetchInterval: 20_000,
 		get enabled() {
 			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
 				return false;

@@ -2,8 +2,6 @@ import { Show } from 'solid-js';
 
 import { type EmbeddedLink } from '~/api/types.ts';
 
-import { getCachedAspectRatio, onImageLoad } from '~/utils/image-cache.ts';
-
 export interface EmbedLinkProps {
 	link: EmbeddedLink;
 }
@@ -25,12 +23,7 @@ const EmbedLink = (props: EmbedLinkProps) => {
 		>
 			<Show when={link().thumb}>
 				{(thumb) => (
-					<img
-						src={thumb()}
-						class="max-h-50vh w-full border-b border-divider bg-muted-fg object-cover"
-						style={{ 'aspect-ratio': getCachedAspectRatio(thumb()) }}
-						onLoad={onImageLoad}
-					/>
+					<img src={thumb()} class="aspect-video w-full border-b border-divider bg-muted-fg object-cover" />
 				)}
 			</Show>
 

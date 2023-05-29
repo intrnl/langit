@@ -10,7 +10,7 @@ import ProfileList from '~/components/ProfileList';
 
 const PAGE_SIZE = 30;
 
-const AuthenticatedProfileFollowersPage = () => {
+const AuthenticatedPostLikesPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status/likes');
 
 	const uid = () => params.uid as DID;
@@ -35,4 +35,4 @@ const AuthenticatedProfileFollowersPage = () => {
 	);
 };
 
-export default AuthenticatedProfileFollowersPage;
+export default AuthenticatedPostLikesPage;

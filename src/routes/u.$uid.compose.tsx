@@ -247,10 +247,16 @@ const AuthenticatedComposePage = () => {
 	};
 
 	const addImages = async (files: (Blob | File)[]) => {
+		if (images().length + files.length > MAX_IMAGE) {
+			setMessage(`You can only add up to 4 images in a single post`);
+			return;
+		}
+
 		const pending: PendingImage[] = [];
 		const next: (Blob | File)[] = [];
 		let errored = false;
 
+		setMessage('');
 		setImageProcessing(imageProcessing() + 1);
 
 		for (let idx = 0, len = files.length; idx < len; idx++) {
@@ -296,12 +302,7 @@ const AuthenticatedComposePage = () => {
 		target.value = '';
 		editor()!.view.focus();
 
-		if (images().length + files.length > MAX_IMAGE) {
-			setMessage(`You can only add up to 4 images in a single post`);
-		} else {
-			setMessage('');
-			addImages(files);
-		}
+		addImages(files);
 	};
 
 	const editor = createTiptapEditor(() => ({
@@ -351,12 +352,12 @@ const AuthenticatedComposePage = () => {
 				for (let idx = 0, len = items.length; idx < len; idx++) {
 					const item = items[idx];
 					const kind = item.kind;
-					const type = item.type;
 
 					if (kind === 'file') {
 						const blob = item.getAsFile();
 
 						if (blob) {
+							addImages([blob]);
 						}
 					}
 				}

@@ -93,7 +93,7 @@ const AuthenticatedFeedPage = () => {
 		queryKey: () => getFeedLatestKey(uid(), feedUri()),
 		queryFn: getFeedLatest,
 		staleTime: 10_000,
-		refetchInterval: 20_000,
+		refetchInterval: 30_000,
 		get enabled() {
 			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
 				return false;

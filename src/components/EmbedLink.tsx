@@ -27,7 +27,7 @@ const EmbedLink = (props: EmbedLinkProps) => {
 				{(thumb) => (
 					<img
 						src={thumb()}
-						class="max-h-141 w-full border-b border-divider bg-muted-fg"
+						class="max-h-50vh w-full border-b border-divider bg-muted-fg object-cover"
 						style={{ 'aspect-ratio': getCachedAspectRatio(thumb()) }}
 						onLoad={onImageLoad}
 					/>

@@ -105,12 +105,12 @@ export const getImageFromBlob = (blob: Blob): Promise<HTMLImageElement> => {
 
 export const getResizedResolution = (w: number, h: number, maxW: number, maxH: number) => {
 	if (w > maxW) {
-		h = (h * maxW) / w;
+		h = ~~((h * maxW) / w);
 		w = maxW;
 	}
 
 	if (h > maxH) {
-		w = (w * maxH) / h;
+		w = ~~((w * maxH) / h);
 		h = maxH;
 	}
 

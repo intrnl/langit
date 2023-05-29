@@ -107,8 +107,11 @@ export const PostRepostDropdown = (props: PostRepostDropdownProps) => {
 
 					<button
 						onClick={() => {
-							navigate(`/u/${uid()}/compose?quote=${encodeURIComponent(post().uri)}`);
 							setIsOpen(false);
+
+							setTimeout(() => {
+								navigate(`/u/${uid()}/compose?quote=${encodeURIComponent(post().uri)}`);
+							}, 0);
 						}}
 						class={/* @once */ menu.item()}
 					>

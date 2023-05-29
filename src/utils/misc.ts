@@ -1,3 +1,5 @@
+import { type Accessor, type Setter, createRenderEffect } from 'solid-js';
+
 let uid = 0;
 
 export const createId = (prefix = '_') => {
@@ -55,4 +57,16 @@ export const isElementClicked = (ev: Event, excludedTags: string[] = EXCLUDED_TA
 
 export const isElementAltClicked = (ev: MouseEvent | KeyboardEvent) => {
 	return ev.type === 'auxclick' || ev.ctrlKey;
+};
+
+export const model = (getter: Accessor<string>, setter: Setter<string>) => {
+	return (node: HTMLInputElement) => {
+		createRenderEffect(() => {
+			node.value = getter();
+		});
+
+		node.addEventListener('input', () => {
+			setter(node.value);
+		});
+	};
 };

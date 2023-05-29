@@ -1,4 +1,4 @@
-import { Show, batch, createSignal } from 'solid-js';
+import { Show, createSignal } from 'solid-js';
 
 import { useSearchParams, useNavigate } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
@@ -7,8 +7,15 @@ import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 import { multiagent } from '~/api/global.ts';
 import { XRPC } from '~/api/rpc/xrpc.ts';
 
+import { model } from '~/utils/misc.ts';
+
+import Dialog from '~/components/Dialog.tsx';
 import button from '~/styles/primitives/button.ts';
+import * as dialog from '~/styles/primitives/dialog.ts';
 import input from '~/styles/primitives/input.ts';
+
+const APP_PASSWORD_REGEX = /^[a-zA-Z\d]{4}(-[a-zA-Z\d]{4}){3}$/;
+const APP_PASSWORD_LINK = 'https://github.com/bluesky-social/atproto-ecosystem/blob/main/app-passwords.md';
 
 const AuthLoginPage = () => {
 	const navigate = useNavigate();
@@ -17,7 +24,12 @@ const AuthLoginPage = () => {
 	const [service, setService] = createSignal(DEFAULT_DATA_SERVERS[0]);
 	const [dispatching, setDispatching] = createSignal(false);
 
-	const [error, setError] = createSignal<string>('');
+	const [error, setError] = createSignal('');
+
+	const [identifier, setIdentifier] = createSignal('');
+	const [password, setPassword] = createSignal('');
+
+	const [isNoticeOpen, setIsNoticeOpen] = createSignal(false);
 
 	const describeQuery = createQuery(
 		() => ['describeServer', service().url],
@@ -33,41 +45,46 @@ const AuthLoginPage = () => {
 		},
 	);
 
+	const submit = (force: boolean) => {
+		const $url = service().url;
+		const $identifier = identifier();
+		const $password = password();
+
+		setError('');
+
+		if (!force && !APP_PASSWORD_REGEX.test($password)) {
+			setIsNoticeOpen(true);
+			return;
+		}
+
+		setDispatching(true);
+
+		multiagent.login({ service: $url, identifier: $identifier, password: $password }).then(
+			(uid) => {
+				const to = searchParams.to;
+
+				if (to) {
+					navigate(to.replace(`@uid/`, `/u/${uid}/`));
+				} else {
+					navigate(`/u/${uid}`);
+				}
+			},
+			(err) => {
+				const message = err.cause ? err.cause.message : err.message;
+				setError(message);
+				setDispatching(false);
+			},
+		);
+	};
+
 	return (
 		<div class="mx-auto max-w-xl px-4 py-8">
 			<h1 class="mb-8 text-lg font-bold">Login</h1>
 
 			<form
 				onSubmit={(ev) => {
-					const form = new FormData(ev.currentTarget);
-
-					const url = service().url;
-					const identifier = form.get('user') as string;
-					const password = form.get('pwd') as string;
-
 					ev.preventDefault();
-
-					batch(() => {
-						setError('');
-						setDispatching(true);
-					});
-
-					multiagent.login({ service: url, identifier, password }).then(
-						(uid) => {
-							const to = searchParams.to;
-
-							if (to) {
-								navigate(to.replace(`@uid/`, `/u/${uid}/`));
-							} else {
-								navigate(`/u/${uid}`);
-							}
-						},
-						(err) => {
-							const message = err.cause ? err.cause.message : err.message;
-							setError(message);
-							setDispatching(false);
-						},
-					);
+					submit(false);
 				}}
 				class="flex flex-col gap-4"
 			>
@@ -89,8 +106,8 @@ const AuthLoginPage = () => {
 						Identifier
 					</label>
 					<input
+						ref={model(identifier, setIdentifier)}
 						type="text"
-						name="user"
 						id="user"
 						required
 						autocomplete="username"
@@ -103,8 +120,8 @@ const AuthLoginPage = () => {
 						Password
 					</label>
 					<input
+						ref={model(password, setPassword)}
 						type="password"
-						name="pwd"
 						id="pwd"
 						required
 						autocomplete="password"
@@ -116,7 +133,7 @@ const AuthLoginPage = () => {
 
 				<Show when={describeQuery.data}>
 					{(data) => (
-						<p class="text-xs leading-6 text-muted-fg">
+						<p class="text-sm leading-6 text-muted-fg">
 							By continuing, you agree to the service's{' '}
 							<a href={data().links.termsOfService} class="text-primary hover:underline">
 								Terms of Service
@@ -140,6 +157,46 @@ const AuthLoginPage = () => {
 					</button>
 				</div>
 			</form>
+
+			<Dialog open={isNoticeOpen()} onClose={() => setIsNoticeOpen(false)}>
+				<div class={/* @once */ dialog.content()}>
+					<h1 class={/* @once */ dialog.title()}>Password notice</h1>
+
+					<p class="mt-3 text-sm">
+						You seem to be attempting to login with your regular password. For your safety, we recommend using
+						app passwords when trying to sign in to third-party clients such as Langit.{' '}
+						<a
+							href={APP_PASSWORD_LINK}
+							target="_blank"
+							rel="noopener noreferrer nofollow"
+							class="text-accent hover:underline"
+						>
+							Learn more here
+						</a>
+						.
+					</p>
+
+					<div class={/* @once */ dialog.actions()}>
+						<button
+							onClick={() => {
+								setIsNoticeOpen(false);
+							}}
+							class={/* @once */ button({ color: 'ghost' })}
+						>
+							Cancel
+						</button>
+						<button
+							onClick={() => {
+								setIsNoticeOpen(false);
+								submit(true);
+							}}
+							class={/* @once */ button({ color: 'primary' })}
+						>
+							Log in anyway
+						</button>
+					</div>
+				</div>
+			</Dialog>
 		</div>
 	);
 };

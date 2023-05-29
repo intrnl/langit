@@ -99,6 +99,10 @@ const AuthenticatedFeedPage = () => {
 				return false;
 			}
 
+			if (latestQuery.data !== timelineQuery.data.pages[0].cid) {
+				return false;
+			}
+
 			return true;
 		},
 	});

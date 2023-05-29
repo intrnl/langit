@@ -6,7 +6,6 @@ import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache/po
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
-import { repostPost } from '~/api/mutations/repost-post.ts';
 
 import { A } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
@@ -14,7 +13,7 @@ import * as relformat from '~/utils/intl/relformatter.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import Embed from '~/components/Embed.tsx';
-import PostDropdown from '~/components/PostDropdown.tsx';
+import { PostDropdown, PostRepostDropdown } from '~/components/PostDropdown.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
@@ -44,6 +43,8 @@ const Post = (props: PostProps) => {
 
 	const author = () => post().author;
 	const record = () => post().record.value;
+
+	const isReposted = () => !!post().viewer.repost.value;
 
 	const handleClick = (ev: MouseEvent | KeyboardEvent) => {
 		if (!props.interactive || !isElementClicked(ev)) {
@@ -182,16 +183,8 @@ const Post = (props: PostProps) => {
 								<span class="text-[0.8125rem]">{comformat.format(post().replyCount.value)}</span>
 							</div>
 
-							<div
-								class="flex grow items-end gap-0.5"
-								classList={{ 'text-green-600': !!post().viewer.repost.value }}
-							>
-								<button
-									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
-									onClick={() => repostPost(uid(), post())}
-								>
-									<RepeatIcon />
-								</button>
+							<div class="flex grow items-end gap-0.5" classList={{ 'text-green-600': isReposted() }}>
+								<PostRepostDropdown uid={uid()} post={post()} reposted={isReposted()} class="-my-1.5 -ml-2" />
 								<span class="text-[0.8125rem]">{comformat.format(post().repostCount.value)}</span>
 							</div>
 

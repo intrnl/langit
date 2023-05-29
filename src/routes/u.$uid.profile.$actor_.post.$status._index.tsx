@@ -17,7 +17,7 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
-import PostDropdown from '~/components/PostDropdown.tsx';
+import { PostDropdown, PostRepostDropdown } from '~/components/PostDropdown.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
@@ -96,6 +96,8 @@ const AuthenticatedPostPage = () => {
 
 						const record = () => post.record.value;
 						const author = post.author;
+
+						const isReposted = () => !!post.viewer.repost.value;
 
 						return (
 							<>
@@ -213,13 +215,7 @@ const AuthenticatedPostPage = () => {
 											<ChatBubbleOutlinedIcon />
 										</UntypedAnchor>
 
-										<button
-											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
-											classList={{ 'text-green-600': !!post.viewer.repost.value }}
-											onClick={() => repostPost(uid(), post)}
-										>
-											<RepeatIcon />
-										</button>
+										<PostRepostDropdown uid={uid()} post={post} reposted={isReposted()} large />
 
 										<button
 											class="group flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"

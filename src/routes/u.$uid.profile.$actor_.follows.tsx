@@ -20,7 +20,7 @@ const AuthenticatedProfileFollowersPage = () => {
 	const followsQuery = createInfiniteQuery({
 		queryKey: () => getProfileFollowsKey(uid(), params.actor, PAGE_SIZE),
 		queryFn: getProfileFollows,
-		getNextPageParam: (last) => last.profiles.length >= PAGE_SIZE && last.cursor,
+		getNextPageParam: (last) => last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

@@ -59,7 +59,7 @@ const AuthenticatedFeedPage = () => {
 	const timelineQuery = createInfiniteQuery({
 		queryKey: () => getFeedKey(uid(), feedUri(), PAGE_SIZE),
 		queryFn: getFeed,
-		getNextPageParam: (last) => last.length >= PAGE_SIZE && last.cursor,
+		getNextPageParam: (last) => last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

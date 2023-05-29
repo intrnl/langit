@@ -27,7 +27,7 @@ const AuthenticatedHome = () => {
 	const timelineQuery = createInfiniteQuery({
 		queryKey: () => getTimelineKey(uid(), DEFAULT_ALGORITHM, PAGE_SIZE),
 		queryFn: getTimeline,
-		getNextPageParam: (last) => last.length >= PAGE_SIZE && last.cursor,
+		getNextPageParam: (last) => last.cursor,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,

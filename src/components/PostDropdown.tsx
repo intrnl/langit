@@ -10,6 +10,7 @@ import { repostPost } from '~/api/mutations/repost-post.ts';
 import Dialog from '~/components/Dialog.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
 
+import FormatQuoteIcon from '~/icons/baseline-format-quote';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
 
@@ -100,7 +101,8 @@ export const PostRepostDropdown = (props: PostRepostDropdownProps) => {
 						}}
 						class={/* @once */ menu.item()}
 					>
-						{reposted() ? 'Undo repost' : 'Repost'}
+						<RepeatIcon class="text-lg" />
+						<span>{reposted() ? 'Undo repost' : 'Repost'}</span>
 					</button>
 
 					<button
@@ -110,7 +112,8 @@ export const PostRepostDropdown = (props: PostRepostDropdownProps) => {
 						}}
 						class={/* @once */ menu.item()}
 					>
-						Quote post
+						<FormatQuoteIcon class="text-lg" />
+						<span>Quote post</span>
 					</button>
 
 					<button

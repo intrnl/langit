@@ -2,10 +2,6 @@ const MAX_HEIGHT = 2_000;
 const MAX_WIDTH = 2_000;
 const MAX_SIZE = 1_000_000; // 1 MB
 
-const MAX_QUALITY = 100;
-const MIN_QUALITY = 70;
-const QUALITY_STEP = 10;
-
 interface ImageResult {
 	width: number;
 	height: number;
@@ -49,7 +45,9 @@ export const compress = async (blob: Blob): Promise<CompressResult> => {
 	ctx.imageSmoothingQuality = 'high';
 	ctx.drawImage(image, 0, 0, width, height);
 
-	for (let q = MAX_QUALITY; q >= MIN_QUALITY; q -= QUALITY_STEP) {
+	const large = blob.size > 1_500_000;
+
+	for (let q = large ? 90 : 100; q >= 70; q -= 10) {
 		const result = await canvas.convertToBlob({
 			type: 'image/webp',
 			quality: q / 100,

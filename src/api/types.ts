@@ -85,6 +85,12 @@ export interface BskyPostRecordEmbedRecord {
 	};
 }
 
+export interface BskyPostRecordEmbedRecordWithMedia {
+	$type: 'app.bsky.embed.recordWithMedia';
+	media: BskyPostRecordEmbedImage;
+	record: BskyPostRecordEmbedRecord;
+}
+
 export interface BskyPostRecordReply {
 	cid: string;
 	uri: string;
@@ -99,7 +105,7 @@ export interface BskyPostRecord {
 		root: BskyPostRecordReply;
 		parent: BskyPostRecordReply;
 	};
-	embed?: BskyPostRecordEmbedImage | BskyPostRecordEmbedRecord;
+	embed?: BskyPostRecordEmbedImage | BskyPostRecordEmbedRecord | BskyPostRecordEmbedRecordWithMedia;
 }
 
 export interface EmbeddedLink {

@@ -29,7 +29,7 @@ import { type DID, getRecordId } from '~/api/utils.ts';
 import {
 	type BskyBlob,
 	type BskyPostRecord,
-	type BskyPostRecordEmbedImage,
+	type BskyPostRecordEmbedRecord,
 	type BskyPostRecordReply,
 	type BskyProfileTypeaheadSearch,
 	type BskySearchActorTypeaheadResponse,
@@ -46,6 +46,7 @@ import '~/styles/compose.css';
 import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Dialog from '~/components/Dialog.tsx';
+import EmbedRecord from '~/components/EmbedRecord.tsx';
 import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
@@ -83,12 +84,13 @@ const AuthenticatedComposePage = () => {
 	let fileInputRef: HTMLInputElement | undefined;
 
 	const navigate = useNavigate();
-	const [searchParams] = useSearchParams();
+	const [searchParams] = useSearchParams<{ quote?: string; reply?: string }>();
 	const params = useParams('/u/:uid/compose');
 
 	const uid = () => params.uid as DID;
 
 	const replyUri = () => searchParams.reply;
+	const quoteUri = () => searchParams.quote;
 
 	const [imageProcessing, setImageProcessing] = createSignal(0);
 	const [images, setImages] = createSignal<ComposedImage[]>([]);
@@ -101,15 +103,28 @@ const AuthenticatedComposePage = () => {
 	const did = createMemo(() => multiagent.accounts[uid()].session.did);
 
 	const replyQuery = createQuery({
-		queryKey: () => getPostKey(uid(), replyUri()),
+		queryKey: () => getPostKey(uid(), replyUri()!),
 		queryFn: getPost,
 		initialData() {
-			const signalized = postsCache[replyUri()];
+			const signalized = postsCache[replyUri()!];
 			return signalized?.deref();
 		},
-		staleTime: 10_000,
+		staleTime: 30_000,
 		get enabled() {
 			return !!replyUri();
+		},
+	});
+
+	const quoteQuery = createQuery({
+		queryKey: () => getPostKey(uid(), quoteUri()!),
+		queryFn: getPost,
+		initialData() {
+			const signalized = postsCache[quoteUri()!];
+			return signalized?.deref();
+		},
+		staleTime: 30_000,
+		get enabled() {
+			return !!quoteUri();
 		},
 	});
 
@@ -132,6 +147,7 @@ const AuthenticatedComposePage = () => {
 		const image = images();
 		return (
 			!replyQuery.isInitialLoading &&
+			!quoteQuery.isInitialLoading &&
 			state() === PostState.IDLE &&
 			((len > 0 && len <= 300) || image.length > 0)
 		);
@@ -147,10 +163,11 @@ const AuthenticatedComposePage = () => {
 		setState(PostState.DISPATCHING);
 
 		const reply = replyQuery.data;
+		const quote = quoteQuery.data;
 		const image = images();
 
-		let replyRecord: BskyPostRecord['reply'] | undefined;
-		let embedRecord: BskyPostRecordEmbedImage | undefined;
+		let replyRecord: BskyPostRecord['reply'];
+		let embedRecord: BskyPostRecord['embed'];
 
 		if (reply) {
 			const ref: BskyPostRecordReply = {
@@ -196,6 +213,26 @@ const AuthenticatedComposePage = () => {
 				$type: 'app.bsky.embed.images',
 				images: image.map((img) => ({ alt: img.alt.value, image: img.record! })),
 			};
+		}
+
+		if (quote) {
+			const rec: BskyPostRecordEmbedRecord = {
+				$type: 'app.bsky.embed.record',
+				record: {
+					cid: quote.cid,
+					uri: quote.uri,
+				},
+			};
+
+			if (embedRecord && embedRecord.$type === 'app.bsky.embed.images') {
+				embedRecord = {
+					$type: 'app.bsky.embed.recordWithMedia',
+					media: embedRecord,
+					record: rec,
+				};
+			} else {
+				embedRecord = rec;
+			}
 		}
 
 		setMessage(undefined);
@@ -422,6 +459,46 @@ const AuthenticatedComposePage = () => {
 							{(msg) => <div class="rounded-md border border-divider px-3 py-2 text-sm">{msg()}</div>}
 						</Show>
 					</div>
+
+					<Switch>
+						<Match when={quoteQuery.isInitialLoading}>
+							<div class="mb-3 mr-3 flex items-center justify-center rounded-md border border-divider p-4">
+								<CircularProgress />
+							</div>
+						</Match>
+
+						<Match when={quoteQuery.data}>
+							{(data) => {
+								const author = () => data().author;
+								const record = () => data().record.value;
+
+								return (
+									<div class="mb-3 mr-3 flex flex-col">
+										<EmbedRecord
+											uid={uid()}
+											// lol
+											record={{
+												$type: 'app.bsky.embed.record#viewRecord',
+												uri: data().uri,
+												// @ts-expect-error this is the only values required for author object
+												author: {
+													did: author().did,
+													avatar: author().avatar.value,
+													handle: author().handle.value,
+													displayName: author().handle.value,
+												},
+												embeds: data().embed.value ? [data().embed.value!] : [],
+												value: {
+													createdAt: record().createdAt,
+													text: record().text,
+												},
+											}}
+										/>
+									</div>
+								);
+							}}
+						</Match>
+					</Switch>
 
 					<div class="flex flex-wrap gap-3 pb-4 pr-3 empty:hidden">
 						<For each={images()}>

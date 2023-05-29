@@ -12,4 +12,4 @@ export const item = cva(
 	'cursor-pointer flex items-center gap-4 px-4 py-3 text-left text-sm hover:bg-hinted disabled:pointer-events-none disabled:opacity-50',
 );
 
-export const cancel = cva(button({ color: 'outline', class: 'mx-4 mt-3 mb-6 justify-center sm:mb-3' }));
+export const cancel = cva(button({ color: 'outline', class: 'mx-4 mt-3 mb-6 justify-center sm:mb-4' }));

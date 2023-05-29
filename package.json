@@ -9,9 +9,9 @@
 		"fmt": "prettier --cache --write ."
 	},
 	"dependencies": {
-		"@floating-ui/dom": "^1.2.8",
+		"@floating-ui/dom": "^1.2.9",
 		"@solidjs/router": "^0.8.2",
-		"@tanstack/solid-query": "^4.29.7",
+		"@tanstack/solid-query": "^4.29.11",
 		"@tiptap/core": "^2.0.3",
 		"@tiptap/extension-document": "^2.0.3",
 		"@tiptap/extension-hard-break": "^2.0.3",
@@ -30,17 +30,17 @@
 	},
 	"devDependencies": {
 		"@tailwindcss/forms": "^0.5.3",
-		"@types/node": "^18.16.12",
+		"@types/node": "^18.16.16",
 		"autoprefixer": "^10.4.14",
 		"glob-to-regexp": "^0.4.1",
-		"postcss": "^8.4.23",
+		"postcss": "^8.4.24",
 		"prettier": "^2.8.8",
 		"prettier-plugin-tailwindcss": "^0.3.0",
 		"remix-flat-routes": "^0.5.8",
 		"tailwindcss": "^3.3.2",
-		"terser": "^5.17.4",
+		"terser": "^5.17.6",
 		"typescript": "^5.0.4",
-		"vite": "4.3.5",
+		"vite": "4.3.9",
 		"vite-plugin-solid": "^2.7.0"
 	},
 	"pnpm": {

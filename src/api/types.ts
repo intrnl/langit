@@ -322,15 +322,17 @@ export interface BskyNotification<T extends string, R extends {}> {
 }
 
 export type BskyFollowNotification = BskyNotification<'follow', BskyFollowRecord>;
+export type BskyLikeNotification = BskyNotification<'like', BskyLikeRecord>;
+export type BskyQuoteNotification = BskyNotification<'quote', BskyPostRecord>;
 export type BskyReplyNotification = BskyNotification<'reply', BskyPostRecord>;
 export type BskyRepostNotification = BskyNotification<'repost', BskyRepostRecord>;
-export type BskyLikeNotification = BskyNotification<'like', BskyLikeRecord>;
 
 export type BskyNotificationType =
 	| BskyFollowNotification
+	| BskyLikeNotification
+	| BskyQuoteNotification
 	| BskyReplyNotification
-	| BskyRepostNotification
-	| BskyLikeNotification;
+	| BskyRepostNotification;
 
 export interface BskyNotificationsResponse {
 	cursor?: string;

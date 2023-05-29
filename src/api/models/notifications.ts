@@ -2,6 +2,7 @@ import {
 	type BskyFollowNotification,
 	type BskyLikeNotification,
 	type BskyNotificationsResponse,
+	type BskyQuoteNotification,
 	type BskyReplyNotification,
 	type BskyRepostNotification,
 } from '../types.ts';
@@ -28,6 +29,13 @@ export interface ReplyNotificationSlice {
 	item: BskyReplyNotification;
 }
 
+export interface QuoteNotificationSlice {
+	type: 'quote';
+	read: boolean;
+	date: number;
+	item: BskyQuoteNotification;
+}
+
 export interface RepostNotificationSlice {
 	type: 'repost';
 	read: boolean;
@@ -39,6 +47,7 @@ export interface RepostNotificationSlice {
 export type NotificationSlice =
 	| FollowNotificationSlice
 	| LikeNotificationSlice
+	| QuoteNotificationSlice
 	| ReplyNotificationSlice
 	| RepostNotificationSlice;
 
@@ -132,13 +141,14 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 				// @ts-expect-error
 				items: [item],
 			});
-		} else if (reason === 'reply') {
+		} else if (reason === 'reply' || reason === 'quote') {
 			slen++;
 
 			slices.unshift({
 				type: reason,
 				read: item.isRead,
 				date: date,
+				// @ts-expect-error
 				item: item,
 			});
 		}

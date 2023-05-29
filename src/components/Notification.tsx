@@ -9,6 +9,7 @@ import {
 	type FollowNotificationSlice,
 	type LikeNotificationSlice,
 	type NotificationSlice,
+	type QuoteNotificationSlice,
 	type ReplyNotificationSlice,
 	type RepostNotificationSlice,
 } from '~/api/models/notifications.ts';
@@ -52,10 +53,10 @@ const Notification = (props: NotificationProps) => {
 
 	return (
 		<Switch>
-			<Match when={_data().type === 'reply'}>
+			<Match when={_data().type === 'reply' || _data().type === 'quote'}>
 				{/* @ts-expect-error */}
 				{() => {
-					const data = _data as any as Accessor<ReplyNotificationSlice>;
+					const data = _data as any as Accessor<ReplyNotificationSlice | QuoteNotificationSlice>;
 
 					const reply = () => data().item;
 
@@ -84,24 +85,27 @@ const Notification = (props: NotificationProps) => {
 							const ref = postsCache[parentUri()];
 							return ref?.deref();
 						},
+						get enabled() {
+							return data().type === 'reply';
+						},
 					});
 
 					return (
 						<Switch>
-							<Match when={replyQuery.isLoading || parentQuery.isLoading}>
+							<Match when={replyQuery.isInitialLoading || parentQuery.isInitialLoading}>
 								<div class="flex justify-center border-b border-divider p-3">
 									<CircularProgress />
 								</div>
 							</Match>
 
-							<Match when={replyQuery.data && parentQuery.data} keyed>
+							<Match when={replyQuery.data} keyed>
 								{/* @ts-expect-error*/}
 								{() => {
-									const post = replyQuery.data!;
-									const parent = parentQuery.data!;
+									const post = () => replyQuery.data!;
+									const parent = () => parentQuery.data;
 
 									return (
-										<Post interactive uid={uid()} post={post} parent={parent} highlight={!data().read} />
+										<Post interactive uid={uid()} post={post()} parent={parent()} highlight={!data().read} />
 									);
 								}}
 							</Match>

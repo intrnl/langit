@@ -57,7 +57,7 @@ const AuthenticatedExplorePage = () => {
 						const feedQuery = createQuery({
 							queryKey: () => getFeedGeneratorKey(uid(), feedUri),
 							queryFn: getFeedGenerator,
-							staleTime: 30_000,
+							staleTime: 120_000,
 							suspense: true,
 							initialData: () => {
 								const ref = feedGeneratorsCache[feedUri];
@@ -68,7 +68,7 @@ const AuthenticatedExplorePage = () => {
 						const timelineQuery = createQuery({
 							queryKey: () => getFeedKey(uid(), feedUri, MAX_POSTS),
 							queryFn: getFeed,
-							staleTime: 30_000,
+							staleTime: 60_000,
 							suspense: true,
 						});
 

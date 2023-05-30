@@ -13,11 +13,10 @@ import * as relformat from '~/utils/intl/relformatter.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import Embed from '~/components/Embed.tsx';
-import { PostDropdown, PostRepostDropdown } from '~/components/PostDropdown.tsx';
+import { PostDropdown, PostRepostDropdown, PostShareDropdown } from '~/components/PostDropdown.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
-import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
 
@@ -203,9 +202,7 @@ const Post = (props: PostProps) => {
 							</div>
 
 							<div class="shrink-0">
-								<button class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary">
-									<ShareIcon />
-								</button>
+								<PostShareDropdown post={post()} class="-mx-2 -my-1.5" />
 							</div>
 						</div>
 					</Show>

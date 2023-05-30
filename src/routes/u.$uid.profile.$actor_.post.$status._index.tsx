@@ -7,7 +7,6 @@ import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
-import { repostPost } from '~/api/mutations/repost-post.ts';
 import { getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { A, useParams } from '~/router.ts';
@@ -17,12 +16,10 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
-import { PostDropdown, PostRepostDropdown } from '~/components/PostDropdown.tsx';
+import { PostDropdown, PostRepostDropdown, PostShareDropdown } from '~/components/PostDropdown.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
-import RepeatIcon from '~/icons/baseline-repeat.tsx';
-import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
 
@@ -226,9 +223,7 @@ const AuthenticatedPostPage = () => {
 											<FavoriteIcon class="hidden group-[.is-active]:block" />
 										</button>
 
-										<button class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary">
-											<ShareIcon />
-										</button>
+										<PostShareDropdown post={post} large />
 									</div>
 								</div>
 

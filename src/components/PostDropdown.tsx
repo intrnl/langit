@@ -13,9 +13,11 @@ import { A } from '~/router.ts';
 import Dialog from '~/components/Dialog.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
 
-import FormatQuoteIcon from '~/icons/baseline-format-quote';
+import FormatQuoteIcon from '~/icons/baseline-format-quote.tsx';
+import LinkIcon from '~/icons/baseline-link.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
+import ShareIcon from '~/icons/baseline-share.tsx';
 
 export interface PostDropdownProps {
 	uid: DID;
@@ -155,7 +157,7 @@ export const PostRepostDropdown = (props: PostRepostDropdownProps) => {
 	return (
 		<>
 			<button
-				class={`flex items-center justify-center rounded-full hover:bg-secondary ${props.class}`}
+				class={`flex items-center justify-center rounded-full hover:bg-secondary ${props.class || ''}`}
 				classList={{
 					'text-green-600': reposted(),
 					'h-9 w-9 text-xl': large(),
@@ -191,6 +193,65 @@ export const PostRepostDropdown = (props: PostRepostDropdownProps) => {
 					>
 						<FormatQuoteIcon class="text-lg" />
 						<span>Quote post</span>
+					</button>
+
+					<button
+						onClick={() => {
+							setIsOpen(false);
+						}}
+						class={/* @once */ menu.cancel()}
+					>
+						Cancel
+					</button>
+				</div>
+			</Dialog>
+		</>
+	);
+};
+
+export interface PostShareDropdownProps {
+	post: SignalizedPost;
+	large?: boolean;
+	class?: string;
+}
+
+export const PostShareDropdown = (props: PostShareDropdownProps) => {
+	const [isOpen, setIsOpen] = createSignal(false);
+
+	const post = () => props.post;
+	const large = () => props.large;
+
+	return (
+		<>
+			<button
+				class={`flex items-center justify-center rounded-full hover:bg-secondary ${props.class || ''}`}
+				classList={{
+					'h-9 w-9 text-xl': large(),
+					'h-8 w-8 text-base': !large(),
+				}}
+				onClick={() => setIsOpen(true)}
+			>
+				<ShareIcon />
+			</button>
+
+			<Dialog open={isOpen()} onClose={() => setIsOpen(false)}>
+				<div class={/* @once */ menu.content()}>
+					<button
+						onClick={() => {
+							const protocol = location.protocol;
+							const host = location.host;
+
+							const uri = post().uri;
+							const author = getRepoId(uri);
+							const status = getRecordId(uri);
+
+							navigator.clipboard.writeText(`${protocol}//${host}/r/profile/${author}/post/${status}`);
+							setIsOpen(false);
+						}}
+						class={/* @once */ menu.item()}
+					>
+						<LinkIcon class="text-lg" />
+						<span>Copy link to post</span>
 					</button>
 
 					<button

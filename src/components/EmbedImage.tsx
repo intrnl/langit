@@ -18,26 +18,40 @@ const EmbedImage = (props: EmbedImageProps) => {
 		<div classList={{ 'overflow-hidden rounded-md border border-divider': !props.borderless }}>
 			<Switch>
 				<Match when={images().length >= 4}>
-					<div class="grid aspect-video grid-cols-2 grid-rows-2 gap-0.5">
-						{renderImg(images()[0], 'h-full w-full object-cover')}
-						{renderImg(images()[1], 'h-full w-full object-cover')}
-						{renderImg(images()[2], 'h-full w-full object-cover')}
-						{renderImg(images()[3], 'h-full w-full object-cover')}
+					<div class="flex aspect-video gap-0.5">
+						<div class="flex grow basis-0 flex-col gap-0.5">
+							{renderImg(images()[0], 'min-h-0 grow basis-0 object-cover')}
+							{renderImg(images()[1], 'min-h-0 grow basis-0 object-cover')}
+						</div>
+
+						<div class="flex grow basis-0 flex-col gap-0.5">
+							{renderImg(images()[2], 'min-h-0 grow basis-0 object-cover')}
+							{renderImg(images()[3], 'min-h-0 grow basis-0 object-cover')}
+						</div>
 					</div>
 				</Match>
 
 				<Match when={images().length >= 3}>
-					<div class="grid aspect-video grid-flow-col grid-rows-2 gap-0.5">
-						{renderImg(images()[0], 'h-full w-full object-cover')}
-						{renderImg(images()[1], 'h-full w-full object-cover')}
-						{renderImg(images()[2], 'h-full w-full row-span-2 object-cover')}
+					<div class="flex aspect-video gap-0.5">
+						<div class="flex grow basis-0 flex-col gap-0.5">
+							{renderImg(images()[0], 'min-h-0 grow basis-0 object-cover')}
+							{renderImg(images()[1], 'min-h-0 grow basis-0 object-cover')}
+						</div>
+
+						<div class="flex grow basis-0 flex-col gap-0.5">
+							{renderImg(images()[2], 'min-h-0 grow basis-0 object-cover')}
+						</div>
 					</div>
 				</Match>
 
 				<Match when={images().length >= 2}>
 					<div class="flex aspect-video gap-0.5">
-						{renderImg(images()[0], 'grow h-full object-cover')}
-						{renderImg(images()[1], 'grow h-full object-cover')}
+						<div class="flex grow basis-0 flex-col gap-0.5">
+							{renderImg(images()[0], 'min-h-0 grow basis-0 object-cover')}
+						</div>
+						<div class="flex grow basis-0 flex-col gap-0.5">
+							{renderImg(images()[1], 'min-h-0 grow basis-0 object-cover')}
+						</div>
 					</div>
 				</Match>
 

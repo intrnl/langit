@@ -6,14 +6,12 @@ import { Stack } from '~/utils/stack.ts';
 const calculatePostScore = (post: BskyPost, parent: BskyPost) => {
 	const isSameAuthor = parent.author.did === post.author.did;
 	const isFollowing = !!post.author.viewer.following;
-	const isLiked = !!(post.viewer.like || post.viewer.repost);
 
 	return (
 		1 *
 		(post.replyCount * 0.5 + post.repostCount * 1 + post.likeCount * 1) *
 		(isSameAuthor ? 1.5 : 1) *
-		(isFollowing ? 1.25 : 1) *
-		(isLiked ? 1.15 : 1)
+		(isFollowing ? 1.35 : 1)
 	);
 };
 

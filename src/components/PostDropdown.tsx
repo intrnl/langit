@@ -256,6 +256,17 @@ export const PostShareDropdown = (props: PostShareDropdownProps) => {
 
 					<button
 						onClick={() => {
+							navigator.clipboard.writeText(post().record.value.text);
+							setIsOpen(false);
+						}}
+						class={/* @once */ menu.item()}
+					>
+						<LinkIcon class="text-lg" />
+						<span>Copy post text</span>
+					</button>
+
+					<button
+						onClick={() => {
 							setIsOpen(false);
 						}}
 						class={/* @once */ menu.cancel()}

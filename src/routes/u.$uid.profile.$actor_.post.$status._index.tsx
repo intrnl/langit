@@ -168,7 +168,7 @@ const AuthenticatedPostPage = () => {
 										</A>
 
 										<div class="flex shrink-0 grow justify-end">
-											<PostDropdown post={post} />
+											<PostDropdown post={post} uid={uid()} />
 										</div>
 									</div>
 

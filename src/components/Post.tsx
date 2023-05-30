@@ -160,7 +160,7 @@ const Post = (props: PostProps) => {
 
 						<Show when={interactive()}>
 							<div class="shrink-0">
-								<PostDropdown post={post()} />
+								<PostDropdown post={post()} uid={uid()} />
 							</div>
 						</Show>
 					</div>

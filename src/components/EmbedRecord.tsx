@@ -1,11 +1,10 @@
 import { Show, createMemo } from 'solid-js';
+import { Dynamic } from 'solid-js/web';
 
-import { useNavigate } from '@solidjs/router';
+import { A } from '@solidjs/router';
 
 import { type EmbeddedPostRecord } from '~/api/types.ts';
 import { getRecordId } from '~/api/utils.ts';
-
-import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import EmbedImage from '~/components/EmbedImage.tsx';
 
@@ -20,8 +19,6 @@ export interface EmbedRecordProps {
 }
 
 const EmbedRecord = (props: EmbedRecordProps) => {
-	const navigate = useNavigate();
-
 	const record = () => props.record;
 	const large = () => props.large;
 	const interactive = () => props.interactive;
@@ -48,26 +45,10 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 		}
 	});
 
-	const handleClick = (ev: MouseEvent | KeyboardEvent) => {
-		if (!interactive() || !isElementClicked(ev)) {
-			return;
-		}
-
-		const path = `/u/${props.uid}/profile/${author().did}/post/${getRecordId(record().uri)}`;
-
-		if (isElementAltClicked(ev)) {
-			open(path, '_blank');
-		} else {
-			navigate(path);
-		}
-	};
-
 	return (
-		<div
-			tabindex={interactive() ? 0 : undefined}
-			onClick={handleClick}
-			onAuxClick={handleClick}
-			onKeyDown={handleClick}
+		<Dynamic
+			component={interactive() ? A : 'div'}
+			href={`/u/${props.uid}/profile/${author().did}/post/${getRecordId(record().uri)}`}
 			class="overflow-hidden rounded-md border border-divider"
 			classList={{ 'cursor-pointer hover:bg-secondary': interactive() }}
 		>
@@ -105,7 +86,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 
 				<EmbedImage images={images()!} borderless />
 			</Show>
-		</div>
+		</Dynamic>
 	);
 };
 

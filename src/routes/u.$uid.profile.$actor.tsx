@@ -12,9 +12,13 @@ import { openModal } from '~/globals/modals.tsx';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
 import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
+import ProfileMenu from '~/components/menus/ProfileMenu.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import FollowButton from '~/components/FollowButton.tsx';
 import TabLink from '~/components/TabLink.tsx';
+import button from '~/styles/primitives/button.ts';
+
+import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
 const AuthenticatedProfileLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor');
@@ -66,6 +70,16 @@ const AuthenticatedProfileLayout = () => {
 									</div>
 
 									<div class="grow" />
+
+									<button
+										title="Actions"
+										onClick={() => {
+											openModal(() => <ProfileMenu uid={uid()} profile={profile()} />);
+										}}
+										class={/* @once */ button({ color: 'outline' })}
+									>
+										<MoreHorizIcon class="-mx-1.5 text-base" />
+									</button>
 
 									<FollowButton uid={uid()} profile={profile()} />
 								</div>

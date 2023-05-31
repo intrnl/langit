@@ -6,7 +6,7 @@ import { type DID, getRecordId } from '../utils.ts';
 import { acquire } from './_locker.ts';
 
 export const favoritePost = (uid: DID, post: SignalizedPost) => {
-	return acquire(post, async () => {
+	return acquire(post.viewer.like, async () => {
 		const agent = await multiagent.connect(uid);
 
 		const prev = post.viewer.like.peek();

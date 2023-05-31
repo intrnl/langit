@@ -6,7 +6,7 @@ import { type DID, getRecordId } from '../utils.ts';
 import { acquire } from './_locker.ts';
 
 export const followProfile = (uid: DID, profile: SignalizedProfile) => {
-	return acquire(profile, async () => {
+	return acquire(profile.viewer.following, async () => {
 		const agent = await multiagent.connect(uid);
 
 		const prev = profile.viewer.following.peek();

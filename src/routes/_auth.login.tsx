@@ -7,15 +7,14 @@ import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 import { multiagent } from '~/api/global.ts';
 import { XRPC } from '~/api/rpc/xrpc.ts';
 
+import { openModal } from '~/globals/modals.tsx';
 import { model } from '~/utils/misc.ts';
 
-import Dialog from '~/components/Dialog.tsx';
+import AppPasswordNoticeDialog from '~/components/dialogs/AppPasswordNoticeDialog';
 import button from '~/styles/primitives/button.ts';
-import * as dialog from '~/styles/primitives/dialog.ts';
 import input from '~/styles/primitives/input.ts';
 
 const APP_PASSWORD_REGEX = /^[a-zA-Z\d]{4}(-[a-zA-Z\d]{4}){3}$/;
-const APP_PASSWORD_LINK = 'https://github.com/bluesky-social/atproto-ecosystem/blob/main/app-passwords.md';
 
 const AuthLoginPage = () => {
 	const navigate = useNavigate();
@@ -28,8 +27,6 @@ const AuthLoginPage = () => {
 
 	const [identifier, setIdentifier] = createSignal('');
 	const [password, setPassword] = createSignal('');
-
-	const [isNoticeOpen, setIsNoticeOpen] = createSignal(false);
 
 	const describeQuery = createQuery(
 		() => ['describeServer', service().url],
@@ -53,7 +50,7 @@ const AuthLoginPage = () => {
 		setError('');
 
 		if (!force && !APP_PASSWORD_REGEX.test($password)) {
-			setIsNoticeOpen(true);
+			openModal(() => <AppPasswordNoticeDialog onSubmit={() => submit(true)} />);
 			return;
 		}
 
@@ -157,46 +154,6 @@ const AuthLoginPage = () => {
 					</button>
 				</div>
 			</form>
-
-			<Dialog open={isNoticeOpen()} onClose={() => setIsNoticeOpen(false)}>
-				<div class={/* @once */ dialog.content()}>
-					<h1 class={/* @once */ dialog.title()}>Password notice</h1>
-
-					<p class="mt-3 text-sm">
-						You seem to be attempting to login with your regular password. For your safety, we recommend using
-						app passwords when trying to sign in to third-party clients such as Langit.{' '}
-						<a
-							href={APP_PASSWORD_LINK}
-							target="_blank"
-							rel="noopener noreferrer nofollow"
-							class="text-accent hover:underline"
-						>
-							Learn more here
-						</a>
-						.
-					</p>
-
-					<div class={/* @once */ dialog.actions()}>
-						<button
-							onClick={() => {
-								setIsNoticeOpen(false);
-							}}
-							class={/* @once */ button({ color: 'ghost' })}
-						>
-							Cancel
-						</button>
-						<button
-							onClick={() => {
-								setIsNoticeOpen(false);
-								submit(true);
-							}}
-							class={/* @once */ button({ color: 'primary' })}
-						>
-							Log in anyway
-						</button>
-					</div>
-				</div>
-			</Dialog>
 		</div>
 	);
 };

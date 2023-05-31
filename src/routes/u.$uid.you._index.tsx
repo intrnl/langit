@@ -1,33 +1,26 @@
-import { For, Show, createMemo, createSignal } from 'solid-js';
+import { For, Show, createMemo } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
 
 import { multiagent } from '~/api/global.ts';
-import { type MultiagentAccountData } from '~/api/multiagent.ts';
-import { type LocalSettings, preferences } from '~/api/preferences.ts';
 import { type DID } from '~/api/utils.ts';
 
 import { A, useParams } from '~/router.ts';
+import { openModal } from '~/globals/modals.tsx';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
-import Dialog from '~/components/Dialog.tsx';
-import button from '~/styles/primitives/button.ts';
-import * as dialog from '~/styles/primitives/dialog.ts';
-import * as menu from '~/styles/primitives/menu.ts';
+import AccountActionMenu from '~/components/menus/AccountActionMenu.tsx';
+import AppThemeMenu from '~/components/menus/AppThemeMenu.tsx';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import AddIcon from '~/icons/baseline-add.tsx';
 import BrightnessMediumIcon from '~/icons/baseline-brightness-medium.tsx';
-import CheckIcon from '~/icons/baseline-check.tsx';
 import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');
 	const navigate = useNavigate();
-
-	const [toLogout, setToLogout] = createSignal<MultiagentAccountData>();
-	const [isThemeOpen, setIsThemeOpen] = createSignal(false);
 
 	const uid = () => params.uid as DID;
 
@@ -37,15 +30,6 @@ const AuthenticatedYouPage = () => {
 		const store = multiagent.accounts;
 		return Object.values(store).sort((account) => (account.did === uid() ? -1 : 1));
 	});
-
-	const theme = createMemo(() => {
-		const prefs = preferences.get('local');
-		return prefs?.theme ?? 'auto';
-	});
-
-	const setTheme = (next: NonNullable<LocalSettings['theme']>) => {
-		preferences.merge('local', { theme: next });
-	};
 
 	return (
 		<div class="flex flex-col pb-4">
@@ -57,8 +41,6 @@ const AuthenticatedYouPage = () => {
 				{(account) => {
 					const profile = account.profile;
 					const did = account.did;
-
-					const [open, setOpen] = createSignal(false);
 
 					const handleClick = (ev: MouseEvent | KeyboardEvent) => {
 						if (!isElementClicked(ev)) {
@@ -105,49 +87,15 @@ const AuthenticatedYouPage = () => {
 
 								<div>
 									<button
-										onClick={() => setOpen(true)}
+										onClick={() => {
+											openModal(() => <AccountActionMenu uid={uid()} account={account} />);
+										}}
 										class="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 									>
 										<MoreHorizIcon />
 									</button>
 								</div>
 							</div>
-
-							<Dialog open={open()} onClose={() => setOpen(false)}>
-								<div class={/* @once */ menu.content()}>
-									<div class={/* @once */ menu.title()}>{profile ? `@${profile.handle}` : did}</div>
-
-									<button
-										onClick={() => {
-											setToLogout(account);
-											setOpen(false);
-										}}
-										class={/* @once */ menu.item()}
-									>
-										Sign out
-									</button>
-
-									<button
-										disabled={did === asDefault()}
-										onClick={() => {
-											multiagent.active = did;
-											setOpen(false);
-										}}
-										class={/* @once */ menu.item()}
-									>
-										Set as default
-									</button>
-
-									<button
-										onClick={() => {
-											setOpen(false);
-										}}
-										class={/* @once */ menu.cancel()}
-									>
-										Cancel
-									</button>
-								</div>
-							</Dialog>
 						</>
 					);
 				}}
@@ -179,89 +127,14 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<button
-				onClick={() => setIsThemeOpen(true)}
+				onClick={() => {
+					openModal(() => <AppThemeMenu />);
+				}}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<BrightnessMediumIcon class="text-2xl" />
 				<span>Application theme</span>
 			</button>
-
-			<Dialog open={isThemeOpen()} onClose={() => setIsThemeOpen(false)}>
-				<div class={/* @once */ menu.content()}>
-					<h1 class={/* @once */ menu.title()}>Application theme</h1>
-
-					<button
-						onClick={() => setTheme('light')}
-						class={/* @once */ menu.item()}
-						classList={{ 'group is-active': theme() === 'light' }}
-					>
-						<span class="grow">Light theme</span>
-						<CheckIcon class="hidden text-xl text-accent group-[.is-active]:block" />
-					</button>
-					<button
-						onClick={() => setTheme('dark')}
-						class={/* @once */ menu.item()}
-						classList={{ 'group is-active': theme() === 'dark' }}
-					>
-						<span class="grow">Dark theme</span>
-						<CheckIcon class="hidden text-xl text-accent group-[.is-active]:block" />
-					</button>
-					<button
-						onClick={() => setTheme('auto')}
-						class={/* @once */ menu.item()}
-						classList={{ 'group is-active': theme() === 'auto' }}
-					>
-						<span class="grow">Automatic</span>
-						<CheckIcon class="hidden text-xl text-accent group-[.is-active]:block" />
-					</button>
-
-					<button
-						onClick={() => {
-							setIsThemeOpen(false);
-						}}
-						class={/* @once */ menu.cancel()}
-					>
-						Cancel
-					</button>
-				</div>
-			</Dialog>
-
-			<Dialog open={toLogout() !== undefined}>
-				<div class={/* @once */ dialog.content()}>
-					<h1 class={/* @once */ dialog.title()}>Sign out?</h1>
-
-					<p class="mt-3 text-sm">
-						This will sign you out of{' '}
-						{toLogout()!.profile ? `@${toLogout()!.profile!.handle}` : toLogout()!.did}, and you'll still be
-						signed in to other accounts.
-					</p>
-
-					<div class={/* @once */ dialog.actions()}>
-						<button
-							onClick={() => {
-								setToLogout(undefined);
-							}}
-							class={/* @once */ button({ color: 'ghost' })}
-						>
-							Cancel
-						</button>
-						<button
-							onClick={() => {
-								const did = toLogout()!.did;
-
-								multiagent.logout(did);
-
-								if (uid() === did) {
-									navigate('/');
-								}
-							}}
-							class={/* @once */ button({ color: 'primary' })}
-						>
-							Sign out
-						</button>
-					</div>
-				</div>
-			</Dialog>
 		</div>
 	);
 };

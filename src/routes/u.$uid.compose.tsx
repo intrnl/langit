@@ -64,6 +64,8 @@ import { compress } from '~/utils/image.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
 import { Locker } from '~/utils/lock.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
+import { getLinkMeta, getLinkMetaKey } from '~/api/queries/get-link-meta';
+import EmbedLink from '~/components/EmbedLink';
 
 const MENTION_SUGGESTION_LIMIT = 6;
 const GRAPHEME_LIMIT = 300;
@@ -98,6 +100,7 @@ const AuthenticatedComposePage = () => {
 	const quoteUri = () => searchParams.quote;
 
 	const [recordUri, setRecordUri] = createDerivedSignal(quoteUri);
+	const [linkUrl, setLinkUrl] = createSignal<string>();
 
 	const [imageProcessing, setImageProcessing] = createSignal(0);
 	const [images, setImages] = createSignal<ComposedImage[]>([]);
@@ -106,6 +109,22 @@ const AuthenticatedComposePage = () => {
 	const [message, setMessage] = createSignal<string>();
 	const [state, setState] = createSignal(PostState.IDLE);
 	const [richtext, setRichtext] = createSignal<ReturnType<typeof pm2rt>>();
+
+	const links = createMemo(() => richtext()?.links, undefined, {
+		equals: (a, b) => {
+			if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
+				for (let idx = a.length - 1; idx >= 0; idx--) {
+					if (a[idx] !== b[idx]) {
+						return false;
+					}
+				}
+
+				return true;
+			}
+
+			return a === b;
+		},
+	});
 
 	const did = createMemo(() => multiagent.accounts[uid()].session.did);
 
@@ -147,6 +166,17 @@ const AuthenticatedComposePage = () => {
 		get enabled() {
 			const uri = recordUri();
 			return !!uri && (isAtpFeedUri(uri) || isBskyFeedUrl(uri));
+		},
+	});
+
+	const linkQuery = createQuery({
+		queryKey: () => getLinkMetaKey(linkUrl()!),
+		queryFn: getLinkMeta,
+		staleTime: 30_000,
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
+		get enabled() {
+			return !!linkUrl();
 		},
 	});
 
@@ -303,6 +333,7 @@ const AuthenticatedComposePage = () => {
 			});
 		}
 
+		setLinkUrl(undefined);
 		setImages(images().concat(next));
 	};
 
@@ -547,29 +578,121 @@ const AuthenticatedComposePage = () => {
 						</Match>
 					</Switch>
 
-					<div class="flex flex-wrap gap-3 pb-4 pr-3 empty:hidden">
-						<For each={images()}>
-							{(image, idx) => (
-								<div class="relative">
-									<BlobImage src={image.blob} class="h-32 w-32 rounded-md object-cover" />
+					<Switch>
+						<Match when={images().length > 0}>
+							<div class="flex flex-wrap gap-3 pb-4 pr-3">
+								<For each={images()}>
+									{(image, idx) => (
+										<div class="relative">
+											<BlobImage src={image.blob} class="h-32 w-32 rounded-md object-cover" />
+
+											<button
+												title="Remove image"
+												disabled={!isEnabled()}
+												onClick={() => {
+													const next = images().slice();
+													next.splice(idx(), 1);
+
+													setImages(next);
+												}}
+												class="absolute right-1 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-fg"
+											>
+												<CloseIcon />
+											</button>
+										</div>
+									)}
+								</For>
+							</div>
+						</Match>
+
+						<Match when={linkQuery.isInitialLoading}>
+							<div class="mb-3 mr-3 flex items-center justify-between gap-3 rounded-md border border-divider p-3 pl-4">
+								<CircularProgress />
+
+								<button
+									disabled={!isEnabled()}
+									onClick={() => setLinkUrl(undefined)}
+									class={/* @once */ button({ color: 'primary' })}
+								>
+									Remove
+								</button>
+							</div>
+						</Match>
+
+						<Match when={linkQuery.error}>
+							{(error) => (
+								<div class="mb-3 mr-3 flex items-center justify-between gap-3 rounded-md border border-divider p-3">
+									<div class="grow text-sm">
+										<p>Error adding link card</p>
+										<p class="text-muted-fg">{'' + ((error() as any)?.message || error())}</p>
+									</div>
 
 									<button
-										title="Remove image"
 										disabled={!isEnabled()}
-										onClick={() => {
-											const next = images().slice();
-											next.splice(idx(), 1);
-
-											setImages(next);
-										}}
-										class="absolute right-1 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-fg"
+										onClick={() => setLinkUrl(undefined)}
+										class={/* @once */ button({ color: 'primary' })}
 									>
-										<CloseIcon />
+										Remove
 									</button>
 								</div>
 							)}
-						</For>
-					</div>
+						</Match>
+
+						<Match when={linkQuery.data}>
+							{(data) => {
+								return (
+									<div class="relative mb-3 mr-3 flex flex-col">
+										<EmbedLink
+											link={{
+												$type: 'app.bsky.embed.external#viewExternal',
+												title: data().title,
+												description: data().description,
+												uri: data().uri,
+												thumb: data().thumb,
+											}}
+										/>
+
+										<button
+											title="Remove link card"
+											disabled={!isEnabled()}
+											onClick={() => setLinkUrl(undefined)}
+											class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-fg"
+										>
+											<CloseIcon />
+										</button>
+									</div>
+								);
+							}}
+						</Match>
+
+						<Match when={links()}>
+							{(links) => (
+								<div class="mb-3 mr-3 flex flex-col gap-3 empty:hidden">
+									<For each={links()}>
+										{(link) => {
+											const isRecord = isBskyPostUrl(link) || isBskyFeedUrl(link);
+
+											return (
+												<button
+													onClick={() => {
+														if (isRecord) {
+															setRecordUri(link);
+														} else {
+															setLinkUrl(link);
+														}
+													}}
+													class="overflow-hidden text-ellipsis whitespace-nowrap rounded-md border border-divider px-3 py-3 text-left text-sm hover:bg-hinted"
+												>
+													<span>Add link card: </span>
+													<span class="text-accent">{link}</span>
+												</button>
+											);
+										}}
+									</For>
+								</div>
+							)}
+						</Match>
+					</Switch>
 
 					<div class="flex items-center gap-3 pr-3">
 						<Show

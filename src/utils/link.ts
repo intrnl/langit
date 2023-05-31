@@ -4,8 +4,6 @@ export const BSKY_FEED_URL_RE = /\/profile\/([^\/]+)\/feed\/([^\/]+)/;
 export const ATP_POST_URL_RE = /([^\/]+)\/app.bsky.feed.post\/([^\/]+)/;
 export const ATP_FEED_URL_RE = /([^\/]+)\/app.bsky.feed.generator\/([^\/]+)/;
 
-export const LINK_PROXY_ENDPOINT = 'https://cardyb.bsky.app/v1/extract';
-
 export const isBskyUrl = (url: string) => {
 	return url.startsWith('https://bsky.app/');
 };

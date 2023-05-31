@@ -71,17 +71,19 @@ const AuthenticatedProfileLayout = () => {
 
 									<div class="grow" />
 
-									<button
-										title="Actions"
-										onClick={() => {
-											openModal(() => <ProfileMenu uid={uid()} profile={profile()} />);
-										}}
-										class={/* @once */ button({ color: 'outline' })}
-									>
-										<MoreHorizIcon class="-mx-1.5 text-base" />
-									</button>
+									<Show when={profile().did !== uid()}>
+										<button
+											title="Actions"
+											onClick={() => {
+												openModal(() => <ProfileMenu uid={uid()} profile={profile()} />);
+											}}
+											class={/* @once */ button({ color: 'outline' })}
+										>
+											<MoreHorizIcon class="-mx-1.5 text-base" />
+										</button>
 
-									<FollowButton uid={uid()} profile={profile()} />
+										<FollowButton uid={uid()} profile={profile()} />
+									</Show>
 								</div>
 
 								<div>

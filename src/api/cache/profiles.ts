@@ -12,7 +12,7 @@ export const profiles: Record<string, WeakRef<SignalizedProfile>> = {};
 /** @see BskyProfile */
 export interface SignalizedProfile {
 	_key?: number;
-	did: string;
+	did: BskyProfile['did'];
 	handle: Signal<BskyProfile['handle']>;
 	displayName: Signal<BskyProfile['displayName']>;
 	description: Signal<BskyProfile['description']>;

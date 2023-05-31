@@ -10,7 +10,7 @@ export interface BskyLabel {
 }
 
 export interface BskyProfile {
-	did: string;
+	did: DID;
 	handle: string;
 	displayName: string;
 	description: string;

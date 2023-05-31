@@ -217,6 +217,7 @@ const Notification = (props: NotificationProps) => {
 																		text: record().text,
 																	},
 																}}
+																interactive
 															/>
 														);
 													}}

@@ -1,9 +1,11 @@
 import { Show, createMemo } from 'solid-js';
 
+import { useNavigate } from '@solidjs/router';
+
 import { type EmbeddedPostRecord } from '~/api/types.ts';
 import { getRecordId } from '~/api/utils.ts';
 
-import { A } from '~/router';
+import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import EmbedImage from '~/components/EmbedImage.tsx';
 
@@ -14,14 +16,18 @@ export interface EmbedRecordProps {
 	record: EmbeddedPostRecord;
 	/** Whether it should show a large UI for image embeds */
 	large?: boolean;
+	interactive?: boolean;
 }
 
 const EmbedRecord = (props: EmbedRecordProps) => {
+	const navigate = useNavigate();
+
 	const record = () => props.record;
+	const large = () => props.large;
+	const interactive = () => props.interactive;
+
 	const author = () => record().author;
 	const val = () => record().value;
-
-	const large = () => props.large;
 
 	// we only show image embeds
 	const images = createMemo(() => {
@@ -42,11 +48,28 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 		}
 	});
 
+	const handleClick = (ev: MouseEvent | KeyboardEvent) => {
+		if (!interactive() || !isElementClicked(ev)) {
+			return;
+		}
+
+		const path = `/u/${props.uid}/profile/${author().did}/post/${getRecordId(record().uri)}`;
+
+		if (isElementAltClicked(ev)) {
+			open(path, '_blank');
+		} else {
+			navigate(path);
+		}
+	};
+
 	return (
-		<A
-			href="/u/:uid/profile/:actor/post/:status"
-			params={{ uid: props.uid, actor: author().did, status: getRecordId(record().uri) }}
-			class="overflow-hidden rounded-md border border-divider hover:bg-secondary"
+		<div
+			tabindex={interactive() ? 0 : undefined}
+			onClick={handleClick}
+			onAuxClick={handleClick}
+			onKeyDown={handleClick}
+			class="overflow-hidden rounded-md border border-divider"
+			classList={{ 'cursor-pointer hover:bg-secondary': interactive() }}
 		>
 			<div class="mx-3 mt-3 flex text-sm text-muted-fg">
 				<div class="mr-1 h-5 w-5 shrink-0 overflow-hidden rounded-full bg-muted-fg">
@@ -82,7 +105,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 
 				<EmbedImage images={images()!} borderless />
 			</Show>
-		</A>
+		</div>
 	);
 };
 

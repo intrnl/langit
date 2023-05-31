@@ -85,7 +85,7 @@ const Embed = (props: EmbedProps) => {
 					<EmbedRecordNotFound />
 				</Match>
 				<Match when={val().post}>
-					{(record) => <EmbedRecord uid={uid()} record={record()} large={props.large} />}
+					{(record) => <EmbedRecord uid={uid()} record={record()} large={props.large} interactive />}
 				</Match>
 
 				<Match when={val().feed}>{(feed) => <EmbedFeed uid={uid()} feed={feed()} />}</Match>

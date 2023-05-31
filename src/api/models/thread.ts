@@ -125,6 +125,7 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 	const thread = createSignalizedLinearThread(linearizeThread(data));
 
 	const cid = thread.post.cid;
+	const parentNotFound = thread.parentNotFound;
 	const ancestors = thread.ancestors;
 	const descendants = thread.descendants;
 
@@ -153,8 +154,8 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 
 	return {
 		post: thread.post,
-		parentNotFound: thread.parentNotFound,
-		ancestors: ancestors.length > 0 ? { items: ancestors } : undefined,
+		parentNotFound: parentNotFound,
+		ancestors: ancestors.length > 0 || parentNotFound ? { items: ancestors } : undefined,
 		descendants: slices,
 	};
 };

@@ -1,7 +1,7 @@
 import { Show } from 'solid-js';
 
 import { type EmbeddedGeneratorRecord } from '~/api/types.ts';
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { A } from '~/router.ts';
 
@@ -17,7 +17,7 @@ const EmbedFeed = (props: EmbedFeedProps) => {
 	return (
 		<A
 			href="/u/:uid/profile/:actor/feed/:feed"
-			params={{ uid: uid(), actor: getRepoId(feed().uri), feed: getRecordId(feed().uri) }}
+			params={{ uid: uid(), actor: feed().creator.did, feed: getRecordId(feed().uri) }}
 			class="flex flex-col gap-2 rounded-md border border-divider p-3 text-sm hover:bg-secondary"
 		>
 			<div class="flex items-center gap-3">

@@ -22,7 +22,6 @@ import {
 } from '@floating-ui/dom';
 import { createTiptapEditor } from 'solid-tiptap';
 
-import { posts as postsCache } from '~/api/cache/posts.ts';
 import { multiagent } from '~/api/global.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
@@ -35,8 +34,11 @@ import {
 	type BskySearchActorTypeaheadResponse,
 } from '~/api/types.ts';
 
+import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
+import { posts as postsCache } from '~/api/cache/posts.ts';
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
+import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
 import { getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
@@ -46,6 +48,7 @@ import '~/styles/compose.css';
 import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Dialog from '~/components/Dialog.tsx';
+import EmbedFeed from '~/components/EmbedFeed.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
 import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
@@ -56,7 +59,9 @@ import ImageIcon from '~/icons/baseline-image.tsx';
 
 import { formatSize } from '~/utils/intl/relformatter.ts';
 import { pm2rt } from '~/utils/composer/pm2rt.ts';
+import { createDerivedSignal } from '~/utils/hooks.ts';
 import { compress } from '~/utils/image.ts';
+import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
 import { Locker } from '~/utils/lock.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
 
@@ -92,6 +97,8 @@ const AuthenticatedComposePage = () => {
 	const replyUri = () => searchParams.reply;
 	const quoteUri = () => searchParams.quote;
 
+	const [recordUri, setRecordUri] = createDerivedSignal(quoteUri);
+
 	const [imageProcessing, setImageProcessing] = createSignal(0);
 	const [images, setImages] = createSignal<ComposedImage[]>([]);
 	const [pendingImages, setPendingImages] = createSignal<PendingImage[]>([]);
@@ -116,7 +123,7 @@ const AuthenticatedComposePage = () => {
 	});
 
 	const quoteQuery = createQuery({
-		queryKey: () => getPostKey(uid(), quoteUri()!),
+		queryKey: () => getPostKey(uid(), recordUri()!),
 		queryFn: getPost,
 		initialData() {
 			const signalized = postsCache[quoteUri()!];
@@ -124,7 +131,22 @@ const AuthenticatedComposePage = () => {
 		},
 		staleTime: 30_000,
 		get enabled() {
-			return !!quoteUri();
+			const uri = recordUri();
+			return !!uri && (isAtpPostUri(uri) || isBskyPostUrl(uri));
+		},
+	});
+
+	const feedQuery = createQuery({
+		queryKey: () => getFeedGeneratorKey(uid(), recordUri()!),
+		queryFn: getFeedGenerator,
+		initialData() {
+			const signalized = feedGeneratorsCache[recordUri()!];
+			return signalized?.deref();
+		},
+		staleTime: 30_000,
+		get enabled() {
+			const uri = recordUri();
+			return !!uri && (isAtpFeedUri(uri) || isBskyFeedUrl(uri));
 		},
 	});
 
@@ -148,6 +170,7 @@ const AuthenticatedComposePage = () => {
 		return (
 			!replyQuery.isInitialLoading &&
 			!quoteQuery.isInitialLoading &&
+			!feedQuery.isInitialLoading &&
 			state() === PostState.IDLE &&
 			((len > 0 && len <= 300) || image.length > 0)
 		);
@@ -163,7 +186,7 @@ const AuthenticatedComposePage = () => {
 		setState(PostState.DISPATCHING);
 
 		const reply = replyQuery.data;
-		const quote = quoteQuery.data;
+		const quote = quoteQuery.data || feedQuery.data;
 		const image = images();
 
 		let replyRecord: BskyPostRecord['reply'];
@@ -461,7 +484,7 @@ const AuthenticatedComposePage = () => {
 					</div>
 
 					<Switch>
-						<Match when={quoteQuery.isInitialLoading}>
+						<Match when={quoteQuery.isInitialLoading || feedQuery.isInitialLoading}>
 							<div class="mb-3 mr-3 flex items-center justify-center rounded-md border border-divider p-4">
 								<CircularProgress />
 							</div>
@@ -492,6 +515,30 @@ const AuthenticatedComposePage = () => {
 													createdAt: record().createdAt,
 													text: record().text,
 												},
+											}}
+										/>
+									</div>
+								);
+							}}
+						</Match>
+
+						<Match when={feedQuery.data}>
+							{(data) => {
+								return (
+									<div class="mb-3 mr-3 flex flex-col">
+										<EmbedFeed
+											uid={uid()}
+											feed={{
+												$type: 'app.bsky.feed.defs#generatorView',
+												uri: data().uri,
+												avatar: data().avatar.value,
+												displayName: data().displayName.value,
+												// @ts-expect-error
+												creator: {
+													did: data().creator.did,
+													handle: data().creator.handle.value,
+												},
+												likeCount: data().likeCount.value,
 											}}
 										/>
 									</div>

@@ -8,6 +8,7 @@ import { type DID } from '../utils.ts';
 import _getDid from './_did.ts';
 
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
+import { BSKY_FEED_URL_RE, isBskyFeedUrl } from '~/utils/link.ts';
 
 type Query = [uid: DID, uri: string];
 
@@ -42,7 +43,19 @@ export const getFeedGeneratorKey = (uid: DID, uri: string) => ['getFeedGenerator
 export const getFeedGenerator = async (ctx: QueryFunctionContext<ReturnType<typeof getFeedGeneratorKey>>) => {
 	const [, uid, uri] = ctx.queryKey;
 
-	const feedGenerator = await fetchFeedGenerator([uid, uri]);
+	const bskyMatch = isBskyFeedUrl(uri) && BSKY_FEED_URL_RE.exec(uri);
+
+	let resolvedUri = uri;
+	if (bskyMatch) {
+		const agent = await multiagent.connect(uid);
+
+		const repo = await _getDid(agent, bskyMatch[1], ctx.signal);
+		const record = bskyMatch[2];
+
+		resolvedUri = createFeedGeneratorUri(repo, record);
+	}
+
+	const feedGenerator = await fetchFeedGenerator([uid, resolvedUri]);
 
 	return mergeSignalizedFeedGenerator(feedGenerator);
 };

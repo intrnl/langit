@@ -8,8 +8,10 @@ import { type DID } from '~/api/utils';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, useParams } from '~/router.ts';
+import { openModal } from '~/globals/modals.tsx';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
+import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import FollowButton from '~/components/FollowButton.tsx';
 import TabLink from '~/components/TabLink.tsx';
@@ -47,8 +49,6 @@ const AuthenticatedProfileLayout = () => {
 				}
 			>
 				{(profile) => {
-					const isFollowing = () => profile().viewer.following.value;
-
 					return (
 						<>
 							<div class="aspect-banner bg-muted-fg">
@@ -92,6 +92,22 @@ const AuthenticatedProfileLayout = () => {
 										<span class="text-muted-fg">Followers</span>
 									</A>
 								</div>
+
+								<Show when={profile().viewer.muted.value}>
+									<div class="text-sm text-muted-fg">
+										<p>
+											You have muted posts from this account.{' '}
+											<button
+												onClick={() => {
+													openModal(() => <MuteConfirmDialog uid={uid()} profile={profile()} />);
+												}}
+												class="text-accent hover:underline"
+											>
+												Unmute
+											</button>
+										</p>
+									</div>
+								</Show>
 							</div>
 
 							<div class="flex overflow-x-auto border-b border-divider">

@@ -1,13 +1,19 @@
 import { Show } from 'solid-js';
 
 import { multiagent } from '~/api/global.ts';
-import { type SignalizedPost } from '~/api/cache/posts.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
+
+import { type SignalizedPost } from '~/api/cache/posts.ts';
 
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
+import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
+
+import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
+import LaunchIcon from '~/icons/baseline-launch.tsx';
+import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
 
 export interface PostMenuProps {
 	uid: DID;
@@ -20,6 +26,8 @@ const PostMenu = (props: PostMenuProps) => {
 
 	const author = () => post().author;
 
+	const isMuted = () => author().viewer.muted.value;
+
 	return (
 		<div class={/* @once */ menu.content()}>
 			<button
@@ -29,7 +37,8 @@ const PostMenu = (props: PostMenuProps) => {
 				}}
 				class={/* @once */ menu.item()}
 			>
-				Open in Bluesky app
+				<LaunchIcon class="text-lg" />
+				<span>Open in Bluesky app</span>
 			</button>
 
 			<Show when={Object.keys(multiagent.accounts).length > 1}>
@@ -46,9 +55,23 @@ const PostMenu = (props: PostMenuProps) => {
 					}}
 					class={/* @once */ menu.item()}
 				>
-					Open in another account...
+					<AccountCircleIcon class="text-lg" />
+					<span>Open in another account...</span>
 				</button>
 			</Show>
+
+			<button
+				onClick={() => {
+					closeModal();
+					openModal(() => <MuteConfirmDialog uid={uid()} profile={author()} />);
+				}}
+				class={/* @once */ menu.item()}
+			>
+				<VolumeOffIcon class="text-lg" />
+				<span>
+					{isMuted() ? 'Unmute' : 'Mute'} @{author().handle.value}
+				</span>
+			</button>
 
 			<button onClick={closeModal} class={/* @once */ menu.cancel()}>
 				Cancel

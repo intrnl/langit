@@ -77,6 +77,16 @@ export interface BskyPostRecordEmbedImage {
 	}>;
 }
 
+export interface BskyPostRecordEmbedExternal {
+	$type: 'app.bsky.embed.external';
+	external: {
+		uri: string;
+		title: string;
+		description: string;
+		thumb?: BskyBlob;
+	};
+}
+
 export interface BskyPostRecordEmbedRecord {
 	$type: 'app.bsky.embed.record';
 	record: {
@@ -87,7 +97,7 @@ export interface BskyPostRecordEmbedRecord {
 
 export interface BskyPostRecordEmbedRecordWithMedia {
 	$type: 'app.bsky.embed.recordWithMedia';
-	media: BskyPostRecordEmbedImage;
+	media: BskyPostRecordEmbedImage | BskyPostRecordEmbedExternal;
 	record: BskyPostRecordEmbedRecord;
 }
 
@@ -105,7 +115,11 @@ export interface BskyPostRecord {
 		root: BskyPostRecordReply;
 		parent: BskyPostRecordReply;
 	};
-	embed?: BskyPostRecordEmbedImage | BskyPostRecordEmbedRecord | BskyPostRecordEmbedRecordWithMedia;
+	embed?:
+		| BskyPostRecordEmbedExternal
+		| BskyPostRecordEmbedImage
+		| BskyPostRecordEmbedRecord
+		| BskyPostRecordEmbedRecordWithMedia;
 }
 
 export interface EmbeddedLink {

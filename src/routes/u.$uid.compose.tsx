@@ -217,6 +217,7 @@ const AuthenticatedComposePage = () => {
 
 		const reply = replyQuery.data;
 		const quote = quoteQuery.data || feedQuery.data;
+		const link = linkQuery.data;
 		const image = images();
 
 		let replyRecord: BskyPostRecord['reply'];
@@ -265,6 +266,32 @@ const AuthenticatedComposePage = () => {
 			embedRecord = {
 				$type: 'app.bsky.embed.images',
 				images: image.map((img) => ({ alt: img.alt.value, image: img.record! })),
+			};
+		} else if (link) {
+			if (link.thumb && !link.record) {
+				setMessage(`Uploading link thumbnail`);
+
+				try {
+					const blob = await uploadBlob(uid(), link.thumb);
+
+					link.record = blob;
+				} catch (err) {
+					console.error(`Failed to upload image`, err);
+
+					setMessage(`Failed to upload link thumbnail`);
+					setState(PostState.IDLE);
+					return;
+				}
+			}
+
+			embedRecord = {
+				$type: 'app.bsky.embed.external',
+				external: {
+					uri: link.uri,
+					title: link.title,
+					description: link.description,
+					thumb: link.record as any,
+				},
 			};
 		}
 

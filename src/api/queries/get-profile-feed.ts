@@ -26,15 +26,15 @@ export const getProfileFeed = async (ctx: QueryFunctionContext<ReturnType<typeof
 		const items = slice.items;
 		const first = items[0];
 
-		if (
-			!replies &&
-			first.reply &&
-			(!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')
-		) {
-			const root = first.reply.root;
-			const parent = first.reply.parent;
+		if (!replies && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+			const reply = first.reply;
 
-			if (root.author.did !== did || parent.author.did !== did) {
+			if (reply) {
+				const root = reply.root;
+				const parent = reply.parent;
+
+				return root.author.did === did && parent.author.did === did;
+			} else if (first.post.record.peek().reply) {
 				return false;
 			}
 		}

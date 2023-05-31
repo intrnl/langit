@@ -5,7 +5,7 @@ export const ATP_POST_URL_RE = /([^\/]+)\/app.bsky.feed.post\/([^\/]+)/;
 export const ATP_FEED_URL_RE = /([^\/]+)\/app.bsky.feed.generator\/([^\/]+)/;
 
 export const isBskyUrl = (url: string) => {
-	return url.startsWith('https://bsky.app/');
+	return url.startsWith('https://bsky.app/') || url.startsWith(`${location.protocol}//${location.hostname}/`);
 };
 
 export const isBskyPostUrl = (url: string) => {

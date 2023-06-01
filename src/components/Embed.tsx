@@ -78,7 +78,7 @@ const Embed = (props: EmbedProps) => {
 		<div class="mt-3 flex flex-col gap-3">
 			<Show when={val().link}>{(link) => <EmbedLink link={link()} interactive />}</Show>
 
-			<Show when={val().images}>{(images) => <EmbedImage images={images()} />}</Show>
+			<Show when={val().images}>{(images) => <EmbedImage images={images()} interactive />}</Show>
 
 			<Switch>
 				<Match when={val().post === false}>

@@ -14,7 +14,7 @@ const ImageViewerDialog = (props: ImageViewerDialogProps) => {
 
 	return (
 		<>
-			<img src={image().fullsize} alt={image().alt} class="max-h-full max-w-full" />
+			<img src={image().fullsize} alt={image().alt} class="z-10 my-auto max-h-full max-w-full" />
 		</>
 	);
 };

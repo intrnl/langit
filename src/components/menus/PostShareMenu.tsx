@@ -5,6 +5,7 @@ import { closeModal } from '~/globals/modals.tsx';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
+import ContentCopyIcon from '~/icons/baseline-content-copy.tsx';
 import LinkIcon from '~/icons/baseline-link.tsx';
 
 export interface PostShareMenuProps {
@@ -40,7 +41,7 @@ const PostShareMenu = (props: PostShareMenuProps) => {
 				}}
 				class={/* @once */ menu.item()}
 			>
-				<LinkIcon class="text-lg" />
+				<ContentCopyIcon class="text-lg" />
 				<span>Copy post text</span>
 			</button>
 

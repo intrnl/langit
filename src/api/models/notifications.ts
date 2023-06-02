@@ -6,6 +6,7 @@ import {
 	type BskyReplyNotification,
 	type BskyRepostNotification,
 } from '../types.ts';
+import { getCollectionId } from '../utils.ts';
 
 export interface FollowNotificationSlice {
 	type: 'follow';
@@ -108,6 +109,12 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 			});
 		} else if (reason === 'like' || reason === 'repost') {
 			const key = item.reasonSubject;
+			const collection = getCollectionId(key);
+
+			// skip if they're not related to posts.
+			if (collection !== 'app.bsky.feed.post') {
+				continue;
+			}
 
 			for (let j = 0; j < slen; j++) {
 				const slice = slices[j];

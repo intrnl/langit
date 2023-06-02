@@ -9,6 +9,13 @@ export const getRecordId = (uri: string) => {
 	return uri.slice(idx + 1);
 };
 
+export const getCollectionId = (uri: string) => {
+	const first = uri.indexOf('/', 5);
+	const second = uri.indexOf('/', first + 1);
+
+	return uri.slice(first + 1, second);
+};
+
 export const getRepoId = (uri: string) => {
 	const idx = uri.indexOf('/', 5);
 	return uri.slice(5, idx);

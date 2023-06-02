@@ -43,6 +43,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.settings.explore.add.tsx")),
       },
       {
+        path: "explore",
+        component: lazy(() => import("./routes/u.$uid.explore._index.tsx")),
+      },
+      {
         path: "profile/:actor",
         component: lazy(() => import("./routes/u.$uid.profile.$actor.tsx")),
         children: [
@@ -75,10 +79,6 @@ const routes: RouteDefinition[] = [
       {
         path: "compose",
         component: lazy(() => import("./routes/u.$uid.compose.tsx")),
-      },
-      {
-        path: "explore",
-        component: lazy(() => import("./routes/u.$uid.explore.tsx")),
       },
       {
         path: "/",

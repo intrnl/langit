@@ -22,6 +22,7 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/follows"
 	| "/u/:uid/settings/explore"
 	| "/u/:uid/settings/explore/add"
+	| "/u/:uid/explore"
 	| "/u/:uid/profile/:actor"
 	| "/u/:uid/profile/:actor/with_replies"
 	| "/u/:uid/profile/:actor/likes"
@@ -29,7 +30,6 @@ export type PathsWithParams =
 	| "/u/:uid/you/invites"
 	| "/u/:uid/you"
 	| "/u/:uid/compose"
-	| "/u/:uid/explore"
 	| "/r/*";
 export type PathsWithoutParams = 
 	| "/"
@@ -45,6 +45,7 @@ export interface Params {
 	"/u/:uid/profile/:actor/follows": { "uid": string, "actor": string };
 	"/u/:uid/settings/explore": { "uid": string };
 	"/u/:uid/settings/explore/add": { "uid": string };
+	"/u/:uid/explore": { "uid": string };
 	"/u/:uid/profile/:actor": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/with_replies": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/likes": { "uid": string, "actor": string };
@@ -52,7 +53,6 @@ export interface Params {
 	"/u/:uid/you/invites": { "uid": string };
 	"/u/:uid/you": { "uid": string };
 	"/u/:uid/compose": { "uid": string };
-	"/u/:uid/explore": { "uid": string };
 	"/r/*": { "*": string };
 }
 

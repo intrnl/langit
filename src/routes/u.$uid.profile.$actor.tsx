@@ -32,7 +32,7 @@ const AuthenticatedProfileLayout = () => {
 	});
 
 	return (
-		<div class="flex flex-col">
+		<div class="flex grow flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<Show when={profileQuery.data} fallback={<p class="text-base font-bold">Profile</p>}>
 					{(profile) => (
@@ -84,7 +84,9 @@ const AuthenticatedProfileLayout = () => {
 											<MoreHorizIcon class="-mx-1.5 text-base" />
 										</button>
 
-										<FollowButton uid={uid()} profile={profile()} />
+										<Show when={!profile().viewer.blocking.value}>
+											<FollowButton uid={uid()} profile={profile()} />
+										</Show>
 									</Show>
 								</div>
 
@@ -130,19 +132,33 @@ const AuthenticatedProfileLayout = () => {
 								</Show>
 							</div>
 
-							<div class="flex overflow-x-auto border-b border-divider">
-								<TabLink href="/u/:uid/profile/:actor" params={params} replace end>
-									Posts
-								</TabLink>
-								<TabLink href="/u/:uid/profile/:actor/with_replies" params={params} replace>
-									Replies
-								</TabLink>
-								<TabLink href="/u/:uid/profile/:actor/likes" params={params} replace>
-									Likes
-								</TabLink>
-							</div>
+							<Show
+								when={!profile().viewer.blocking.value}
+								fallback={
+									<div class="grid grow place-items-center">
+										<div class="max-w-sm p-4">
+											<h1 class="mb-1 text-xl font-bold">@{profile().handle.value} is blocked</h1>
+											<p class="text-sm text-muted-fg">
+												You can't view any of the posts if you've blocked them.
+											</p>
+										</div>
+									</div>
+								}
+							>
+								<div class="flex overflow-x-auto border-b border-divider">
+									<TabLink href="/u/:uid/profile/:actor" params={params} replace end>
+										Posts
+									</TabLink>
+									<TabLink href="/u/:uid/profile/:actor/with_replies" params={params} replace>
+										Replies
+									</TabLink>
+									<TabLink href="/u/:uid/profile/:actor/likes" params={params} replace>
+										Likes
+									</TabLink>
+								</div>
 
-							<Outlet />
+								<Outlet />
+							</Show>
 						</>
 					);
 				}}

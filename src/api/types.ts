@@ -23,13 +23,14 @@ export interface BskyProfile {
 	labels: BskyLabel[];
 	viewer: {
 		muted: boolean;
+		blocking?: string;
 		blockedBy: boolean;
 		following?: string;
 	};
 }
 
 export interface BskyProfileBasic {
-	did: string;
+	did: DID;
 	handle: string;
 	displayName: string;
 	avatar?: string;
@@ -42,7 +43,7 @@ export interface BskyProfileBasic {
 }
 
 export interface BskyProfileFollow {
-	did: string;
+	did: DID;
 	handle: string;
 	displayName: string;
 	description: string;

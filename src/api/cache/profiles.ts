@@ -25,6 +25,7 @@ export interface SignalizedProfile {
 	labels: Signal<BskyProfile['labels']>;
 	viewer: {
 		muted: Signal<BskyProfile['viewer']['muted']>;
+		blocking: Signal<BskyProfile['viewer']['blocking']>;
 		blockedBy: Signal<BskyProfile['viewer']['blockedBy']>;
 		following: Signal<BskyProfile['viewer']['following']>;
 	};
@@ -54,6 +55,7 @@ const createSignalizedProfile = (
 		labels: signal(profile.labels),
 		viewer: {
 			muted: signal(profile.viewer.muted),
+			blocking: signal(isProfile ? profile.viewer.blocking : undefined),
 			blockedBy: signal(profile.viewer.blockedBy),
 			following: signal(profile.viewer.following),
 		},

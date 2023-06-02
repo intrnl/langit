@@ -1,5 +1,6 @@
 import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
+import { useNavigate } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { preferences } from '~/api/preferences.ts';
@@ -14,7 +15,7 @@ import { A, useParams } from '~/router.ts';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
-// import input from '~/styles/primitives/input.ts';
+import input from '~/styles/primitives/input.ts';
 
 import SettingsIcon from '~/icons/baseline-settings.tsx';
 
@@ -22,6 +23,7 @@ const MAX_POSTS = 5;
 
 const AuthenticatedExplorePage = () => {
 	const params = useParams('/u/:uid/explore');
+	const navigate = useNavigate();
 
 	const uid = () => params.uid as DID;
 
@@ -32,8 +34,19 @@ const AuthenticatedExplorePage = () => {
 	return (
 		<div class="flex flex-col pb-4">
 			<div class="sticky top-0 z-20 flex h-13 items-center gap-4 border-b border-divider bg-background px-4">
-				{/* <input placeholder="Search Bluesky" class={input()} /> */}
-				<p class="grow text-base font-bold">Explore</p>
+				<input
+					placeholder="Search Bluesky"
+					class={input()}
+					onKeyDown={(ev) => {
+						if (ev.key === 'Enter') {
+							const value = ev.currentTarget.value.trim();
+
+							if (value) {
+								navigate(`/u/${uid()}/explore/search/posts?q=${encodeURIComponent(value)}`);
+							}
+						}
+					}}
+				/>
 
 				<A
 					href="/u/:uid/settings/explore"

@@ -23,6 +23,9 @@ export type PathsWithParams =
 	| "/u/:uid/settings/explore"
 	| "/u/:uid/settings/explore/add"
 	| "/u/:uid/explore"
+	| "/u/:uid/explore/search"
+	| "/u/:uid/explore/search/posts"
+	| "/u/:uid/explore/search/users"
 	| "/u/:uid/profile/:actor"
 	| "/u/:uid/profile/:actor/with_replies"
 	| "/u/:uid/profile/:actor/likes"
@@ -46,6 +49,9 @@ export interface Params {
 	"/u/:uid/settings/explore": { "uid": string };
 	"/u/:uid/settings/explore/add": { "uid": string };
 	"/u/:uid/explore": { "uid": string };
+	"/u/:uid/explore/search": { "uid": string };
+	"/u/:uid/explore/search/posts": { "uid": string };
+	"/u/:uid/explore/search/users": { "uid": string };
 	"/u/:uid/profile/:actor": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/with_replies": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/likes": { "uid": string, "actor": string };

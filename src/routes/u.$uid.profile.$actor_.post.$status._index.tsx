@@ -212,7 +212,7 @@ const AuthenticatedPostPage = () => {
 											<ChatBubbleOutlinedIcon />
 										</UntypedAnchor>
 
-										<PostRepostDropdown uid={uid()} post={post} reposted={isReposted()} large />
+										<PostRepostDropdown uid={uid()} post={post} large />
 
 										<button
 											class="group flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"

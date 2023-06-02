@@ -32,8 +32,6 @@ const ProfileList = (props: ProfileListProps) => {
 			<For each={listQuery.data ? listQuery.data.pages : []}>
 				{(page) => {
 					return page.profiles.map((profile) => {
-						const isFollowing = () => profile.viewer.following.value;
-
 						const handleClick = (ev: MouseEvent | KeyboardEvent) => {
 							if (!isElementClicked(ev)) {
 								return;
@@ -93,7 +91,13 @@ const ProfileList = (props: ProfileListProps) => {
 				}}
 			</For>
 
-			<Switch>
+			<Switch
+				fallback={
+					<div class="flex h-13 items-center justify-center">
+						<p class="text-sm text-muted-fg">End of list</p>
+					</div>
+				}
+			>
 				<Match when={listQuery.isFetching}>
 					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />

@@ -99,6 +99,12 @@ const Timeline = (props: TimelineProps) => {
 						Show more posts
 					</button>
 				</Match>
+
+				<Match when={!timelineQuery.isInitialLoading}>
+					<div class="flex h-13 items-center justify-center">
+						<p class="text-sm text-muted-fg">End of list</p>
+					</div>
+				</Match>
 			</Switch>
 		</>
 	);

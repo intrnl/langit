@@ -37,7 +37,9 @@ const AuthenticatedProfileLayout = () => {
 				<Show when={profileQuery.data} fallback={<p class="text-base font-bold">Profile</p>}>
 					{(profile) => (
 						<div class="flex flex-col gap-0.5">
-							<p class="text-base font-bold leading-5">{profile().displayName.value}</p>
+							<p class="line-clamp-1 break-all text-base font-bold leading-5">
+								{profile().displayName.value}
+							</p>
 							<p class="text-xs text-muted-fg">{comformat.format(profile().postsCount.value)} posts</p>
 						</div>
 					)}
@@ -87,8 +89,10 @@ const AuthenticatedProfileLayout = () => {
 								</div>
 
 								<div>
-									<p class="text-xl font-bold">{profile().displayName.value || profile().handle.value}</p>
-									<p class="text-sm text-muted-fg">@{profile().handle.value}</p>
+									<p class="line-clamp-1 break-all text-xl font-bold">
+										{profile().displayName.value || profile().handle.value}
+									</p>
+									<p class="line-clamp-1 break-all text-sm text-muted-fg">@{profile().handle.value}</p>
 								</div>
 
 								<Show when={profile().description.value}>

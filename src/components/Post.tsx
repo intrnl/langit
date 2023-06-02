@@ -78,13 +78,14 @@ const Post = (props: PostProps) => {
 						<div class="flex w-12 shrink-0 justify-end">
 							<RepeatIcon />
 						</div>
-						<div>
+						<div class="min-w-0">
 							<A
 								href="/u/:uid/profile/:actor"
 								params={{ uid: uid(), actor: reason()!.by.did }}
-								class="line-clamp-1 min-w-0 grow font-medium hover:underline"
+								class="flex font-medium hover:underline"
 							>
-								{reason()!.by.displayName || reason()!.by.handle} Reposted
+								<span class="line-clamp-1 break-all">{reason()!.by.displayName || reason()!.by.handle}</span>
+								<span class="whitespace-pre"> Reposted</span>
 							</A>
 						</div>
 					</div>
@@ -95,13 +96,16 @@ const Post = (props: PostProps) => {
 						<div class="flex w-12 shrink-0 justify-end">
 							<ChatBubbleOutlinedIcon />
 						</div>
-						<div>
+						<div class="min-w-0">
 							<A
 								href="/u/:uid/profile/:actor/post/:status"
 								params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
-								class="line-clamp-1 min-w-0 grow font-medium hover:underline"
+								class="flex font-medium hover:underline"
 							>
-								Replying to {parent()!.author.displayName.value}
+								<span class="whitespace-pre">Replying to </span>
+								<span class="line-clamp-1">
+									{parent()!.author.displayName.value || parent()!.author.handle.value}
+								</span>
 							</A>
 						</div>
 					</div>
@@ -183,7 +187,7 @@ const Post = (props: PostProps) => {
 							</div>
 
 							<div class="flex grow items-end gap-0.5" classList={{ 'text-green-600': isReposted() }}>
-								<PostRepostDropdown uid={uid()} post={post()} reposted={isReposted()} class="-my-1.5 -ml-2" />
+								<PostRepostDropdown uid={uid()} post={post()} class="-my-1.5 -ml-2" />
 								<span class="text-[0.8125rem]">{comformat.format(post().repostCount.value)}</span>
 							</div>
 

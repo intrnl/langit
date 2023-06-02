@@ -62,8 +62,8 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 				}}
 				class={/* @once */ menu.item()}
 			>
-				<VolumeOffIcon class="text-lg" />
-				<span>
+				<VolumeOffIcon class="shrink-0 text-lg" />
+				<span class="line-clamp-1 break-all">
 					{isMuted() ? 'Unmute' : 'Mute'} @{profile().handle.value}
 				</span>
 			</button>

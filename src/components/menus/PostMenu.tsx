@@ -67,8 +67,8 @@ const PostMenu = (props: PostMenuProps) => {
 				}}
 				class={/* @once */ menu.item()}
 			>
-				<VolumeOffIcon class="text-lg" />
-				<span>
+				<VolumeOffIcon class="shrink-0 text-lg" />
+				<span class="line-clamp-1 break-all">
 					{isMuted() ? 'Unmute' : 'Mute'} @{author().handle.value}
 				</span>
 			</button>

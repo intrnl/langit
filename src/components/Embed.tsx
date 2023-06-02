@@ -1,11 +1,10 @@
-import { Match, Show, Switch, createMemo } from 'solid-js';
+import { Show, createMemo } from 'solid-js';
 
 import {
 	type BskyPost,
-	type EmbeddedGeneratorRecord,
+	type BskyPostEmbedRecord,
 	type EmbeddedImage,
 	type EmbeddedLink,
-	type EmbeddedPostRecord,
 } from '~/api/types.ts';
 import { type DID } from '~/api/utils.ts';
 
@@ -13,6 +12,7 @@ import EmbedFeed from '~/components/EmbedFeed.tsx';
 import EmbedImage from '~/components/EmbedImage.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
+import EmbedRecordBlocked from '~/components/EmbedRecordBlocked.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 
 export interface EmbedProps {
@@ -31,38 +31,21 @@ const Embed = (props: EmbedProps) => {
 
 		let images: EmbeddedImage[] | undefined;
 		let link: EmbeddedLink | undefined;
-		let post: EmbeddedPostRecord | false | undefined;
-		let feed: EmbeddedGeneratorRecord | undefined;
+		let record: BskyPostEmbedRecord['record'] | undefined;
 
 		if (type === 'app.bsky.embed.external#view') {
 			link = embed.external;
 		} else if (type === 'app.bsky.embed.images#view') {
 			images = embed.images;
 		} else if (type === 'app.bsky.embed.record#view') {
-			const rec = embed.record;
-			const type = rec.$type;
-
-			if (type === 'app.bsky.embed.record#viewRecord') {
-				post = rec;
-			} else if (type === 'app.bsky.feed.defs#generatorView') {
-				feed = rec;
-			} else {
-				post = false;
-			}
+			record = embed.record;
 		} else if (type === 'app.bsky.embed.recordWithMedia#view') {
 			const rec = embed.record.record;
-			const type = rec.$type;
 
 			const media = embed.media;
 			const mediatype = media.$type;
 
-			if (type === 'app.bsky.embed.record#viewRecord') {
-				post = rec;
-			} else if (type === 'app.bsky.feed.defs#generatorView') {
-				feed = rec;
-			} else {
-				post = false;
-			}
+			record = rec;
 
 			if (mediatype === 'app.bsky.embed.external#view') {
 				link = media.external;
@@ -71,7 +54,7 @@ const Embed = (props: EmbedProps) => {
 			}
 		}
 
-		return { images, link, post, feed };
+		return { images, link, record };
 	});
 
 	return (
@@ -80,16 +63,29 @@ const Embed = (props: EmbedProps) => {
 
 			<Show when={val().images}>{(images) => <EmbedImage images={images()} interactive />}</Show>
 
-			<Switch>
-				<Match when={val().post === false}>
-					<EmbedRecordNotFound />
-				</Match>
-				<Match when={val().post}>
-					{(record) => <EmbedRecord uid={uid()} record={record()} large={props.large} interactive />}
-				</Match>
+			<Show when={val().record} keyed>
+				{(record) => {
+					const type = record.$type;
 
-				<Match when={val().feed}>{(feed) => <EmbedFeed uid={uid()} feed={feed()} />}</Match>
-			</Switch>
+					if (type === 'app.bsky.embed.record#viewNotFound') {
+						return <EmbedRecordNotFound />;
+					}
+
+					if (type === 'app.bsky.embed.record#viewBlocked') {
+						return <EmbedRecordBlocked uid={uid()} record={record} />;
+					}
+
+					if (type === 'app.bsky.embed.record#viewRecord') {
+						return <EmbedRecord uid={uid()} record={record} large={props.large} interactive />;
+					}
+
+					if (type === 'app.bsky.feed.defs#generatorView') {
+						return <EmbedFeed uid={uid()} feed={record} />;
+					}
+
+					return <></>;
+				}}
+			</Show>
 		</div>
 	);
 };

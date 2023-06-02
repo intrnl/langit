@@ -62,7 +62,7 @@ const AuthenticatedProfileLayout = () => {
 							<Match when={(error() as XRPCError).error === 'InvalidRequest'}>
 								<div class="grid grow place-items-center">
 									<div class="max-w-sm p-4">
-										<h1 class="mb-1 text-xl font-bold">Failed to load account</h1>
+										<h1 class="mb-1 text-xl font-bold">Failed to load profile</h1>
 										<p class="text-sm">{(error() as XRPCError).message}</p>
 									</div>
 								</div>

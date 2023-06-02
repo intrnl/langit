@@ -295,6 +295,10 @@ const AuthenticatedPostPage = () => {
 										);
 									}}
 								</For>
+
+								<div class='flex h-13 items-center justify-center'>
+									<span class='text-sm text-muted-fg'>End of thread</span>
+								</div>
 							</>
 						);
 					}}

@@ -38,7 +38,7 @@ const AuthenticatedProfileLayout = () => {
 					{(profile) => (
 						<div class="flex flex-col gap-0.5">
 							<p class="text-base font-bold leading-5">{profile().displayName.value}</p>
-							<p class="text-xs text-muted-fg">{profile().postsCount.value} posts</p>
+							<p class="text-xs text-muted-fg">{comformat.format(profile().postsCount.value)} posts</p>
 						</div>
 					)}
 				</Show>

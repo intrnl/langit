@@ -89,7 +89,7 @@ const AuthenticatedPostPage = () => {
 							<Match when={error instanceof BlockedThreadError}>
 								<div class="p-4">
 									<div class="mb-4">
-										<p class="text-sm">This post is from an account you blocked</p>
+										<p class="text-sm font-bold">This post is from an account you blocked</p>
 										<p class="text-sm text-muted-fg">You need to unblock the account to view the post.</p>
 									</div>
 

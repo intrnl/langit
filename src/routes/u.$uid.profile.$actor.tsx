@@ -154,7 +154,7 @@ const AuthenticatedProfileLayout = () => {
 									when={!profile().viewer.blocking.value}
 									fallback={
 										<div class="grid grow place-items-center">
-											<div class="max-w-sm p-4">
+											<div class="max-w-sm p-4 py-24">
 												<h1 class="mb-1 text-xl font-bold">@{profile().handle.value} is blocked</h1>
 												<p class="text-sm text-muted-fg">
 													You can't view any of the posts if you've blocked them.

@@ -60,18 +60,20 @@ const PostMenu = (props: PostMenuProps) => {
 				</button>
 			</Show>
 
-			<button
-				onClick={() => {
-					closeModal();
-					openModal(() => <MuteConfirmDialog uid={uid()} profile={author()} />);
-				}}
-				class={/* @once */ menu.item()}
-			>
-				<VolumeOffIcon class="shrink-0 text-lg" />
-				<span class="line-clamp-1 break-all">
-					{isMuted() ? 'Unmute' : 'Mute'} @{author().handle.value}
-				</span>
-			</button>
+			<Show when={author().did !== uid()}>
+				<button
+					onClick={() => {
+						closeModal();
+						openModal(() => <MuteConfirmDialog uid={uid()} profile={author()} />);
+					}}
+					class={/* @once */ menu.item()}
+				>
+					<VolumeOffIcon class="shrink-0 text-lg" />
+					<span class="line-clamp-1 break-all">
+						{isMuted() ? 'Unmute' : 'Mute'} @{author().handle.value}
+					</span>
+				</button>
+			</Show>
 
 			<button onClick={closeModal} class={/* @once */ menu.cancel()}>
 				Cancel

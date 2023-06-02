@@ -7,6 +7,8 @@ import { type DID } from '../utils.ts';
 
 import _getDid from './_did.ts';
 
+export class BlockedThreadError extends Error {}
+
 export const getPostThreadKey = (uid: DID, actor: string, post: string, depth: number, height: number) =>
 	['getPostThread', uid, actor, post, depth, height] as const;
 export const getPostThread = async (ctx: QueryFunctionContext<ReturnType<typeof getPostThreadKey>>) => {
@@ -27,6 +29,11 @@ export const getPostThread = async (ctx: QueryFunctionContext<ReturnType<typeof 
 	});
 
 	const data = response.data as BskyThreadResponse;
+
+	if (data.thread.$type === 'app.bsky.feed.defs#blockedPost') {
+		throw new BlockedThreadError();
+	}
+
 	const page = createThreadPage(data.thread);
 
 	return page;

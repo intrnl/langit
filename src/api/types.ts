@@ -221,7 +221,7 @@ export interface BskyThread {
 }
 
 export interface BskyThreadResponse {
-	thread: BskyThread;
+	thread: BskyThread | BskyThreadBlockedPost;
 }
 
 export interface LinearizedThread {

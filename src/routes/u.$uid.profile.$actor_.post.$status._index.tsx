@@ -7,7 +7,7 @@ import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
-import { getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
+import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
@@ -18,6 +18,7 @@ import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
 import { PostDropdown, PostRepostDropdown, PostShareDropdown } from '~/components/PostDropdown.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
+import button from '~/styles/primitives/button.ts';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
@@ -38,10 +39,11 @@ const AuthenticatedPostPage = () => {
 	const location = useLocation();
 
 	const uid = () => params.uid as DID;
+	const actor = () => params.actor;
 	const status = () => params.status;
 
 	const threadQuery = createQuery({
-		queryKey: () => getPostThreadKey(uid(), params.actor, status(), MAX_DESCENDANTS + 1, MAX_ANCESTORS + 1),
+		queryKey: () => getPostThreadKey(uid(), actor(), status(), MAX_DESCENDANTS + 1, MAX_ANCESTORS + 1),
 		queryFn: getPostThread,
 		staleTime: 60_000,
 		refetchOnMount: true,
@@ -83,6 +85,23 @@ const AuthenticatedPostPage = () => {
 									<EmbedRecordNotFound />
 								</div>
 							</Match>
+
+							<Match when={error instanceof BlockedThreadError}>
+								<div class="p-4">
+									<div class="mb-4">
+										<p class="text-sm">This post is from an account you blocked</p>
+										<p class="text-sm text-muted-fg">You need to unblock the account to view the post.</p>
+									</div>
+
+									<A
+										href="/u/:uid/profile/:actor"
+										params={{ uid: uid(), actor: actor() }}
+										class={button({ color: 'primary' })}
+									>
+										View profile
+									</A>
+								</div>
+							</Match>
 						</Switch>
 					)}
 				</Match>
@@ -93,8 +112,6 @@ const AuthenticatedPostPage = () => {
 
 						const record = () => post.record.value;
 						const author = post.author;
-
-						const isReposted = () => !!post.viewer.repost.value;
 
 						return (
 							<>

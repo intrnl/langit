@@ -16,21 +16,21 @@ const calculatePostScore = (post: BskyPost, parent: BskyPost) => {
 };
 
 const linearizeThread = (thread: BskyThread): LinearizedThread => {
-	const ancestors: BskyPost[] = [];
-	const descendants: BskyPost[] = [];
+	const ancestors: LinearizedThread['ancestors'] = [];
+	const descendants: LinearizedThread['descendants'] = [];
 
 	const stack = new Stack<BskyThread>();
 
 	let parent = thread.parent;
 	let node: BskyThread | undefined;
 
-	let parentNotFound = false;
+	let parentBreak: LinearizedThread['parentBreak'];
 
 	stack.push(thread);
 
 	while (parent) {
-		if (parent.$type === 'app.bsky.feed.defs#notFoundPost') {
-			parentNotFound = true;
+		if (parent.$type !== 'app.bsky.feed.defs#threadViewPost') {
+			parentBreak = parent;
 			break;
 		}
 
@@ -89,7 +89,7 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 
 	return {
 		post: thread.post,
-		parentNotFound,
+		parentBreak,
 		ancestors,
 		descendants,
 	};
@@ -116,7 +116,7 @@ const isNextInThread = (slice: ThreadSlice, child: SignalizedPost) => {
 
 export interface ThreadPage {
 	post: SignalizedPost;
-	parentNotFound: boolean;
+	parentBreak: LinearizedThread['parentBreak'];
 	ancestors?: ThreadSlice;
 	descendants: ThreadSlice[];
 }
@@ -125,7 +125,7 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 	const thread = createSignalizedLinearThread(linearizeThread(data));
 
 	const cid = thread.post.cid;
-	const parentNotFound = thread.parentNotFound;
+	const parentBreak = thread.parentBreak;
 	const ancestors = thread.ancestors;
 	const descendants = thread.descendants;
 
@@ -154,8 +154,8 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 
 	return {
 		post: thread.post,
-		parentNotFound: parentNotFound,
-		ancestors: ancestors.length > 0 || parentNotFound ? { items: ancestors } : undefined,
+		parentBreak: parentBreak,
+		ancestors: ancestors.length > 0 || parentBreak ? { items: ancestors } : undefined,
 		descendants: slices,
 	};
 };

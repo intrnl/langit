@@ -216,7 +216,7 @@ export interface BskyThreadBlockedPost {
 export interface BskyThread {
 	$type: 'app.bsky.feed.defs#threadViewPost';
 	post: BskyPost;
-	parent?: BskyThread | BskyThreadNotFound;
+	parent?: BskyThread | BskyThreadNotFound | BskyThreadBlockedPost;
 	replies: Array<BskyThread | BskyThreadBlockedPost>;
 }
 
@@ -226,7 +226,7 @@ export interface BskyThreadResponse {
 
 export interface LinearizedThread {
 	post: BskyPost;
-	parentNotFound: boolean;
+	parentBreak?: BskyThreadNotFound | BskyThreadBlockedPost;
 	ancestors: BskyPost[];
 	descendants: BskyPost[];
 }

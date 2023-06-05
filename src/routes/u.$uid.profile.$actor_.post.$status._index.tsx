@@ -3,7 +3,7 @@ import { For, Match, Show, Switch } from 'solid-js';
 import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
-import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
+import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
@@ -23,6 +23,7 @@ import button from '~/styles/primitives/button.ts';
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
+import EmbedRecordBlocked from '~/components/EmbedRecordBlocked';
 
 const seen = new Set<string>();
 
@@ -80,7 +81,7 @@ const AuthenticatedPostPage = () => {
 				<Match when={threadQuery.error} keyed>
 					{(error) => (
 						<Switch fallback={<div class="p-3 text-sm">Something went wrong.</div>}>
-							<Match when={(error as XRPCError).error === 'NotFound'}>
+							<Match when={error instanceof XRPCError && error.error === 'NotFound'}>
 								<div class="p-3">
 									<EmbedRecordNotFound />
 								</div>
@@ -113,6 +114,8 @@ const AuthenticatedPostPage = () => {
 						const record = () => post.record.value;
 						const author = post.author;
 
+						const parentBreak = data.parentBreak;
+
 						return (
 							<>
 								<Show when={data.ancestors} keyed>
@@ -142,9 +145,19 @@ const AuthenticatedPostPage = () => {
 														</div>
 														<span class="text-sm text-accent">Show parent post</span>
 													</A>
-												) : data.parentNotFound ? (
+												) : parentBreak ? (
 													<div class="p-3">
-														<EmbedRecordNotFound />
+														{parentBreak.$type === 'app.bsky.feed.defs#notFoundPost' ? (
+															<EmbedRecordNotFound />
+														) : parentBreak.$type === 'app.bsky.feed.defs#blockedPost' ? (
+															<EmbedRecordBlocked
+																uid={uid()}
+																record={{
+																	$type: 'app.bsky.embed.record#viewBlocked',
+																	uri: parentBreak.uri,
+																}}
+															/>
+														) : null}
 													</div>
 												) : null}
 
@@ -296,8 +309,8 @@ const AuthenticatedPostPage = () => {
 									}}
 								</For>
 
-								<div class='flex h-13 items-center justify-center'>
-									<span class='text-sm text-muted-fg'>End of thread</span>
+								<div class="flex h-13 items-center justify-center">
+									<span class="text-sm text-muted-fg">End of thread</span>
 								</div>
 							</>
 						);

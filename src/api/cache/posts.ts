@@ -110,7 +110,7 @@ export const createSignalizedTimelinePost = (
 /** @see LinearizedThread */
 export interface SignalizedLinearThread {
 	post: SignalizedPost;
-	parentNotFound: boolean;
+	parentBreak: LinearizedThread['parentBreak'];
 	ancestors: SignalizedPost[];
 	descendants: SignalizedPost[];
 }
@@ -140,7 +140,7 @@ export const createSignalizedLinearThread = (
 
 	return {
 		post: mergeSignalizedPost(thread.post),
-		parentNotFound: thread.parentNotFound,
+		parentBreak: thread.parentBreak,
 		ancestors,
 		descendants,
 	};

@@ -62,15 +62,16 @@ type NavigateWithParamOptions<P> = P extends number
 		? [Partial<NavigateOptions> & { params: Params[P] }]
 		: [Partial<NavigateOptions> & { params?: never }] | [];
 
-export type AnchorWithParamProps<P> =
-	& AnchorProps
-	& (P extends PathsWithParams ? { href: P; params: Params[P] } : { href: P; params?: never });
-export type NavigateWithParamProps<P> =
-	& NavigateProps
-	& (P extends PathsWithParams ? { href: P; params: Params[P] } : { href: P; params?: never });
+export type AnchorWithParamProps<P> = AnchorProps &
+	(P extends PathsWithParams ? { href: P; params: Params[P] } : { href: P; params?: never });
+export type NavigateWithParamProps<P> = NavigateProps &
+	(P extends PathsWithParams ? { href: P; params: Params[P] } : { href: P; params?: never });
 
 export const useParams: <P extends PathsWithParams>(path: P) => Params[P] = useParams_ as any;
-export const useNavigate = (): <P extends Paths | number>(href: P, ...options: NavigateWithParamOptions<P>) => void => {
+export const useNavigate = (): (<P extends Paths | number>(
+	href: P,
+	...options: NavigateWithParamOptions<P>
+) => void) => {
 	const navigate = useNavigate_();
 	return ((path: any, options: any) => {
 		if (typeof path === "number") {
@@ -82,16 +83,16 @@ export const useNavigate = (): <P extends Paths | number>(href: P, ...options: N
 };
 
 export const A = <P extends Paths>(props: AnchorWithParamProps<P>) => {
-	const [int, ext] = splitProps(props, ['href', 'params'])
-
-	return A_(mergeProps(ext, { get href () { return int.params ? generatePath(int.href, int.params) : int.href; } }))
+	const [int, ext] = splitProps(props, ["href", "params"]);
+	return A_(mergeProps(ext, { get href() { return int.params ? generatePath(int.href, int.params) : int.href; } }));
 };
 export const Navigate = <P extends Paths>(props: NavigateWithParamProps<P>) => {
-	return Navigate_(mergeProps(props, { get href () { return props.params ? generatePath(props.href, props.params) : props.href; } }))
+	const [int, ext] = splitProps(props, ["href", "params"]);
+	return Navigate_(mergeProps(ext, { get href() { return int.params ? generatePath(int.href, int.params) : int.href; } }));
 };
 
 export { A as NavLink };
 
 const RE_PARAM = /\/:(\w+)(\??)/g;
 const generatePath = (path: string, params: Record<string, string>) =>
-	path.replace(RE_PARAM, (_, segment) => (params[segment] ? `/${params[segment]}` : ""));
+	path.replace(RE_PARAM, (_, segment) => (params[segment] ? `/${params[segment]}` : ''));

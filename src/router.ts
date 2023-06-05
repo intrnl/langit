@@ -78,7 +78,8 @@ export const useNavigate = (): (<P extends Paths | number>(
 			return navigate(path);
 		}
 
-		return navigate(options?.params ? generatePath(path, options.params) : path, options);
+		const params = options?.params;
+		return navigate(params ? generatePath(path, params) : path, options);
 	}) as any;
 };
 
@@ -95,4 +96,4 @@ export { A as NavLink };
 
 const RE_PARAM = /\/:(\w+)(\??)/g;
 const generatePath = (path: string, params: Record<string, string>) =>
-	path.replace(RE_PARAM, (_, segment) => (params[segment] ? `/${params[segment]}` : ''));
+	path.replace(RE_PARAM, (_, segment) => (params[segment] ? `/${params[segment]}` : ""));

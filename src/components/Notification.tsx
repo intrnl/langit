@@ -242,19 +242,19 @@ const renderText = (
 	data: FollowNotificationSlice | LikeNotificationSlice | RepostNotificationSlice,
 ) => {
 	const items = data.items;
-	const sliced = items.slice(0, items.length > MAX_NAMES ? MAX_NAMES_AFTER_TRUNCATION : MAX_NAMES);
-	const remaining = items.length - sliced.length;
+	const sliced = Math.min(items.length, items.length > MAX_NAMES ? MAX_NAMES_AFTER_TRUNCATION : MAX_NAMES);
+	const remaining = items.length - sliced;
 
 	const type = data.type;
 
 	const nodes: JSX.Element[] = [];
 
-	for (let idx = 0, len = sliced.length; idx < len; idx++) {
-		const item = sliced[idx];
+	for (let idx = 0; idx < sliced; idx++) {
+		const item = items[idx];
 		const author = item.author;
 
-		if (len > 1) {
-			if (remaining < 1 && idx === len - 1) {
+		if (sliced > 1) {
+			if (remaining < 1 && idx === sliced - 1) {
 				nodes.push(` and `);
 			} else if (idx !== 0) {
 				nodes.push(`, `);

@@ -4,8 +4,14 @@ if (Intl.Segmenter) {
 	const segmenter = new Intl.Segmenter();
 
 	graphemeLen = (text) => {
-		const segments = Array.from(segmenter.segment(text));
-		return segments.length;
+		const iterator = segmenter.segment(text)[Symbol.iterator]();
+		let count = 0;
+
+		while (!iterator.next().done) {
+			count++;
+		}
+
+		return count;
 	};
 } else {
 	console.log('Intl.Segmenter API not available, falling back to polyfill...');

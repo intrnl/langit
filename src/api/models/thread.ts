@@ -57,6 +57,10 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 		const thread = node.thread;
 		const slice = node.slice;
 
+		if (!thread.replies) {
+			continue;
+		}
+
 		const post = thread.post;
 		const scores: Record<string, number> = {};
 

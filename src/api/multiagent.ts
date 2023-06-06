@@ -38,10 +38,7 @@ export class MultiagentError extends Error {}
 export class Multiagent {
 	public storage: ReactiveLocalStorage<MultiagentStorage>;
 
-	/**
-	 * A record of connected agents
-	 */
-	public agents: Record<DID, Agent> = {};
+	private agents: Record<DID, Promise<Agent>> = {};
 
 	constructor(name: string) {
 		this.storage = new ReactiveLocalStorage(name);
@@ -86,7 +83,7 @@ export class Multiagent {
 				},
 			});
 
-			this.agents[did] = agent;
+			this.agents[did] = Promise.resolve(agent);
 			return did;
 		} catch (err) {
 			throw new MultiagentError(`Failed to login`, { cause: err });
@@ -127,7 +124,7 @@ export class Multiagent {
 	/**
 	 * Retrieve an agent associated with an account
 	 */
-	async connect(did: DID): Promise<Agent> {
+	connect(did: DID): Promise<Agent> {
 		if (did in this.agents) {
 			return this.agents[did];
 		}
@@ -136,20 +133,22 @@ export class Multiagent {
 		const data = accounts && accounts[did];
 
 		if (!data) {
-			throw new MultiagentError(`Invalid account`);
+			return Promise.reject(new MultiagentError(`Invalid account`));
 		}
 
-		const agent = this._createAgent(data.service);
+		return (this.agents[did] = new Promise((resolve, reject) => {
+			const agent = this._createAgent(data.service);
 
-		try {
-			this.agents[did] = agent;
-			await agent.resumeSession(data.session);
-
-			return agent;
-		} catch (err) {
-			delete this.agents[did];
-			throw new MultiagentError(`Failed to resume session`, { cause: err });
-		}
+			agent.resumeSession(data.session).then(
+				() => {
+					resolve(agent);
+				},
+				(err) => {
+					delete this.agents[did];
+					reject(new MultiagentError(`Failed to resume session`, { cause: err }));
+				},
+			);
+		}));
 	}
 
 	private _createAgent(serviceUri: string) {

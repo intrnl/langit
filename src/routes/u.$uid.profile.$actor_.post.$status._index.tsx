@@ -79,7 +79,25 @@ const AuthenticatedPostPage = () => {
 
 				<Match when={threadQuery.error} keyed>
 					{(error) => (
-						<Switch fallback={<div class="p-3 text-sm">Something went wrong.</div>}>
+						<Switch
+							fallback={
+								<div class="p-4">
+									<div class="mb-4 text-sm">
+										<p class="font-bold">Something went wrong</p>
+										<p class="text-muted-fg">{'' + error}</p>
+									</div>
+
+									<button
+										onClick={() => {
+											threadQuery.refetch();
+										}}
+										class={/* @once */ button({ color: 'primary' })}
+									>
+										Try again
+									</button>
+								</div>
+							}
+						>
 							<Match when={error instanceof XRPCError && error.error === 'NotFound'}>
 								<div class="p-3">
 									<EmbedRecordNotFound />
@@ -88,15 +106,15 @@ const AuthenticatedPostPage = () => {
 
 							<Match when={error instanceof BlockedThreadError}>
 								<div class="p-4">
-									<div class="mb-4">
-										<p class="text-sm font-bold">This post is from an account you blocked</p>
-										<p class="text-sm text-muted-fg">You need to unblock the account to view the post.</p>
+									<div class="mb-4 text-sm">
+										<p class="font-bold">This post is from an account you blocked</p>
+										<p class="text-muted-fg">You need to unblock the account to view the post.</p>
 									</div>
 
 									<A
 										href="/u/:uid/profile/:actor"
 										params={{ uid: uid(), actor: actor() }}
-										class={button({ color: 'primary' })}
+										class={/* @once */ button({ color: 'primary' })}
 									>
 										View profile
 									</A>

@@ -12,6 +12,7 @@ import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
+import GTranslateIcon from '~/icons/baseline-g-translate.tsx';
 import LaunchIcon from '~/icons/baseline-launch.tsx';
 import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
 
@@ -74,6 +75,20 @@ const PostMenu = (props: PostMenuProps) => {
 					</span>
 				</button>
 			</Show>
+
+			<button
+				onClick={() => {
+					const text = post().record.value.text;
+					const url = `https://translate.google.com/?sl=auto&text=${encodeURIComponent(text)}`;
+
+					open(url, '_blank');
+					closeModal();
+				}}
+				class={/* @once */ menu.item()}
+			>
+				<GTranslateIcon class="text-lg" />
+				<span>Translate with Google Translate</span>
+			</button>
 
 			<button onClick={closeModal} class={/* @once */ menu.cancel()}>
 				Cancel

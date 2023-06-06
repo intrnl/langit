@@ -7,11 +7,13 @@ import { type SignalizedPost } from '~/api/cache/posts.ts';
 
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
+import DeletePostConfirmDialog from '~/components/dialogs/DeletePostConfirmDialog.tsx';
 import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
+import DeleteIcon from '~/icons/baseline-delete.tsx';
 import GTranslateIcon from '~/icons/baseline-g-translate.tsx';
 import LaunchIcon from '~/icons/baseline-launch.tsx';
 import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
@@ -90,6 +92,19 @@ const PostMenu = (props: PostMenuProps) => {
 				<GTranslateIcon class="text-lg" />
 				<span>Translate with Google Translate</span>
 			</button>
+
+			<Show when={author().did === uid()}>
+				<button
+					onClick={() => {
+						closeModal();
+						openModal(() => <DeletePostConfirmDialog uid={uid()} post={post()} />);
+					}}
+					class={/* @once */ menu.item()}
+				>
+					<DeleteIcon class="text-lg" />
+					<span>Delete</span>
+				</button>
+			</Show>
 
 			<button onClick={closeModal} class={/* @once */ menu.cancel()}>
 				Cancel

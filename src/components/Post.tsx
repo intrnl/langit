@@ -44,6 +44,7 @@ const Post = (props: PostProps) => {
 	const record = () => post().record.value;
 
 	const isReposted = () => !!post().viewer.repost.value;
+	const isDeleted = () => post().$deleted.value;
 
 	const handleClick = (ev: MouseEvent | KeyboardEvent) => {
 		if (!props.interactive || !isElementClicked(ev)) {

@@ -28,6 +28,7 @@ export interface SignalizedPost {
 		repost: Signal<BskyPost['viewer']['repost']>;
 	};
 
+	$deleted: Signal<boolean>;
 	$renderedContent: ReturnType<typeof createPostRenderer>;
 }
 
@@ -48,6 +49,7 @@ const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
 			like: signal(post.viewer.like),
 			repost: signal(post.viewer.repost),
 		},
+		$deleted: signal(false),
 		$renderedContent: createPostRenderer(),
 	};
 };

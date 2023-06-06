@@ -31,7 +31,7 @@ const InvalidSessionNoticeDialog = (props: InvalidSessionNoticeDialogProps) => {
 						multiagent.logout(did);
 
 						closeModal();
-						navigate('/');
+						navigate('/login');
 					}}
 					class={/* @once */ button({ color: 'primary' })}
 				>

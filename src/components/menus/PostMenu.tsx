@@ -78,8 +78,9 @@ const PostMenu = (props: PostMenuProps) => {
 
 			<button
 				onClick={() => {
+					const sl = navigator.language;
 					const text = post().record.value.text;
-					const url = `https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(text)}`;
+					const url = `https://translate.google.com/?sl=auto&tl=${sl}&text=${encodeURIComponent(text)}`;
 
 					open(url, '_blank');
 					closeModal();

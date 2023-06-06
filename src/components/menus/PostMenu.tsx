@@ -79,7 +79,7 @@ const PostMenu = (props: PostMenuProps) => {
 			<button
 				onClick={() => {
 					const text = post().record.value.text;
-					const url = `https://translate.google.com/?sl=auto&text=${encodeURIComponent(text)}`;
+					const url = `https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(text)}`;
 
 					open(url, '_blank');
 					closeModal();

@@ -224,13 +224,6 @@ export interface BskyThreadResponse {
 	thread: BskyThread | BskyThreadBlockedPost;
 }
 
-export interface LinearizedThread {
-	post: BskyPost;
-	parentBreak?: BskyThreadNotFound | BskyThreadBlockedPost;
-	ancestors: BskyPost[];
-	descendants: BskyPost[];
-}
-
 export interface BskyTimelinePost {
 	post: BskyPost;
 	reply?: {

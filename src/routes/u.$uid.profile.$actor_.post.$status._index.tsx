@@ -4,7 +4,7 @@ import { A as UntypedAnchor, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
-import { type DID, getRecordId } from '~/api/utils.ts';
+import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
@@ -114,28 +114,25 @@ const AuthenticatedPostPage = () => {
 						const record = () => post.record.value;
 						const author = post.author;
 
-						const parentBreak = data.parentBreak;
-
 						return (
 							<>
 								<Show when={data.ancestors} keyed>
-									{(slice) => {
+									{(items) => {
 										let overflowing = false;
-										let items = slice.items;
 
 										if (items.length > MAX_ANCESTORS) {
 											overflowing = true;
-											items = items.slice(-MAX_ANCESTORS);
+											items = items.slice(-MAX_ANCESTORS) as any;
 										}
 
 										return (
 											<>
-												{overflowing ? (
+												{overflowing && (
 													<A
 														href="/u/:uid/profile/:actor/post/:status"
 														params={{
 															uid: uid(),
-															actor: items[0].author.did,
+															actor: getRepoId(items[0].uri),
 															status: getRecordId(items[0].uri),
 														}}
 														class="flex h-10 items-center gap-3 px-4 hover:bg-hinted"
@@ -145,27 +142,36 @@ const AuthenticatedPostPage = () => {
 														</div>
 														<span class="text-sm text-accent">Show parent post</span>
 													</A>
-												) : parentBreak ? (
-													<div class="p-3">
-														{parentBreak.$type === 'app.bsky.feed.defs#notFoundPost' ? (
-															<EmbedRecordNotFound />
-														) : parentBreak.$type === 'app.bsky.feed.defs#blockedPost' ? (
-															<EmbedRecordBlocked
-																uid={uid()}
-																record={{
-																	$type: 'app.bsky.embed.record#viewBlocked',
-																	uri: parentBreak.uri,
-																}}
-															/>
-														) : null}
-													</div>
-												) : null}
+												)}
 
-												{items.map((item, idx) => (
-													<VirtualContainer key="posts" id={/* @once */ createPostKey(item.cid, false, true)}>
-														<Post interactive uid={uid()} post={item} prev={idx !== 0} next />
-													</VirtualContainer>
-												))}
+												{items.map((item, idx) => {
+													if ('$type' in item) {
+														return (
+															<div class="p-3">
+																{item.$type === 'app.bsky.feed.defs#notFoundPost' ? (
+																	<EmbedRecordNotFound />
+																) : item.$type === 'app.bsky.feed.defs#blockedPost' ? (
+																	<EmbedRecordBlocked
+																		uid={uid()}
+																		record={{
+																			$type: 'app.bsky.embed.record#viewBlocked',
+																			uri: item.uri,
+																		}}
+																	/>
+																) : null}
+															</div>
+														);
+													}
+
+													return (
+														<VirtualContainer
+															key="posts"
+															id={/* @once */ createPostKey(item.cid, false, true)}
+														>
+															<Post interactive uid={uid()} post={item} prev={idx !== 0} next />
+														</VirtualContainer>
+													);
+												})}
 											</>
 										);
 									}}
@@ -267,33 +273,51 @@ const AuthenticatedPostPage = () => {
 
 										if (len > MAX_DESCENDANTS) {
 											overflowing = true;
-											items = items.slice(0, MAX_DESCENDANTS);
+											items = items.slice(0, MAX_DESCENDANTS) as any;
 											len = MAX_DESCENDANTS;
 										}
 
 										return (
 											<>
-												{items.map((item, idx) => (
-													<VirtualContainer
-														key="posts"
-														id={/* @once */ createPostKey(item.cid, false, overflowing || idx !== len - 1)}
-													>
-														<Post
-															interactive
-															uid={uid()}
-															post={item}
-															prev={idx !== 0}
-															next={overflowing || idx !== len - 1}
-														/>
-													</VirtualContainer>
-												))}
+												{items.map((item, idx) => {
+													if ('$type' in item) {
+														return (
+															<div class="p-3">
+																{item.$type === 'app.bsky.feed.defs#blockedPost' ? (
+																	<EmbedRecordBlocked
+																		uid={uid()}
+																		record={{
+																			$type: 'app.bsky.embed.record#viewBlocked',
+																			uri: item.uri,
+																		}}
+																	/>
+																) : null}
+															</div>
+														);
+													}
+
+													return (
+														<VirtualContainer
+															key="posts"
+															id={/* @once */ createPostKey(item.cid, false, overflowing || idx !== len - 1)}
+														>
+															<Post
+																interactive
+																uid={uid()}
+																post={item}
+																prev={idx !== 0}
+																next={overflowing || idx !== len - 1}
+															/>
+														</VirtualContainer>
+													);
+												})}
 
 												{overflowing && (
 													<A
 														href="/u/:uid/profile/:actor/post/:status"
 														params={{
 															uid: uid(),
-															actor: items[len - 1].author.did,
+															actor: getRepoId(items[len - 1].uri),
 															status: getRecordId(items[len - 1].uri),
 														}}
 														class="flex h-10 items-center gap-3 border-b border-divider px-4 hover:bg-hinted"

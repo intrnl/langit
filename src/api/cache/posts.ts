@@ -2,7 +2,7 @@ import { dequal } from 'dequal/lite';
 
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
-import { type BskyPost, type BskyTimelinePost, type LinearizedThread } from '../types.ts';
+import { type BskyPost, type BskyTimelinePost } from '../types.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
 
@@ -104,45 +104,6 @@ export const createSignalizedTimelinePost = (
 			parent: mergeSignalizedPost(reply.parent, key),
 		},
 		reason: item.reason,
-	};
-};
-
-/** @see LinearizedThread */
-export interface SignalizedLinearThread {
-	post: SignalizedPost;
-	parentBreak: LinearizedThread['parentBreak'];
-	ancestors: SignalizedPost[];
-	descendants: SignalizedPost[];
-}
-
-export const createSignalizedLinearThread = (
-	thread: LinearizedThread,
-	key?: number,
-): SignalizedLinearThread => {
-	const anc = thread.ancestors;
-	const dec = thread.descendants;
-
-	const anclen = anc.length;
-	const declen = dec.length;
-
-	const ancestors: SignalizedPost[] = new Array(anclen);
-	const descendants: SignalizedPost[] = new Array(declen);
-
-	for (let idx = 0; idx < anclen; idx++) {
-		const post = anc[idx];
-		ancestors[idx] = mergeSignalizedPost(post, key);
-	}
-
-	for (let idx = 0; idx < declen; idx++) {
-		const post = dec[idx];
-		descendants[idx] = mergeSignalizedPost(post, key);
-	}
-
-	return {
-		post: mergeSignalizedPost(thread.post),
-		parentBreak: thread.parentBreak,
-		ancestors,
-		descendants,
 	};
 };
 

@@ -1,5 +1,10 @@
-import { type SignalizedPost, createSignalizedLinearThread } from '../cache/posts.ts';
-import { type BskyPost, type BskyThread, type LinearizedThread } from '../types.ts';
+import { type SignalizedPost, mergeSignalizedPost } from '../cache/posts.ts';
+import {
+	type BskyPost,
+	type BskyThread,
+	type BskyThreadBlockedPost,
+	type BskyThreadNotFound,
+} from '../types.ts';
 
 import { Stack } from '~/utils/stack.ts';
 
@@ -15,50 +20,47 @@ const calculatePostScore = (post: BskyPost, parent: BskyPost) => {
 	);
 };
 
-const linearizeThread = (thread: BskyThread): LinearizedThread => {
-	const ancestors: LinearizedThread['ancestors'] = [];
-	const descendants: LinearizedThread['descendants'] = [];
+export interface ThreadSlice {
+	items: [...items: SignalizedPost[], last: SignalizedPost | BskyThreadBlockedPost];
+}
 
-	const stack = new Stack<BskyThread>();
+export interface ThreadPage {
+	post: SignalizedPost;
+	ancestors: [first: SignalizedPost | BskyThreadNotFound | BskyThreadBlockedPost, ...items: SignalizedPost[]];
+	descendants: ThreadSlice[];
+}
 
-	let parent = thread.parent;
-	let node: BskyThread | undefined;
+type ThreadStackNode = { thread: BskyThread; slice: ThreadSlice | undefined };
 
-	let parentBreak: LinearizedThread['parentBreak'];
+export const createThreadPage = (data: BskyThread): ThreadPage => {
+	const ancestors: (SignalizedPost | BskyThreadNotFound | BskyThreadBlockedPost)[] = [];
+	const descendants: ThreadSlice[] = [];
 
-	stack.push(thread);
+	const stack = new Stack<ThreadStackNode>();
+
+	let parent = data.parent;
+	let node: ThreadStackNode | undefined;
+
+	stack.push({ thread: data, slice: undefined });
 
 	while (parent) {
 		if (parent.$type !== 'app.bsky.feed.defs#threadViewPost') {
-			parentBreak = parent;
+			ancestors.push(parent);
 			break;
 		}
 
-		ancestors.push(parent.post);
+		ancestors.push(mergeSignalizedPost(parent.post));
 		parent = parent.parent;
 	}
 
 	while ((node = stack.pop())) {
-		// skip any nodes that doesn't have a replies array, think this might be
-		// when we reach the depth limit? not certain.
-		const post = node.post;
+		const thread = node.thread;
+		const slice = node.slice;
 
-		if (!node.replies) {
-			if (node !== thread) {
-				descendants.push(post);
-			}
-
-			continue;
-		}
-
-		const replies = node.replies.slice();
+		const post = thread.post;
 		const scores: Record<string, number> = {};
 
-		if (node !== thread) {
-			descendants.push(post);
-		}
-
-		replies.sort((a, b) => {
+		const replies = thread.replies.slice().sort((a, b) => {
 			if (a.$type === 'app.bsky.feed.defs#blockedPost' || b.$type === 'app.bsky.feed.defs#blockedPost') {
 				return 0;
 			}
@@ -72,90 +74,37 @@ const linearizeThread = (thread: BskyThread): LinearizedThread => {
 			return bScore - aScore;
 		});
 
-		// this is LIFO, and we want the first reply to be processed first, so we
-		// have to loop starting from the back and not the front.
-		for (let idx = replies.length - 1; idx >= 0; idx--) {
-			const child = replies[idx];
+		if (!slice) {
+			// we're in the root thread
+			for (let idx = 0, len = replies.length; idx < len; idx++) {
+				const reply = replies[idx];
 
-			if (child.$type === 'app.bsky.feed.defs#blockedPost') {
-				continue;
+				if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
+					const next: ThreadSlice = { items: [mergeSignalizedPost(reply.post)] };
+
+					stack.push({ thread: reply, slice: next });
+					descendants.push(next);
+				} else {
+					descendants.push({ items: [reply] });
+				}
 			}
+		} else if (replies.length > 0) {
+			const reply = replies[0];
 
-			stack.push(child);
-		}
-	}
+			if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
+				const post = mergeSignalizedPost(reply.post);
 
-	ancestors.reverse();
-
-	return {
-		post: thread.post,
-		parentBreak,
-		ancestors,
-		descendants,
-	};
-};
-
-export interface ThreadSlice {
-	items: SignalizedPost[];
-}
-
-const isChildOf = (cid: string, child: SignalizedPost) => {
-	const reply = child.record.peek().reply;
-
-	return !!reply && reply.parent.cid === cid;
-};
-
-const isNextInThread = (slice: ThreadSlice, child: SignalizedPost) => {
-	const reply = child.record.peek().reply;
-
-	const items = slice.items;
-	const last = items[items.length - 1];
-
-	return !!reply && last.cid == reply.parent.cid;
-};
-
-export interface ThreadPage {
-	post: SignalizedPost;
-	parentBreak: LinearizedThread['parentBreak'];
-	ancestors?: ThreadSlice;
-	descendants: ThreadSlice[];
-}
-
-export const createThreadPage = (data: BskyThread): ThreadPage => {
-	const thread = createSignalizedLinearThread(linearizeThread(data));
-
-	const cid = thread.post.cid;
-	const parentBreak = thread.parentBreak;
-	const ancestors = thread.ancestors;
-	const descendants = thread.descendants;
-
-	const slices: ThreadSlice[] = [];
-	let jlen = 0;
-
-	for (let idx = 0, len = descendants.length; idx < len; idx++) {
-		const post = descendants[idx];
-
-		if (isChildOf(cid, post)) {
-			slices.push({ items: [post] });
-			jlen++;
-
-			continue;
-		}
-
-		if (jlen > 0) {
-			const slice = slices[jlen - 1];
-
-			if (isNextInThread(slice, post)) {
 				slice.items.push(post);
-				continue;
+				stack.push({ thread: reply, slice: slice });
+			} else {
+				slice.items.push(reply);
 			}
 		}
 	}
 
 	return {
-		post: thread.post,
-		parentBreak: parentBreak,
-		ancestors: ancestors.length > 0 || parentBreak ? { items: ancestors } : undefined,
-		descendants: slices,
+		post: mergeSignalizedPost(data.post),
+		ancestors: ancestors.reverse() as any,
+		descendants: descendants,
 	};
 };

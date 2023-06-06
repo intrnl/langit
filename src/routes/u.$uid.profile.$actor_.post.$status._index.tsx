@@ -50,7 +50,6 @@ const AuthenticatedPostPage = () => {
 		refetchOnMount: true,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
-		retry: false,
 	});
 
 	const focusRef = (node: HTMLDivElement) => {

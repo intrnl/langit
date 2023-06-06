@@ -4,13 +4,18 @@ import { Navigate, Outlet, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { multiagent } from '~/api/global.ts';
+import { MultiagentError } from '~/api/multiagent.ts';
+import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID } from '~/api/utils.ts';
 
 import { getNotificationsLatest, getNotificationsLatestKey } from '~/api/queries/get-notifications.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { A, useParams } from '~/router.ts';
+import { openModal } from '~/globals/modals.tsx';
 import { useMediaQuery } from '~/utils/media-query.ts';
+
+import InvalidSessionNoticeDialog from '~/components/dialogs/InvalidSessionNoticeDialog.tsx';
 
 import AddBoxIcon from '~/icons/baseline-add-box.tsx';
 import ExploreIcon from '~/icons/baseline-explore.tsx';
@@ -41,6 +46,21 @@ const AuthenticatedLayout = () => {
 		refetchOnMount: true,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
+		onError(err) {
+			if (err instanceof MultiagentError) {
+				err = err.cause || err;
+			}
+
+			if (err instanceof XRPCError) {
+				const name = err.error;
+
+				if (name === 'InvalidToken' || name === 'ExpiredToken') {
+					openModal(() => <InvalidSessionNoticeDialog uid={/* @once */ uid()} />, {
+						disableBackdropClose: true,
+					});
+				}
+			}
+		},
 	});
 
 	const notificationsQuery = createQuery({

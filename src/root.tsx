@@ -3,7 +3,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 
 import { ModalProvider } from '~/globals/modals.tsx';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			retry: false,
+		},
+	},
+});
 
 const Root = () => {
 	return (

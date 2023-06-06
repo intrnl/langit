@@ -30,7 +30,6 @@ const AuthenticatedProfileLayout = () => {
 		queryKey: () => getProfileKey(uid(), params.actor),
 		queryFn: getProfile,
 		staleTime: 10_000,
-		retry: false,
 		refetchOnWindowFocus: false,
 	});
 

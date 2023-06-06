@@ -33,6 +33,8 @@ interface MultiagentStorage {
 	accounts: Record<DID, MultiagentAccountData>;
 }
 
+export class MultiagentError extends Error {}
+
 export class Multiagent {
 	public storage: ReactiveLocalStorage<MultiagentStorage>;
 
@@ -87,7 +89,7 @@ export class Multiagent {
 			this.agents[did] = agent;
 			return did;
 		} catch (err) {
-			throw new Error(`Failed to login`, { cause: err });
+			throw new MultiagentError(`Failed to login`, { cause: err });
 		}
 	}
 
@@ -134,7 +136,7 @@ export class Multiagent {
 		const data = accounts && accounts[did];
 
 		if (!data) {
-			throw new Error(`Invalid account`);
+			throw new MultiagentError(`Invalid account`);
 		}
 
 		const agent = this._createAgent(data.service);
@@ -146,7 +148,7 @@ export class Multiagent {
 			return agent;
 		} catch (err) {
 			delete this.agents[did];
-			throw new Error(`Failed to resume session`, { cause: err });
+			throw new MultiagentError(`Failed to resume session`, { cause: err });
 		}
 	}
 

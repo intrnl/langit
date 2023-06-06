@@ -5,10 +5,18 @@ import Dialog from '~/components/Dialog.tsx';
 
 type ModalComponent = () => JSX.Element;
 
-const [modals, setModals] = createSignal<ModalComponent[]>([]);
+export interface ModalOptions {
+	disableBackdropClose?: boolean;
+}
 
-export const openModal = (fn: ModalComponent) => {
-	setModals(($modals) => $modals.concat(fn));
+interface ModalState extends ModalOptions {
+	render: ModalComponent;
+}
+
+const [modals, setModals] = createSignal<ModalState[]>([]);
+
+export const openModal = (fn: ModalComponent, options?: ModalOptions) => {
+	setModals(($modals) => $modals.concat({ render: fn, ...options }));
 };
 
 export const closeModal = () => {
@@ -23,8 +31,8 @@ export const ModalProvider = () => {
 	return (
 		<For each={modals()}>
 			{(modal) => (
-				<Dialog open onClose={closeModal}>
-					{modal()}
+				<Dialog open onClose={!modal.disableBackdropClose ? closeModal : undefined}>
+					{modal.render()}
 				</Dialog>
 			)}
 		</For>

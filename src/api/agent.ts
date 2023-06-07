@@ -1,3 +1,5 @@
+import decodeJwt from 'jwt-decode';
+
 import { type DID } from './utils.ts';
 
 import { type Headers, ResponseType, httpResponseCodeToEnum } from './rpc/xrpc-utils.ts';
@@ -7,6 +9,21 @@ import { type Signal, signal } from '~/utils/signals.ts';
 
 type SessionType = 'create' | 'create-failed' | 'update' | 'expired';
 type PersistSessionHandler = (type: SessionType, session?: AtpSessionData) => void;
+
+interface AtpAccessJwt {
+	scope: 'com.atproto.access';
+	sub: DID;
+	exp: number;
+	iat: number;
+}
+
+interface AtpRefreshJwt {
+	scope: 'com.atproto.refresh';
+	sub: DID;
+	exp: number;
+	iat: number;
+	jti: string;
+}
 
 export interface AtpSessionData {
 	refreshJwt: string;
@@ -76,21 +93,20 @@ export class Agent {
 
 	public async resumeSession(session: AtpSessionData) {
 		try {
-			this.session.value = session;
+			const now = Date.now() / 1000 + 60 * 5;
 
-			const res = await this.rpc.get({ method: 'com.atproto.server.getSession' });
+			const refreshToken = decodeJwt(session.refreshJwt) as AtpRefreshJwt;
 
-			if (!res.success || res.data.did !== session.did) {
-				throw new Error('Invalid session');
+			if (now >= refreshToken.exp) {
+				throw new Error('INVALID_TOKEN');
 			}
 
-			this.session.value = {
-				...session,
-				email: res.data.email,
-				handle: res.data.handle,
-			};
+			const accessToken = decodeJwt(session.accessJwt) as AtpAccessJwt;
+			this.session.value = session;
 
-			return res;
+			if (now >= accessToken.exp) {
+				await this._refreshSession();
+			}
 		} catch (e) {
 			this.session.value = undefined;
 			throw e;
@@ -130,7 +146,7 @@ export class Agent {
 	private _addAuthHeader(httpHeaders: Headers) {
 		const session = this.session.peek();
 
-		if (!httpHeaders['authorization'] && session?.accessJwt) {
+		if (!httpHeaders['authorization'] && session) {
 			return {
 				...httpHeaders,
 				authorization: `Bearer ${session.accessJwt}`,

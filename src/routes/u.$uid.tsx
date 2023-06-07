@@ -47,18 +47,22 @@ const AuthenticatedLayout = () => {
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
 		onError(err) {
+			let invalid = false;
+
 			if (err instanceof MultiagentError) {
 				err = err.cause || err;
 			}
 
 			if (err instanceof XRPCError) {
-				const name = err.error;
+				invalid = err.error === 'InvalidToken' || err.error === 'ExpiredToken';
+			} else if (err instanceof Error) {
+				invalid = err.message === 'INVALID_TOKEN';
+			}
 
-				if (name === 'InvalidToken' || name === 'ExpiredToken') {
-					openModal(() => <InvalidSessionNoticeDialog uid={/* @once */ uid()} />, {
-						disableBackdropClose: true,
-					});
-				}
+			if (invalid) {
+				openModal(() => <InvalidSessionNoticeDialog uid={/* @once */ uid()} />, {
+					disableBackdropClose: true,
+				});
 			}
 		},
 	});

@@ -59,6 +59,8 @@ export class Agent {
 	}
 
 	public async login(options: AtpLoginOptions) {
+		this.session.value = undefined;
+
 		try {
 			const res = await this.rpc.post({
 				method: 'com.atproto.server.createSession',
@@ -77,9 +79,6 @@ export class Agent {
 			};
 
 			return res;
-		} catch (e) {
-			this.session.value = undefined;
-			throw e;
 		} finally {
 			const session = this.session.peek();
 

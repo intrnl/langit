@@ -7,7 +7,7 @@ import { type FetchHandlerResponse, XRPC, fetchHandler, isErrorResponse } from '
 
 import { type Signal, signal } from '~/utils/signals.ts';
 
-type SessionType = 'create' | 'create-failed' | 'update' | 'expired';
+type SessionType = 'update' | 'expired';
 type PersistSessionHandler = (type: SessionType, session?: AtpSessionData) => void;
 
 interface AtpAccessJwt {
@@ -61,33 +61,23 @@ export class Agent {
 	public async login(options: AtpLoginOptions) {
 		this.session.value = undefined;
 
-		try {
-			const res = await this.rpc.post({
-				method: 'com.atproto.server.createSession',
-				data: {
-					identifier: options.identifier,
-					password: options.password,
-				},
-			});
+		const res = await this.rpc.post({
+			method: 'com.atproto.server.createSession',
+			data: {
+				identifier: options.identifier,
+				password: options.password,
+			},
+		});
 
-			this.session.value = {
-				accessJwt: res.data.accessJwt,
-				refreshJwt: res.data.refreshJwt,
-				handle: res.data.handle,
-				did: res.data.did,
-				email: res.data.email,
-			};
+		this.session.value = {
+			accessJwt: res.data.accessJwt,
+			refreshJwt: res.data.refreshJwt,
+			handle: res.data.handle,
+			did: res.data.did,
+			email: res.data.email,
+		};
 
-			return res;
-		} finally {
-			const session = this.session.peek();
-
-			if (session) {
-				this._persistSession?.('create', session);
-			} else {
-				this._persistSession?.('create-failed', undefined);
-			}
-		}
+		return res;
 	}
 
 	public async resumeSession(session: AtpSessionData) {

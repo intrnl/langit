@@ -92,32 +92,23 @@ export class Agent {
 	}
 
 	public async resumeSession(session: AtpSessionData) {
-		try {
-			const now = Date.now() / 1000 + 60 * 5;
+		const now = Date.now() / 1000 + 60 * 5;
 
-			const refreshToken = decodeJwt(session.refreshJwt) as AtpRefreshJwt;
+		const refreshToken = decodeJwt(session.refreshJwt) as AtpRefreshJwt;
 
-			if (now >= refreshToken.exp) {
-				throw new Error('INVALID_TOKEN');
-			}
+		if (now >= refreshToken.exp) {
+			throw new Error('INVALID_TOKEN');
+		}
 
-			const accessToken = decodeJwt(session.accessJwt) as AtpAccessJwt;
-			this.session.value = session;
+		const accessToken = decodeJwt(session.accessJwt) as AtpAccessJwt;
+		this.session.value = session;
 
-			if (now >= accessToken.exp) {
-				await this._refreshSession();
-			}
-		} catch (e) {
-			this.session.value = undefined;
-			throw e;
-		} finally {
-			const session = this.session.peek();
+		if (now >= accessToken.exp) {
+			await this._refreshSession();
+		}
 
-			if (session) {
-				this._persistSession?.('create', session);
-			} else {
-				this._persistSession?.('create-failed', undefined);
-			}
+		if (!this.session.peek()) {
+			throw new Error(`INVALID_TOKEN`);
 		}
 	}
 

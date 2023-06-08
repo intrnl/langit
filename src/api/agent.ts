@@ -193,7 +193,7 @@ export class Agent {
 			undefined,
 		);
 
-		if (isErrorResponse(res, ['ExpiredToken', 'InvalidToken'])) {
+		if (isErrorResponse(res.body, ['ExpiredToken', 'InvalidToken'])) {
 			// failed due to a bad refresh token
 			this.session.value = undefined;
 			this._persistSession?.('expired', undefined);

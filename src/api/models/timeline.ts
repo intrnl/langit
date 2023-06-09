@@ -67,11 +67,11 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 		for (let j = 0; j < jlen; j++) {
 			const slice = slices[j];
 
-			if (isNextInThread(slice, item)) {
-				slice.items.push(signalized);
-				continue loop;
-			} else if (isFirstInThread(slice, item)) {
+			if (isFirstInThread(slice, item)) {
 				slice.items.unshift(signalized);
+				continue loop;
+			} else if (isNextInThread(slice, item)) {
+				slice.items.push(signalized);
 				continue loop;
 			}
 		}

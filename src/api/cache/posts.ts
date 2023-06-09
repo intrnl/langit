@@ -1,5 +1,3 @@
-import { dequal } from 'dequal/lite';
-
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 import { type BskyPost, type BskyTimelinePost } from '../types.ts';
@@ -38,7 +36,7 @@ const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
 		uri: post.uri,
 		cid: post.cid,
 		author: mergeSignalizedProfile(post.author, key),
-		record: signal(post.record, { equals: dequal }),
+		record: signal(post.record),
 		embed: signal(post.embed),
 		replyCount: signal(post.replyCount),
 		repostCount: signal(post.repostCount),
@@ -68,7 +66,7 @@ export const mergeSignalizedPost = (post: BskyPost, key?: number) => {
 
 		val.author = mergeSignalizedProfile(post.author, key);
 
-		val.record.value = post.record;
+		// val.record.value = post.record;
 		val.embed.value = post.embed;
 		val.replyCount.value = post.replyCount;
 		val.repostCount.value = post.repostCount;

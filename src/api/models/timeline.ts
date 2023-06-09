@@ -54,7 +54,7 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 	let jlen = 0;
 
 	// arrange the posts into connected slices
-	loop: for (let i = feed.length - 1; i >= 0; i--) {
+	loop: for (let i = 0; i < len; i++) {
 		const item = feed[i];
 		const cid = item.post.cid;
 
@@ -75,26 +75,14 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 
 			if (isNextInThread(slice, item)) {
 				slice.items.push(item);
-
-				if (j !== 0) {
-					slices.splice(j, 1);
-					slices.unshift(slice);
-				}
-
 				continue loop;
 			} else if (isFirstInThread(slice, item)) {
 				slice.items.unshift(item);
-
-				if (j !== 0) {
-					slices.splice(j, 1);
-					slices.unshift(slice);
-				}
-
 				continue loop;
 			}
 		}
 
-		slices.unshift({ items: [item] });
+		slices.push({ items: [item] });
 		jlen++;
 	}
 

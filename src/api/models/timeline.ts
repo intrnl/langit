@@ -3,13 +3,13 @@ import {
 	createSignalizedTimelinePost,
 	mergeSignalizedPost,
 } from '../cache/posts.ts';
-import { type BskyPost, type BskyTimelineResponse } from '../types.ts';
+import { type BskyPost, type BskyTimelinePost, type BskyTimelineResponse } from '../types.ts';
 
 export interface TimelineSlice {
 	items: SignalizedTimelinePost[];
 }
 
-const isNextInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
+const isNextInThread = (slice: TimelineSlice, item: BskyTimelinePost) => {
 	const items = slice.items;
 	const last = items[items.length - 1];
 
@@ -18,7 +18,7 @@ const isNextInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
 	return !!reply && last.post.cid == reply.parent.cid;
 };
 
-const isFirstInThread = (slice: TimelineSlice, item: SignalizedTimelinePost) => {
+const isFirstInThread = (slice: TimelineSlice, item: BskyTimelinePost) => {
 	const items = slice.items;
 	const first = items[0];
 
@@ -39,15 +39,8 @@ export type SliceFilter = (slice: TimelineSlice, seen: Set<string>) => boolean;
 export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFilter): TimelinePage => {
 	const key = Date.now();
 
-	const orig = data.feed;
-	const len = orig.length;
-
-	const feed: SignalizedTimelinePost[] = new Array(len);
-
-	for (let idx = 0; idx < len; idx++) {
-		const item = orig[idx];
-		feed[idx] = createSignalizedTimelinePost(item, key);
-	}
+	const arr = data.feed;
+	const len = arr.length;
 
 	const seen = new Set<string>();
 	let slices: TimelineSlice[] = [];
@@ -55,7 +48,7 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 
 	// arrange the posts into connected slices
 	loop: for (let i = 0; i < len; i++) {
-		const item = feed[i];
+		const item = arr[i];
 		const cid = item.post.cid;
 
 		// skip any posts that have been seen already
@@ -66,6 +59,7 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 		seen.add(cid);
 
 		// find a slice that matches
+		const signalized = createSignalizedTimelinePost(item, key);
 
 		// if we find a matching slice and it's currently not in front, then bump
 		// it to the front. this is so that new reply don't get buried away because
@@ -74,15 +68,15 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 			const slice = slices[j];
 
 			if (isNextInThread(slice, item)) {
-				slice.items.push(item);
+				slice.items.push(signalized);
 				continue loop;
 			} else if (isFirstInThread(slice, item)) {
-				slice.items.unshift(item);
+				slice.items.unshift(signalized);
 				continue loop;
 			}
 		}
 
-		slices.push({ items: [item] });
+		slices.push({ items: [signalized] });
 		jlen++;
 	}
 
@@ -102,7 +96,7 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 
 	return {
 		cursor: data.cursor,
-		cid: len > 0 ? orig[0].post.cid : undefined,
+		cid: len > 0 ? arr[0].post.cid : undefined,
 		length: len,
 		slices,
 	};

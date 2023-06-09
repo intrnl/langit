@@ -4,7 +4,7 @@
 
 Alternative client for Bluesky, designed primarily for mobile. Currently work-in-progress.
 
-Only latest browser versions are supported, Safari is untested due to lack of hardware.
+Only latest versions of Chrome and Firefox is supported, Safari is not supported due to lack of Apple hardware.
 
 <div align=center>
   <img width=200 src=https://github.com/intrnl/langit/assets/20620901/02ab9d7e-7f0d-4674-b235-aa6f60b8a4a9 />

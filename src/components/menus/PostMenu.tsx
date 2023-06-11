@@ -14,8 +14,8 @@ import * as menu from '~/styles/primitives/menu.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import DeleteIcon from '~/icons/baseline-delete.tsx';
-import GTranslateIcon from '~/icons/baseline-g-translate.tsx';
 import LaunchIcon from '~/icons/baseline-launch.tsx';
+import TranslateIcon from '~/icons/baseline-translate.tsx';
 import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
 
 export interface PostMenuProps {
@@ -81,19 +81,13 @@ const PostMenu = (props: PostMenuProps) => {
 
 			<button
 				onClick={(ev) => {
-					// const sl = navigator.language;
-					// const text = post().record.value.text;
-					// const url = `https://translate.google.com/?sl=auto&tl=${sl}&text=${encodeURIComponent(text)}`;
-
-					// open(url, '_blank');
-
 					props.onTranslate(ev);
 					closeModal();
 				}}
 				class={/* @once */ menu.item()}
 			>
-				<GTranslateIcon class="text-lg" />
-				<span>Translate with Google Translate</span>
+				<TranslateIcon class="text-lg" />
+				<span>Translate</span>
 			</button>
 
 			<Show when={author().did === uid()}>

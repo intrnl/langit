@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
-import { A as UntypedAnchor, useLocation } from '@solidjs/router';
+import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
@@ -21,6 +21,7 @@ import Embed from '~/components/Embed.tsx';
 import EmbedRecordBlocked from '~/components/EmbedRecordBlocked.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
+import PostTranslation from '~/components/PostTranslation.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
@@ -44,6 +45,8 @@ const formatter = new Intl.DateTimeFormat('en-US', {
 const AuthenticatedPostPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
 	const location = useLocation();
+
+	const [searchParams, setSearchParams] = useSearchParams<{ tl?: 'y' }>();
 
 	const uid = () => params.uid as DID;
 	const actor = () => params.actor;
@@ -226,7 +229,13 @@ const AuthenticatedPostPage = () => {
 										<div class="flex shrink-0 grow justify-end">
 											<button
 												onClick={() => {
-													openModal(() => <PostMenu uid={uid()} post={post} />);
+													openModal(() => (
+														<PostMenu
+															uid={uid()}
+															post={post}
+															onTranslate={() => setSearchParams({ tl: 'y' }, { replace: true })}
+														/>
+													));
 												}}
 												class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base text-muted-fg hover:bg-secondary"
 											>
@@ -239,6 +248,10 @@ const AuthenticatedPostPage = () => {
 										<div class="mt-3 whitespace-pre-wrap break-words text-base">
 											{post.$renderedContent(uid())}
 										</div>
+									</Show>
+
+									<Show when={searchParams.tl === 'y'}>
+										<PostTranslation text={record().text} />
 									</Show>
 
 									<Show when={post.embed.value}>

@@ -51,12 +51,16 @@ const Post = (props: PostProps) => {
 	const isReposted = () => !!post().viewer.repost.value;
 	const isDeleted = () => post().$deleted.value;
 
-	const handleClick = (ev: MouseEvent | KeyboardEvent) => {
+	const handleClick = (ev: MouseEvent | KeyboardEvent, translate?: boolean) => {
 		if (!props.interactive || !isElementClicked(ev)) {
 			return;
 		}
 
-		const path = `/u/${uid()}/profile/${author().did}/post/${getRecordId(post().uri)}`;
+		let path = `/u/${uid()}/profile/${author().did}/post/${getRecordId(post().uri)}`;
+
+		if (translate) {
+			path += '?tl=y';
+		}
 
 		if (isElementAltClicked(ev)) {
 			open(path, '_blank');
@@ -171,7 +175,9 @@ const Post = (props: PostProps) => {
 							<div class="shrink-0">
 								<button
 									onClick={() => {
-										openModal(() => <PostMenu uid={uid()} post={post()} />);
+										openModal(() => (
+											<PostMenu uid={uid()} post={post()} onTranslate={(ev) => handleClick(ev, true)} />
+										));
 									}}
 									class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base text-muted-fg hover:bg-secondary"
 								>

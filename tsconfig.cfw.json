@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"composite": true,
+		"target": "ESNext",
+		"module": "ESNext",
+		"strict": true,
+		"skipLibCheck": true,
+		"types": ["@cloudflare/workers-types"]
+	},
+	"include": ["functions"]
+}

@@ -69,6 +69,9 @@ dependencies:
     version: 0.6.0(@tiptap/core@2.0.3)(@tiptap/pm@2.0.3)(solid-js@1.7.6)
 
 devDependencies:
+  '@cloudflare/workers-types':
+    specifier: ^4.20230518.0
+    version: 4.20230518.0
   '@tailwindcss/forms':
     specifier: ^0.5.3
     version: 0.5.3(tailwindcss@3.3.2)
@@ -466,6 +469,10 @@ packages:
       '@babel/helper-string-parser': 7.22.5
       '@babel/helper-validator-identifier': 7.22.5
       to-fast-properties: 2.0.0
+
+  /@cloudflare/workers-types@4.20230518.0:
+    resolution: {integrity: sha512-A0w1V+5SUawGaaPRlhFhSC/SCDT9oQG8TMoWOKFLA4qbqagELqEAFD4KySBIkeVOvCBLT1DZSYBMCxbXddl0kw==}
+    dev: true
 
   /@esbuild/android-arm64@0.17.19:
     resolution: {integrity: sha512-KBMWvEZooR7+kzY0BtbTQn0OAYY7CsiydT63pVEaPtVYF0hXbUaOyZog37DKxK7NF3XacBJOpYT4adIJh+avxA==}

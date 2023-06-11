@@ -21,6 +21,7 @@ import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
 export interface PostMenuProps {
 	uid: DID;
 	post: SignalizedPost;
+	onTranslate: (ev: MouseEvent) => void;
 }
 
 const PostMenu = (props: PostMenuProps) => {
@@ -79,12 +80,14 @@ const PostMenu = (props: PostMenuProps) => {
 			</Show>
 
 			<button
-				onClick={() => {
-					const sl = navigator.language;
-					const text = post().record.value.text;
-					const url = `https://translate.google.com/?sl=auto&tl=${sl}&text=${encodeURIComponent(text)}`;
+				onClick={(ev) => {
+					// const sl = navigator.language;
+					// const text = post().record.value.text;
+					// const url = `https://translate.google.com/?sl=auto&tl=${sl}&text=${encodeURIComponent(text)}`;
 
-					open(url, '_blank');
+					// open(url, '_blank');
+
+					props.onTranslate(ev);
 					closeModal();
 				}}
 				class={/* @once */ menu.item()}

@@ -10,20 +10,26 @@ import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { A, useParams } from '~/router.ts';
+import { openModal } from '~/globals/modals.tsx';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
+import PostMenu from '~/components/menus/PostMenu.tsx';
+import PostRepostMenu from '~/components/menus/PostRepostMenu.tsx';
+import PostShareMenu from '~/components/menus/PostShareMenu.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
+import EmbedRecordBlocked from '~/components/EmbedRecordBlocked.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import Post from '~/components/Post.tsx';
-import { PostDropdown, PostRepostDropdown, PostShareDropdown } from '~/components/PostDropdown.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
+import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+import RepeatIcon from '~/icons/baseline-repeat.tsx';
+import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
-import EmbedRecordBlocked from '~/components/EmbedRecordBlocked';
 
 const seen = new Set<string>();
 
@@ -218,7 +224,14 @@ const AuthenticatedPostPage = () => {
 										</A>
 
 										<div class="flex shrink-0 grow justify-end">
-											<PostDropdown post={post} uid={uid()} />
+											<button
+												onClick={() => {
+													openModal(() => <PostMenu uid={uid()} post={post} />);
+												}}
+												class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base text-muted-fg hover:bg-secondary"
+											>
+												<MoreHorizIcon />
+											</button>
 										</div>
 									</div>
 
@@ -265,7 +278,17 @@ const AuthenticatedPostPage = () => {
 											<ChatBubbleOutlinedIcon />
 										</UntypedAnchor>
 
-										<PostRepostDropdown uid={uid()} post={post} large />
+										<button
+											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
+											classList={{
+												'text-green-600': !!post.viewer.repost.value,
+											}}
+											onClick={() => {
+												openModal(() => <PostRepostMenu uid={uid()} post={post} />);
+											}}
+										>
+											<RepeatIcon />
+										</button>
 
 										<button
 											class="group flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
@@ -276,7 +299,14 @@ const AuthenticatedPostPage = () => {
 											<FavoriteIcon class="hidden group-[.is-active]:block" />
 										</button>
 
-										<PostShareDropdown post={post} large />
+										<button
+											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
+											onClick={() => {
+												openModal(() => <PostShareMenu post={post} />);
+											}}
+										>
+											<ShareIcon />
+										</button>
 									</div>
 								</div>
 

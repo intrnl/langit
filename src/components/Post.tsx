@@ -8,15 +8,20 @@ import { type DID, getRecordId } from '~/api/utils.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 
 import { A } from '~/router.ts';
+import { openModal } from '~/globals/modals.tsx';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
+import PostMenu from '~/components/menus/PostMenu.tsx';
+import PostRepostMenu from '~/components/menus/PostRepostMenu.tsx';
+import PostShareMenu from '~/components/menus/PostShareMenu.tsx';
 import Embed from '~/components/Embed.tsx';
-import { PostDropdown, PostRepostDropdown, PostShareDropdown } from '~/components/PostDropdown.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
+import MoreHorizIcon from '~/icons/baseline-more-horiz';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
+import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
 
@@ -164,7 +169,14 @@ const Post = (props: PostProps) => {
 
 						<Show when={interactive()}>
 							<div class="shrink-0">
-								<PostDropdown post={post()} uid={uid()} />
+								<button
+									onClick={() => {
+										openModal(() => <PostMenu uid={uid()} post={post()} />);
+									}}
+									class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base text-muted-fg hover:bg-secondary"
+								>
+									<MoreHorizIcon />
+								</button>
 							</div>
 						</Show>
 					</div>
@@ -188,7 +200,18 @@ const Post = (props: PostProps) => {
 							</div>
 
 							<div class="flex grow items-end gap-0.5" classList={{ 'text-green-600': isReposted() }}>
-								<PostRepostDropdown uid={uid()} post={post()} class="-my-1.5 -ml-2" />
+								<button
+									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
+									classList={{
+										'text-green-600': !!post().viewer.repost.value,
+									}}
+									onClick={() => {
+										openModal(() => <PostRepostMenu uid={uid()} post={post()} />);
+									}}
+								>
+									<RepeatIcon />
+								</button>
+
 								<span class="text-[0.8125rem]">{comformat.format(post().repostCount.value)}</span>
 							</div>
 
@@ -207,7 +230,14 @@ const Post = (props: PostProps) => {
 							</div>
 
 							<div class="shrink-0">
-								<PostShareDropdown post={post()} class="-mx-2 -my-1.5" />
+								<button
+									class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
+									onClick={() => {
+										openModal(() => <PostShareMenu post={post()} />);
+									}}
+								>
+									<ShareIcon />
+								</button>
 							</div>
 						</div>
 					</Show>

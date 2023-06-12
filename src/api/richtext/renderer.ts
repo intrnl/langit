@@ -40,6 +40,10 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 				} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
 					anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
 					anchor.toggleAttribute('link', true);
+				} else {
+					anchor.href = uri;
+					anchor.rel = 'noopener noreferrer nofollow';
+					anchor.target = '_blank';
 				}
 			} else {
 				anchor.href = uri;

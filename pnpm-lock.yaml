@@ -19,6 +19,9 @@ dependencies:
   '@tanstack/solid-query':
     specifier: ^4.29.11
     version: 4.29.11(solid-js@1.7.6)
+  '@thisbeyond/solid-dnd':
+    specifier: ^0.7.4
+    version: 0.7.4(solid-js@1.7.6)
   '@tiptap/core':
     specifier: ^2.0.3
     version: 2.0.3(@tiptap/pm@2.0.3)
@@ -848,6 +851,14 @@ packages:
       solid-js: ^1.5.7
     dependencies:
       '@tanstack/query-core': 4.29.11
+      solid-js: 1.7.6
+    dev: false
+
+  /@thisbeyond/solid-dnd@0.7.4(solid-js@1.7.6):
+    resolution: {integrity: sha512-jgV9EtR3gAtVsILG8p1OAGrhHIgnK4W04YxpyLgJRCDKEFYQWuDrMdUe8F5Kc6pcVXlC4IMXr4cB8fS2Ut3/Ow==}
+    peerDependencies:
+      solid-js: ^1.5
+    dependencies:
       solid-js: 1.7.6
     dev: false
 

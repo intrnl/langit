@@ -1,3 +1,3 @@
-import { Multiagent } from '../api/multiagent.js';
+import { Multiagent } from '~/api/multiagent.ts';
 
 export const multiagent = new Multiagent('store');

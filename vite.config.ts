@@ -25,11 +25,6 @@ export default defineConfig({
 		modulePreload: {
 			polyfill: false,
 		},
-		rollupOptions: {
-			output: {
-				experimentalMinChunkSize: 20_000,
-			},
-		},
 	},
 	resolve: {
 		alias: {

@@ -1,4 +1,4 @@
-import { BSKY_FEED_URL_RE, BSKY_POST_URL_RE, BSKY_PROFILE_URL_RE } from '~/utils/link.ts';
+import { BSKY_FEED_URL_RE, BSKY_POST_URL_RE, BSKY_PROFILE_URL_RE, isAppUrl } from '~/utils/link.ts';
 
 import { type RichTextSegment } from './types.ts';
 
@@ -30,15 +30,17 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			anchor.className = 'text-accent hover:underline';
 			anchor.textContent = toShortUrl(uri);
 
-			if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
-				anchor.href = `/u/${uid}/profile/${match[1]}`;
-				anchor.toggleAttribute('link', true);
-			} else if ((match = BSKY_POST_URL_RE.exec(uri))) {
-				anchor.href = `/u/${uid}/profile/${match[1]}/post/${match[2]}`;
-				anchor.toggleAttribute('link', true);
-			} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
-				anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
-				anchor.toggleAttribute('link', true);
+			if (isAppUrl(uri)) {
+				if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
+					anchor.href = `/u/${uid}/profile/${match[1]}`;
+					anchor.toggleAttribute('link', true);
+				} else if ((match = BSKY_POST_URL_RE.exec(uri))) {
+					anchor.href = `/u/${uid}/profile/${match[1]}/post/${match[2]}`;
+					anchor.toggleAttribute('link', true);
+				} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
+					anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
+					anchor.toggleAttribute('link', true);
+				}
 			} else {
 				anchor.href = uri;
 				anchor.rel = 'noopener noreferrer nofollow';

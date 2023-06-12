@@ -9,12 +9,16 @@ export const isBskyUrl = (url: string) => {
 	return url.startsWith('https://bsky.app/') || url.startsWith(`${location.protocol}//${location.hostname}/`);
 };
 
+export const isAppUrl = (url: string) => {
+	return isBskyUrl(url) || url.startsWith(`${location.protocol}//${location.hostname}/`);
+};
+
 export const isBskyPostUrl = (url: string) => {
-	return isBskyUrl(url) && BSKY_POST_URL_RE.test(url);
+	return isAppUrl(url) && BSKY_POST_URL_RE.test(url);
 };
 
 export const isBskyFeedUrl = (url: string) => {
-	return isBskyUrl(url) && BSKY_FEED_URL_RE.test(url);
+	return isAppUrl(url) && BSKY_FEED_URL_RE.test(url);
 };
 
 export const isAtpUri = (uri: string) => {

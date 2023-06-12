@@ -58,9 +58,20 @@ export default {
 		},
 	},
 	plugins: [
-		plugin(({ addVariant }) => {
+		plugin(({ addVariant, addUtilities }) => {
 			addVariant('modal', '&:modal');
 			addVariant('dark', '.dark:where(&)');
+
+			addUtilities({
+				'.scrollbar-hide': {
+					'-ms-overflow-style': 'none',
+					'scrollbar-width': 'none',
+
+					'&::-webkit-scrollbar': {
+						display: 'none',
+					},
+				},
+			});
 		}),
 	],
 };

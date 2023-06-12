@@ -16,7 +16,7 @@ import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import ProfileMenu from '~/components/menus/ProfileMenu.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import FollowButton from '~/components/FollowButton.tsx';
-import TabLink from '~/components/TabLink.tsx';
+import { TabLink } from '~/components/Tab.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
@@ -162,7 +162,7 @@ const AuthenticatedProfileLayout = () => {
 										</div>
 									}
 								>
-									<div class="flex overflow-x-auto border-b border-divider">
+									<div class="flex h-13 overflow-x-auto border-b border-divider">
 										<TabLink href="/u/:uid/profile/:actor" params={params} replace end>
 											Posts
 										</TabLink>

@@ -4,7 +4,6 @@ import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } f
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
 import { type TimelinePage } from '~/api/models/timeline.ts';
-import { preferences } from '~/api/preferences.ts';
 import { type DID } from '~/api/utils.ts';
 
 import {
@@ -15,6 +14,7 @@ import {
 import { getFeed, getFeedKey, getFeedLatest, getFeedLatestKey } from '~/api/queries/get-feed.ts';
 import { getProfileDid, getProfileDidKey } from '~/api/queries/get-profile-did.ts';
 
+import { preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
 
 import Timeline from '~/components/Timeline.tsx';

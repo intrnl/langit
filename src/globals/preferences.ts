@@ -1,5 +1,5 @@
-import { ReactiveLocalStorage } from './storage.ts';
-import { type DID } from './utils.ts';
+import { ReactiveLocalStorage } from '../api/storage.js';
+import { type DID } from '../api/utils.js';
 
 export const preferences = new ReactiveLocalStorage<AccountPreferencesStore>('prefs');
 

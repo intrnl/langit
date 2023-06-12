@@ -2,13 +2,13 @@ import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
 import { createQuery } from '@tanstack/solid-query';
 
-import { preferences } from '~/api/preferences.ts';
 import { getRecordId, getRepoId, type DID } from '~/api/utils.ts';
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
 import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
 import { getFeed, getFeedKey } from '~/api/queries/get-feed.ts';
 
+import { preferences } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';

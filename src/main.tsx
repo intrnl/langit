@@ -3,8 +3,7 @@ import { render } from 'solid-js/web';
 
 import { Router, useRoutes } from '@solidjs/router';
 
-import { type LocalSettings, preferences } from '~/api/preferences.ts';
-
+import { type LocalSettings, preferences } from '~/globals/preferences.ts';
 import routes from '~/router-routes.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 

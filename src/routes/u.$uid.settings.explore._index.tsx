@@ -11,11 +11,11 @@ import {
 } from '@thisbeyond/solid-dnd';
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
-import { preferences } from '~/api/preferences.ts';
 import { getRepoId, type DID, getRecordId } from '~/api/utils.ts';
 
 import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
 
+import { preferences } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
 import { ConstrainXDragAxis } from '~/utils/dnd.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';

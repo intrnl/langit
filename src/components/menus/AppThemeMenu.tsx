@@ -1,8 +1,7 @@
 import { createMemo } from 'solid-js';
 
-import { type LocalSettings, preferences } from '~/api/preferences.ts';
-
 import { closeModal } from '~/globals/modals.tsx';
+import { type LocalSettings, preferences } from '~/globals/preferences.ts';
 
 import * as menu from '~/styles/primitives/menu.ts';
 

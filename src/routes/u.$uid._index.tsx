@@ -146,7 +146,7 @@ const AuthenticatedHome = () => {
 
 			<Show when={pinnedFeeds()}>
 				<Suspense fallback={<hr class="-mt-px border-divider" />}>
-					<div class="sticky top-0 z-10 flex h-13 items-center justify-center overflow-x-auto border-b border-divider bg-background scrollbar-hide">
+					<div class="sticky top-0 z-10 flex h-13 items-center overflow-x-auto border-b border-divider bg-background">
 						<Tab<'button'>
 							component="button"
 							active={feed() === DEFAULT_ALGORITHM}

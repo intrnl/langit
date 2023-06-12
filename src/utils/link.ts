@@ -1,8 +1,9 @@
-export const BSKY_POST_URL_RE = /\/profile\/([^\/]+)\/post\/([^\/]+)/;
-export const BSKY_FEED_URL_RE = /\/profile\/([^\/]+)\/feed\/([^\/]+)/;
+export const BSKY_PROFILE_URL_RE = /\/profile\/([^\/]+)$/;
+export const BSKY_POST_URL_RE = /\/profile\/([^\/]+)\/post\/([^\/]+)$/;
+export const BSKY_FEED_URL_RE = /\/profile\/([^\/]+)\/feed\/([^\/]+)$/;
 
-export const ATP_POST_URL_RE = /([^\/]+)\/app.bsky.feed.post\/([^\/]+)/;
-export const ATP_FEED_URL_RE = /([^\/]+)\/app.bsky.feed.generator\/([^\/]+)/;
+export const ATP_POST_URL_RE = /([^\/]+)\/app.bsky.feed.post\/([^\/]+)$/;
+export const ATP_FEED_URL_RE = /([^\/]+)\/app.bsky.feed.generator\/([^\/]+)$/;
 
 export const isBskyUrl = (url: string) => {
 	return url.startsWith('https://bsky.app/') || url.startsWith(`${location.protocol}//${location.hostname}/`);

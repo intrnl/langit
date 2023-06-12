@@ -1,3 +1,5 @@
+import { BSKY_FEED_URL_RE, BSKY_POST_URL_RE, BSKY_PROFILE_URL_RE } from '~/utils/link.ts';
+
 import { type RichTextSegment } from './types.ts';
 
 export const createRenderedRichText = (uid: string, segments: RichTextSegment[]) => {
@@ -9,6 +11,8 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 		const mention = segment.mention;
 		const link = segment.link;
 
+		let match: RegExpExecArray | null | undefined;
+
 		if (mention) {
 			const did = mention.did;
 			const anchor = document.createElement('a');
@@ -17,18 +21,29 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			anchor.className = 'text-accent hover:underline';
 			anchor.textContent = segment.text;
 			anchor.toggleAttribute('link', true);
-			anchor.setAttribute('data-mention', did);
 
 			div.appendChild(anchor);
 		} else if (link) {
 			const uri = link.uri;
 			const anchor = document.createElement('a');
 
-			anchor.rel = 'noopener noreferrer nofollow';
-			anchor.target = '_blank';
-			anchor.href = uri;
 			anchor.className = 'text-accent hover:underline';
 			anchor.textContent = toShortUrl(uri);
+
+			if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
+				anchor.href = `/u/${uid}/profile/${match[1]}`;
+				anchor.toggleAttribute('link', true);
+			} else if ((match = BSKY_POST_URL_RE.exec(uri))) {
+				anchor.href = `/u/${uid}/profile/${match[1]}/post/${match[2]}`;
+				anchor.toggleAttribute('link', true);
+			} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
+				anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
+				anchor.toggleAttribute('link', true);
+			} else {
+				anchor.href = uri;
+				anchor.rel = 'noopener noreferrer nofollow';
+				anchor.target = '_blank';
+			}
 
 			div.appendChild(anchor);
 		} else {
@@ -39,14 +54,16 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 	return div;
 };
 
+const U_RE = /^\/u\/[^\/]+/;
+
 export const alterRenderedRichTextUid = (template: HTMLElement, uid: string) => {
-	const mentions = template.querySelectorAll<HTMLAnchorElement>('a[data-mention]');
+	const links = template.querySelectorAll<HTMLAnchorElement>('a[link]');
 
-	for (let idx = 0, len = mentions.length; idx < len; idx++) {
-		const node = mentions[idx];
-		const did = node.getAttribute('data-mention')!;
+	for (let idx = 0, len = links.length; idx < len; idx++) {
+		const node = links[idx];
+		const href = node.getAttribute('href')!;
 
-		node.href = `/u/${uid}/profile/${did}`;
+		node.href = href.replace(U_RE, `/u/${uid}`);
 	}
 };
 

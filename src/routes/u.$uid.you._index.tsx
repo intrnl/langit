@@ -2,11 +2,11 @@ import { For, Show, createMemo } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
 
-import { multiagent } from '~/api/global.ts';
 import { type DID } from '~/api/utils.ts';
 
-import { A, useParams } from '~/router.ts';
+import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
+import { A, useParams } from '~/router.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import AccountActionMenu from '~/components/menus/AccountActionMenu.tsx';

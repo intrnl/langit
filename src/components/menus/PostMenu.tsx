@@ -1,10 +1,10 @@
 import { Show } from 'solid-js';
 
-import { multiagent } from '~/api/global.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { type SignalizedPost } from '~/api/cache/posts.ts';
 
+import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
 import DeletePostConfirmDialog from '~/components/dialogs/DeletePostConfirmDialog.tsx';

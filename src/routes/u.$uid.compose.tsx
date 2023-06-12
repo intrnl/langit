@@ -22,7 +22,6 @@ import {
 } from '@floating-ui/dom';
 import { createTiptapEditor } from 'solid-tiptap';
 
-import { multiagent } from '~/api/global.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import {
@@ -42,6 +41,7 @@ import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-ge
 import { getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
+import { multiagent } from '~/globals/agent.ts';
 import { useNavigate, useParams } from '~/router.ts';
 
 import '~/styles/compose.css';

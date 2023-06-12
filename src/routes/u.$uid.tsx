@@ -3,7 +3,6 @@ import { Show } from 'solid-js';
 import { Navigate, Outlet, useLocation } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
-import { multiagent } from '~/api/global.ts';
 import { MultiagentError } from '~/api/multiagent.ts';
 import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID } from '~/api/utils.ts';
@@ -11,8 +10,9 @@ import { type DID } from '~/api/utils.ts';
 import { getNotificationsLatest, getNotificationsLatestKey } from '~/api/queries/get-notifications.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { A, useParams } from '~/router.ts';
+import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
+import { A, useParams } from '~/router.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 
 import InvalidSessionNoticeDialog from '~/components/dialogs/InvalidSessionNoticeDialog.tsx';

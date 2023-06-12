@@ -3,11 +3,11 @@ import { Show } from 'solid-js';
 import { type DID } from '~/api/utils.ts';
 
 import { type SignalizedProfile } from '~/api/cache/profiles.ts';
-import { multiagent } from '~/api/global.ts';
 
+import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
-import BlockConfirmDialog from '../dialogs/BlockConfirmDialog';
+import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog';
 import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
 import * as menu from '~/styles/primitives/menu.ts';

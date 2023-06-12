@@ -2,9 +2,9 @@ import { For, Show } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
 
-import { multiagent } from '~/api/global.ts';
 import { type DID } from '~/api/utils.ts';
 
+import { multiagent } from '~/globals/agent.ts';
 import { closeModal } from '~/globals/modals.tsx';
 
 import * as menu from '~/styles/primitives/menu.ts';

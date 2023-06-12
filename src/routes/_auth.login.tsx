@@ -4,9 +4,9 @@ import { useSearchParams, useNavigate } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
-import { multiagent } from '~/api/global.ts';
 import { XRPC } from '~/api/rpc/xrpc.ts';
 
+import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { model } from '~/utils/misc.ts';
 

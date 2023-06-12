@@ -1,7 +1,7 @@
-import { multiagent } from '~/api/global.ts';
 import { type MultiagentAccountData } from '~/api/multiagent.ts';
 import { type DID } from '~/api/utils.ts';
 
+import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
 import LogoutConfirmDialog from '~/components/dialogs/LogoutConfirmDialog.tsx';

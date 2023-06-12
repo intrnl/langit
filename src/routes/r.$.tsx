@@ -1,7 +1,6 @@
 import { Navigate } from '@solidjs/router';
 
-import { multiagent } from '~/api/global.ts';
-
+import { multiagent } from '~/globals/agent.ts';
 import { useParams } from '~/router';
 
 const RedirectPage = () => {

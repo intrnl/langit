@@ -1,6 +1,6 @@
 import { createEffect } from 'solid-js';
 
-import { multiagent } from '~/api/global.ts';
+import { multiagent } from '~/globals/agent.ts';
 import { A, useNavigate } from '~/router.ts';
 
 import button from '~/styles/primitives/button.ts';

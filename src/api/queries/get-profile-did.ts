@@ -1,6 +1,7 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
-import { multiagent } from '../global.ts';
+import { multiagent } from '~/globals/agent.ts';
+
 import { type BskyResolvedDidResponse } from '../types.ts';
 import { type DID, isDid } from '../utils.ts';
 

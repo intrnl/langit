@@ -1,6 +1,7 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
-import { multiagent } from '../global.ts';
+import { multiagent } from '~/globals/agent.ts';
+
 import { createProfilesListPage } from '../models/profiles-list.ts';
 import { type BskyFollowersResponse } from '../types.ts';
 import { type DID } from '../utils.ts';

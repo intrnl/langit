@@ -1,14 +1,14 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
+import { multiagent } from '~/globals/agent.ts';
+import { createBatchedFetch } from '~/utils/batch-fetch.ts';
+import { BSKY_POST_URL_RE, isBskyUrl } from '~/utils/link.ts';
+
 import { mergeSignalizedPost } from '../cache/posts.ts';
-import { multiagent } from '../global.ts';
 import { type BskyGetPostsResponse, type BskyPost } from '../types.ts';
 import { type DID } from '../utils.ts';
 
 import _getDid from './_did.ts';
-
-import { createBatchedFetch } from '~/utils/batch-fetch.ts';
-import { BSKY_POST_URL_RE, isBskyUrl } from '~/utils/link.ts';
 
 type Query = [uid: DID, uri: string];
 

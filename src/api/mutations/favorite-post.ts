@@ -1,5 +1,6 @@
+import { multiagent } from '~/globals/agent.ts';
+
 import { type SignalizedPost } from '../cache/posts.ts';
-import { multiagent } from '../global.ts';
 import { type BskyCreateRecordResponse } from '../types.ts';
 import { type DID, getRecordId } from '../utils.ts';
 

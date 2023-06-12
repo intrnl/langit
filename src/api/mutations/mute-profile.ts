@@ -1,5 +1,6 @@
+import { multiagent } from '~/globals/agent.ts';
+
 import { type SignalizedProfile } from '../cache/profiles.ts';
-import { multiagent } from '../global.ts';
 import { type DID } from '../utils.ts';
 
 import { acquire } from './_locker.ts';

@@ -1,7 +1,8 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
+import { multiagent } from '~/globals/agent.ts';
+
 import { mergeSignalizedProfile } from '../cache/profiles.ts';
-import { multiagent } from '../global.ts';
 import { type BskyProfile } from '../types.ts';
 import { type DID } from '../utils.ts';
 

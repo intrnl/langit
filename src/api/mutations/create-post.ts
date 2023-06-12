@@ -1,4 +1,5 @@
-import { multiagent } from '../global.ts';
+import { multiagent } from '~/globals/agent.ts';
+
 import { type BskyCreateRecordResponse, type BskyPostRecord } from '../types.ts';
 import { type DID } from '../utils.ts';
 

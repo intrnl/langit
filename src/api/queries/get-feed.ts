@@ -1,11 +1,11 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
-import { multiagent } from '../global.ts';
+import { multiagent } from '~/globals/agent.ts';
+import { isAtpFeedUri } from '~/utils/link.ts';
+
 import { type SliceFilter, createTimelinePage } from '../models/timeline.ts';
 import { type BskyTimelineResponse } from '../types.ts';
 import { type DID } from '../utils.ts';
-
-import { isAtpFeedUri } from '~/utils/link.ts';
 
 const ceateHomeTimelineFilter = (uid: DID): SliceFilter => {
 	return (slice) => {

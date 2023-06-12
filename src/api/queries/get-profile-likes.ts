@@ -1,6 +1,7 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
-import { multiagent } from '../global.ts';
+import { multiagent } from '~/globals/agent.ts';
+
 import { createLikesTimelinePage } from '../models/timeline.ts';
 import { type BskyLikeRecord, type BskyListRecordsResponse } from '../types.ts';
 import { type DID } from '../utils.ts';

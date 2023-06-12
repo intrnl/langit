@@ -27,7 +27,7 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 	const profile = () => props.profile;
 
 	const isMuted = () => profile().viewer.muted.value;
-	const isBlocked = () => profile().viewer.blocking.value
+	const isBlocked = () => profile().viewer.blocking.value;
 
 	return (
 		<div class={/* @once */ menu.content()}>

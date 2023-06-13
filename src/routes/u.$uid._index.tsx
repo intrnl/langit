@@ -7,7 +7,13 @@ import { type DID } from '~/api/utils.ts';
 
 import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators';
 import { type TimelinePage } from '~/api/models/timeline.ts';
-import { getFeed, getFeedKey, getFeedLatest, getFeedLatestKey } from '~/api/queries/get-feed.ts';
+import {
+	FOLLOWING_FEED,
+	getFeed,
+	getFeedKey,
+	getFeedLatest,
+	getFeedLatestKey,
+} from '~/api/queries/get-feed.ts';
 import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
 
 import { preferences } from '~/globals/preferences.ts';
@@ -16,7 +22,6 @@ import { useParams } from '~/router.ts';
 import { Tab } from '~/components/Tab.tsx';
 import Timeline from '~/components/Timeline.tsx';
 
-const DEFAULT_ALGORITHM = 'reverse-chronological';
 const PAGE_SIZE = 30;
 
 const FeedTab = (props: { uid: DID; uri: string; active: boolean; onClick?: () => void }) => {
@@ -128,7 +133,7 @@ const AuthenticatedHome = () => {
 	const [searchParams, setSearchParams] = useSearchParams<{ feed?: string }>();
 
 	const uid = () => params.uid as DID;
-	const feed = () => searchParams.feed || DEFAULT_ALGORITHM;
+	const feed = () => searchParams.feed || FOLLOWING_FEED;
 
 	const pinnedFeeds = createMemo(() => {
 		const arr = preferences.get(uid())?.pinnedFeeds;
@@ -149,7 +154,7 @@ const AuthenticatedHome = () => {
 					<div class="sticky top-0 z-10 flex h-13 items-center overflow-x-auto border-b border-divider bg-background">
 						<Tab<'button'>
 							component="button"
-							active={feed() === DEFAULT_ALGORITHM}
+							active={feed() === FOLLOWING_FEED}
 							onClick={() => {
 								setSearchParams({ feed: null }, { replace: true });
 								window.scrollTo({ top: 0 });

@@ -1,7 +1,6 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '~/globals/agent.ts';
-import { isAtpFeedUri } from '~/utils/link.ts';
 
 import { type SliceFilter, createTimelinePage } from '../models/timeline.ts';
 import { type BskyTimelineResponse } from '../types.ts';
@@ -29,6 +28,8 @@ const ceateHomeTimelineFilter = (uid: DID): SliceFilter => {
 	};
 };
 
+export const FOLLOWING_FEED = 'reverse-chronological';
+
 export const getFeedKey = (uid: DID, feed: string, limit: number) => ['getFeed', uid, feed, limit] as const;
 export const getFeed = async (ctx: QueryFunctionContext<ReturnType<typeof getFeedKey>, string>) => {
 	const [, uid, feed, limit] = ctx.queryKey;
@@ -38,7 +39,7 @@ export const getFeed = async (ctx: QueryFunctionContext<ReturnType<typeof getFee
 	let data: BskyTimelineResponse;
 	let filter: SliceFilter | undefined;
 
-	if (isAtpFeedUri(feed)) {
+	if (feed !== FOLLOWING_FEED) {
 		const response = await agent.rpc.get({
 			method: 'app.bsky.feed.getFeed',
 			signal: ctx.signal,
@@ -70,7 +71,7 @@ export const getFeedLatest = async (ctx: QueryFunctionContext<ReturnType<typeof 
 
 	let data: BskyTimelineResponse;
 
-	if (isAtpFeedUri(feed)) {
+	if (feed !== FOLLOWING_FEED) {
 		const response = await agent.rpc.get({
 			method: 'app.bsky.feed.getFeed',
 			signal: ctx.signal,

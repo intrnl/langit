@@ -372,7 +372,7 @@ const ImageCarousel = (props: ImageCarouselProps) => {
 	});
 
 	return (
-		<div ref={view} class="flex h-full w-full touch-none overflow-hidden">
+		<div ref={view} class="flex h-full w-full touch-none overflow-hidden bg-black">
 			<div
 				ref={slider}
 				class="flex h-full w-full items-center"

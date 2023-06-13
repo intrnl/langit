@@ -3,7 +3,7 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 import { multiagent } from '~/globals/agent.ts';
 
 import { createLikesTimelinePage } from '../models/timeline.ts';
-import { type BskyLikeRecord, type BskyListRecordsResponse } from '../types.ts';
+import { type BskyLikeRecord, type BskyListRecordsResponse, type BskyPost } from '../types.ts';
 import { type DID } from '../utils.ts';
 
 import _getDid from './_did.ts';
@@ -31,9 +31,12 @@ export const getProfileLikes = async (ctx: QueryFunctionContext<ReturnType<typeo
 	const data = response.data as BskyListRecordsResponse<BskyLikeRecord>;
 
 	const postUris = data.records.map((record) => record.value.subject.uri);
-	const posts = await Promise.all(postUris.map((uri) => fetchPost([uid, uri])));
+	const posts = await Promise.allSettled(postUris.map((uri) => fetchPost([uid, uri])));
 
-	const page = createLikesTimelinePage(data.cursor, posts.flat());
+	const page = createLikesTimelinePage(
+		data.cursor,
+		posts.filter((v): v is PromiseFulfilledResult<BskyPost> => v.status === 'fulfilled').map((v) => v.value),
+	);
 
 	return page;
 };

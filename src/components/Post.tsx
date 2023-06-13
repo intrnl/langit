@@ -1,4 +1,4 @@
-import { Show } from 'solid-js';
+import { Match, Show, Switch } from 'solid-js';
 
 import { A as UntypedAnchor, useNavigate } from '@solidjs/router';
 
@@ -44,6 +44,7 @@ const Post = (props: PostProps) => {
 	const parent = () => props.parent;
 	const interactive = () => props.interactive;
 	const reason = () => props.reason;
+	const prev = () => props.prev;
 
 	const author = () => post().author;
 	const record = () => post().record.value;
@@ -101,25 +102,44 @@ const Post = (props: PostProps) => {
 					</div>
 				</Show>
 
-				<Show when={parent() && !props.prev}>
-					<div class="-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg">
-						<div class="flex w-12 shrink-0 justify-end">
-							<ChatBubbleOutlinedIcon />
+				<Switch>
+					<Match when={!prev() && parent()}>
+						<div class="-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg">
+							<div class="flex w-12 shrink-0 justify-end">
+								<ChatBubbleOutlinedIcon />
+							</div>
+							<div class="min-w-0">
+								<A
+									href="/u/:uid/profile/:actor/post/:status"
+									params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
+									class="flex font-medium hover:underline"
+								>
+									<span class="whitespace-pre">Replying to </span>
+									<span class="line-clamp-1">
+										{parent()!.author.displayName.value || parent()!.author.handle.value}
+									</span>
+								</A>
+							</div>
 						</div>
-						<div class="min-w-0">
-							<A
-								href="/u/:uid/profile/:actor/post/:status"
-								params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
-								class="flex font-medium hover:underline"
-							>
-								<span class="whitespace-pre">Replying to </span>
-								<span class="line-clamp-1">
-									{parent()!.author.displayName.value || parent()!.author.handle.value}
-								</span>
-							</A>
+					</Match>
+
+					<Match when={!prev() && post().record.value.reply}>
+						<div class="-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg">
+							<div class="flex w-12 shrink-0 justify-end">
+								<ChatBubbleOutlinedIcon />
+							</div>
+							<div class="min-w-0">
+								<A
+									href="/u/:uid/profile/:actor/post/:status"
+									params={{ uid: uid(), actor: post().author.did, status: getRecordId(post()!.uri) }}
+									class="flex font-medium hover:underline"
+								>
+									Show full thread
+								</A>
+							</div>
 						</div>
-					</div>
-				</Show>
+					</Match>
+				</Switch>
 			</div>
 
 			<div class="flex gap-3">

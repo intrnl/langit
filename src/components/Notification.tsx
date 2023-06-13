@@ -61,7 +61,6 @@ const Notification = (props: NotificationProps) => {
 					const reply = () => data().item;
 
 					const replyUri = () => reply().uri;
-					const parentUri = () => reply().reasonSubject;
 
 					const replyQuery = createQuery({
 						queryKey: () => getPostKey(uid(), replyUri()),
@@ -75,24 +74,9 @@ const Notification = (props: NotificationProps) => {
 						},
 					});
 
-					const parentQuery = createQuery({
-						queryKey: () => getPostKey(uid(), parentUri()),
-						queryFn: getPost,
-						refetchOnMount: false,
-						refetchOnReconnect: false,
-						refetchOnWindowFocus: false,
-						initialData: () => {
-							const ref = postsCache[parentUri()];
-							return ref?.deref();
-						},
-						get enabled() {
-							return data().type === 'reply';
-						},
-					});
-
 					return (
 						<Switch>
-							<Match when={replyQuery.isInitialLoading || parentQuery.isInitialLoading}>
+							<Match when={replyQuery.isInitialLoading}>
 								<div class="flex justify-center border-b border-divider p-3">
 									<CircularProgress />
 								</div>
@@ -102,11 +86,8 @@ const Notification = (props: NotificationProps) => {
 								{/* @ts-expect-error*/}
 								{() => {
 									const post = () => replyQuery.data!;
-									const parent = () => parentQuery.data;
 
-									return (
-										<Post interactive uid={uid()} post={post()} parent={parent()} highlight={!data().read} />
-									);
+									return <Post interactive uid={uid()} post={post()} highlight={!data().read} />;
 								}}
 							</Match>
 						</Switch>

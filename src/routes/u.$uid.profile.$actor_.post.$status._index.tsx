@@ -194,7 +194,7 @@ const AuthenticatedPostPage = () => {
 															key="posts"
 															id={/* @once */ createPostKey(item.cid, false, true)}
 														>
-															<Post interactive uid={uid()} post={item} prev={idx !== 0} next />
+															<Post interactive uid={uid()} post={item} prev next />
 														</VirtualContainer>
 													);
 												})}
@@ -365,7 +365,7 @@ const AuthenticatedPostPage = () => {
 																interactive
 																uid={uid()}
 																post={item}
-																prev={idx !== 0}
+																prev
 																next={overflowing || idx !== len - 1}
 															/>
 														</VirtualContainer>

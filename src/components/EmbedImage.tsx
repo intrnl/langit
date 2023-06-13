@@ -28,7 +28,13 @@ const EmbedImage = (props: EmbedImageProps) => {
 				onClick={() => {
 					if (interactive()) {
 						openModal(() => (
-							<Suspense fallback={<CircularProgress />}>
+							<Suspense
+								fallback={
+									<div class="my-auto">
+										<CircularProgress />
+									</div>
+								}
+							>
 								<LazyImageViewerDialog images={images()} active={index} />
 							</Suspense>
 						));

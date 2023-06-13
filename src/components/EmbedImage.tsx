@@ -1,15 +1,18 @@
-import { Match, Switch } from 'solid-js';
+import { Match, Suspense, Switch, lazy } from 'solid-js';
 
 import { type EmbeddedImage } from '~/api/types.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import ImageViewerDialog from './dialogs/ImageViewerDialog';
+
+import CircularProgress from '~/components/CircularProgress.tsx';
 
 export interface EmbedImageProps {
 	images: EmbeddedImage[];
 	borderless?: boolean;
 	interactive?: boolean;
 }
+
+const LazyImageViewerDialog = lazy(() => import('~/components/dialogs/ImageViewerDialog.tsx'));
 
 const EmbedImage = (props: EmbedImageProps) => {
 	const images = () => props.images;
@@ -24,7 +27,11 @@ const EmbedImage = (props: EmbedImageProps) => {
 				alt={image.alt}
 				onClick={() => {
 					if (interactive()) {
-						openModal(() => <ImageViewerDialog images={images()} active={index} />);
+						openModal(() => (
+							<Suspense fallback={<CircularProgress />}>
+								<LazyImageViewerDialog images={images()} active={index} />
+							</Suspense>
+						));
 					}
 				}}
 				class={(className || 'min-h-0 grow basis-0 object-cover') + (interactive() ? ' cursor-pointer' : '')}

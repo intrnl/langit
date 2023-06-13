@@ -46,8 +46,6 @@ export const createBatchedFetch = <Query, Id extends QueryId, Data>(
 	let curr: BatchedFetchMap<Query, Id, Data> | undefined;
 
 	return (query: Query): Promise<Data> => {
-		const deferred = createDeferred<Data>();
-
 		const id = idFromQuery(query);
 		const key = _key(query);
 
@@ -62,8 +60,14 @@ export const createBatchedFetch = <Query, Id extends QueryId, Data>(
 			};
 		}
 
-		map.queries.push(query);
-		map.pending.set(id, deferred);
+		let deferred = map.pending.get(id);
+
+		if (!deferred) {
+			deferred = createDeferred<Data>();
+
+			map.queries.push(query);
+			map.pending.set(id, deferred);
+		}
 
 		clearTimeout(map.timeout);
 

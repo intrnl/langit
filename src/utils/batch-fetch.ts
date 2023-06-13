@@ -111,7 +111,7 @@ const perform = async <Query, Id extends QueryId, Data>(
 	} finally {
 		if (!errored) {
 			for (const deferred of pending.values()) {
-				deferred.reject(new Error('Requested batch does not contain specified resource'));
+				deferred.reject(new Error(`RESOURCE_NOT_FOUND`));
 			}
 		}
 	}

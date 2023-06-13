@@ -190,7 +190,7 @@ const Notification = (props: NotificationProps) => {
 																		did: author().did,
 																		avatar: author().avatar.value,
 																		handle: author().handle.value,
-																		displayName: author().handle.value,
+																		displayName: author().displayName.value,
 																	},
 																	embeds: data().embed.value ? [data().embed.value!] : [],
 																	value: {

@@ -168,7 +168,7 @@ const Notification = (props: NotificationProps) => {
 										return (
 											<Switch>
 												<Match when={postQuery.isLoading}>
-													<div class="flex justify-center border border-divider p-3">
+													<div class="flex justify-center rounded-md border border-divider p-3">
 														<CircularProgress />
 													</div>
 												</Match>

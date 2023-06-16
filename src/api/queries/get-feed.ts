@@ -22,6 +22,8 @@ const ceateHomeTimelineFilter = (uid: DID): SliceFilter => {
 			) {
 				return false;
 			}
+		} else if (first.post.record.peek().reply) {
+			return false;
 		}
 
 		return true;

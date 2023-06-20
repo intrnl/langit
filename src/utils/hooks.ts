@@ -14,7 +14,7 @@ export const useDebouncedValue = <T>(accessor: Accessor<T>, delay: number): Acce
 	createEffect(() => {
 		const next = accessor();
 
-		if (untrack(state) !== accessor) {
+		if (untrack(state) !== next) {
 			const timeout = setTimeout(() => setState(() => next), delay);
 
 			onCleanup(() => clearTimeout(timeout));

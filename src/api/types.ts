@@ -370,7 +370,7 @@ export interface BskyFeedGenerator {
 	uri: string;
 	cid: string;
 	did?: string;
-	creator: BskyProfileBasic;
+	creator: BskyProfile;
 	displayName: string;
 	description?: string;
 	descriptionFacets?: Facet[];

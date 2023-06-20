@@ -10,7 +10,7 @@ import { getPopularFeedGenerators, getPopularFeedGeneratorsKey } from '~/api/que
 import { preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
 import { useDebouncedValue } from '~/utils/hooks.ts';
-import { isElementAltClicked, isElementClicked, model } from '~/utils/misc.ts';
+import { INTERACTION_TAGS, isElementAltClicked, isElementClicked, model } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import input from '~/styles/primitives/input.ts';
@@ -88,7 +88,7 @@ const AuthenticatedAddFeedPage = () => {
 					};
 
 					const click = (ev: MouseEvent | KeyboardEvent) => {
-						if (!isElementClicked(ev)) {
+						if (!isElementClicked(ev, INTERACTION_TAGS)) {
 							return;
 						}
 

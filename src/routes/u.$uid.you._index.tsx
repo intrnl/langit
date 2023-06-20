@@ -7,7 +7,7 @@ import { type DID } from '~/api/utils.ts';
 import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { A, useParams } from '~/router.ts';
-import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
+import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import AccountActionMenu from '~/components/menus/AccountActionMenu.tsx';
 import AppThemeMenu from '~/components/menus/AppThemeMenu.tsx';
@@ -43,7 +43,7 @@ const AuthenticatedYouPage = () => {
 					const did = account.did;
 
 					const handleClick = (ev: MouseEvent | KeyboardEvent) => {
-						if (!isElementClicked(ev)) {
+						if (!isElementClicked(ev, INTERACTION_TAGS)) {
 							return;
 						}
 

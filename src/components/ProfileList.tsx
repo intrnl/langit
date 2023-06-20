@@ -6,7 +6,7 @@ import { type CreateInfiniteQueryResult } from '@tanstack/solid-query';
 import { type PostProfilesListPage } from '~/api/models/profiles-list.ts';
 import { type DID } from '~/api/utils.ts';
 
-import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
+import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import FollowButton from '~/components/FollowButton.tsx';
@@ -33,7 +33,7 @@ const ProfileList = (props: ProfileListProps) => {
 				{(page) => {
 					return page.profiles.map((profile) => {
 						const handleClick = (ev: MouseEvent | KeyboardEvent) => {
-							if (!isElementClicked(ev)) {
+							if (!isElementClicked(ev, INTERACTION_TAGS)) {
 								return;
 							}
 

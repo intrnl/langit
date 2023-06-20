@@ -19,7 +19,7 @@ import { preferences } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
 import { ConstrainXDragAxis } from '~/utils/dnd.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
-import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
+import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 
@@ -63,7 +63,7 @@ const FeedItem = (props: FeedItemProps) => {
 	const feed = () => feedQuery.data!;
 
 	const click = (ev: MouseEvent | KeyboardEvent) => {
-		if (!isElementClicked(ev) || editing()) {
+		if (editing() || !isElementClicked(ev, INTERACTION_TAGS)) {
 			return;
 		}
 

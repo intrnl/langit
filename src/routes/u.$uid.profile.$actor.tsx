@@ -1,12 +1,13 @@
 import { Match, Show, Switch } from 'solid-js';
 
 import { Outlet } from '@solidjs/router';
-import { createQuery } from '@tanstack/solid-query';
+import { createInfiniteQuery, createQuery } from '@tanstack/solid-query';
 
 import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID } from '~/api/utils.ts';
 
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
+import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
 
 import { A, useParams } from '~/router.ts';
 import { openModal } from '~/globals/modals.tsx';
@@ -21,15 +22,27 @@ import button from '~/styles/primitives/button.ts';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
+const PAGE_SIZE = 30;
+
 const AuthenticatedProfileLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor');
 
 	const uid = () => params.uid as DID;
+	const actor = () => params.actor;
 
 	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(uid(), params.actor),
+		queryKey: () => getProfileKey(uid(), actor()),
 		queryFn: getProfile,
 		staleTime: 10_000,
+		refetchOnWindowFocus: false,
+	});
+
+	const listQuery = createInfiniteQuery({
+		queryKey: () => getProfileListsKey(uid(), actor(), PAGE_SIZE),
+		queryFn: getProfileLists,
+		getNextPageParam: (last) => last.cursor,
+		refetchOnMount: false,
+		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 	});
 
@@ -172,6 +185,12 @@ const AuthenticatedProfileLayout = () => {
 										<TabLink href="/u/:uid/profile/:actor/likes" params={params} replace>
 											Likes
 										</TabLink>
+
+										<Show when={listQuery.data}>
+											<TabLink href="/u/:uid/profile/:actor/list" params={params} replace>
+												Lists
+											</TabLink>
+										</Show>
 									</div>
 
 									<Outlet />

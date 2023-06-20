@@ -385,3 +385,22 @@ export interface BskyFeedGenerator {
 export interface BskyGetFeedGeneratorsResponse {
 	feeds: BskyFeedGenerator[];
 }
+
+export interface BskyList {
+	uri: string;
+	creator: BskyProfile;
+	name: string;
+	purpose: 'app.bsky.graph.defs#modlist';
+	description?: string;
+	descriptionFacets?: Facet[];
+	avatar?: string;
+	indexedAt: string;
+	viewer?: {
+		muted?: boolean;
+	};
+}
+
+export interface BskyGetListsResponse {
+	cursor?: string;
+	lists: BskyList[];
+}

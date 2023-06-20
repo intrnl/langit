@@ -28,7 +28,7 @@ export const createDerivedSignal = <T>(accessor: Accessor<T>): Signal<T> => {
 	const [state, setState] = createSignal<T>();
 
 	createRenderEffect(() => {
-		setState(() => accessor());
+		setState(accessor);
 	});
 
 	return [state, setState] as any;

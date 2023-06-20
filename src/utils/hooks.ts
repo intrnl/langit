@@ -5,21 +5,22 @@ import {
 	createRenderEffect,
 	createSignal,
 	onCleanup,
-	untrack,
 } from 'solid-js';
 
 export const useDebouncedValue = <T>(accessor: Accessor<T>, delay: number): Accessor<T> => {
-	const [state, setState] = createSignal(accessor());
+	const initial = accessor();
+	const [state, setState] = createSignal(initial);
 
-	createEffect(() => {
+	createEffect((prev: T) => {
 		const next = accessor();
 
-		if (untrack(state) !== next) {
+		if (prev !== next) {
 			const timeout = setTimeout(() => setState(() => next), delay);
-
 			onCleanup(() => clearTimeout(timeout));
 		}
-	});
+
+		return next;
+	}, initial);
 
 	return state;
 };

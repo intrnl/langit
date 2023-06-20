@@ -186,7 +186,7 @@ const AuthenticatedProfileLayout = () => {
 											Likes
 										</TabLink>
 
-										<Show when={listQuery.data}>
+										<Show when={!!listQuery.data?.pages[0]?.lists.length}>
 											<TabLink href="/u/:uid/profile/:actor/list" params={params} replace>
 												Lists
 											</TabLink>

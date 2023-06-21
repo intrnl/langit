@@ -39,22 +39,20 @@ const AuthenticatedProfileListsPage = () => {
 									</Show>
 								</div>
 
-								<div class="flex min-w-0 grow flex-col gap-1">
-									<div>
-										<div class="text-sm">
-											<span class="font-bold">{list.name.value}</span>
+								<div class="flex min-w-0 grow flex-col">
+									<div class="text-sm">
+										<span class="font-bold">{list.name.value}</span>
 
-											<Show when={list.viewer.muted.value}>
-												<span class="ml-2 rounded bg-muted px-1 py-0.5 align-[1px] text-xs font-medium">
-													Subscribed
-												</span>
-											</Show>
-										</div>
-										<p class="text-sm text-muted-fg">Mute list by @{list.creator.handle.value}</p>
+										<Show when={list.viewer.muted.value}>
+											<span class="ml-2 rounded bg-muted px-1 py-0.5 align-[1px] text-xs font-medium">
+												Subscribed
+											</span>
+										</Show>
 									</div>
+									<p class="text-sm text-muted-fg">Mute list by @{list.creator.handle.value}</p>
 
 									<Show when={list.description.value}>
-										<div class="whitespace-pre-wrap break-words text-sm">
+										<div class="mt-1 whitespace-pre-wrap break-words text-sm">
 											{list.$renderedDescription(uid())}
 										</div>
 									</Show>

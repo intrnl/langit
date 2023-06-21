@@ -17,18 +17,10 @@ export const createProfilesListPage = (
 	subject: BskyProfileFollow,
 	profiles: BskyProfileFollow[],
 ): ProfilesListPage => {
-	const len = profiles.length;
-	const arr: SignalizedProfile[] = new Array(len);
-
-	for (let idx = 0; idx < len; idx++) {
-		const profile = profiles[idx];
-		arr[idx] = mergeSignalizedProfile(profile);
-	}
-
 	return {
 		cursor,
 		subject: mergeSignalizedProfile(subject),
-		profiles: arr,
+		profiles: profiles.map((profile) => mergeSignalizedProfile(profile)),
 	};
 };
 
@@ -36,16 +28,8 @@ export const createPostProfilesListPage = (
 	cursor: string | undefined,
 	profiles: BskyProfileFollow[],
 ): PostProfilesListPage => {
-	const len = profiles.length;
-	const arr: SignalizedProfile[] = new Array(len);
-
-	for (let idx = 0; idx < len; idx++) {
-		const profile = profiles[idx];
-		arr[idx] = mergeSignalizedProfile(profile);
-	}
-
 	return {
 		cursor,
-		profiles: arr,
+		profiles: profiles.map((profile) => mergeSignalizedProfile(profile)),
 	};
 };

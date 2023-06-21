@@ -19,7 +19,6 @@ const AuthenticatedProfileListsPage = () => {
 		queryKey: () => getProfileListsKey(uid(), params.actor, PAGE_SIZE),
 		queryFn: getProfileLists,
 		getNextPageParam: (last) => last.cursor,
-		refetchOnMount: false,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 	});

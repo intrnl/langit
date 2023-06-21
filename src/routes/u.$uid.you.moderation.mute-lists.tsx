@@ -20,7 +20,6 @@ const AuthenticatedYouModerationPage = () => {
 		queryKey: () => getProfileListsKey(uid(), uid(), PAGE_SIZE),
 		queryFn: getProfileLists,
 		getNextPageParam: (last) => last.cursor,
-		refetchOnMount: false,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 	});
@@ -29,7 +28,6 @@ const AuthenticatedYouModerationPage = () => {
 		queryKey: () => getSubscribedListsKey(uid(), PAGE_SIZE, true),
 		queryFn: getSubscribedLists,
 		getNextPageParam: (last) => last.cursor,
-		refetchOnMount: false,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 	});

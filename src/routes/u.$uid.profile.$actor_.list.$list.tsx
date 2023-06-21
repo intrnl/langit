@@ -29,7 +29,6 @@ const AuthenticatedListPage = () => {
 		queryKey: () => getListKey(uid(), params.actor, params.list, PAGE_SIZE),
 		queryFn: getList,
 		getNextPageParam: (last) => last.cursor,
-		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
 	});

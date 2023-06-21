@@ -347,7 +347,7 @@ export interface BskyNotificationsResponse {
 	notifications: Array<BskyNotificationType>;
 }
 
-export interface BskyLikedByResponse {
+export interface BskyGetLikesResponse {
 	uri: string;
 	cursor?: string;
 	likes: Array<{
@@ -355,6 +355,12 @@ export interface BskyLikedByResponse {
 		indexedAt: string;
 		actor: BskyProfileFollow;
 	}>;
+}
+
+export interface BskyGetRepostedByResponse {
+	uri: string;
+	cursor?: string;
+	repostedBy: BskyProfileFollow[];
 }
 
 export interface BskyBlob {

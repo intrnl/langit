@@ -4,14 +4,14 @@ import { multiagent } from '~/globals/agent.ts';
 
 import { createPostProfilesListPage } from '../models/profiles-list.ts';
 import { type DID } from '../utils.ts';
-import { type BskyGetLikesResponse } from '../types.ts';
+import { type BskyGetRepostedByResponse } from '../types.ts';
 
 import _getDid from './_did.ts';
 
-export const getPostLikedByKey = (uid: DID, actor: string, post: string, limit: number) =>
-	['getPostLikes', uid, actor, post, limit] as const;
-export const getPostLikedBy = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getPostLikedByKey>, string>,
+export const getPostRepostedByKey = (uid: DID, actor: string, post: string, limit: number) =>
+	['getPostRepostedBy', uid, actor, post, limit] as const;
+export const getPostRepostedBy = async (
+	ctx: QueryFunctionContext<ReturnType<typeof getPostRepostedByKey>, string>,
 ) => {
 	const [, uid, actor, post, limit] = ctx.queryKey;
 
@@ -20,16 +20,13 @@ export const getPostLikedBy = async (
 
 	const uri = `at://${did}/app.bsky.feed.post/${post}`;
 	const response = await agent.rpc.get({
-		method: 'app.bsky.feed.getLikes',
+		method: 'app.bsky.feed.getRepostedBy',
 		signal: ctx.signal,
 		params: { uri, limit, cursor: ctx.pageParam },
 	});
 
-	const data = response.data as BskyGetLikesResponse;
-	const page = createPostProfilesListPage(
-		data.cursor,
-		data.likes.map((like) => like.actor),
-	);
+	const data = response.data as BskyGetRepostedByResponse;
+	const page = createPostProfilesListPage(data.cursor, data.repostedBy);
 
 	return page;
 };

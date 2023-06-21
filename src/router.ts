@@ -15,6 +15,7 @@ import {
 
 export type PathsWithParams = 
 	| "/u/:uid"
+	| "/u/:uid/profile/:actor/post/:status/reposts"
 	| "/u/:uid/profile/:actor/post/:status"
 	| "/u/:uid/profile/:actor/post/:status/likes"
 	| "/u/:uid/profile/:actor/feed/:feed"
@@ -40,6 +41,7 @@ export type Paths = PathsWithParams | PathsWithoutParams;
 
 export interface Params {
 	"/u/:uid": { "uid": string };
+	"/u/:uid/profile/:actor/post/:status/reposts": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/post/:status": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/post/:status/likes": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/feed/:feed": { "uid": string, "actor": string, "feed": string };

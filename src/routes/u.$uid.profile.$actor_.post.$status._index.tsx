@@ -271,10 +271,14 @@ const AuthenticatedPostPage = () => {
 									<hr class="border-divider" />
 
 									<div class="flex flex-wrap gap-4 py-4 text-sm">
-										<div>
+										<A
+											href="/u/:uid/profile/:actor/post/:status/reposts"
+											params={params}
+											class="hover:underline"
+										>
 											<span class="font-bold">{comformat.format(post.repostCount.value)}</span>{' '}
 											<span class="text-muted-fg">Reposts</span>
-										</div>
+										</A>
 										<A
 											href="/u/:uid/profile/:actor/post/:status/likes"
 											params={params}

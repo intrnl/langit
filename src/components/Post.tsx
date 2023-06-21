@@ -49,9 +49,6 @@ const Post = (props: PostProps) => {
 	const author = () => post().author;
 	const record = () => post().record.value;
 
-	const isReposted = () => !!post().viewer.repost.value;
-	const isDeleted = () => post().$deleted.value;
-
 	const handleClick = (ev: MouseEvent | KeyboardEvent, translate?: boolean) => {
 		if (!props.interactive || !isElementClicked(ev)) {
 			return;
@@ -207,7 +204,7 @@ const Post = (props: PostProps) => {
 						</Show>
 					</div>
 
-					<Show when={isDeleted()}>
+					<Show when={post().$deleted.value}>
 						<div class="text-sm text-muted-fg">This post has been deleted.</div>
 					</Show>
 
@@ -229,7 +226,10 @@ const Post = (props: PostProps) => {
 								<span class="text-[0.8125rem]">{comformat.format(post().replyCount.value)}</span>
 							</div>
 
-							<div class="flex grow items-end gap-0.5" classList={{ 'text-green-600': isReposted() }}>
+							<div
+								class="flex grow items-end gap-0.5"
+								classList={{ 'text-green-600': !!post().viewer.repost.value }}
+							>
 								<button
 									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
 									classList={{

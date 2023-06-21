@@ -140,8 +140,6 @@ const AuthenticatedPostPage = () => {
 						const record = () => post.record.value;
 						const author = post.author;
 
-						const isDeleted = () => post.$deleted.value;
-
 						return (
 							<>
 								<Show when={data.ancestors} keyed>
@@ -246,7 +244,7 @@ const AuthenticatedPostPage = () => {
 										</div>
 									</div>
 
-									<Show when={isDeleted()}>
+									<Show when={post.$deleted.value}>
 										<div class="mt-3 text-sm text-muted-fg">This post has been deleted.</div>
 									</Show>
 

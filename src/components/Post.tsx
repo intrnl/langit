@@ -207,6 +207,10 @@ const Post = (props: PostProps) => {
 						</Show>
 					</div>
 
+					<Show when={isDeleted()}>
+						<div class="text-sm text-muted-fg">This post has been deleted.</div>
+					</Show>
+
 					<Show when={record().text}>
 						<div class="whitespace-pre-wrap break-words text-sm">{post().$renderedContent(uid())}</div>
 					</Show>

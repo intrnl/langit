@@ -140,6 +140,8 @@ const AuthenticatedPostPage = () => {
 						const record = () => post.record.value;
 						const author = post.author;
 
+						const isDeleted = () => post.$deleted.value;
+
 						return (
 							<>
 								<Show when={data.ancestors} keyed>
@@ -170,7 +172,7 @@ const AuthenticatedPostPage = () => {
 													</A>
 												)}
 
-												{items.map((item, idx) => {
+												{items.map((item) => {
 													if ('$type' in item) {
 														return (
 															<div class="p-3">
@@ -243,6 +245,10 @@ const AuthenticatedPostPage = () => {
 											</button>
 										</div>
 									</div>
+
+									<Show when={isDeleted()}>
+										<div class="mt-3 text-sm text-muted-fg">This post has been deleted.</div>
+									</Show>
 
 									<Show when={record().text}>
 										<div class="mt-3 whitespace-pre-wrap break-words text-base">

@@ -400,7 +400,17 @@ export interface BskyList {
 	};
 }
 
+export interface BskyListSubject {
+	subject: BskyProfile;
+}
+
 export interface BskyGetListsResponse {
 	cursor?: string;
 	lists: BskyList[];
+}
+
+export interface BskyGetListResponse {
+	cursor?: string;
+	list: BskyList;
+	items: BskyListSubject[];
 }

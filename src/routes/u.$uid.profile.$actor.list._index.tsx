@@ -1,12 +1,14 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
+import { useNavigate } from '@solidjs/router';
 import { createInfiniteQuery } from '@tanstack/solid-query';
 
-import { type DID } from '~/api/utils.ts';
+import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
 
 import { useParams } from '~/router.ts';
+import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 
@@ -14,6 +16,7 @@ const PAGE_SIZE = 30;
 
 const AuthenticatedProfileListsPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/list');
+	const navigate = useNavigate();
 
 	const uid = () => params.uid as DID;
 
@@ -31,7 +34,30 @@ const AuthenticatedProfileListsPage = () => {
 			<For each={listQuery.data?.pages}>
 				{(page) => {
 					return page.lists.map((list) => {
+						const click = (ev: MouseEvent | KeyboardEvent) => {
+							if (!isElementClicked(ev, INTERACTION_TAGS)) {
+								return;
+							}
+
+							const uri = list.uri;
+							const path = `/u/${uid()}/profile/${getRepoId(uri)}/list/${getRecordId(uri)}`;
+
+							if (isElementAltClicked(ev)) {
+								open(path, '_blank');
+							} else {
+								navigate(path);
+							}
+						};
+
 						return (
+							<div
+								tabindex={0}
+								onClick={click}
+								onAuxClick={click}
+								onKeyDown={click}
+								role="button"
+								class="flex gap-3 px-4 py-3 hover:bg-hinted"
+							>
 								<div class="mt-0.5 h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg">
 									<Show when={list.avatar.value}>
 										{(avatar) => <img src={avatar()} class="h-full w-full" />}

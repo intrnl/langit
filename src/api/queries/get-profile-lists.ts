@@ -3,12 +3,16 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 import { multiagent } from '~/globals/agent.ts';
 
 import { mergeSignalizedList } from '../cache/lists.ts';
+import { type ListsPage } from '../models/list.ts';
+
 import { type BskyGetListsResponse } from '../types.ts';
 import { type DID } from '../utils.ts';
 
 export const getProfileListsKey = (uid: DID, actor: string, limit: number) =>
 	['getProfileLists', uid, actor, limit] as const;
-export const getProfileLists = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileListsKey>>) => {
+export const getProfileLists = async (
+	ctx: QueryFunctionContext<ReturnType<typeof getProfileListsKey>>,
+): Promise<ListsPage> => {
 	const [, uid, actor, limit] = ctx.queryKey;
 
 	const agent = await multiagent.connect(uid);
@@ -22,7 +26,7 @@ export const getProfileLists = async (ctx: QueryFunctionContext<ReturnType<typeo
 	const data = response.data as BskyGetListsResponse;
 
 	return {
-		cursor: data.cursor,
+		cursor: data.lists.length > limit ? data.cursor : undefined,
 		lists: data.lists.map((list) => mergeSignalizedList(list)),
 	};
 };

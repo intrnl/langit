@@ -14,9 +14,13 @@ import AppThemeMenu from '~/components/menus/AppThemeMenu.tsx';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import AddIcon from '~/icons/baseline-add.tsx';
+import BlockIcon from '~/icons/baseline-block.tsx';
 import BrightnessMediumIcon from '~/icons/baseline-brightness-medium.tsx';
 import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
+import GroupOffIcon from '~/icons/baseline-group-off.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+import PersonOffIcon from '~/icons/baseline-person-off.tsx';
+import VisibilityIcon from '~/icons/baseline-visibility.tsx';
 
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');
@@ -102,7 +106,7 @@ const AuthenticatedYouPage = () => {
 			</For>
 
 			<A href="/login" class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted">
-				<AddIcon class="text-2xl" />
+				<AddIcon class="text-xl" />
 				<span>Add new account</span>
 			</A>
 
@@ -113,7 +117,7 @@ const AuthenticatedYouPage = () => {
 				params={{ uid: uid(), actor: uid() }}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
-				<AccountCircleIcon class="text-2xl" />
+				<AccountCircleIcon class="text-xl" />
 				<span>Profile</span>
 			</A>
 
@@ -122,7 +126,7 @@ const AuthenticatedYouPage = () => {
 				params={params}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
-				<ConfirmationNumberIcon class="text-2xl" />
+				<ConfirmationNumberIcon class="text-xl" />
 				<span>Invite codes</span>
 			</A>
 
@@ -132,9 +136,39 @@ const AuthenticatedYouPage = () => {
 				}}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
-				<BrightnessMediumIcon class="text-2xl" />
+				<BrightnessMediumIcon class="text-xl" />
 				<span>Application theme</span>
 			</button>
+
+			<hr class="mt-4 border-divider" />
+
+			<div class="flex h-13 items-center px-4">
+				<p class="text-base font-bold">Moderation</p>
+			</div>
+
+			<div class="flex items-center gap-4 px-4 py-3 text-sm text-muted-fg">
+				<VisibilityIcon class="text-xl" />
+				<span>Content filtering (coming soon)</span>
+			</div>
+
+			<A
+				href="/u/:uid/you/moderation/mute-lists"
+				params={params}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
+				<GroupOffIcon class="text-xl" />
+				<span>Mute lists</span>
+			</A>
+
+			<div class="flex items-center gap-4 px-4 py-3 text-sm text-muted-fg">
+				<PersonOffIcon class="text-xl" />
+				<span>Muted accounts (coming soon)</span>
+			</div>
+
+			<div class="flex items-center gap-4 px-4 py-3 text-sm text-muted-fg">
+				<BlockIcon class="text-xl" />
+				<span>Blocked accounts (coming soon)</span>
+			</div>
 		</div>
 	);
 };

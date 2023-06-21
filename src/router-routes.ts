@@ -39,6 +39,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.followers.tsx")),
       },
       {
+        path: "you/moderation/mute-lists",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.mute-lists.tsx")),
+      },
+      {
         path: "profile/:actor/follows",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.follows.tsx")),
       },

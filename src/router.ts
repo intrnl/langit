@@ -21,6 +21,7 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/feed/:feed"
 	| "/u/:uid/profile/:actor/list/:list"
 	| "/u/:uid/profile/:actor/followers"
+	| "/u/:uid/you/moderation/mute-lists"
 	| "/u/:uid/profile/:actor/follows"
 	| "/u/:uid/settings/explore"
 	| "/u/:uid/settings/explore/add"
@@ -47,6 +48,7 @@ export interface Params {
 	"/u/:uid/profile/:actor/feed/:feed": { "uid": string, "actor": string, "feed": string };
 	"/u/:uid/profile/:actor/list/:list": { "uid": string, "actor": string, "list": string };
 	"/u/:uid/profile/:actor/followers": { "uid": string, "actor": string };
+	"/u/:uid/you/moderation/mute-lists": { "uid": string };
 	"/u/:uid/profile/:actor/follows": { "uid": string, "actor": string };
 	"/u/:uid/settings/explore": { "uid": string };
 	"/u/:uid/settings/explore/add": { "uid": string };

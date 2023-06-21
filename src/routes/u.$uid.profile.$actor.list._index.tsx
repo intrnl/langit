@@ -32,8 +32,7 @@ const AuthenticatedProfileListsPage = () => {
 				{(page) => {
 					return page.lists.map((list) => {
 						return (
-							<div class="flex gap-3 px-4 py-3">
-								<div class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg">
+								<div class="mt-0.5 h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg">
 									<Show when={list.avatar.value}>
 										{(avatar) => <img src={avatar()} class="h-full w-full" />}
 									</Show>

@@ -24,6 +24,19 @@ export default {
 			aspectRatio: {
 				banner: '3 / 1',
 			},
+			keyframes: {
+				indeterminate: {
+					'0%': {
+						translate: '-100%',
+					},
+					'100%': {
+						translate: '400%',
+					},
+				},
+			},
+			animation: {
+				indeterminate: 'indeterminate 1s linear infinite',
+			},
 		},
 		colors: {
 			accent: 'rgb(var(--accent))',

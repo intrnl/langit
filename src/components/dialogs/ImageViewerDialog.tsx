@@ -124,6 +124,8 @@ const ImageCarousel = (props: ImageCarouselProps) => {
 
 	// const isZoomedIn = () => scale() > 1;
 
+	const [loading, setLoading] = createSignal(0);
+
 	const goToFocusedSlide = () => {
 		const $active = active();
 		const slide = slider!.childNodes[$active] as HTMLDivElement;
@@ -372,7 +374,7 @@ const ImageCarousel = (props: ImageCarouselProps) => {
 	});
 
 	return (
-		<div ref={view} class="flex h-full w-full touch-none overflow-hidden bg-black">
+		<div ref={view} class="relative flex h-full w-full touch-none overflow-hidden bg-black">
 			<div
 				ref={slider}
 				class="flex h-full w-full items-center"
@@ -386,18 +388,32 @@ const ImageCarousel = (props: ImageCarouselProps) => {
 				}}
 			>
 				<For each={images()}>
-					{(image) => (
-						<div class="flex h-full w-full shrink-0 items-center justify-center">
-							<img
-								src={image.fullsize}
-								alt={image.alt}
-								class="max-h-full max-w-full select-none"
-								draggable={false}
-							/>
-						</div>
-					)}
+					{(image) => {
+						const finish = () => setLoading(($loading) => $loading - 1);
+
+						setLoading(($loading) => $loading + 1);
+
+						return (
+							<div class="flex h-full w-full shrink-0 items-center justify-center">
+								<img
+									src={image.fullsize}
+									alt={image.alt}
+									class="max-h-full max-w-full select-none"
+									draggable={false}
+									onError={finish}
+									onLoad={finish}
+								/>
+							</div>
+						);
+					}}
 				</For>
 			</div>
+
+			<Show when={loading() > 0}>
+				<div class="pointer-events-none absolute top-0 h-1 w-full">
+					<div class="h-full w-1/4 animate-indeterminate bg-accent" />
+				</div>
+			</Show>
 		</div>
 	);
 };

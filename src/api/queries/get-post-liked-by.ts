@@ -2,7 +2,9 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '~/globals/agent.ts';
 
-import { createPostProfilesListPage } from '../models/profiles-list.ts';
+import { mergeSignalizedProfile } from '../cache/profiles.ts';
+import { type PostProfilesListPage } from '../models/profiles-list.ts';
+
 import { type DID } from '../utils.ts';
 import { type BskyGetLikesResponse } from '../types.ts';
 
@@ -12,7 +14,7 @@ export const getPostLikedByKey = (uid: DID, actor: string, post: string, limit: 
 	['getPostLikes', uid, actor, post, limit] as const;
 export const getPostLikedBy = async (
 	ctx: QueryFunctionContext<ReturnType<typeof getPostLikedByKey>, string>,
-) => {
+): Promise<PostProfilesListPage> => {
 	const [, uid, actor, post, limit] = ctx.queryKey;
 
 	const agent = await multiagent.connect(uid);
@@ -26,10 +28,9 @@ export const getPostLikedBy = async (
 	});
 
 	const data = response.data as BskyGetLikesResponse;
-	const page = createPostProfilesListPage(
-		data.cursor,
-		data.likes.map((like) => like.actor),
-	);
 
-	return page;
+	return {
+		cursor: data.cursor,
+		profiles: data.likes.map((record) => mergeSignalizedProfile(record.actor)),
+	};
 };

@@ -2,7 +2,9 @@ import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '~/globals/agent.ts';
 
-import { createPostProfilesListPage } from '../models/profiles-list.ts';
+import { mergeSignalizedProfile } from '../cache/profiles.ts';
+import { type PostProfilesListPage } from '../models/profiles-list.ts';
+
 import { type DID } from '../utils.ts';
 import { type BskyGetRepostedByResponse } from '../types.ts';
 
@@ -12,7 +14,7 @@ export const getPostRepostedByKey = (uid: DID, actor: string, post: string, limi
 	['getPostRepostedBy', uid, actor, post, limit] as const;
 export const getPostRepostedBy = async (
 	ctx: QueryFunctionContext<ReturnType<typeof getPostRepostedByKey>, string>,
-) => {
+): Promise<PostProfilesListPage> => {
 	const [, uid, actor, post, limit] = ctx.queryKey;
 
 	const agent = await multiagent.connect(uid);
@@ -26,7 +28,9 @@ export const getPostRepostedBy = async (
 	});
 
 	const data = response.data as BskyGetRepostedByResponse;
-	const page = createPostProfilesListPage(data.cursor, data.repostedBy);
 
-	return page;
+	return {
+		cursor: data.cursor,
+		profiles: data.repostedBy.map((profile) => mergeSignalizedProfile(profile)),
+	};
 };

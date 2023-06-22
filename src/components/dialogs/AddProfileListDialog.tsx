@@ -139,7 +139,10 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 										</Show>
 									</div>
 
-									<p class="min-w-0 grow break-words text-sm font-bold">{list.name.value}</p>
+									<div class="min-w-0 grow">
+										<p class="break-words text-sm font-bold">{list.name.value}</p>
+										<p class="text-sm text-muted-fg">Mute list</p>
+									</div>
 
 									<Show when={checked()}>
 										<CheckIcon class="text-xl text-accent" />

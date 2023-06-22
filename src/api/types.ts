@@ -23,6 +23,7 @@ export interface BskyProfile {
 	labels: BskyLabel[];
 	viewer: {
 		muted: boolean;
+		mutedByList?: BskyListBasic;
 		blocking?: string;
 		blockedBy: boolean;
 		following?: string;
@@ -392,13 +393,26 @@ export interface BskyGetFeedGeneratorsResponse {
 	feeds: BskyFeedGenerator[];
 }
 
+export type BskyListType = 'app.bsky.graph.defs#modlist';
+
 export interface BskyList {
 	uri: string;
 	creator: BskyProfile;
 	name: string;
-	purpose: 'app.bsky.graph.defs#modlist';
+	purpose: BskyListType;
 	description?: string;
 	descriptionFacets?: Facet[];
+	avatar?: string;
+	indexedAt: string;
+	viewer?: {
+		muted?: boolean;
+	};
+}
+
+export interface BskyListBasic {
+	uri: string;
+	name: string;
+	purpose: BskyListType;
 	avatar?: string;
 	indexedAt: string;
 	viewer?: {

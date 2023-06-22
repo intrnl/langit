@@ -4,7 +4,7 @@ import { Outlet } from '@solidjs/router';
 import { createInfiniteQuery, createQuery } from '@tanstack/solid-query';
 
 import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
-import { type DID } from '~/api/utils.ts';
+import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
@@ -145,21 +145,44 @@ const AuthenticatedProfileLayout = () => {
 										</A>
 									</div>
 
-									<Show when={profile().viewer.muted.value}>
-										<div class="text-sm text-muted-fg">
-											<p>
-												You have muted posts from this account.{' '}
-												<button
-													onClick={() => {
-														openModal(() => <MuteConfirmDialog uid={uid()} profile={profile()} />);
-													}}
-													class="text-accent hover:underline"
-												>
-													Unmute
-												</button>
-											</p>
-										</div>
-									</Show>
+									<Switch>
+										<Match when={profile().viewer.mutedByList.value}>
+											{(list) => (
+												<div class="text-sm text-muted-fg">
+													<p>
+														This user is muted by{' '}
+														<A
+															href="/u/:uid/profile/:actor/list/:list"
+															params={{
+																uid: uid(),
+																actor: getRepoId(list().uri),
+																list: getRecordId(list().uri),
+															}}
+															class="text-accent hover:underline"
+														>
+															{list().name}
+														</A>
+													</p>
+												</div>
+											)}
+										</Match>
+
+										<Match when={profile().viewer.muted.value}>
+											<div class="text-sm text-muted-fg">
+												<p>
+													You have muted posts from this user.{' '}
+													<button
+														onClick={() => {
+															openModal(() => <MuteConfirmDialog uid={uid()} profile={profile()} />);
+														}}
+														class="text-accent hover:underline"
+													>
+														Unmute
+													</button>
+												</p>
+											</div>
+										</Match>
+									</Switch>
 								</div>
 
 								<Show

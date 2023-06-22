@@ -144,7 +144,7 @@ const AuthenticatedFeedPage = () => {
 						<button
 							title={isSaved() ? `Remove feed` : 'Add feed'}
 							onClick={toggleSave}
-							class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base hover:bg-secondary"
+							class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary"
 						>
 							{isSaved() ? <DeleteIcon /> : <AddIcon />}
 						</button>

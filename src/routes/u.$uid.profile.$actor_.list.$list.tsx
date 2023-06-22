@@ -14,8 +14,9 @@ import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils
 import SubscribeListConfirmDialog from '~/components/dialogs/SubscribeListConfirmDialog.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 
-import AddIcon from '~/icons/baseline-add.tsx';
-import DeleteIcon from '~/icons/baseline-delete.tsx';
+import PlaylistAddIcon from '~/icons/baseline-playlist-add.tsx';
+import PlaylistAddCheckIcon from '~/icons/baseline-playlist-add-check.tsx';
+import SettingsIcon from '~/icons/baseline-settings';
 
 const PAGE_SIZE = 30;
 
@@ -47,15 +48,17 @@ const AuthenticatedListPage = () => {
 			>
 				<Show when={list()} fallback={<p class="grow text-base font-bold">List</p>}>
 					{(list) => (
-						<button
-							title={isSubscribed() ? `Unsubscribe from list` : 'Subscribe to list'}
-							onClick={() => {
-								openModal(() => <SubscribeListConfirmDialog uid={uid()} list={list()} />);
-							}}
-							class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base hover:bg-secondary"
-						>
-							{isSubscribed() ? <DeleteIcon /> : <AddIcon />}
-						</button>
+						<>
+							<button
+								title={isSubscribed() ? `Unsubscribe from list` : 'Subscribe to list'}
+								onClick={() => {
+									openModal(() => <SubscribeListConfirmDialog uid={uid()} list={list()} />);
+								}}
+								class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary"
+							>
+								{isSubscribed() ? <PlaylistAddCheckIcon /> : <PlaylistAddIcon />}
+							</button>
+						</>
 					)}
 				</Show>
 			</div>

@@ -101,6 +101,8 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 				}
 			}
 
+			slen++;
+
 			slices.unshift({
 				type: reason,
 				read: item.isRead,
@@ -139,6 +141,8 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 					continue loop;
 				}
 			}
+
+			slen++;
 
 			slices.unshift({
 				type: reason,

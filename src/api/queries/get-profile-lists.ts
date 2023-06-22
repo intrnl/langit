@@ -26,7 +26,7 @@ export const getProfileLists = async (
 	const data = response.data as BskyGetListsResponse;
 
 	return {
-		cursor: data.lists.length > limit ? data.cursor : undefined,
+		cursor: data.lists.length >= limit ? data.cursor : undefined,
 		lists: data.lists.map((list) => mergeSignalizedList(list)),
 	};
 };

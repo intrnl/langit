@@ -27,7 +27,7 @@ export const getSubscribedLists = async (
 	const filtered = filter ? data.lists.filter((list) => list.creator.did !== uid) : data.lists;
 
 	return {
-		cursor: filtered.length > limit ? data.cursor : undefined,
+		cursor: filtered.length >= limit ? data.cursor : undefined,
 		lists: filtered.map((list) => mergeSignalizedList(list)),
 	};
 };

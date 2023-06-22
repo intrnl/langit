@@ -29,7 +29,7 @@ const EmbedLink = (props: EmbedLinkProps) => {
 			href={link().uri}
 			rel="noopener noreferrer nofollow"
 			target="_blank"
-			class="overflow-hidden rounded-md border border-divider"
+			class="flex overflow-hidden rounded-md border border-divider"
 			classList={{ 'hover:bg-secondary': interactive() }}
 		>
 			<Show when={link().thumb} keyed>
@@ -38,21 +38,24 @@ const EmbedLink = (props: EmbedLinkProps) => {
 						return (
 							<BlobImage
 								src={thumb}
-								class="aspect-video w-full border-b border-divider bg-muted-fg object-cover"
+								class="aspect-square w-[86px] border-r border-divider object-cover sm:w-32"
 							/>
 						);
 					}
 
 					return (
-						<img src={thumb} class="aspect-video w-full border-b border-divider bg-muted-fg object-cover" />
+						<img src={thumb} class="aspect-square w-[86px] border-r border-divider object-cover sm:w-32" />
 					);
 				}}
 			</Show>
 
-			<div class="flex flex-col gap-0.5 p-3 text-sm">
+			<div class="flex flex-col justify-center gap-0.5 p-3 text-sm">
 				<p class="text-muted-fg">{getDomain(link().uri)}</p>
-				<p class="line-clamp-2 overflow-hidden empty:hidden">{link().title}</p>
-				<p class="line-clamp-2 overflow-hidden text-muted-fg empty:hidden">{link().description}</p>
+				<p class="line-clamp-2 empty:hidden">{link().title}</p>
+
+				<div class="hidden sm:block">
+					<p class="line-clamp-2 text-muted-fg empty:hidden">{link().description}</p>
+				</div>
 			</div>
 		</Dynamic>
 	);

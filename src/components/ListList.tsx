@@ -8,6 +8,7 @@ import { type DID } from '~/api/utils.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import ListItem from '~/components/ListItem.tsx';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
 
 export interface ListListProps {
 	uid: DID;
@@ -28,7 +29,9 @@ const ListList = (props: ListListProps) => {
 			<For each={listQuery.data?.pages}>
 				{(page) => {
 					return page.lists.map((list) => (
-						<ListItem uid={props.uid} list={list} hideSubscribedBadge={props.hideSubscribedBadge} />
+						<VirtualContainer key="list" id={list.uri}>
+							<ListItem uid={props.uid} list={list} hideSubscribedBadge={props.hideSubscribedBadge} />
+						</VirtualContainer>
 					));
 				}}
 			</For>

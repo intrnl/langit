@@ -1,15 +1,13 @@
-import { For, Match, Show, Switch } from 'solid-js';
+import { For, Match, Switch } from 'solid-js';
 import { type JSX } from 'solid-js/jsx-runtime';
 
-import { useNavigate } from '@solidjs/router';
 import { type CreateInfiniteQueryResult } from '@tanstack/solid-query';
 
 import { type ListsPage } from '~/api/models/list.ts';
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
-
-import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
+import { type DID } from '~/api/utils.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
+import ListItem from '~/components/ListItem.tsx';
 
 export interface ListListProps {
 	uid: DID;
@@ -25,66 +23,13 @@ const ListList = (props: ListListProps) => {
 	// change, they shouldn't.
 	const { listQuery, onLoadMore } = props;
 
-	const navigate = useNavigate();
-
-	const uid = () => props.uid;
-
 	return (
 		<>
 			<For each={listQuery.data?.pages}>
 				{(page) => {
-					return page.lists.map((list) => {
-						const click = (ev: MouseEvent | KeyboardEvent) => {
-							if (!isElementClicked(ev, INTERACTION_TAGS)) {
-								return;
-							}
-
-							const uri = list.uri;
-							const path = `/u/${uid()}/profile/${getRepoId(uri)}/list/${getRecordId(uri)}`;
-
-							if (isElementAltClicked(ev)) {
-								open(path, '_blank');
-							} else {
-								navigate(path);
-							}
-						};
-
-						return (
-							<div
-								tabindex={0}
-								onClick={click}
-								onAuxClick={click}
-								onKeyDown={click}
-								role="button"
-								class="flex gap-3 px-4 py-3 hover:bg-hinted"
-							>
-								<div class="mt-0.5 h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg">
-									<Show when={list.avatar.value}>
-										{(avatar) => <img src={avatar()} class="h-full w-full" />}
-									</Show>
-								</div>
-
-								<div class="flex min-w-0 grow flex-col">
-									<div class="text-sm">
-										<span class="font-bold">{list.name.value}</span>
-
-										<Show when={list.viewer.muted.value && !props.hideSubscribedBadge}>
-											<span class="ml-2 rounded bg-muted px-1 py-0.5 align-[1px] text-xs font-medium">
-												Subscribed
-											</span>
-										</Show>
-									</div>
-									<p class="text-sm text-muted-fg">Mute list by @{list.creator.handle.value}</p>
-
-									<Show when={list.description.value}>
-										<div class="mt-1 whitespace-pre-wrap break-words text-sm">
-											{list.$renderedDescription(uid())}
-										</div>
-									</Show>
-								</div>
-							</div>
-						);
-					});
+					return page.lists.map((list) => (
+						<ListItem uid={props.uid} list={list} hideSubscribedBadge={props.hideSubscribedBadge} />
+					));
 				}}
 			</For>
 

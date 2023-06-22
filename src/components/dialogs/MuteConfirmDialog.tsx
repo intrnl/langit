@@ -1,13 +1,17 @@
 import { Match, Switch } from 'solid-js';
 
+import { createQuery } from '@tanstack/solid-query';
+
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { type SignalizedProfile } from '~/api/cache/profiles.ts';
 import { muteProfile } from '~/api/mutations/mute-profile.ts';
+import { getList, getListKey } from '~/api/queries/get-list.ts';
 
-import { A } from '~/router.ts';
 import { closeModal } from '~/globals/modals.tsx';
 
+import CircularProgress from '~/components/CircularProgress.tsx';
+import ListItem from '~/components/ListItem.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
 
@@ -26,37 +30,59 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 		<div class={/* @once */ dialog.content()}>
 			<Switch>
 				<Match when={profile().viewer.mutedByList.value}>
-					{(list) => (
-						<>
-							<h1 class={/* @once */ dialog.title()}>Cannot unmute @{profile().handle.value}</h1>
+					{(list) => {
+						const query = createQuery({
+							queryKey: () => getListKey(uid(), getRepoId(list().uri), getRecordId(list().uri), 1),
+							queryFn: getList,
+							staleTime: 60_000,
+							refetchOnReconnect: false,
+							refetchOnWindowFocus: false,
+						});
 
-							<p class="mt-3 text-sm">
-								To unmute this user, you have to unsubscribe from{' '}
-								<A
-									href="/u/:uid/profile/:actor/list/:list"
-									params={{ uid: uid(), actor: getRepoId(list().uri), list: getRecordId(list().uri) }}
-									onClick={() => {
-										closeModal();
-									}}
-									class="text-accent hover:underline"
-								>
-									{list().name}
-								</A>{' '}
-								mute list.
-							</p>
+						return (
+							<>
+								<h1 class={/* @once */ dialog.title()}>Cannot unmute @{profile().handle.value}</h1>
 
-							<div class={/* @once */ dialog.actions()}>
-								<button
-									onClick={() => {
-										closeModal();
-									}}
-									class={/* @once */ button({ color: 'primary' })}
-								>
-									Ok
-								</button>
-							</div>
-						</>
-					)}
+								<p class="mt-3 text-sm">
+									To unmute this user, you have to unsubscribe from this mute list.
+								</p>
+
+								<div class="mt-3 rounded-md border border-divider">
+									<Switch>
+										<Match when={query.isLoading}>
+											<div class="flex justify-center p-3">
+												<CircularProgress />
+											</div>
+										</Match>
+
+										<Match when={query.data}>
+											{(data) => (
+												<ListItem
+													uid={uid()}
+													list={data().list}
+													hideSubscribedBadge
+													onClick={() => {
+														closeModal();
+													}}
+												/>
+											)}
+										</Match>
+									</Switch>
+								</div>
+
+								<div class={/* @once */ dialog.actions()}>
+									<button
+										onClick={() => {
+											closeModal();
+										}}
+										class={/* @once */ button({ color: 'primary' })}
+									>
+										Ok
+									</button>
+								</div>
+							</>
+						);
+					}}
 				</Match>
 
 				<Match when>

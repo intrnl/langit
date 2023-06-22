@@ -1,4 +1,4 @@
-import { For, createSignal } from 'solid-js';
+import { For, createContext, createSignal, useContext } from 'solid-js';
 import { type JSX } from 'solid-js/jsx-runtime';
 
 import Dialog from '~/components/Dialog.tsx';
@@ -10,21 +10,38 @@ export interface ModalOptions {
 }
 
 interface ModalState extends ModalOptions {
+	id: number;
 	render: ModalComponent;
 }
 
+interface ModalContextState {
+	id: number;
+	close: () => void;
+}
+
 const [modals, setModals] = createSignal<ModalState[]>([]);
+let _id = 0;
+
+const StateContext = createContext<ModalContextState>();
 
 export const openModal = (fn: ModalComponent, options?: ModalOptions) => {
-	setModals(($modals) => $modals.concat({ render: fn, ...options }));
+	setModals(($modals) => $modals.concat({ id: _id++, render: fn, ...options }));
 };
 
 export const closeModal = () => {
 	setModals(($modals) => $modals.slice(0, -1));
 };
 
+export const closeModalId = (id: number) => {
+	setModals(($modals) => $modals.filter((modal) => modal.id !== id));
+};
+
 export const resetModals = () => {
 	setModals([]);
+};
+
+export const useModalState = () => {
+	return useContext(StateContext)!;
 };
 
 export const ModalProvider = () => {
@@ -32,7 +49,9 @@ export const ModalProvider = () => {
 		<For each={modals()}>
 			{(modal) => (
 				<Dialog open onClose={!modal.disableBackdropClose ? closeModal : undefined}>
-					{modal.render()}
+					<StateContext.Provider value={{ id: modal.id, close: () => closeModalId(modal.id) }}>
+						{modal.render()}
+					</StateContext.Provider>
 				</Dialog>
 			)}
 		</For>

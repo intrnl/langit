@@ -7,6 +7,7 @@ import { type SignalizedProfile } from '~/api/cache/profiles.ts';
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
+import AddProfileListDialog from '~/components/dialogs/AddProfileListDialog.tsx';
 import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog';
 import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
@@ -15,6 +16,7 @@ import * as menu from '~/styles/primitives/menu.ts';
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import BlockIcon from '~/icons/baseline-block';
 import LaunchIcon from '~/icons/baseline-launch.tsx';
+import PlaylistAddIcon from '~/icons/baseline-playlist-add.tsx';
 import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
 
 export interface ProfileMenuProps {
@@ -82,6 +84,17 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 				<span class="line-clamp-1 break-all">
 					{isBlocked() ? 'Unblock' : 'Block'} @{profile().handle.value}
 				</span>
+			</button>
+
+			<button
+				onClick={() => {
+					closeModal();
+					openModal(() => <AddProfileListDialog uid={uid()} profile={profile()} />);
+				}}
+				class={/* @once */ menu.item()}
+			>
+				<PlaylistAddIcon class="shrink-0 text-lg" />
+				<span class="line-clamp-1 break-all">Add/remove @{profile().handle.value} from Lists</span>
 			</button>
 
 			<button onClick={closeModal} class={/* @once */ menu.cancel()}>

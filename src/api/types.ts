@@ -424,6 +424,13 @@ export interface BskyListSubject {
 	subject: BskyProfile;
 }
 
+export interface BskyListSubjectRecord {
+	$type: 'app.bsky.graph.listitem';
+	list: string;
+	subject: DID;
+	createdAt: string;
+}
+
 export interface BskyGetListsResponse {
 	cursor?: string;
 	lists: BskyList[];

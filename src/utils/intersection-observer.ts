@@ -13,7 +13,7 @@ const callback: IntersectionObserverCallback = (entries, observer) => {
 	}
 };
 
-export const scrollObserver = new IntersectionObserver(callback, { rootMargin: '112.5% 0px' });
+export const scrollObserver = new IntersectionObserver(callback, { rootMargin: '106.25% 0px' });
 
 declare module 'solid-js' {
 	namespace JSX {

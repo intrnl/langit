@@ -5,6 +5,7 @@ const button = cva(
 	{
 		variants: {
 			size: {
+				xs: 'h-8 px-4 leading-none',
 				sm: `h-9 px-4`,
 			},
 			color: {

@@ -103,21 +103,33 @@ const AuthenticatedProfileLayout = () => {
 
 										<div class="grow" />
 
-										<Show when={profile().did !== uid()}>
-											<button
-												title="Actions"
-												onClick={() => {
-													openModal(() => <ProfileMenu uid={uid()} profile={profile()} />);
-												}}
-												class={/* @once */ button({ color: 'outline' })}
-											>
-												<MoreHorizIcon class="-mx-1.5 text-base" />
-											</button>
+										<Switch>
+											<Match when={profile().did === uid()}>
+												<A
+													href="/u/:uid/settings/profile"
+													params={params}
+													class={/* @once */ button({ color: 'primary' })}
+												>
+													Edit profile
+												</A>
+											</Match>
 
-											<Show when={!profile().viewer.blocking.value}>
-												<FollowButton uid={uid()} profile={profile()} />
-											</Show>
-										</Show>
+											<Match when>
+												<button
+													title="Actions"
+													onClick={() => {
+														openModal(() => <ProfileMenu uid={uid()} profile={profile()} />);
+													}}
+													class={/* @once */ button({ color: 'outline' })}
+												>
+													<MoreHorizIcon class="-mx-1.5 text-base" />
+												</button>
+
+												<Show when={!profile().viewer.blocking.value}>
+													<FollowButton uid={uid()} profile={profile()} />
+												</Show>
+											</Match>
+										</Switch>
 									</div>
 
 									<div>

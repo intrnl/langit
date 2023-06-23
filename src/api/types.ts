@@ -58,6 +58,14 @@ export interface BskyProfileFollow {
 	};
 }
 
+export interface BskyProfileRecord {
+	$type: 'app.bsky.actor.profile';
+	displayName?: string;
+	description?: string;
+	avatar?: BskyBlob;
+	banner?: BskyBlob;
+}
+
 export interface BskyProfileTypeaheadSearch {
 	did: string;
 	handle: string;

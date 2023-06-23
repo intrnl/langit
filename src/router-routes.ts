@@ -55,6 +55,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.settings.explore.add.tsx")),
       },
       {
+        path: "settings/profile",
+        component: lazy(() => import("./routes/u.$uid.settings.profile.tsx")),
+      },
+      {
         path: "explore",
         component: lazy(() => import("./routes/u.$uid.explore._index.tsx")),
       },

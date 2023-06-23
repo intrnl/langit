@@ -61,7 +61,7 @@ export const isElementAltClicked = (ev: MouseEvent | KeyboardEvent) => {
 };
 
 export const model = (getter: Accessor<string>, setter: Setter<string>) => {
-	return (node: HTMLInputElement) => {
+	return (node: HTMLInputElement | HTMLTextAreaElement) => {
 		createRenderEffect(() => {
 			node.value = getter();
 		});

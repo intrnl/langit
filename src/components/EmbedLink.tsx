@@ -33,20 +33,12 @@ const EmbedLink = (props: EmbedLinkProps) => {
 			classList={{ 'hover:bg-secondary': interactive() }}
 		>
 			<Show when={link().thumb} keyed>
-				{(thumb) => {
-					if (thumb instanceof Blob) {
-						return (
-							<BlobImage
-								src={thumb}
-								class="aspect-square w-[86px] border-r border-divider object-cover sm:w-32"
-							/>
-						);
-					}
-
-					return (
-						<img src={thumb} class="aspect-square w-[86px] border-r border-divider object-cover sm:w-32" />
-					);
-				}}
+				{(thumb) => (
+					<BlobImage
+						src={thumb}
+						class="aspect-square w-[86px] border-r border-divider object-cover sm:w-32"
+					/>
+				)}
 			</Show>
 
 			<div class="flex flex-col justify-center gap-0.5 p-3 text-sm">

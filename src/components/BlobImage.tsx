@@ -1,7 +1,7 @@
-import { createMemo, type ComponentProps, onCleanup } from 'solid-js';
+import { type ComponentProps, onCleanup } from 'solid-js';
 
 export interface BlobImageProps extends Omit<ComponentProps<'img'>, 'src'> {
-	src: Blob;
+	src: Blob | string;
 }
 
 interface BlobObject {
@@ -13,8 +13,13 @@ interface BlobObject {
 const map = new WeakMap<Blob, BlobObject>();
 
 const BlobImage = (props: BlobImageProps) => {
-	const blob = createMemo(() => {
+	const blob = () => {
 		const src = props.src;
+
+		if (typeof src === 'string') {
+			return { url: src };
+		}
+
 		let obj = map.get(src);
 
 		if (!obj) {
@@ -31,7 +36,7 @@ const BlobImage = (props: BlobImageProps) => {
 		});
 
 		return obj;
-	});
+	};
 
 	return <img {...props} src={blob().url} />;
 };

@@ -3,7 +3,7 @@ import { closeModal } from '~/globals/modals.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
 
-const APP_PASSWORD_LINK = 'https://github.com/bluesky-social/atproto-ecosystem/blob/main/app-passwords.md';
+const APP_PASSWORD_LINK = 'https://atproto.com/community/projects#app-passwords';
 
 export interface AppPasswordNoticeDialogProps {
 	onSubmit: () => void;

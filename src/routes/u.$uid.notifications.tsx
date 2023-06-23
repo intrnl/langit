@@ -137,7 +137,7 @@ const AuthenticatedNotificationsPage = () => {
 				<button
 					disabled={dispatching() || notificationsQuery.isInitialLoading || notificationsQuery.isRefetching}
 					onClick={onMarkAsRead}
-					class={/* @once */ button({ color: 'outline' })}
+					class={/* @once */ button({ color: 'outline', size: 'xs' })}
 				>
 					Mark as read
 				</button>

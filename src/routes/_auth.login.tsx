@@ -1,7 +1,7 @@
 import { Show, createSignal } from 'solid-js';
 
 import { useSearchParams, useNavigate } from '@solidjs/router';
-import { createQuery } from '@tanstack/solid-query';
+import { createMutation, createQuery } from '@tanstack/solid-query';
 
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 import { XRPC } from '~/api/rpc/xrpc.ts';
@@ -21,9 +21,6 @@ const AuthLoginPage = () => {
 	const [searchParams] = useSearchParams<{ to?: string }>();
 
 	const [service, setService] = createSignal(DEFAULT_DATA_SERVERS[0]);
-	const [dispatching, setDispatching] = createSignal(false);
-
-	const [error, setError] = createSignal('');
 
 	const [identifier, setIdentifier] = createSignal('');
 	const [password, setPassword] = createSignal('');
@@ -42,36 +39,34 @@ const AuthLoginPage = () => {
 		},
 	);
 
-	const submit = (force: boolean) => {
-		const $url = service().url;
-		const $identifier = identifier();
-		const $password = password();
+	const loginMutation = createMutation({
+		mutationFn: () => {
+			const $url = service().url;
+			const $identifier = identifier();
+			const $password = password();
 
-		setError('');
+			return multiagent.login({ service: $url, identifier: $identifier, password: $password });
+		},
+		onSuccess: (uid) => {
+			const to = searchParams.to;
+
+			if (to) {
+				navigate(to.replace(`@uid/`, `/u/${uid}/`));
+			} else {
+				navigate(`/u/${uid}`);
+			}
+		},
+	});
+
+	const submit = (force: boolean) => {
+		const $password = password();
 
 		if (!force && !APP_PASSWORD_REGEX.test($password)) {
 			openModal(() => <AppPasswordNoticeDialog onSubmit={() => submit(true)} />);
 			return;
 		}
 
-		setDispatching(true);
-
-		multiagent.login({ service: $url, identifier: $identifier, password: $password }).then(
-			(uid) => {
-				const to = searchParams.to;
-
-				if (to) {
-					navigate(to.replace(`@uid/`, `/u/${uid}/`));
-				} else {
-					navigate(`/u/${uid}`);
-				}
-			},
-			(err) => {
-				const message = err.cause ? err.cause.message : err.message;
-				setError(message);
-				setDispatching(false);
-			},
-		);
+		loginMutation.mutate();
 	};
 
 	return (
@@ -126,7 +121,13 @@ const AuthLoginPage = () => {
 					/>
 				</div>
 
-				<Show when={error()}>{(error) => <p class="text-sm leading-6 text-red-600">{error()}</p>}</Show>
+				<Show when={loginMutation.error} keyed>
+					{(error: any) => (
+						<p class="text-sm leading-6 text-red-600">
+							{error.cause ? error.cause.message : error.message || '' + error}
+						</p>
+					)}
+				</Show>
 
 				<Show when={describeQuery.data}>
 					{(data) => (
@@ -146,7 +147,7 @@ const AuthLoginPage = () => {
 
 				<div>
 					<button
-						disabled={dispatching() || describeQuery.isLoading}
+						disabled={loginMutation.isLoading || describeQuery.isLoading}
 						type="submit"
 						class={/* @once */ button({ color: 'primary' })}
 					>

@@ -77,15 +77,15 @@ export class XRPC {
 		this.service = serviceUri instanceof URL ? serviceUri : new URL(serviceUri);
 	}
 
-	public get(options: Omit<NewCallOptions, 'type'>) {
-		return this.call({ type: 'get', ...options });
+	public get<T = any>(options: Omit<NewCallOptions, 'type'>) {
+		return this.call<T>({ type: 'get', ...options });
 	}
 
-	public post(options: Omit<NewCallOptions, 'type'>) {
-		return this.call({ type: 'post', ...options });
+	public post<T = any>(options: Omit<NewCallOptions, 'type'>) {
+		return this.call<T>({ type: 'post', ...options });
 	}
 
-	public async call(options: NewCallOptions) {
+	public async call<T = any>(options: NewCallOptions) {
 		const { type, method, params, data, encoding, headers, signal } = options;
 
 		const httpUri = constructMethodCallUri(method, this.service, params);
@@ -102,7 +102,7 @@ export class XRPC {
 		const resCode = httpResponseCodeToEnum(res.status);
 
 		if (resCode === ResponseType.Success) {
-			return new XRPCResponse(res.body, res.headers);
+			return new XRPCResponse<T>(res.body, res.headers);
 		} else {
 			if (res.body && isErrorResponse(res.body)) {
 				throw new XRPCError(resCode, res.body.error, res.body.message);

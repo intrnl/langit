@@ -38,10 +38,10 @@ export enum ResponseType {
 	UpstreamTimeout = 504,
 }
 
-export class XRPCResponse {
+export class XRPCResponse<T = any> {
 	success = true;
 
-	constructor(public data: any, public headers: Headers) {}
+	constructor(public data: T, public headers: Headers) {}
 }
 
 export class XRPCError extends Error {

@@ -1,7 +1,8 @@
 import { For, Match, Show, Switch, createSignal } from 'solid-js';
 
-import { createInfiniteQuery, createQuery } from '@tanstack/solid-query';
+import { createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
 
+import { type BskyCreateRecordResponse } from '~/api/types.ts';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { type SignalizedProfile } from '~/api/cache/profiles.ts';
@@ -30,6 +31,7 @@ type PendingItem = [list: string, record: string | null];
 const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 	let listEl: HTMLDivElement | undefined;
 
+	const client = useQueryClient();
 	const { close } = useModalState();
 
 	const [mutating, setMutating] = createSignal(false);
@@ -68,13 +70,14 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 		const $uid = uid();
 		const $profile = profile();
 
+		const actor = $profile.did;
 		const date = new Date().toISOString();
 
 		const agent = await multiagent.connect($uid);
 
-		const promises = pending.map(([list, record]) => {
+		const promises = pending.map(async ([list, record]) => {
 			if (record) {
-				return agent.rpc.post({
+				await agent.rpc.post({
 					method: 'com.atproto.repo.deleteRecord',
 					data: {
 						collection: 'app.bsky.graph.listitem',
@@ -82,8 +85,10 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 						rkey: getRecordId(record),
 					},
 				});
+
+				client.setQueryData(getProfileInListKey(uid(), actor, list), { actor, list, exists: undefined });
 			} else {
-				return agent.rpc.post({
+				const response = await agent.rpc.post({
 					method: 'com.atproto.repo.createRecord',
 					data: {
 						collection: 'app.bsky.graph.listitem',
@@ -91,11 +96,15 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 						record: {
 							$type: 'app.bsky.graph.listitem',
 							list: list,
-							subject: $profile.did,
+							subject: actor,
 							createdAt: date,
 						},
 					},
 				});
+
+				const data = response.data as BskyCreateRecordResponse;
+
+				client.setQueryData(getProfileInListKey(uid(), actor, list), { actor, list, exists: data.uri });
 			}
 		});
 

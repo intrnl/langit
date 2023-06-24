@@ -2,6 +2,8 @@ import { Match, Switch } from 'solid-js';
 
 import { createQuery } from '@tanstack/solid-query';
 
+import { languageNames } from '~/utils/intl/displaynames.ts';
+
 import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
 
@@ -65,7 +67,12 @@ const PostTranslation = (props: PostTranslationProps) => {
 				<Match when={query.data}>
 					{(data) => (
 						<>
-							<p class="text-sm text-muted-fg">Translated from {data().source.join(', ')}</p>
+							<p class="text-sm text-muted-fg">
+								Translated from{' '}
+								{data()
+									.source.map((code) => languageNames.of(code))
+									.join(', ')}
+							</p>
 							<p class="whitespace-pre-wrap break-words text-base">{data().result}</p>
 						</>
 					)}

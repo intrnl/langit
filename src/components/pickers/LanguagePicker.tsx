@@ -3,7 +3,7 @@ import { Show } from 'solid-js';
 import { closeModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
-import { CODE2S } from '~/utils/intl/languages.ts';
+import { CODE2_TO_CODE3 } from '~/utils/intl/languages.ts';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
@@ -13,12 +13,12 @@ export interface LanguagePickerProps {
 	onPick: (next: string) => void;
 }
 
-let _sortedLanguages: string[];
+let _sortedLanguages: [string, string][];
 
 const LanguagePicker = (props: LanguagePickerProps) => {
-	const sortedLanguages = (_sortedLanguages ||= CODE2S.slice().sort((a, b) => {
-		const aIsSystem = systemLanguages.includes(a);
-		const bIsSystem = systemLanguages.includes(b);
+	const sortedLanguages = (_sortedLanguages ||= Object.entries(CODE2_TO_CODE3).sort((a, b) => {
+		const aIsSystem = systemLanguages.includes(a[0]);
+		const bIsSystem = systemLanguages.includes(b[0]);
 
 		return +bIsSystem - +aIsSystem;
 	}));
@@ -45,9 +45,9 @@ const LanguagePicker = (props: LanguagePickerProps) => {
 					</button>
 				</Show>
 
-				{sortedLanguages.map((code) => (
-					<button data-value={code} onClick={choose} class={/* @once */ menu.item()}>
-						{languageNames.of(code)}
+				{sortedLanguages.map(([code2, code3]) => (
+					<button data-value={code2} onClick={choose} class={/* @once */ menu.item()}>
+						{languageNames.of(code3)}
 					</button>
 				))}
 			</div>

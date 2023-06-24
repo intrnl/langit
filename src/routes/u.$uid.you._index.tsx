@@ -18,6 +18,7 @@ import BlockIcon from '~/icons/baseline-block.tsx';
 import BrightnessMediumIcon from '~/icons/baseline-brightness-medium.tsx';
 import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
 import GroupOffIcon from '~/icons/baseline-group-off.tsx';
+import LanguageIcon from '~/icons/baseline-language.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import PersonOffIcon from '~/icons/baseline-person-off.tsx';
 import VisibilityIcon from '~/icons/baseline-visibility.tsx';
@@ -128,6 +129,15 @@ const AuthenticatedYouPage = () => {
 			>
 				<ConfirmationNumberIcon class="text-xl" />
 				<span>Invite codes</span>
+			</A>
+
+			<A
+				href="/u/:uid/settings/content-languages"
+				params={params}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
+				<LanguageIcon class="text-xl" />
+				<span>Content languages</span>
 			</A>
 
 			<button

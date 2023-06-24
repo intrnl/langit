@@ -1,5 +1,7 @@
 import { type Accessor, type Setter, createRenderEffect } from 'solid-js';
 
+export const EMPTY_ARRAY: unknown[] = [];
+
 let uid = 0;
 
 export const createId = (prefix = '_') => {

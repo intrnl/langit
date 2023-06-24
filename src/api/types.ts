@@ -118,9 +118,9 @@ export interface BskyPostRecordReply {
 
 export interface BskyPostRecord {
 	$type: 'app.bsky.feed.post';
+	createdAt: string;
 	text: string;
 	facets?: Facet[];
-	createdAt: string;
 	reply?: {
 		root: BskyPostRecordReply;
 		parent: BskyPostRecordReply;
@@ -130,6 +130,7 @@ export interface BskyPostRecord {
 		| BskyPostRecordEmbedImage
 		| BskyPostRecordEmbedRecord
 		| BskyPostRecordEmbedRecordWithMedia;
+	langs?: string[];
 }
 
 export interface EmbeddedLink {

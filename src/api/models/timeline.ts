@@ -35,8 +35,13 @@ export interface TimelinePage {
 }
 
 export type SliceFilter = (slice: TimelineSlice, seen: Set<string>) => boolean;
+export type PostFilter = (post: BskyTimelinePost) => boolean;
 
-export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFilter): TimelinePage => {
+export const createTimelinePage = (
+	data: BskyTimelineResponse,
+	sliceFilter?: SliceFilter,
+	postFilter?: PostFilter,
+): TimelinePage => {
 	const key = Date.now();
 
 	const arr = data.feed;
@@ -57,6 +62,10 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 		}
 
 		seen.add(cid);
+
+		if (postFilter && !postFilter(item)) {
+			continue;
+		}
 
 		// find a slice that matches
 		const signalized = createSignalizedTimelinePost(item, key);
@@ -92,13 +101,13 @@ export const createTimelinePage = (data: BskyTimelineResponse, filter?: SliceFil
 		jlen++;
 	}
 
-	if (filter && jlen > 0) {
+	if (sliceFilter && jlen > 0) {
 		const finalslices: TimelineSlice[] = [];
 
 		for (let i = 0; i < jlen; i++) {
 			const slice = slices[i];
 
-			if (filter(slice, seen)) {
+			if (sliceFilter(slice, seen)) {
 				finalslices.push(slice);
 			}
 		}

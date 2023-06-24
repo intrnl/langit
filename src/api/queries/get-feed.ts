@@ -1,12 +1,14 @@
 import { type QueryFunctionContext } from '@tanstack/solid-query';
 
 import { multiagent } from '~/globals/agent.ts';
+import { systemLanguages } from '~/globals/platform.ts';
+import { preferences } from '~/globals/preferences.ts';
 
-import { type SliceFilter, createTimelinePage } from '../models/timeline.ts';
+import { type PostFilter, type SliceFilter, createTimelinePage } from '../models/timeline.ts';
 import { type BskyTimelineResponse } from '../types.ts';
 import { type DID } from '../utils.ts';
 
-const ceateHomeTimelineFilter = (uid: DID): SliceFilter => {
+const createHomeSliceFilter = (uid: DID): SliceFilter => {
 	return (slice) => {
 		const items = slice.items;
 		const first = items[0];
@@ -30,6 +32,32 @@ const ceateHomeTimelineFilter = (uid: DID): SliceFilter => {
 	};
 };
 
+const createFeedPostFilter = (uid: DID): PostFilter | undefined => {
+	const pref = preferences.get(uid);
+
+	const allowUnspecified = pref?.cl_unspecified ?? true;
+	let languages = pref?.cl_codes;
+
+	if (pref?.cl_systemLanguage ?? true) {
+		languages = languages ? systemLanguages.concat(languages) : systemLanguages;
+	}
+
+	if (!languages || languages.length < 1) {
+		return undefined;
+	}
+
+	return (item) => {
+		const record = item.post.record;
+		const langs = record.langs;
+
+		if (!langs) {
+			return allowUnspecified;
+		}
+
+		return langs.some((code) => languages!.includes(code));
+	};
+};
+
 export const FOLLOWING_FEED = 'reverse-chronological';
 
 export const getFeedKey = (uid: DID, feed: string, limit: number) => ['getFeed', uid, feed, limit] as const;
@@ -39,7 +67,8 @@ export const getFeed = async (ctx: QueryFunctionContext<ReturnType<typeof getFee
 	const agent = await multiagent.connect(uid);
 
 	let data: BskyTimelineResponse;
-	let filter: SliceFilter | undefined;
+	let sliceFilter: SliceFilter | undefined;
+	let postFilter: PostFilter | undefined;
 
 	if (feed !== FOLLOWING_FEED) {
 		const response = await agent.rpc.get({
@@ -49,6 +78,7 @@ export const getFeed = async (ctx: QueryFunctionContext<ReturnType<typeof getFee
 		});
 
 		data = response.data as BskyTimelineResponse;
+		postFilter = createFeedPostFilter(uid);
 	} else {
 		const response = await agent.rpc.get({
 			method: 'app.bsky.feed.getTimeline',
@@ -57,10 +87,10 @@ export const getFeed = async (ctx: QueryFunctionContext<ReturnType<typeof getFee
 		});
 
 		data = response.data as BskyTimelineResponse;
-		filter = ceateHomeTimelineFilter(uid);
+		sliceFilter = createHomeSliceFilter(uid);
 	}
 
-	const page = createTimelinePage(data, filter);
+	const page = createTimelinePage(data, sliceFilter, postFilter);
 
 	return page;
 };

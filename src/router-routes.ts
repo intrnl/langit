@@ -35,6 +35,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.list.$list.tsx")),
       },
       {
+        path: "settings/content-languages",
+        component: lazy(() => import("./routes/u.$uid.settings.content-languages.tsx")),
+      },
+      {
         path: "profile/:actor/followers",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.followers.tsx")),
       },

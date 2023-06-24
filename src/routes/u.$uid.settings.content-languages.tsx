@@ -66,10 +66,13 @@ const AuthenticatedLanguagesSettingsPage = () => {
 
 			<button
 				onClick={() => {
+					const codes = preferences.get(uid())?.cl_codes;
+
 					openModal(() => (
 						<LanguagePicker
+							exclude={codes}
 							onPick={(next) => {
-								const array = preferences.get(uid())?.cl_codes || [];
+								const array = codes || [];
 								preferences.merge(uid(), { cl_codes: array.concat(next) });
 							}}
 						/>

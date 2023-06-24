@@ -10,6 +10,7 @@ import * as menu from '~/styles/primitives/menu.ts';
 export interface LanguagePickerProps {
 	/** Shows additional language options meant for post composing */
 	post?: boolean;
+	exclude?: string[];
 	onPick: (next: string) => void;
 }
 
@@ -45,11 +46,17 @@ const LanguagePicker = (props: LanguagePickerProps) => {
 					</button>
 				</Show>
 
-				{sortedLanguages.map(([code2, code3]) => (
-					<button data-value={code2} onClick={choose} class={/* @once */ menu.item()}>
-						{languageNames.of(code3)}
-					</button>
-				))}
+				{(() => {
+					const excludes = props.exclude;
+
+					return sortedLanguages.map(([code2, code3]) =>
+						!excludes || !excludes.includes(code2) ? (
+							<button data-value={code2} onClick={choose} class={/* @once */ menu.item()}>
+								{languageNames.of(code3)}
+							</button>
+						) : null,
+					);
+				})()}
 			</div>
 
 			<button onClick={closeModal} class={/* @once */ menu.cancel()}>

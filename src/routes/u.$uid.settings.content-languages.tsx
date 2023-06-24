@@ -107,7 +107,6 @@ const AuthenticatedLanguagesSettingsPage = () => {
 				<label class="flex justify-between gap-4">
 					<span class="text-sm">Show unspecified posts</span>
 					<Checkbox
-						disabled
 						checked={preferences.get(uid())?.cl_unspecified ?? true}
 						onChange={(ev) => {
 							const next = ev.target.checked;

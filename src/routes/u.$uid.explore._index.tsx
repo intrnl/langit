@@ -130,7 +130,7 @@ const AuthenticatedExplorePage = () => {
 										}}
 									</For>
 
-									<Show when={timelineQuery.data && timelineQuery.data.slices.length > 0}>
+									<Show when={timelineQuery.data?.cid}>
 										<A
 											href="/u/:uid/profile/:actor/feed/:feed"
 											params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}

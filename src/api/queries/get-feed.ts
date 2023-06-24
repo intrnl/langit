@@ -50,6 +50,10 @@ const createFeedPostFilter = (uid: DID): PostFilter | undefined => {
 		const record = item.post.record;
 		const langs = record.langs;
 
+		if (!record.text) {
+			return true;
+		}
+
 		if (!langs) {
 			return allowUnspecified;
 		}

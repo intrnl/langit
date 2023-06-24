@@ -65,7 +65,8 @@ const LanguagePicker = (props: LanguagePickerProps) => {
 					return sortedLanguages.map(([code2, code3]) =>
 						!excludes || !excludes.includes(code2) ? (
 							<button data-value={code2} onClick={choose} class={/* @once */ menu.item()}>
-								{languageNames.of(code3)}
+								<span class="grow">{languageNames.of(code3)}</span>
+								<span class="font-mono text-muted-fg">{code3}</span>
 							</button>
 						) : null,
 					);

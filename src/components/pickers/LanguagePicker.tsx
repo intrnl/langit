@@ -2,7 +2,7 @@ import { Show } from 'solid-js';
 
 import { closeModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
-import { languageNames } from '~/utils/intl/displaynames.ts';
+import { languageNamesStrict } from '~/utils/intl/displaynames.ts';
 import { CODE2_TO_CODE3 } from '~/utils/intl/languages.ts';
 
 import * as menu from '~/styles/primitives/menu.ts';
@@ -15,7 +15,6 @@ export interface LanguagePickerProps {
 }
 
 const createSortedLanguages = () => {
-	const map: Record<string, number> = {};
 	const oob = systemLanguages.length;
 
 	const score = (value: string) => {
@@ -23,15 +22,18 @@ const createSortedLanguages = () => {
 		return raw === -1 ? oob : raw;
 	};
 
-	return Object.entries(CODE2_TO_CODE3).sort((a, b) => {
-		const aLang = a[0];
-		const bLang = b[0];
+	return Object.entries(CODE2_TO_CODE3)
+		.map(([code2, code3]) => {
+			const name = languageNamesStrict.of(code3);
 
-		const aIndex = (map[aLang] ||= score(aLang));
-		const bIndex = (map[bLang] ||= score(bLang));
-
-		return aIndex - bIndex;
-	});
+			return {
+				score: name !== undefined ? score(code2) : oob + 1,
+				value: code2,
+				code: code3,
+				label: name,
+			};
+		})
+		.sort((a, b) => a.score - b.score);
 };
 
 const LanguagePicker = (props: LanguagePickerProps) => {
@@ -55,18 +57,20 @@ const LanguagePicker = (props: LanguagePickerProps) => {
 						None
 					</button>
 					<button data-value="system" onClick={choose} class={/* @once */ menu.item()}>
-						Primary system language ({languageNames.of(systemLanguages[0])})
+						Primary system language ({languageNamesStrict.of(systemLanguages[0])})
 					</button>
 				</Show>
 
 				{(() => {
 					const excludes = props.exclude;
 
-					return sortedLanguages.map(([code2, code3]) =>
-						!excludes || !excludes.includes(code2) ? (
-							<button data-value={code2} onClick={choose} class={/* @once */ menu.item()}>
-								<span class="grow">{languageNames.of(code3)}</span>
-								<span class="font-mono text-muted-fg">{code3}</span>
+					return sortedLanguages.map(({ value, code, label }) =>
+						!excludes || !excludes.includes(value) ? (
+							<button data-value={value} onClick={choose} class={/* @once */ menu.item()}>
+								<span class="grow" classList={{ 'text-muted-fg': !label }}>
+									{label || 'N/A'}
+								</span>
+								<span class="font-mono text-muted-fg">{code}</span>
 							</button>
 						) : null,
 					);

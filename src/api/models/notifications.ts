@@ -86,7 +86,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 				}
 
 				if (date - slice.date <= MAX_MERGE_TIME) {
-					slice.items.push(item);
+					slice.items.unshift(item);
 
 					if (!item.isRead) {
 						slice.read = false;
@@ -127,7 +127,7 @@ export const createNotificationsPage = (data: BskyNotificationsResponse): Notifi
 
 				if (date - slice.date <= MAX_MERGE_TIME) {
 					// @ts-expect-error this won't mix up, as we already filter by type
-					slice.items.push(item);
+					slice.items.unshift(item);
 
 					if (!item.isRead) {
 						slice.read = false;

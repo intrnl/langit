@@ -3,7 +3,7 @@ import { Show } from 'solid-js';
 import { closeModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
-import { CODE3S } from '~/utils/intl/languages.ts';
+import { CODE2S } from '~/utils/intl/languages.ts';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
@@ -16,7 +16,7 @@ export interface LanguagePickerProps {
 let _sortedLanguages: string[];
 
 const LanguagePicker = (props: LanguagePickerProps) => {
-	const sortedLanguages = (_sortedLanguages ||= CODE3S.slice().sort((a, b) => {
+	const sortedLanguages = (_sortedLanguages ||= CODE2S.slice().sort((a, b) => {
 		const aIsSystem = systemLanguages.includes(a);
 		const bIsSystem = systemLanguages.includes(b);
 

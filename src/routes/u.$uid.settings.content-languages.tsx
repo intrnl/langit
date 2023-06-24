@@ -68,7 +68,6 @@ const AuthenticatedLanguagesSettingsPage = () => {
 				onClick={() => {
 					openModal(() => (
 						<LanguagePicker
-							post
 							onPick={(next) => {
 								const array = preferences.get(uid())?.cl_codes || [];
 								preferences.merge(uid(), { cl_codes: array.concat(next) });

@@ -2,7 +2,7 @@ import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } f
 
 import { type DID } from '~/api/utils.ts';
 
-import { type TimelinePage } from '~/api/models/timeline.ts';
+import { type TimelinePage, shouldFetchNextPage } from '~/api/models/timeline.ts';
 import {
 	getProfileFeed,
 	getProfileFeedKey,
@@ -49,12 +49,8 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 
 			// check if the last page is empty because of its slices being filtered
 			// away, if so, fetch next page
-			if (length > 0) {
-				const last = pages[length - 1];
-
-				if (last.cid && last.slices.length === 0) {
-					timelineQuery.fetchNextPage();
-				}
+			if (shouldFetchNextPage(data)) {
+				timelineQuery.fetchNextPage();
 			}
 		},
 	});

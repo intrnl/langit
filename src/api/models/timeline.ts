@@ -1,3 +1,5 @@
+import { type InfiniteData } from '@tanstack/solid-query';
+
 import {
 	type SignalizedTimelinePost,
 	createSignalizedTimelinePost,
@@ -142,4 +144,23 @@ export const createLikesTimelinePage = (cursor: string, posts: BskyPost[]): Time
 		length: len,
 		slices: slices,
 	};
+};
+
+// Do not automatically fetch the next page if the N last pages have all been empty.
+const MAX_DISTANCE = 3;
+
+export const shouldFetchNextPage = (data: InfiniteData<TimelinePage>) => {
+	const pages = data.pages;
+	const length = pages.length;
+
+	const last = pages[length - 1];
+
+	if (last.slices.length === 0) {
+		return (
+			last.cid &&
+			(length <= MAX_DISTANCE || pages.slice(-MAX_DISTANCE).some((page) => page.slices.length !== 0))
+		);
+	}
+
+	return false;
 };

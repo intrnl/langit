@@ -14,15 +14,28 @@ export interface LanguagePickerProps {
 	onPick: (next: string) => void;
 }
 
-let _sortedLanguages: [string, string][];
+const createSortedLanguages = () => {
+	const map: Record<string, number> = {};
+	const oob = systemLanguages.length;
+
+	const score = (value: string) => {
+		const raw = systemLanguages.indexOf(value);
+		return raw === -1 ? oob : raw;
+	};
+
+	return Object.entries(CODE2_TO_CODE3).sort((a, b) => {
+		const aLang = a[0];
+		const bLang = b[0];
+
+		const aIndex = (map[aLang] ||= score(aLang));
+		const bIndex = (map[bLang] ||= score(bLang));
+
+		return aIndex - bIndex;
+	});
+};
 
 const LanguagePicker = (props: LanguagePickerProps) => {
-	const sortedLanguages = (_sortedLanguages ||= Object.entries(CODE2_TO_CODE3).sort((a, b) => {
-		const aIsSystem = systemLanguages.includes(a[0]);
-		const bIsSystem = systemLanguages.includes(b[0]);
-
-		return +bIsSystem - +aIsSystem;
-	}));
+	const sortedLanguages = createSortedLanguages();
 
 	const choose = (ev: MouseEvent) => {
 		const target = ev.currentTarget as HTMLButtonElement;

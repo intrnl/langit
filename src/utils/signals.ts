@@ -4,26 +4,26 @@ import { type Accessor, type Setter, type SignalOptions, createSignal, untrack }
 // that is expected to be destructured, this Signal class serves as a wrapper.
 
 export class Signal<T> {
-	private g: Accessor<T>;
-	private s: Setter<T>;
+	#get: Accessor<T>;
+	#set: Setter<T>;
 
 	constructor(value: T, options?: SignalOptions<T>) {
 		const impl = createSignal(value, options);
-		this.g = impl[0];
-		this.s = impl[1];
+		this.#get = impl[0];
+		this.#set = impl[1];
 	}
 
 	get value() {
-		return this.g();
+		return this.#get();
 	}
 
 	set value(next: T) {
 		// @ts-expect-error
-		this.s(typeof next === 'function' ? () => next : next);
+		this.#set(typeof next === 'function' ? () => next : next);
 	}
 
 	peek() {
-		return untrack(this.g);
+		return untrack(this.#get);
 	}
 }
 

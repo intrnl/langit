@@ -36,9 +36,9 @@ interface MultiagentStorage {
 export class MultiagentError extends Error {}
 
 export class Multiagent {
-	public storage: ReactiveLocalStorage<MultiagentStorage>;
+	storage: ReactiveLocalStorage<MultiagentStorage>;
 
-	private agents: Record<DID, Promise<Agent>> = {};
+	#agents: Record<DID, Promise<Agent>> = {};
 
 	constructor(name: string) {
 		this.storage = new ReactiveLocalStorage(name);
@@ -65,7 +65,7 @@ export class Multiagent {
 	 * Login with a new account
 	 */
 	async login({ service, identifier, password }: MultiagentLoginOptions): Promise<DID> {
-		const agent = this._createAgent(service);
+		const agent = this.#createAgent(service);
 
 		try {
 			await agent.login({ identifier, password });
@@ -83,7 +83,7 @@ export class Multiagent {
 				},
 			});
 
-			this.agents[did] = Promise.resolve(agent);
+			this.#agents[did] = Promise.resolve(agent);
 			return did;
 		} catch (err) {
 			throw new MultiagentError(`Failed to login`, { cause: err });
@@ -116,7 +116,7 @@ export class Multiagent {
 		const next = { ...this.storage.get('accounts') };
 
 		delete next[did];
-		delete this.agents[did];
+		delete this.#agents[did];
 
 		this.storage.set('accounts', next);
 	}
@@ -125,8 +125,8 @@ export class Multiagent {
 	 * Retrieve an agent associated with an account
 	 */
 	connect(did: DID): Promise<Agent> {
-		if (did in this.agents) {
-			return this.agents[did];
+		if (did in this.#agents) {
+			return this.#agents[did];
 		}
 
 		const accounts = this.storage.get('accounts');
@@ -136,22 +136,22 @@ export class Multiagent {
 			return Promise.reject(new MultiagentError(`Invalid account`));
 		}
 
-		return (this.agents[did] = new Promise((resolve, reject) => {
-			const agent = this._createAgent(data.service);
+		return (this.#agents[did] = new Promise((resolve, reject) => {
+			const agent = this.#createAgent(data.service);
 
 			agent.resumeSession(data.session).then(
 				() => {
 					resolve(agent);
 				},
 				(err) => {
-					delete this.agents[did];
+					delete this.#agents[did];
 					reject(new MultiagentError(`Failed to resume session`, { cause: err }));
 				},
 			);
 		}));
 	}
 
-	private _createAgent(serviceUri: string) {
+	#createAgent(serviceUri: string) {
 		const agent = new Agent({
 			service: serviceUri,
 			persistSession: (type, session) => {

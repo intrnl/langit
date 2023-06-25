@@ -5,27 +5,27 @@ import { Signal, signal } from '~/utils/signals.ts';
 export type StorageType = Record<string, any>;
 
 export class ReactiveStorage<T extends StorageType> extends Signal<T> {
-	private _keys: Record<keyof T, Signal<any>> = Object.create(null);
+	#keys: Record<keyof T, Signal<any>> = Object.create(null);
 
 	constructor(value?: T) {
 		super(value || ({} as T));
 	}
 
-	private _key(key: keyof T) {
-		return (this._keys[key] ||= signal(this.peek()[key]));
+	#key(key: keyof T) {
+		return (this.#keys[key] ||= signal(this.peek()[key]));
 	}
 
 	set<K extends keyof T>(key: K, value: T[K]) {
 		const next = { ...this.peek(), [key]: value };
 
 		batch(() => {
-			this._key(key).value = value;
+			this.#key(key).value = value;
 			this.value = next;
 		});
 	}
 
 	get<K extends keyof T>(key: K): T[K] {
-		return this._key(key).value;
+		return this.#key(key).value;
 	}
 
 	merge<K extends keyof T>(
@@ -40,7 +40,7 @@ export class ReactiveStorage<T extends StorageType> extends Signal<T> {
 
 	clear() {
 		this.value = null as any;
-		this._keys = Object.create(null);
+		this.#keys = Object.create(null);
 	}
 }
 

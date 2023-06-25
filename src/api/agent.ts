@@ -39,26 +39,26 @@ export interface AgentOptions {
 }
 
 export class Agent {
-	public service: URL;
-	public rpc: XRPC;
+	service: URL;
+	rpc: XRPC;
 
-	public session: Signal<AtpSessionData | undefined>;
+	session: Signal<AtpSessionData | undefined>;
 
-	private _persistSession?: PersistSessionHandler;
-	private _refreshSessionPromise?: Promise<void>;
+	#persistSession?: PersistSessionHandler;
+	#refreshSessionPromise?: Promise<void>;
 
 	constructor(options: AgentOptions) {
 		this.service = new URL(options.service);
-		this._persistSession = options.persistSession;
+		this.#persistSession = options.persistSession;
 
 		this.session = signal<AtpSessionData | undefined>(undefined);
 
 		// monkeypatch the fetch handler to add authorization and expired token handling
 		this.rpc = new XRPC(this.service);
-		this.rpc.fetch = this._fetch.bind(this);
+		this.rpc.fetch = this.#fetch.bind(this);
 	}
 
-	public async login(options: AtpLoginOptions) {
+	async login(options: AtpLoginOptions) {
 		this.session.value = undefined;
 
 		const res = await this.rpc.post({
@@ -80,7 +80,7 @@ export class Agent {
 		return res;
 	}
 
-	public async resumeSession(session: AtpSessionData) {
+	async resumeSession(session: AtpSessionData) {
 		const now = Date.now() / 1000 + 60 * 5;
 
 		const refreshToken = decodeJwt(session.refreshJwt) as AtpRefreshJwt;
@@ -93,7 +93,7 @@ export class Agent {
 		this.session.value = session;
 
 		if (now >= accessToken.exp) {
-			await this._refreshSession();
+			await this.#refreshSession();
 		}
 
 		if (!this.session.peek()) {
@@ -101,29 +101,29 @@ export class Agent {
 		}
 	}
 
-	private async _fetch(
+	async #fetch(
 		httpUri: string,
 		httpMethod: string,
 		httpHeaders: Headers,
 		httpReqBody: unknown,
 	): Promise<FetchHandlerResponse> {
-		await this._refreshSessionPromise;
+		await this.#refreshSessionPromise;
 
 		const session = this.session.peek();
-		let res = await fetchHandler(httpUri, httpMethod, this._addAuthHeader(httpHeaders), httpReqBody);
+		let res = await fetchHandler(httpUri, httpMethod, this.#addAuthHeader(httpHeaders), httpReqBody);
 
 		if (isErrorResponse(res.body, ['ExpiredToken']) && session?.refreshJwt) {
 			// refresh session
-			await this._refreshSession();
+			await this.#refreshSession();
 
 			// retry fetch
-			res = await fetchHandler(httpUri, httpMethod, this._addAuthHeader(httpHeaders), httpReqBody);
+			res = await fetchHandler(httpUri, httpMethod, this.#addAuthHeader(httpHeaders), httpReqBody);
 		}
 
 		return res;
 	}
 
-	private _addAuthHeader(httpHeaders: Headers) {
+	#addAuthHeader(httpHeaders: Headers) {
 		const session = this.session.peek();
 
 		if (!httpHeaders['authorization'] && session) {
@@ -136,21 +136,21 @@ export class Agent {
 		return httpHeaders;
 	}
 
-	private async _refreshSession() {
-		if (this._refreshSessionPromise) {
-			return this._refreshSessionPromise;
+	async #refreshSession() {
+		if (this.#refreshSessionPromise) {
+			return this.#refreshSessionPromise;
 		}
 
-		this._refreshSessionPromise = this._refreshSessionInner();
+		this.#refreshSessionPromise = this.#refreshSessionInner();
 
 		try {
-			await this._refreshSessionPromise;
+			await this.#refreshSessionPromise;
 		} finally {
-			this._refreshSessionPromise = undefined;
+			this.#refreshSessionPromise = undefined;
 		}
 	}
 
-	private async _refreshSessionInner() {
+	async #refreshSessionInner() {
 		const session = this.session.peek();
 
 		if (!session || !session.refreshJwt) {
@@ -176,7 +176,7 @@ export class Agent {
 		if (isErrorResponse(res.body, ['ExpiredToken', 'InvalidToken'])) {
 			// failed due to a bad refresh token
 			this.session.value = undefined;
-			this._persistSession?.('expired', undefined);
+			this.#persistSession?.('expired', undefined);
 		} else if (httpResponseCodeToEnum(res.status) === ResponseType.Success) {
 			// succeeded, update the session
 			this.session.value = {
@@ -186,7 +186,7 @@ export class Agent {
 				did: res.body.did,
 			};
 
-			this._persistSession?.('update', this.session.peek());
+			this.#persistSession?.('update', this.session.peek());
 		}
 	}
 }

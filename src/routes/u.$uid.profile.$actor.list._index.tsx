@@ -16,7 +16,7 @@ const AuthenticatedProfileListsPage = () => {
 	const uid = () => params.uid as DID;
 
 	const [lists, { refetch }] = createQuery({
-		key: () => getProfileListsKey(uid(), uid(), PAGE_SIZE),
+		key: () => getProfileListsKey(uid(), params.actor, PAGE_SIZE),
 		fetch: getProfileLists,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,

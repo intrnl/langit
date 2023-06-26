@@ -69,12 +69,12 @@ const countPosts = (slices: TimelineSlice[], limit?: number) => {
 	let len = slices.length;
 
 	for (; idx < len; idx++) {
+		const slice = slices[idx];
+		count += slice.items.length;
+
 		if (limit !== undefined && count > limit) {
 			return idx;
 		}
-
-		const slice = slices[idx];
-		count += slice.items.length;
 	}
 
 	if (limit !== undefined) {
@@ -151,7 +151,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 	}
 
 	// we're still slicing by the amount of slices and not amount of posts
-	const remainingSlices = slices.splice(countPosts(slices, limit), slices.length);
+	const remainingSlices = slices.splice(countPosts(slices, limit) + 1, slices.length);
 
 	const page: FeedPage = {
 		cursor,

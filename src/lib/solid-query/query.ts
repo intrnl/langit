@@ -23,7 +23,7 @@ class QueryResult<Data> {
 	public _promise: Signal<Promise<Data>>;
 	public _refetchParam: Signal<unknown> = signal<unknown>(undefined);
 
-	public _triggers: (() => void)[] = [];
+	public _count = 0;
 	public _timeout?: any;
 
 	constructor(public value?: Data, public updatedAt = -1) {
@@ -147,9 +147,7 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 			cache!.set(hash, query);
 		}
 
-		const triggers = query._triggers;
-
-		const [read, { refetch: trigger }] = createResource<Data, Promise<Data>>(
+		const [read] = createResource<Data, Promise<Data>>(
 			() => query!._promise.value,
 			($promise) => $promise,
 			query!.value !== undefined ? { initialValue: query!.value } : {},
@@ -203,7 +201,7 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 		};
 
 		clearTimeout(query._timeout);
-		triggers.push(trigger);
+		query._count++;
 
 		if (refetchOnMount || query!._fresh) {
 			refetch();
@@ -220,10 +218,7 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 		}
 
 		onCleanup(() => {
-			const index = triggers.indexOf(trigger);
-			triggers.splice(index, 1);
-
-			if (triggers.length < 1) {
+			if (--query!._count < 1) {
 				query!._timeout = setTimeout(() => cache!.delete(hash), cacheTime!);
 			}
 		});

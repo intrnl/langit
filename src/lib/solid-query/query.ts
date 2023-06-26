@@ -41,11 +41,14 @@ export type QueryFn<Data, Key extends QueryKey = QueryKey, Param = unknown> = (
 	info: QueryInfo<Data, Param>,
 ) => Data | Promise<Data>;
 
+export type QueryDataReplacer<Data> = (prev: Data | undefined, next: Data) => Data;
+
 export interface QueryContextOptions<Data = unknown, Key extends QueryKey = QueryKey, Info = unknown> {
 	fetch?: QueryFn<Data, Key, Info>;
 	cache?: Map<string, QueryResult<Data>>;
 	staleTime?: number;
 	cacheTime?: number;
+	replaceData?: QueryDataReplacer<Data>;
 	refetchOnMount?: boolean;
 	refetchOnWindowFocus?: boolean;
 	refetchOnReconnect?: boolean;
@@ -79,6 +82,7 @@ export const defaultQueryOptions: QueryContextOptions = {
 	cache: new Map(),
 	staleTime: 3 * 1_000, // 3 seconds
 	cacheTime: 5 * 60 * 1_000, // 5 minutes
+	replaceData: (prev, next) => (prev === next ? prev : next),
 	refetchOnMount: true,
 	refetchOnWindowFocus: true,
 	refetchOnReconnect: true,
@@ -101,6 +105,7 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 
 		staleTime,
 		cacheTime,
+		replaceData,
 		refetchOnMount,
 		refetchOnWindowFocus,
 		refetchOnReconnect,
@@ -159,18 +164,21 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 					let same = false;
 
 					try {
-						const result = await fetch!(key, { data: query!.value, param: info });
+						const prev = query!.value;
+						const next = await fetch!(key, { data: prev, param: info });
 
-						if (result === undefined) {
+						if (next === undefined) {
 							assert(false, `query function must not return undefined`);
 						}
 
+						const replaced = replaceData!(prev, next);
+
 						if ((same = query?._promise.peek() === promise!)) {
-							query!.value = result;
+							query!.value = replaced;
 							query!.updatedAt = Date.now();
 						}
 
-						return result;
+						return replaced;
 					} catch (err) {
 						if ((same = query?._promise.peek() === promise!)) {
 							query._fresh = true;

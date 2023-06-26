@@ -3,6 +3,8 @@ import { render } from 'solid-js/web';
 
 import { Router, useRoutes } from '@solidjs/router';
 
+import { defaultQueryOptions, replaceEqualDeep } from './lib/solid-query/index.ts';
+
 import { type LocalSettings, preferences } from '~/globals/preferences.ts';
 import routes from '~/router-routes.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
@@ -24,6 +26,8 @@ const App = () => {
 		</Router>
 	);
 };
+
+defaultQueryOptions.replaceData = replaceEqualDeep;
 
 createRoot(() => {
 	createRenderEffect((prev: LocalSettings['theme']) => {

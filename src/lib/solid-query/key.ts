@@ -1,13 +1,6 @@
+import { isPlainObject } from './utils.ts';
+
 export type QueryKey = readonly unknown[];
-
-const isPlainObject = (value: any): value is Object => {
-	if (typeof value !== 'object' || value === null) {
-		return false;
-	}
-
-	var prototype = Object.getPrototypeOf(value);
-	return prototype === null || prototype === Object.prototype;
-};
 
 const queryKeyReplacer = (_key: any, value: any) => {
 	if (isPlainObject(value)) {

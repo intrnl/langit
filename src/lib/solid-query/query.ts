@@ -5,6 +5,7 @@ import {
 	createMemo,
 	createResource,
 	onCleanup,
+	startTransition,
 	useContext,
 } from 'solid-js';
 
@@ -215,16 +216,16 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 		query._count++;
 
 		if (refetchOnMount || query!._fresh) {
-			refetch();
+			queueMicrotask(() => startTransition(refetch));
 		}
 		if (refetchOnWindowFocus) {
-			makeEventListener(document, 'visibilitychange', () => document.hidden || refetch());
+			makeEventListener(document, 'visibilitychange', () => document.hidden || startTransition(refetch));
 		}
 		if (refetchOnReconnect) {
-			makeEventListener(window, 'online', () => refetch());
+			makeEventListener(window, 'online', () => startTransition(refetch));
 		}
 		if (refetchInterval !== undefined) {
-			const interval = setInterval(() => refetch(), refetchInterval);
+			const interval = setInterval(() => startTransition(refetch), refetchInterval);
 			onCleanup(() => clearInterval(interval));
 		}
 

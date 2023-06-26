@@ -196,8 +196,11 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 		};
 
 		const mutate = (data: Data) => {
-			query!._promise.value = Promise.resolve(data);
-			query!.updatedAt = Date.now();
+			return batch(() => {
+				query!._promise.value = Promise.resolve(data);
+				query!._refetchParam.value = undefined;
+				query!.updatedAt = Date.now();
+			});
 		};
 
 		clearTimeout(query._timeout);

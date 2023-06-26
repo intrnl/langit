@@ -1,3 +1,5 @@
+const isArray = Array.isArray;
+
 export const noop = () => {};
 
 export const isPlainObject = (value: any): value is Object => {
@@ -9,14 +11,16 @@ export const isPlainObject = (value: any): value is Object => {
 	return prototype === null || prototype === Object.prototype;
 };
 
-const isArray = Array.isArray;
+const isPlainArray = (value: any) => {
+	return isArray(value) && value.length === Object.keys(value).length;
+};
 
 export const replaceEqualDeep = (a: any, b: any): any => {
 	if (a === b) {
 		return a;
 	}
 
-	const array = isArray(a) && isArray(b);
+	const array = isPlainArray(a) && isPlainArray(b);
 
 	if (array || (isPlainObject(a) && isPlainObject(b))) {
 		const aSize = array ? a.length : Object.keys(a).length;
@@ -28,8 +32,10 @@ export const replaceEqualDeep = (a: any, b: any): any => {
 
 		for (let i = 0; i < bSize; i++) {
 			const key = array ? i : bItems[i];
+			// @ts-expect-error
 			copy[key] = replaceEqualDeep(a[key], b[key]);
 
+			// @ts-expect-error
 			if (copy[key] === a[key]) {
 				equalItems++;
 			}

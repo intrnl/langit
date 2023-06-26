@@ -81,11 +81,11 @@ export const createMutation = <D, V, C = void>(options: MutationOptions<D, V, C>
 
 	const mutateAsync = async (variables: V) => {
 		const id = ++uid;
-		const retries = options.retry ?? 0;
+		const retries = options.retry ?? 3;
 
 		let context = undefined as C;
 
-		setState(MutationState.IDLE);
+		setState(MutationState.LOADING);
 
 		try {
 			context = (await options.onMutate?.(variables)) as C;
@@ -105,7 +105,7 @@ export const createMutation = <D, V, C = void>(options: MutationOptions<D, V, C>
 					errored = true;
 					value = err;
 				}
-			} while (attempt > retries);
+			} while (attempt < retries + 1);
 
 			if (errored) {
 				throw value;
@@ -116,7 +116,7 @@ export const createMutation = <D, V, C = void>(options: MutationOptions<D, V, C>
 
 			if (uid === id) {
 				batch(() => {
-					setState(MutationState.LOADING);
+					setState(MutationState.SUCCESS);
 					setValue(value);
 				});
 			}

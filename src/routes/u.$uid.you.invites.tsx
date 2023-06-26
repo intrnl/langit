@@ -1,6 +1,6 @@
 import { For, Match, Switch, createMemo } from 'solid-js';
 
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID } from '~/api/utils.ts';
 
@@ -16,9 +16,9 @@ const AuthenticatedInviteCodesPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const inviteQuery = createQuery({
-		queryKey: () => getInviteCodesKey(uid()),
-		queryFn: getInviteCodes,
+	const [invites] = createQuery({
+		key: () => getInviteCodesKey(uid()),
+		fetch: getInviteCodes,
 		staleTime: 5_000,
 	});
 
@@ -29,13 +29,7 @@ const AuthenticatedInviteCodesPage = () => {
 			</div>
 
 			<Switch>
-				<Match when={inviteQuery.isLoading}>
-					<div class="flex h-13 items-center justify-center">
-						<CircularProgress />
-					</div>
-				</Match>
-
-				<Match when={inviteQuery.data}>
+				<Match when={invites()}>
 					{(data) => {
 						const codes = () => data().codes;
 
@@ -101,6 +95,12 @@ const AuthenticatedInviteCodesPage = () => {
 							</div>
 						);
 					}}
+				</Match>
+
+				<Match when>
+					<div class="flex h-13 items-center justify-center">
+						<CircularProgress />
+					</div>
 				</Match>
 			</Switch>
 		</div>

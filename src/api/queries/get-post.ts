@@ -1,10 +1,10 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type InitialDataFn, type QueryFn } from '~/lib/solid-query/index.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 import { BSKY_POST_URL_RE, isAppUrl } from '~/utils/link.ts';
 
-import { mergeSignalizedPost } from '../cache/posts.ts';
+import { type SignalizedPost, mergeSignalizedPost, posts } from '../cache/posts.ts';
 import { type BskyGetPostsResponse, type BskyPost } from '../types.ts';
 import { type DID } from '../utils.ts';
 
@@ -36,8 +36,8 @@ export const fetchPost = createBatchedFetch<Query, string, BskyPost>({
 });
 
 export const getPostKey = (uid: DID, uri: string) => ['getPost', uid, uri] as const;
-export const getPost = async (ctx: QueryFunctionContext<ReturnType<typeof getPostKey>>) => {
-	const [, uid, uri] = ctx.queryKey;
+export const getPost: QueryFn<SignalizedPost, ReturnType<typeof getPostKey>> = async (key) => {
+	const [, uid, uri] = key;
 
 	const bskyMatch = isAppUrl(uri) && BSKY_POST_URL_RE.exec(uri);
 
@@ -45,7 +45,7 @@ export const getPost = async (ctx: QueryFunctionContext<ReturnType<typeof getPos
 	if (bskyMatch) {
 		const agent = await multiagent.connect(uid);
 
-		const repo = await _getDid(agent, bskyMatch[1], ctx.signal);
+		const repo = await _getDid(agent, bskyMatch[1]);
 		const record = bskyMatch[2];
 
 		resolvedUri = `at://${repo}/app.bsky.feed.post/${record}`;
@@ -54,4 +54,13 @@ export const getPost = async (ctx: QueryFunctionContext<ReturnType<typeof getPos
 	const post = await fetchPost([uid, resolvedUri]);
 
 	return mergeSignalizedPost(post);
+};
+
+export const getInitialPost: InitialDataFn<SignalizedPost, ReturnType<typeof getPostKey>> = (key) => {
+	const [, , uri] = key;
+
+	const ref = posts[uri];
+	const post = ref?.deref();
+
+	return post && { data: post };
 };

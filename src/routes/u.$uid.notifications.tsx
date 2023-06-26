@@ -1,9 +1,8 @@
-import { For, Match, Switch, createSignal } from 'solid-js';
+import { For, Match, Switch, createEffect } from 'solid-js';
 
-import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
+import { createMutation, createQuery } from '~/lib/solid-query/index.ts';
 
-import { type NotificationsPage } from '~/api/models/notifications.ts';
-import { type DID } from '~/api/utils.ts';
+import { type DID, getCollectionCursor } from '~/api/utils.ts';
 
 import { updateNotificationsSeen } from '~/api/mutations/update-notifications-seen.ts';
 import {
@@ -27,53 +26,22 @@ const AuthenticatedNotificationsPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const [dispatching, setDispatching] = createSignal(false);
-
-	const client = useQueryClient();
-
-	const notificationsQuery = createInfiniteQuery({
-		queryKey: () => getNotificationsKey(uid(), PAGE_SIZE),
-		queryFn: getNotifications,
-		getNextPageParam: (last) => last.cursor,
+	const [notifications, { refetch }] = createQuery({
+		key: () => getNotificationsKey(uid(), PAGE_SIZE),
+		fetch: getNotifications,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
-		onSuccess: (data) => {
-			const pages = data.pages;
-			const length = pages.length;
-
-			// if the page size is 1, that means we've just went through an initial
-			// fetch, or a refetch, since our refetch process involves truncating the
-			// timeline first.
-			if (length === 1) {
-				const page = pages[0];
-
-				client.setQueryData(getNotificationsLatestKey(uid()), {
-					cid: page.cid,
-					read: page.slices[0]?.read ?? true,
-				});
-			}
-
-			// check if the last page is empty because of its slices being filtered
-			// away, if so, fetch next page
-			if (length > 0) {
-				const last = pages[length - 1];
-
-				if (last.cid && last.slices.length === 0) {
-					notificationsQuery.fetchNextPage();
-				}
-			}
-		},
 	});
 
-	const latestQuery = createQuery({
-		queryKey: () => getNotificationsLatestKey(uid()),
-		queryFn: getNotificationsLatest,
+	const [latest, { mutate }] = createQuery({
+		key: () => getNotificationsLatestKey(uid()),
+		fetch: getNotificationsLatest,
 		staleTime: 10_000,
-		get enabled() {
-			const data = notificationsQuery.data;
+		enabled: () => {
+			const $notifications = notifications();
 
-			if (!data || data.pages.length < 1 || !data.pages[0].cid) {
+			if (!$notifications || $notifications.pages.length < 1 || !$notifications.pages[0].cid) {
 				return false;
 			}
 
@@ -81,52 +49,36 @@ const AuthenticatedNotificationsPage = () => {
 		},
 	});
 
-	const getLatestCid = () => {
-		return notificationsQuery.data?.pages[0].cid;
-	};
+	const read = createMutation({
+		mutate: async () => {
+			const date = notifications()?.pages[0]?.date;
 
-	const onRefetch = () => {
-		// we want to truncate the notifications here so that the refetch doesn't
-		// also refetching however many pages of notifications that the user has
-		// gone through.
-
-		// this is the only way we can do that in tanstack query
-
-		// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
-		// but unfortunately that breaks the `hasNextPage` check down below
-		// and would also mean the user gets to see nothing for a bit.
-		client.setQueryData(getNotificationsKey(uid(), PAGE_SIZE), (prev?: InfiniteData<NotificationsPage>) => {
-			if (prev) {
-				return {
-					pages: prev.pages.slice(0, 1),
-					pageParams: prev.pageParams.slice(0, 1),
-				};
+			if (!date) {
+				return;
 			}
 
-			return;
-		});
-
-		notificationsQuery.refetch();
-	};
-
-	const onMarkAsRead = async () => {
-		// Only mark read up to the last notifications we've seen, it's possible that
-		// new notifications might have arrived and we haven't refreshed yet.
-		const date = notificationsQuery.data?.pages[0]?.date;
-
-		if (dispatching() || !date) {
-			return;
-		}
-
-		setDispatching(true);
-
-		try {
 			await updateNotificationsSeen(uid(), new Date(date));
+		},
+		onSuccess: () => refetch(true),
+	});
 
-			onRefetch();
-		} finally {
-			setDispatching(false);
+	createEffect(() => {
+		const $notifications = notifications();
+
+		if ($notifications) {
+			const pages = $notifications.pages;
+
+			if (pages.length === 1) {
+				const page = pages[0];
+				const slice = page.slices[0];
+
+				mutate({ cid: page.cid, read: slice?.read ?? true });
+			}
 		}
+	});
+
+	const getLatestCid = () => {
+		return notifications()?.pages[0].cid;
 	};
 
 	return (
@@ -135,8 +87,8 @@ const AuthenticatedNotificationsPage = () => {
 				<p class="text-base font-bold">Notifications</p>
 
 				<button
-					disabled={dispatching() || notificationsQuery.isInitialLoading || notificationsQuery.isRefetching}
-					onClick={onMarkAsRead}
+					disabled={read.isLoading || notifications.loading}
+					onClick={() => read.mutate(null)}
 					class={/* @once */ button({ color: 'outline', size: 'xs' })}
 				>
 					Mark as read
@@ -144,18 +96,18 @@ const AuthenticatedNotificationsPage = () => {
 			</div>
 
 			<Switch>
-				<Match when={notificationsQuery.isInitialLoading || notificationsQuery.isRefetching}>
+				<Match when={notifications.loading && !notifications.refetchParam}>
 					<div
 						class="flex h-13 items-center justify-center border-divider"
-						classList={{ 'border-b': notificationsQuery.isRefetching }}
+						classList={{ 'border-b': !!notifications() }}
 					>
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={latestQuery.data && latestQuery.data.cid !== getLatestCid()}>
+				<Match when={latest() && latest()!.cid !== getLatestCid()}>
 					<button
-						onClick={onRefetch}
+						onClick={() => refetch(true)}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"
 					>
 						Show new notifications
@@ -164,7 +116,7 @@ const AuthenticatedNotificationsPage = () => {
 			</Switch>
 
 			<div>
-				<For each={notificationsQuery.data ? notificationsQuery.data.pages : []}>
+				<For each={notifications()?.pages}>
 					{(page) =>
 						page.slices.map((slice) => {
 							return (
@@ -178,20 +130,28 @@ const AuthenticatedNotificationsPage = () => {
 			</div>
 
 			<Switch>
-				<Match when={notificationsQuery.isFetchingNextPage}>
+				<Match when={notifications.loading && notifications.refetchParam}>
 					<div class="flex h-13 items-center justify-center">
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={notificationsQuery.hasNextPage}>
-					<button
-						onClick={() => notificationsQuery.fetchNextPage()}
-						disabled={notificationsQuery.isRefetching}
-						class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
-					>
-						Show more notifications
-					</button>
+				<Match when={getCollectionCursor(notifications(), 'cursor')}>
+					{(cursor) => (
+						<button
+							onClick={() => refetch(true, cursor())}
+							disabled={notifications.loading}
+							class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
+						>
+							Show more notifications
+						</button>
+					)}
+				</Match>
+
+				<Match when={!notifications.loading}>
+					<div class="flex h-13 items-center justify-center">
+						<p class="text-sm text-muted-fg">End of list</p>
+					</div>
 				</Match>
 			</Switch>
 		</div>

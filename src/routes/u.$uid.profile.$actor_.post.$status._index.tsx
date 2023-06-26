@@ -1,7 +1,8 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
 import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
-import { createQuery } from '@tanstack/solid-query';
+
+import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
@@ -9,17 +10,17 @@ import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
-import { A, useParams } from '~/router.ts';
 import { openModal } from '~/globals/modals.tsx';
+import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
-import PostMenu from '~/components/menus/PostMenu.tsx';
-import PostRepostMenu from '~/components/menus/PostRepostMenu.tsx';
-import PostShareMenu from '~/components/menus/PostShareMenu.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
 import EmbedRecordBlocked from '~/components/EmbedRecordBlocked.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
+import PostMenu from '~/components/menus/PostMenu.tsx';
+import PostRepostMenu from '~/components/menus/PostRepostMenu.tsx';
+import PostShareMenu from '~/components/menus/PostShareMenu.tsx';
 import Post from '~/components/Post.tsx';
 import PostTranslation from '~/components/PostTranslation.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
@@ -52,9 +53,9 @@ const AuthenticatedPostPage = () => {
 	const actor = () => params.actor;
 	const status = () => params.status;
 
-	const threadQuery = createQuery({
-		queryKey: () => getPostThreadKey(uid(), actor(), status(), MAX_DESCENDANTS + 1, MAX_ANCESTORS + 1),
-		queryFn: getPostThread,
+	const [thread, { refetch }] = createQuery({
+		key: () => getPostThreadKey(uid(), actor(), status(), MAX_DESCENDANTS + 1, MAX_ANCESTORS + 1),
+		fetch: getPostThread,
 		staleTime: 60_000,
 		refetchOnMount: true,
 		refetchOnReconnect: false,
@@ -63,10 +64,10 @@ const AuthenticatedPostPage = () => {
 
 	const focusRef = (node: HTMLDivElement) => {
 		requestAnimationFrame(() => {
-			const data = threadQuery.data;
+			const $thread = thread();
 			const key = location.key;
 
-			if (data && key && !seen.has(key)) {
+			if ($thread && key && !seen.has(key)) {
 				seen.add(key);
 				node.scrollIntoView();
 			}
@@ -80,13 +81,7 @@ const AuthenticatedPostPage = () => {
 			</div>
 
 			<Switch>
-				<Match when={threadQuery.isLoading}>
-					<div class="flex h-13 items-center justify-center">
-						<CircularProgress />
-					</div>
-				</Match>
-
-				<Match when={threadQuery.error} keyed>
+				<Match when={thread.error} keyed>
 					{(error) => (
 						<Switch
 							fallback={
@@ -96,12 +91,7 @@ const AuthenticatedPostPage = () => {
 										<p class="text-muted-fg">{'' + error}</p>
 									</div>
 
-									<button
-										onClick={() => {
-											threadQuery.refetch();
-										}}
-										class={/* @once */ button({ color: 'primary' })}
-									>
+									<button onClick={() => refetch(true)} class={/* @once */ button({ color: 'primary' })}>
 										Try again
 									</button>
 								</div>
@@ -133,7 +123,7 @@ const AuthenticatedPostPage = () => {
 					)}
 				</Match>
 
-				<Match when={threadQuery.data} keyed>
+				<Match when={thread()} keyed>
 					{(data) => {
 						const post = data.post;
 
@@ -407,6 +397,12 @@ const AuthenticatedPostPage = () => {
 							</>
 						);
 					}}
+				</Match>
+
+				<Match when>
+					<div class="flex h-13 items-center justify-center">
+						<CircularProgress />
+					</div>
 				</Match>
 			</Switch>
 		</div>

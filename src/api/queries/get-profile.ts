@@ -1,19 +1,18 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type InitialDataFn, type QueryFn } from '~/lib/solid-query/index.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 
-import { mergeSignalizedProfile } from '../cache/profiles.ts';
+import { type SignalizedProfile, mergeSignalizedProfile, profiles } from '../cache/profiles.ts';
 import { type BskyProfile } from '../types.ts';
-import { type DID } from '../utils.ts';
+import { type DID, isDid } from '../utils.ts';
 
 export const getProfileKey = (uid: DID, actor: string) => ['getProfile', uid, actor] as const;
-export const getProfile = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileKey>>) => {
-	const [, uid, actor] = ctx.queryKey;
+export const getProfile: QueryFn<SignalizedProfile, ReturnType<typeof getProfileKey>> = async (key) => {
+	const [, uid, actor] = key;
 	const agent = await multiagent.connect(uid);
 
 	const response = await agent.rpc.get({
 		method: 'app.bsky.actor.getProfile',
-		signal: ctx.signal,
 		params: { actor },
 	});
 
@@ -37,4 +36,17 @@ export const getProfile = async (ctx: QueryFunctionContext<ReturnType<typeof get
 	}
 
 	return profile;
+};
+
+export const getInitialProfile: InitialDataFn<SignalizedProfile, ReturnType<typeof getProfileKey>> = (
+	key,
+) => {
+	const [, , actor] = key;
+
+	if (isDid(actor)) {
+		const ref = profiles[actor];
+		const profile = ref?.deref();
+
+		return profile && { data: profile };
+	}
 };

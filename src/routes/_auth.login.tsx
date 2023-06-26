@@ -1,7 +1,8 @@
 import { Show, createSignal } from 'solid-js';
 
-import { useSearchParams, useNavigate } from '@solidjs/router';
-import { createMutation, createQuery } from '@tanstack/solid-query';
+import { useNavigate, useSearchParams } from '@solidjs/router';
+
+import { createMutation, createQuery } from '~/lib/solid-query/index.ts';
 
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 import { XRPC } from '~/api/rpc/xrpc.ts';
@@ -10,7 +11,7 @@ import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { model } from '~/utils/misc.ts';
 
-import AppPasswordNoticeDialog from '~/components/dialogs/AppPasswordNoticeDialog';
+import AppPasswordNoticeDialog from '~/components/dialogs/AppPasswordNoticeDialog.tsx';
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input.ts';
 
@@ -25,22 +26,21 @@ const AuthLoginPage = () => {
 	const [identifier, setIdentifier] = createSignal('');
 	const [password, setPassword] = createSignal('');
 
-	const describeQuery = createQuery(
-		() => ['describeServer', service().url],
-		async (query) => {
+	const [description] = createQuery({
+		key: () => ['describeServer', service().url] as const,
+		fetch: async () => {
 			const rpc = new XRPC(service().url);
 
 			const res = await rpc.get({
 				method: 'com.atproto.server.describeServer',
-				signal: query.signal,
 			});
 
 			return res.data;
 		},
-	);
+	});
 
 	const loginMutation = createMutation({
-		mutationFn: () => {
+		mutate: () => {
 			const $url = service().url;
 			const $identifier = identifier();
 			const $password = password();
@@ -66,7 +66,7 @@ const AuthLoginPage = () => {
 			return;
 		}
 
-		loginMutation.mutate();
+		loginMutation.mutate(null);
 	};
 
 	return (
@@ -129,7 +129,7 @@ const AuthLoginPage = () => {
 					)}
 				</Show>
 
-				<Show when={describeQuery.data}>
+				<Show when={description()}>
 					{(data) => (
 						<p class="text-sm leading-6 text-muted-fg">
 							By continuing, you agree to the service's{' '}
@@ -147,7 +147,7 @@ const AuthLoginPage = () => {
 
 				<div>
 					<button
-						disabled={loginMutation.isLoading || describeQuery.isLoading}
+						disabled={loginMutation.isLoading || description.loading}
 						type="submit"
 						class={/* @once */ button({ color: 'primary' })}
 					>

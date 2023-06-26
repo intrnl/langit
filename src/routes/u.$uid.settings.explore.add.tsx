@@ -1,7 +1,8 @@
 import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
-import { createQuery } from '@tanstack/solid-query';
+
+import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -27,14 +28,14 @@ const AuthenticatedAddFeedPage = () => {
 	const [search, setSearch] = createSignal('');
 	const debouncedSearch = useDebouncedValue(search, 150);
 
-	const feedQuery = createQuery({
-		queryKey: () => getPopularFeedGeneratorsKey(uid()),
-		queryFn: getPopularFeedGenerators,
+	const [feeds] = createQuery({
+		key: () => getPopularFeedGeneratorsKey(uid()),
+		fetch: getPopularFeedGenerators,
 		staleTime: 120_000,
 	});
 
 	const list = createMemo(() => {
-		const data = feedQuery.data;
+		const data = feeds();
 		const text = debouncedSearch();
 
 		if (!data) {
@@ -144,15 +145,15 @@ const AuthenticatedAddFeedPage = () => {
 			</For>
 
 			<Switch>
-				<Match when={feedQuery.isLoading}>
-					<div class="flex h-13 items-center justify-center border-divider">
-						<CircularProgress />
+				<Match when={feeds()}>
+					<div class="flex h-13 items-center justify-center">
+						<p class="text-sm text-muted-fg">End of list</p>
 					</div>
 				</Match>
 
-				<Match when={feedQuery.data}>
-					<div class="flex h-13 items-center justify-center">
-						<p class="text-sm text-muted-fg">End of list</p>
+				<Match when>
+					<div class="flex h-13 items-center justify-center border-divider">
+						<CircularProgress />
 					</div>
 				</Match>
 			</Switch>

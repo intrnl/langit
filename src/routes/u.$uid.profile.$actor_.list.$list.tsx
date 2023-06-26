@@ -1,22 +1,22 @@
 import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
-import { createInfiniteQuery } from '@tanstack/solid-query';
 
-import { type DID } from '~/api/utils.ts';
+import { createQuery } from '~/lib/solid-query/index.ts';
+
+import { type DID, getCollectionCursor } from '~/api/utils.ts';
 
 import { getList, getListKey } from '~/api/queries/get-list.ts';
 
-import { useParams } from '~/router.ts';
 import { openModal } from '~/globals/modals.tsx';
+import { useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
-import SubscribeListConfirmDialog from '~/components/dialogs/SubscribeListConfirmDialog.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
+import SubscribeListConfirmDialog from '~/components/dialogs/SubscribeListConfirmDialog.tsx';
 
-import PlaylistAddIcon from '~/icons/baseline-playlist-add.tsx';
 import PlaylistAddCheckIcon from '~/icons/baseline-playlist-add-check.tsx';
-import SettingsIcon from '~/icons/baseline-settings';
+import PlaylistAddIcon from '~/icons/baseline-playlist-add.tsx';
 
 const PAGE_SIZE = 30;
 
@@ -26,16 +26,14 @@ const AuthenticatedListPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const listQuery = createInfiniteQuery({
-		queryKey: () => getListKey(uid(), params.actor, params.list, PAGE_SIZE),
-		queryFn: getList,
-		getNextPageParam: (last) => last.cursor,
-		refetchOnWindowFocus: false,
-		refetchOnReconnect: false,
+	const [listing, { refetch }] = createQuery({
+		key: () => getListKey(uid(), params.actor, params.list, PAGE_SIZE),
+		fetch: getList,
+		refetchOnMount: false,
 	});
 
 	const list = createMemo(() => {
-		return listQuery.data?.pages[0].list;
+		return listing()?.pages[0].list;
 	});
 
 	const isSubscribed = () => list()?.viewer.muted.value;
@@ -96,7 +94,7 @@ const AuthenticatedListPage = () => {
 				}}
 			</Show>
 
-			<For each={listQuery.data?.pages}>
+			<For each={listing()?.pages}>
 				{(page) => {
 					return page.items.map((item) => {
 						const profile = item.subject;
@@ -151,23 +149,24 @@ const AuthenticatedListPage = () => {
 			</For>
 
 			<Switch>
-				<Match when={listQuery.isFetching}>
+				<Match when={listing.loading}>
 					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={listQuery.hasNextPage}>
-					<button
-						onClick={() => listQuery.fetchNextPage()}
-						disabled={listQuery.isRefetching}
-						class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
-					>
-						Show more
-					</button>
+				<Match when={getCollectionCursor(listing(), 'cursor')}>
+					{(cursor) => (
+						<button
+							onClick={() => refetch(true, cursor())}
+							class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
+						>
+							Show more
+						</button>
+					)}
 				</Match>
 
-				<Match when={listQuery.data}>
+				<Match when={!!listing()}>
 					<div class="flex h-13 items-center justify-center">
 						<p class="text-sm text-muted-fg">End of list</p>
 					</div>

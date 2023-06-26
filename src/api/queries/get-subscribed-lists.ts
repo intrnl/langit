@@ -1,33 +1,71 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type EnhancedResource, type QueryFn } from '~/lib/solid-query/index.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 
-import { mergeSignalizedList } from '../cache/lists.ts';
-import { type ListsPage } from '../models/list.ts';
+import { type SignalizedList, mergeSignalizedList } from '../cache/lists.ts';
+import { type SubscribedListsPage } from '../models/list.ts';
 
 import { type BskyGetListsResponse } from '../types.ts';
-import { type DID } from '../utils.ts';
+import { type Collection, type DID, pushCollection } from '../utils.ts';
 
-export const getSubscribedListsKey = (uid: DID, limit: number, filter: boolean) =>
-	['getSubscribedLists', uid, limit, filter] as const;
-export const getSubscribedLists = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getSubscribedListsKey>>,
-): Promise<ListsPage> => {
-	const [, uid, limit, filter] = ctx.queryKey;
+// How many attempts it should try looking for more items before it gives up on empty pages.
+const MAX_EMPTY = 3;
+
+export type SubscribedListsResource = EnhancedResource<Collection<SubscribedListsPage>, string>;
+
+export const getSubscribedListsKey = (uid: DID, limit: number, others = true) =>
+	['getSubscribedLists', uid, limit, others] as const;
+export const getSubscribedLists: QueryFn<
+	Collection<SubscribedListsPage>,
+	ReturnType<typeof getSubscribedListsKey>,
+	string
+> = async (key, { data: collection, param }) => {
+	const [, uid, limit, others] = key;
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
-		method: 'app.bsky.graph.getListMutes',
-		signal: ctx.signal,
-		params: { limit, cursor: ctx.pageParam },
-	});
+	let cursor = param;
+	let empty = 0;
 
-	const data = response.data as BskyGetListsResponse;
-	const filtered = filter ? data.lists.filter((list) => list.creator.did !== uid) : data.lists;
+	let lists: SignalizedList[];
 
-	return {
-		cursor: filtered.length >= limit ? data.cursor : undefined,
-		lists: filtered.map((list) => mergeSignalizedList(list)),
+	if (param && collection) {
+		const pages = collection.pages;
+		const last = pages[pages.length - 1];
+
+		lists = last.remainingLists;
+	} else {
+		lists = [];
+	}
+
+	while (lists.length < limit) {
+		const response = await agent.rpc.get({
+			method: 'app.bsky.graph.getListMutes',
+			params: { limit, cursor },
+		});
+
+		const data = response.data as BskyGetListsResponse;
+
+		const arr = data.lists;
+		const filtered = others ? arr.filter((list) => list.creator.did !== uid) : arr;
+		const next = filtered.map((raw) => mergeSignalizedList(raw));
+
+		cursor = arr.length >= limit ? data.cursor : undefined;
+		empty = filtered.length > 0 ? 0 : empty + 1;
+		lists = lists.concat(next);
+
+		if (!cursor || empty >= MAX_EMPTY) {
+			break;
+		}
+	}
+
+	const remainingLists = lists.splice(limit, lists.length);
+
+	const page: SubscribedListsPage = {
+		cursor,
+		lists,
+		remainingLists,
 	};
+
+	return pushCollection(collection, page, param);
 };

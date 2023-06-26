@@ -1,4 +1,4 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type QueryFn } from '~/lib/solid-query/index.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 
@@ -6,8 +6,8 @@ import { type BskyResolvedDidResponse } from '../types.ts';
 import { type DID, isDid } from '../utils.ts';
 
 export const getProfileDidKey = (uid: DID, actor: string) => ['getProfileDid', uid, actor] as const;
-export const getProfileDid = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileDidKey>>) => {
-	const [, uid, actor] = ctx.queryKey;
+export const getProfileDid: QueryFn<DID, ReturnType<typeof getProfileDidKey>> = async (key) => {
+	const [, uid, actor] = key;
 
 	if (isDid(actor)) {
 		return actor;
@@ -17,7 +17,6 @@ export const getProfileDid = async (ctx: QueryFunctionContext<ReturnType<typeof 
 
 	const response = await agent.rpc.get({
 		method: 'com.atproto.identity.resolveHandle',
-		signal: ctx.signal,
 		params: { handle: actor },
 	});
 

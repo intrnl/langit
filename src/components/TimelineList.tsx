@@ -1,45 +1,43 @@
 import { For, Match, Switch } from 'solid-js';
 
-import { type CreateInfiniteQueryResult, type CreateQueryResult } from '@tanstack/solid-query';
+import { type FeedLatestResource, type FeedResource } from '~/api/queries/get-timeline.ts';
 
-import { type DID } from '~/api/utils.ts';
-
-import { type TimelinePage } from '~/api/models/timeline.ts';
+import { type DID, getCollectionCursor } from '~/api/utils.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 
-export interface TimelineProps {
+export interface TimelineListProps {
 	uid: DID;
-	timelineQuery: CreateInfiniteQueryResult<TimelinePage, unknown>;
-	latestQuery: CreateQueryResult<string | undefined, unknown>;
-	onRefetch?: () => void;
-	onLoadMore?: () => void;
+	timeline: FeedResource;
+	latest: FeedLatestResource;
+	onRefetch: () => void;
+	onLoadMore: (cursor: string) => void;
 }
 
-const Timeline = (props: TimelineProps) => {
+const TimelineList = (props: TimelineListProps) => {
 	// we're destructuring these props because we don't expect these to ever
 	// change, they shouldn't.
-	const { timelineQuery, latestQuery, onRefetch, onLoadMore } = props;
+	const { timeline, latest, onRefetch, onLoadMore } = props;
 
 	const getLatestCid = () => {
-		return timelineQuery.data?.pages[0].cid;
+		return timeline()?.pages[0].cid;
 	};
 
 	return (
 		<>
 			<Switch>
-				<Match when={timelineQuery.isInitialLoading || timelineQuery.isRefetching}>
+				<Match when={timeline.loading && !timeline.refetchParam}>
 					<div
 						class="flex h-13 items-center justify-center border-divider"
-						classList={{ 'border-b': timelineQuery.isRefetching }}
+						classList={{ 'border-b': !!timeline() }}
 					>
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={latestQuery.data && latestQuery.data !== getLatestCid()}>
+				<Match when={latest() && latest()!.cid !== getLatestCid()}>
 					<button
 						onClick={onRefetch}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"
@@ -50,9 +48,9 @@ const Timeline = (props: TimelineProps) => {
 			</Switch>
 
 			<div>
-				<For each={timelineQuery.data ? timelineQuery.data.pages : []}>
-					{(page) =>
-						page.slices.map((slice) => {
+				<For each={timeline()?.pages}>
+					{(page) => {
+						return page.slices.map((slice) => {
 							const items = slice.items;
 							const len = items.length;
 
@@ -78,29 +76,31 @@ const Timeline = (props: TimelineProps) => {
 									/>
 								</VirtualContainer>
 							));
-						})
-					}
+						});
+					}}
 				</For>
 			</div>
 
 			<Switch>
-				<Match when={timelineQuery.isFetchingNextPage}>
+				<Match when={timeline.loading && timeline.refetchParam}>
 					<div class="flex h-13 items-center justify-center">
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={timelineQuery.hasNextPage}>
-					<button
-						onClick={onLoadMore}
-						disabled={timelineQuery.isRefetching}
-						class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
-					>
-						Show more posts
-					</button>
+				<Match when={getCollectionCursor(timeline(), 'cursor')}>
+					{(cursor) => (
+						<button
+							onClick={() => onLoadMore(cursor())}
+							disabled={timeline.loading}
+							class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
+						>
+							Show more posts
+						</button>
+					)}
 				</Match>
 
-				<Match when={!timelineQuery.isInitialLoading}>
+				<Match when={!timeline.loading}>
 					<div class="flex h-13 items-center justify-center">
 						<p class="text-sm text-muted-fg">End of list</p>
 					</div>
@@ -110,4 +110,4 @@ const Timeline = (props: TimelineProps) => {
 	);
 };
 
-export default Timeline;
+export default TimelineList;

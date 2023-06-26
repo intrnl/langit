@@ -1,7 +1,8 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type QueryFn } from '~/lib/solid-query/index.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
+import { type Signal, signal } from '~/utils/signals.ts';
 
 import { type BskyListRecordsResponse, type BskyListSubjectRecord } from '../types.ts';
 import { type DID } from '../utils.ts';
@@ -9,13 +10,13 @@ import { type DID } from '../utils.ts';
 type Query = [uid: DID, actor: DID, list: string];
 type Key = `${DID}|${string}`;
 
-interface QueryResult {
+export interface ProfileExistsResult {
 	actor: DID;
 	list: string;
-	exists: string | undefined;
+	exists: Signal<string | undefined>;
 }
 
-export const fetchIsProfileInList = createBatchedFetch<Query, Key, QueryResult>({
+export const fetchIsProfileInList = createBatchedFetch<Query, Key, ProfileExistsResult>({
 	limit: 100,
 	timeout: 0,
 	key: (query) => query[0],
@@ -27,7 +28,7 @@ export const fetchIsProfileInList = createBatchedFetch<Query, Key, QueryResult>(
 		const agent = await multiagent.connect(uid);
 
 		const remaining = new Map<Key, Query>();
-		const results: QueryResult[] = [];
+		const results: ProfileExistsResult[] = [];
 
 		let cursor: string | undefined;
 
@@ -60,7 +61,7 @@ export const fetchIsProfileInList = createBatchedFetch<Query, Key, QueryResult>(
 				const match = remaining.get(key);
 
 				if (match) {
-					results.push({ actor: match[1], list: match[2], exists: record.uri });
+					results.push({ actor: match[1], list: match[2], exists: signal<string | undefined>(record.uri) });
 					remaining.delete(key);
 				}
 			}
@@ -73,7 +74,7 @@ export const fetchIsProfileInList = createBatchedFetch<Query, Key, QueryResult>(
 		}
 
 		for (const query of remaining.values()) {
-			results.push({ actor: query[1], list: query[2], exists: undefined });
+			results.push({ actor: query[1], list: query[2], exists: signal<string | undefined>(undefined) });
 		}
 
 		return results;
@@ -82,8 +83,10 @@ export const fetchIsProfileInList = createBatchedFetch<Query, Key, QueryResult>(
 
 export const getProfileInListKey = (uid: DID, actor: DID, list: string) =>
 	['getProfileInList', uid, actor, list] as const;
-export const getProfileInList = async (ctx: QueryFunctionContext<ReturnType<typeof getProfileInListKey>>) => {
-	const [, uid, actor, list] = ctx.queryKey;
+export const getProfileInList: QueryFn<ProfileExistsResult, ReturnType<typeof getProfileInListKey>> = async (
+	key,
+) => {
+	const [, uid, actor, list] = key;
 
 	const match = await fetchIsProfileInList([uid, actor, list]);
 

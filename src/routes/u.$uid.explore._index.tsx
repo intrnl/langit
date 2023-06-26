@@ -1,12 +1,15 @@
 import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery } from '~/lib/solid-query/index.ts';
 
-import { getRecordId, getRepoId, type DID } from '~/api/utils.ts';
+import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
-import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
-import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
-import { getFeed, getFeedKey } from '~/api/queries/get-feed.ts';
+import {
+	getFeedGenerator,
+	getFeedGeneratorKey,
+	getInitialFeedGenerator,
+} from '~/api/queries/get-feed-generator.ts';
+import { getTimeline, getTimelineKey } from '~/api/queries/get-timeline';
 
 import { preferences } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
@@ -54,25 +57,18 @@ const AuthenticatedExplorePage = () => {
 					}
 				>
 					{(feedUri) => {
-						const feedQuery = createQuery({
-							queryKey: () => getFeedGeneratorKey(uid(), feedUri),
-							queryFn: getFeedGenerator,
+						const [feed] = createQuery({
+							key: () => getFeedGeneratorKey(uid(), feedUri),
+							fetch: getFeedGenerator,
 							staleTime: 120_000,
-							suspense: true,
-							initialData: () => {
-								const ref = feedGeneratorsCache[feedUri];
-								return ref?.deref();
-							},
+							initialData: getInitialFeedGenerator,
 						});
 
-						const timelineQuery = createQuery({
-							queryKey: () => getFeedKey(uid(), feedUri, MAX_POSTS),
-							queryFn: getFeed,
+						const [timeline] = createQuery({
+							key: () => getTimelineKey(uid(), { type: 'custom', uri: feedUri }, MAX_POSTS),
+							fetch: getTimeline,
 							staleTime: 60_000,
-							suspense: true,
 						});
-
-						const feed = () => feedQuery.data;
 
 						return (
 							<Suspense
@@ -94,7 +90,7 @@ const AuthenticatedExplorePage = () => {
 									</div>
 
 									<For
-										each={timelineQuery.data?.slices}
+										each={timeline()?.pages[0].slices}
 										fallback={
 											<div>
 												<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>
@@ -130,7 +126,7 @@ const AuthenticatedExplorePage = () => {
 										}}
 									</For>
 
-									<Show when={timelineQuery.data?.cid}>
+									<Show when={timeline()?.pages[0].cid}>
 										<A
 											href="/u/:uid/profile/:actor/feed/:feed"
 											params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}

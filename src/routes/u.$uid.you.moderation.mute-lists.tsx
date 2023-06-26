@@ -1,4 +1,4 @@
-import { createInfiniteQuery } from '@tanstack/solid-query';
+import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
 import { getSubscribedLists, getSubscribedListsKey } from '~/api/queries/get-subscribed-lists.ts';
@@ -16,18 +16,16 @@ const AuthenticatedYouModerationPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const myListQuery = createInfiniteQuery({
-		queryKey: () => getProfileListsKey(uid(), uid(), PAGE_SIZE),
-		queryFn: getProfileLists,
-		getNextPageParam: (last) => last.cursor,
+	const [myLists, { refetch: refetchMyLists }] = createQuery({
+		key: () => getProfileListsKey(uid(), uid(), PAGE_SIZE),
+		fetch: getProfileLists,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 	});
 
-	const subbedListQuery = createInfiniteQuery({
-		queryKey: () => getSubscribedListsKey(uid(), PAGE_SIZE, true),
-		queryFn: getSubscribedLists,
-		getNextPageParam: (last) => last.cursor,
+	const [subbedLists, { refetch: refetchSubbedLists }] = createQuery({
+		key: () => getSubscribedListsKey(uid(), PAGE_SIZE),
+		fetch: getSubscribedLists,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 	});
@@ -46,12 +44,12 @@ const AuthenticatedYouModerationPage = () => {
 
 				<ListList
 					uid={uid()}
-					listQuery={myListQuery}
+					list={myLists}
 					fallback={
 						<div class="p-4 pt-2 text-sm text-muted-fg">Mute lists you've created will show up here.</div>
 					}
 					disableEndMarker
-					onLoadMore={() => myListQuery.fetchNextPage()}
+					onLoadMore={(cursor) => refetchMyLists(true, cursor)}
 				/>
 
 				<div class="pt-2" />
@@ -66,14 +64,14 @@ const AuthenticatedYouModerationPage = () => {
 
 				<ListList
 					uid={uid()}
-					listQuery={subbedListQuery}
+					list={subbedLists}
 					fallback={
 						<div class="p-4 pt-2 text-sm text-muted-fg">
 							Mute lists created by other users will show up here.
 						</div>
 					}
 					hideSubscribedBadge
-					onLoadMore={() => subbedListQuery.fetchNextPage()}
+					onLoadMore={(cursor) => refetchSubbedLists(true, cursor)}
 				/>
 			</div>
 		</div>

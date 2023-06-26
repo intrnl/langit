@@ -7,16 +7,16 @@ import { type DID, getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 
-import { A } from '~/router.ts';
 import { openModal } from '~/globals/modals.tsx';
+import { A } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
+import Embed from '~/components/Embed.tsx';
 import PostMenu from '~/components/menus/PostMenu.tsx';
 import PostRepostMenu from '~/components/menus/PostRepostMenu.tsx';
 import PostShareMenu from '~/components/menus/PostShareMenu.tsx';
-import Embed from '~/components/Embed.tsx';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz';
@@ -93,7 +93,7 @@ const Post = (props: PostProps) => {
 								class="flex font-medium hover:underline"
 							>
 								<span class="line-clamp-1 break-all">{reason()!.by.displayName || reason()!.by.handle}</span>
-								<span class="whitespace-pre"> Reposted</span>
+								<span class="whitespace-pre">Reposted</span>
 							</A>
 						</div>
 					</div>
@@ -111,7 +111,7 @@ const Post = (props: PostProps) => {
 									params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
 									class="flex font-medium hover:underline"
 								>
-									<span class="whitespace-pre">Replying to </span>
+									<span class="whitespace-pre">Replying to</span>
 									<span class="line-clamp-1">
 										{parent()!.author.displayName.value || parent()!.author.handle.value}
 									</span>

@@ -9,8 +9,8 @@ import { closeModal } from '~/globals/modals.tsx';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
-import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import FormatQuoteIcon from '~/icons/baseline-format-quote.tsx';
+import RepeatIcon from '~/icons/baseline-repeat.tsx';
 
 export interface PostRepostMenuProps {
 	uid: DID;

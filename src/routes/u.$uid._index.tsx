@@ -1,87 +1,65 @@
-import { For, Show, Suspense, createMemo } from 'solid-js';
+import { For, Show, Suspense, createEffect, createMemo } from 'solid-js';
 
 import { useSearchParams } from '@solidjs/router';
-import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
+
+import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID } from '~/api/utils.ts';
 
-import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators';
-import { type TimelinePage, shouldFetchNextPage } from '~/api/models/timeline.ts';
 import {
-	FOLLOWING_FEED,
-	getFeed,
-	getFeedKey,
-	getFeedLatest,
-	getFeedLatestKey,
-} from '~/api/queries/get-feed.ts';
-import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
+	getFeedGenerator,
+	getFeedGeneratorKey,
+	getInitialFeedGenerator,
+} from '~/api/queries/get-feed-generator.ts';
+import {
+	type CustomTimelineParams,
+	type HomeTimelineParams,
+	getTimeline,
+	getTimelineKey,
+	getTimelineLatest,
+	getTimelineLatestKey,
+} from '~/api/queries/get-timeline.ts';
 
 import { preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
 
 import { Tab } from '~/components/Tab.tsx';
-import Timeline from '~/components/Timeline.tsx';
-
-const PAGE_SIZE = 30;
+import TimelineList from '~/components/TimelineList.tsx';
 
 const FeedTab = (props: { uid: DID; uri: string; active: boolean; onClick?: () => void }) => {
-	const feedUri = () => props.uri;
-
-	const feedQuery = createQuery({
-		queryKey: () => getFeedGeneratorKey(props.uid, feedUri()),
-		queryFn: getFeedGenerator,
+	const [feed] = createQuery({
+		key: () => getFeedGeneratorKey(props.uid, props.uri),
+		fetch: getFeedGenerator,
 		staleTime: 30_000,
-		suspense: true,
-		initialData: () => {
-			const ref = feedGeneratorsCache[feedUri()];
-			return ref?.deref();
-		},
+		initialData: getInitialFeedGenerator,
 	});
 
 	return (
 		<Tab<'button'> component="button" active={props.active} onClick={props.onClick}>
-			{feedQuery.data?.displayName.value}
+			{feed()?.displayName.value}
 		</Tab>
 	);
 };
 
-const Feed = (props: { uid: DID; uri: string }) => {
+const Feed = (props: { uid: DID; params: HomeTimelineParams | CustomTimelineParams }) => {
 	const uid = () => props.uid;
-	const feed = () => props.uri;
+	const params = () => props.params;
 
-	const client = useQueryClient();
-
-	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getFeedKey(uid(), feed(), PAGE_SIZE),
-		queryFn: getFeed,
-		getNextPageParam: (last) => last.cursor,
+	const [timeline, { refetch }] = createQuery({
+		key: () => getTimelineKey(uid(), params()),
+		fetch: getTimeline,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
-		onSuccess: (data) => {
-			const pages = data.pages;
-			const length = pages.length;
-
-			// if the page size is 1, that means we've just went through an initial
-			// fetch, or a refetch, since our refetch process involves truncating the
-			// timeline first.
-			if (length === 1) {
-				client.setQueryData(getFeedLatestKey(uid(), feed()), pages[0].cid);
-			}
-
-			if (shouldFetchNextPage(data)) {
-				timelineQuery.fetchNextPage();
-			}
-		},
 	});
 
-	const latestQuery = createQuery({
-		queryKey: () => getFeedLatestKey(uid(), feed()),
-		queryFn: getFeedLatest,
+	const [latest, { mutate: mutateLatest }] = createQuery({
+		key: () => getTimelineLatestKey(uid(), params()),
+		fetch: getTimelineLatest,
 		staleTime: 10_000,
 		refetchInterval: 30_000,
-		get enabled() {
-			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
+		enabled: () => {
+			if (!timeline() || timeline()!.pages.length < 1 || !timeline()!.pages[0].cid) {
 				return false;
 			}
 
@@ -89,35 +67,26 @@ const Feed = (props: { uid: DID; uri: string }) => {
 		},
 	});
 
+	createEffect(() => {
+		const $timeline = timeline();
+
+		if ($timeline) {
+			const pages = $timeline.pages;
+			const length = pages.length;
+
+			if (length === 1) {
+				mutateLatest({ cid: pages[0].cid });
+			}
+		}
+	});
+
 	return (
-		<Timeline
+		<TimelineList
 			uid={uid()}
-			timelineQuery={timelineQuery}
-			latestQuery={latestQuery}
-			onLoadMore={() => timelineQuery.fetchNextPage()}
-			onRefetch={() => {
-				// we want to truncate the timeline here so that the refetch doesn't
-				// also refetching however many pages of timeline that the user has
-				// gone through.
-
-				// this is the only way we can do that in tanstack query
-
-				// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
-				// but unfortunately that breaks the `hasNextPage` check down below
-				// and would also mean the user gets to see nothing for a bit.
-				client.setQueryData(getFeedKey(uid(), feed(), PAGE_SIZE), (prev?: InfiniteData<TimelinePage>) => {
-					if (prev) {
-						return {
-							pages: prev.pages.slice(0, 1),
-							pageParams: prev.pageParams.slice(0, 1),
-						};
-					}
-
-					return;
-				});
-
-				timelineQuery.refetch();
-			}}
+			timeline={timeline}
+			latest={latest}
+			onLoadMore={(cursor) => refetch(true, cursor)}
+			onRefetch={() => refetch(true)}
 		/>
 	);
 };
@@ -127,7 +96,7 @@ const AuthenticatedHome = () => {
 	const [searchParams, setSearchParams] = useSearchParams<{ feed?: string }>();
 
 	const uid = () => params.uid as DID;
-	const feed = () => searchParams.feed || FOLLOWING_FEED;
+	const feed = () => searchParams.feed;
 
 	const pinnedFeeds = createMemo(() => {
 		const arr = preferences.get(uid())?.pinnedFeeds;
@@ -148,7 +117,7 @@ const AuthenticatedHome = () => {
 					<div class="sticky top-0 z-10 flex h-13 items-center overflow-x-auto border-b border-divider bg-background">
 						<Tab<'button'>
 							component="button"
-							active={feed() === FOLLOWING_FEED}
+							active={!feed()}
 							onClick={() => {
 								setSearchParams({ feed: null }, { replace: true });
 								window.scrollTo({ top: 0 });
@@ -174,8 +143,15 @@ const AuthenticatedHome = () => {
 				</Suspense>
 			</Show>
 
-			<Show when={feed()} keyed>
-				<Feed uid={uid()} uri={feed()} />
+			<Show when={feed() ?? true} keyed>
+				{($feed) => {
+					const params: HomeTimelineParams | CustomTimelineParams =
+						$feed !== true
+							? { type: 'custom', uri: $feed }
+							: { type: 'home', algorithm: 'reverse-chronological' };
+
+					return <Feed uid={uid()} params={params} />;
+				}}
 			</Show>
 		</div>
 	);

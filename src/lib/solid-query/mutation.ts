@@ -81,7 +81,7 @@ export const createMutation = <D, V, C = void>(options: MutationOptions<D, V, C>
 
 	const mutateAsync = async (variables: V) => {
 		const id = ++uid;
-		const retries = options.retry ?? 3;
+		const retries = options.retry ?? 0;
 
 		let context = undefined as C;
 

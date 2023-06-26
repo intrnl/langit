@@ -505,7 +505,7 @@ const AuthenticatedComposePage = () => {
 			<Switch>
 				<Match when={reply()}>{(reply) => <Post uid={uid()} post={reply()} next />}</Match>
 
-				<Match when>
+				<Match when={reply.loading}>
 					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />
 					</div>
@@ -587,7 +587,7 @@ const AuthenticatedComposePage = () => {
 							}}
 						</Match>
 
-						<Match when>
+						<Match when={quote.loading || feed.loading}>
 							<div class="mb-3 mr-3 flex items-center justify-center rounded-md border border-divider p-4">
 								<CircularProgress />
 							</div>

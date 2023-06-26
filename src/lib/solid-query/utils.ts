@@ -32,10 +32,8 @@ export const replaceEqualDeep = (a: any, b: any): any => {
 
 		for (let i = 0; i < bSize; i++) {
 			const key = array ? i : bItems[i];
-			// @ts-expect-error
 			copy[key] = replaceEqualDeep(a[key], b[key]);
 
-			// @ts-expect-error
 			if (copy[key] === a[key]) {
 				equalItems++;
 			}

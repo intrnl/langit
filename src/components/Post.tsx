@@ -93,7 +93,7 @@ const Post = (props: PostProps) => {
 								class="flex font-medium hover:underline"
 							>
 								<span class="line-clamp-1 break-all">{reason()!.by.displayName || reason()!.by.handle}</span>
-								<span class="whitespace-pre">Reposted</span>
+								<span class="whitespace-pre"> Reposted</span>
 							</A>
 						</div>
 					</div>
@@ -111,7 +111,7 @@ const Post = (props: PostProps) => {
 									params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
 									class="flex font-medium hover:underline"
 								>
-									<span class="whitespace-pre">Replying to</span>
+									<span class="whitespace-pre">Replying to </span>
 									<span class="line-clamp-1">
 										{parent()!.author.displayName.value || parent()!.author.handle.value}
 									</span>

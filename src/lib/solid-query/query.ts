@@ -212,20 +212,25 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 			});
 		};
 
+		const refetchWithTransition = () => {
+			return startTransition(refetch);
+		};
+
 		clearTimeout(query._timeout);
 		query._count++;
 
 		if (refetchOnMount || query!._fresh) {
-			queueMicrotask(() => startTransition(refetch));
+			queueMicrotask(refetchWithTransition);
 		}
 		if (refetchOnWindowFocus) {
-			makeEventListener(document, 'visibilitychange', () => document.hidden || startTransition(refetch));
+			makeEventListener(window, 'visibilitychange', refetchWithTransition);
+			makeEventListener(window, 'focus', refetchWithTransition);
 		}
 		if (refetchOnReconnect) {
-			makeEventListener(window, 'online', () => startTransition(refetch));
+			makeEventListener(window, 'online', refetchWithTransition);
 		}
 		if (refetchInterval !== undefined) {
-			const interval = setInterval(() => startTransition(refetch), refetchInterval);
+			const interval = setInterval(refetchWithTransition, refetchInterval);
 			onCleanup(() => clearInterval(interval));
 		}
 

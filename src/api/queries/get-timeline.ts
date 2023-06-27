@@ -72,7 +72,7 @@ const countPosts = (slices: TimelineSlice[], limit?: number) => {
 		const slice = slices[idx];
 		count += slice.items.length;
 
-		if (limit !== undefined && count > limit) {
+		if (limit !== undefined && count >= limit) {
 			return idx;
 		}
 	}

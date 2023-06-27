@@ -14,17 +14,17 @@ import { makeEventListener } from '@solid-primitives/event-listener';
 import { type QueryKey, hashQueryKey } from './key.ts';
 import { noop } from './utils.ts';
 
-import { assert } from '~/utils/misc.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
 
 class QueryResult<Data> {
+	public _fetch = 0;
 	public _fresh = true;
 	public _loading = false;
 
 	public _promise: Signal<Promise<Data>>;
 	public _refetchParam: Signal<unknown> = signal<unknown>(undefined);
 
-	public _count = 0;
+	public _uses = 0;
 	public _timeout?: any;
 
 	constructor(public value?: Data, public updatedAt = -1) {
@@ -161,43 +161,48 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 
 		const refetch = (force = false, info?: unknown) => {
 			if (force || query!._fresh || (!query!._loading && Date.now() - query!.updatedAt > staleTime!)) {
+				const id = ++query!._fetch;
+
 				const promise = (async () => {
-					let same = false;
+					let errored = false;
+					let value: unknown;
 
 					try {
 						const prev = query!.value;
 						const next = await fetch!(key, { data: prev, param: info });
 
-						if (next === undefined) {
-							assert(false, `query function must not return undefined`);
-						}
-
 						const replaced = replaceData!(prev, next);
 
-						if ((same = query?._promise.peek() === promise!)) {
-							query!.value = replaced;
+						value = replaced;
+					} catch (err) {
+						errored = true;
+						value = err;
+					}
+
+					if (query!._fetch === id) {
+						if (errored) {
+							query!._fresh = true;
+						} else {
+							query!.value = value as Data;
 							query!.updatedAt = Date.now();
 						}
 
-						return replaced;
-					} catch (err) {
-						if ((same = query?._promise.peek() === promise!)) {
-							query._fresh = true;
-						}
+						query!._loading = false;
+					}
 
-						throw err;
-					} finally {
-						if (same) {
-							query!._loading = false;
-						}
+					if (errored) {
+						throw value;
+					} else {
+						return value as Data;
 					}
 				})();
 
 				batch(() => {
-					query!._fresh = false;
-					query!._loading = true;
 					query!._refetchParam.value = info;
 					query!._promise.value = promise;
+
+					query!._fresh = false;
+					query!._loading = true;
 				});
 
 				return promise.then(noop, noop);
@@ -208,6 +213,12 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 			return batch(() => {
 				query!._promise.value = Promise.resolve(data);
 				query!._refetchParam.value = undefined;
+
+				query!._fetch++;
+				query!._fresh = false;
+				query!._loading = false;
+
+				query!.value = data;
 				query!.updatedAt = Date.now();
 			});
 		};
@@ -217,7 +228,7 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 		};
 
 		clearTimeout(query._timeout);
-		query._count++;
+		query._uses++;
 
 		if (refetchOnMount || query!._fresh) {
 			queueMicrotask(refetchWithTransition);
@@ -235,7 +246,7 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 		}
 
 		onCleanup(() => {
-			if (--query!._count < 1) {
+			if (--query!._uses < 1) {
 				query!._timeout = setTimeout(() => cache!.delete(hash), cacheTime!);
 			}
 		});

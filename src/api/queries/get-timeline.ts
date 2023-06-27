@@ -143,7 +143,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 
 		count += countPosts(result);
 
-		cid ||= feed.length > 0 ? feed[0].post.cid : undefined;
+		cid ||= timeline.cid || (feed.length > 0 ? feed[0].post.cid : undefined);
 
 		if (!cursor || empty >= MAX_EMPTY) {
 			break;
@@ -204,7 +204,7 @@ const fetchPage = async (
 	limit: number,
 	cursor: string | undefined,
 	_did: DID | undefined,
-): Promise<BskyTimelineResponse> => {
+): Promise<BskyTimelineResponse & { cid?: string }> => {
 	const type = params.type;
 
 	if (type === 'home') {
@@ -234,12 +234,15 @@ const fetchPage = async (
 			});
 
 			const data = response.data;
-			const postUris = data.records.map((record) => record.value.subject.uri);
+			const records = data.records;
+
+			const postUris = records.map((record) => record.value.subject.uri);
 
 			const uid = agent.session.peek()!.did;
 			const queries = await Promise.allSettled(postUris.map((uri) => fetchPost([uid, uri])));
 
 			return {
+				cid: records.length > 0 ? records[0].cid : undefined,
 				cursor: data.cursor,
 				feed: queries
 					.filter((result): result is PromiseFulfilledResult<BskyPost> => result.status === 'fulfilled')

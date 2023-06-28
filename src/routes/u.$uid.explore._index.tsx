@@ -1,4 +1,4 @@
-import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
+import { ErrorBoundary, For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
 import { createQuery } from '~/lib/solid-query/index.ts';
 
@@ -89,52 +89,54 @@ const AuthenticatedExplorePage = () => {
 										<span class="text-base font-bold">{feed()?.displayName.value}</span>
 									</div>
 
-									<For
-										each={timeline()?.pages[0].slices}
+									<ErrorBoundary
 										fallback={
-											<div>
-												<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>
-											</div>
+											<p class="p-4 text-sm text-muted-fg">Something went wrong with retrieving the feed</p>
 										}
 									>
-										{(slice) => {
-											const items = slice.items;
-											const len = items.length;
-
-											return items.map((item, idx) => (
-												<VirtualContainer
-													key="posts"
-													id={
-														/* @once */ createPostKey(
-															item.post.cid,
-															(!!item.reply?.parent && idx === 0) || !!item.reason,
-															idx !== len - 1,
-														)
-													}
-												>
-													<Post
-														interactive
-														uid={uid()}
-														post={/* @once */ item.post}
-														parent={/* @once */ item.reply?.parent}
-														reason={/* @once */ item.reason}
-														prev={idx !== 0}
-														next={idx !== len - 1}
-													/>
-												</VirtualContainer>
-											));
-										}}
-									</For>
-
-									<Show when={timeline()?.pages[0].cid}>
-										<A
-											href="/u/:uid/profile/:actor/feed/:feed"
-											params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}
-											class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
+										<For
+											each={timeline()?.pages[0].slices}
+											fallback={<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>}
 										>
-											Show more
-										</A>
-									</Show>
+											{(slice) => {
+												const items = slice.items;
+												const len = items.length;
+
+												return items.map((item, idx) => (
+													<VirtualContainer
+														key="posts"
+														id={
+															/* @once */ createPostKey(
+																item.post.cid,
+																(!!item.reply?.parent && idx === 0) || !!item.reason,
+																idx !== len - 1,
+															)
+														}
+													>
+														<Post
+															interactive
+															uid={uid()}
+															post={/* @once */ item.post}
+															parent={/* @once */ item.reply?.parent}
+															reason={/* @once */ item.reason}
+															prev={idx !== 0}
+															next={idx !== len - 1}
+														/>
+													</VirtualContainer>
+												));
+											}}
+										</For>
+
+										<Show when={timeline()?.pages[0].cid}>
+											<A
+												href="/u/:uid/profile/:actor/feed/:feed"
+												params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}
+												class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
+											>
+												Show more
+											</A>
+										</Show>
+									</ErrorBoundary>
 								</div>
 							</Suspense>
 						);

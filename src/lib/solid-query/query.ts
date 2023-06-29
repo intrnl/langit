@@ -123,7 +123,7 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 			}
 		},
 		undefined,
-		{ equals: (a, b) => !!a && !!b && a.hash === b.hash },
+		{ equals: (a, b) => a?.hash === b?.hash },
 	);
 
 	const instance = createMemo((): QueryReturn<Data, Param> => {

@@ -3,7 +3,7 @@ import { type QueryFn } from '~/lib/solid-query/index.ts';
 import { multiagent } from '~/globals/agent.ts';
 
 import { mergeSignalizedProfile } from '../cache/profiles.ts';
-import { type PostProfilesListPage } from '../models/profiles-list.ts';
+import { type ProfilesListPage } from '../models/profiles-list.ts';
 
 import { type BskyGetLikesResponse } from '../types.ts';
 import { type Collection, type DID, pushCollection } from '../utils.ts';
@@ -13,7 +13,7 @@ import _getDid from './_did.ts';
 export const getPostLikedByKey = (uid: DID, actor: string, post: string, limit: number) =>
 	['getPostLikes', uid, actor, post, limit] as const;
 export const getPostLikedBy: QueryFn<
-	Collection<PostProfilesListPage>,
+	Collection<ProfilesListPage>,
 	ReturnType<typeof getPostLikedByKey>,
 	string
 > = async (key, { data: collection, param }) => {
@@ -29,7 +29,7 @@ export const getPostLikedBy: QueryFn<
 	});
 
 	const data = response.data as BskyGetLikesResponse;
-	const page: PostProfilesListPage = {
+	const page: ProfilesListPage = {
 		cursor: data.cursor,
 		profiles: data.likes.map((record) => mergeSignalizedProfile(record.actor)),
 	};

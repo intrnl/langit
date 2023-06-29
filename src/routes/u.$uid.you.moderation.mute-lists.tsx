@@ -11,7 +11,7 @@ import ListList from '~/components/ListList.tsx';
 
 const PAGE_SIZE = 30;
 
-const AuthenticatedYouModerationPage = () => {
+const AuthenticatedMutedListModerationPage = () => {
 	const params = useParams('/u/:uid/you/moderation/mute-lists');
 
 	const uid = () => params.uid as DID;
@@ -78,4 +78,4 @@ const AuthenticatedYouModerationPage = () => {
 	);
 };
 
-export default AuthenticatedYouModerationPage;
+export default AuthenticatedMutedListModerationPage;

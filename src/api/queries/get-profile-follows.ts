@@ -3,7 +3,7 @@ import { type QueryFn } from '~/lib/solid-query/index.ts';
 import { multiagent } from '~/globals/agent.ts';
 
 import { mergeSignalizedProfile } from '../cache/profiles.ts';
-import { type ProfilesListPage } from '../models/profiles-list.ts';
+import { type ProfilesListWithSubjectPage } from '../models/profiles-list.ts';
 
 import { type BskyFollowsResponse } from '../types.ts';
 import { type Collection, type DID, pushCollection } from '../utils.ts';
@@ -11,7 +11,7 @@ import { type Collection, type DID, pushCollection } from '../utils.ts';
 export const getProfileFollowsKey = (uid: DID, actor: string, limit: number) =>
 	['getProfileFollows', uid, actor, limit] as const;
 export const getProfileFollows: QueryFn<
-	Collection<ProfilesListPage>,
+	Collection<ProfilesListWithSubjectPage>,
 	ReturnType<typeof getProfileFollowsKey>,
 	string
 > = async (key, { data: collection, param }) => {
@@ -25,7 +25,7 @@ export const getProfileFollows: QueryFn<
 	});
 
 	const data = response.data as BskyFollowsResponse;
-	const page: ProfilesListPage = {
+	const page: ProfilesListWithSubjectPage = {
 		cursor: data.cursor,
 		subject: mergeSignalizedProfile(data.subject),
 		profiles: data.follows.map((profile) => mergeSignalizedProfile(profile)),

@@ -9,6 +9,15 @@ export interface BskyLabel {
 	val: string;
 }
 
+export interface BskyProfileViewerState {
+	muted?: boolean;
+	mutedByList?: BskyListBasic;
+	blockedBy?: boolean;
+	blocking?: string;
+	following?: string;
+	followedBy?: string;
+}
+
 export interface BskyProfile {
 	did: DID;
 	handle: string;
@@ -21,13 +30,7 @@ export interface BskyProfile {
 	postsCount: number;
 	indexedAt: string;
 	labels: BskyLabel[];
-	viewer: {
-		muted: boolean;
-		mutedByList?: BskyListBasic;
-		blocking?: string;
-		blockedBy: boolean;
-		following?: string;
-	};
+	viewer: BskyProfileViewerState;
 }
 
 export interface BskyProfileBasic {
@@ -36,11 +39,7 @@ export interface BskyProfileBasic {
 	displayName: string;
 	avatar?: string;
 	labels: BskyLabel[];
-	viewer: {
-		muted: boolean;
-		blockedBy: boolean;
-		following?: string;
-	};
+	viewer: BskyProfileViewerState;
 }
 
 export interface BskyProfileFollow {
@@ -51,11 +50,7 @@ export interface BskyProfileFollow {
 	avatar?: string;
 	labels: BskyLabel[];
 	indexedAt: string;
-	viewer: {
-		muted: boolean;
-		blockedBy: boolean;
-		following?: string;
-	};
+	viewer: BskyProfileViewerState;
 }
 
 export interface BskyProfileRecord {

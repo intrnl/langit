@@ -55,6 +55,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.settings.explore._index.tsx")),
       },
       {
+        path: "you/moderation/blocked",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.blocked.tsx")),
+      },
+      {
         path: "settings/explore/add",
         component: lazy(() => import("./routes/u.$uid.settings.explore.add.tsx")),
       },

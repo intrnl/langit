@@ -179,10 +179,14 @@ const AuthenticatedYouPage = () => {
 				<span>Muted users</span>
 			</A>
 
-			<div class="flex items-center gap-4 px-4 py-3 text-sm text-muted-fg">
+			<A
+				href="/u/:uid/you/moderation/blocked"
+				params={params}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
 				<BlockIcon class="text-xl" />
-				<span>Blocked users (coming soon)</span>
-			</div>
+				<span>Blocked users</span>
+			</A>
 		</div>
 	);
 };

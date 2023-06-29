@@ -19,6 +19,9 @@ dependencies:
   '@solid-primitives/event-listener':
     specifier: ^2.2.13
     version: 2.2.13(solid-js@1.7.7)
+  '@solidjs/meta':
+    specifier: ^0.28.5
+    version: 0.28.5(solid-js@1.7.7)
   '@solidjs/router':
     specifier: ^0.8.2
     version: 0.8.2(patch_hash=c3drdvrwxamj6xkllh2z5xfdoe)(solid-js@1.7.7)
@@ -848,6 +851,14 @@ packages:
     resolution: {integrity: sha512-T62WlLwKkbmicsw/xpwMQyv9MmZRSaVyutXfS5icc9v0cb8qGMUxRxr5LVvZHYQCZ9DEFboZB0r711xsbVBbeA==}
     peerDependencies:
       solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.7.7
+    dev: false
+
+  /@solidjs/meta@0.28.5(solid-js@1.7.7):
+    resolution: {integrity: sha512-52luJR6hVNMA1K8Od5OD0d8WVz/svqZG4is8lrDimiUGxdia3DzuLF+pK56dnEzbNt9cA42qVFL134U9LkC9Gg==}
+    peerDependencies:
+      solid-js: '>=1.4.0'
     dependencies:
       solid-js: 1.7.7
     dev: false

@@ -1,5 +1,6 @@
 import { Match, Show, Switch } from 'solid-js';
 
+import { Title } from '@solidjs/meta';
 import { Outlet } from '@solidjs/router';
 
 import { createQuery } from '~/lib/solid-query/index.ts';
@@ -52,6 +53,13 @@ const AuthenticatedProfileLayout = () => {
 					<Match when={profile()}>
 						{(profile) => (
 							<div class="flex flex-col gap-0.5">
+								<Title>
+									{profile().displayName.value
+										? `${profile().displayName.value} (@${profile().handle.value})`
+										: `@${profile().handle.value}`}{' '}
+									/ Langit
+								</Title>
+
 								<p class="line-clamp-1 break-all text-base font-bold leading-5">
 									{profile().displayName.value}
 								</p>
@@ -61,6 +69,7 @@ const AuthenticatedProfileLayout = () => {
 					</Match>
 
 					<Match when>
+						<Title>Profile ({actor()}) / Langit</Title>
 						<p class="text-base font-bold">Profile</p>
 					</Match>
 				</Switch>

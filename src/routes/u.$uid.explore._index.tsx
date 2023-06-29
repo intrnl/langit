@@ -1,5 +1,7 @@
 import { ErrorBoundary, For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
+import { Title } from '@solidjs/meta';
+
 import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
@@ -34,10 +36,11 @@ const AuthenticatedExplorePage = () => {
 
 	return (
 		<div class="flex flex-col pb-4">
+			<Title>Explore / Langit</Title>
+
 			<div class="sticky top-0 z-20 flex h-13 items-center gap-4 border-b border-divider bg-background px-4">
 				{/* <input placeholder="Search Bluesky" class={input()} /> */}
 				<p class="grow text-base font-bold">Explore</p>
-
 				<A
 					href="/u/:uid/settings/explore"
 					params={params}

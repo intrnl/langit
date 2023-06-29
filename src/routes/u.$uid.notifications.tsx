@@ -1,5 +1,7 @@
 import { For, Match, Switch, createEffect } from 'solid-js';
 
+import { Title } from '@solidjs/meta';
+
 import { createMutation, createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID, getCollectionCursor } from '~/api/utils.ts';
@@ -83,6 +85,8 @@ const AuthenticatedNotificationsPage = () => {
 
 	return (
 		<div class="flex grow flex-col">
+			<Title>Notifications / Langit</Title>
+
 			<div class="sticky top-0 z-10 flex h-13 items-center justify-between gap-4 border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Notifications</p>
 

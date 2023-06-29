@@ -1,5 +1,6 @@
 import { For, Show, Suspense, createEffect, createMemo } from 'solid-js';
 
+import { Title } from '@solidjs/meta';
 import { useSearchParams } from '@solidjs/router';
 
 import { createQuery } from '~/lib/solid-query/index.ts';
@@ -105,6 +106,8 @@ const AuthenticatedHome = () => {
 
 	return (
 		<div class="flex grow flex-col">
+			<Title>Home / Langit</Title>
+
 			<div
 				class="flex h-13 items-center px-4"
 				classList={{ 'sticky top-0 z-10 border-b border-divider bg-background': !pinnedFeeds() }}

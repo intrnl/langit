@@ -1,6 +1,7 @@
 import { type Accessor, For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 
+import { Title } from '@solidjs/meta';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
 import { Extension } from '@tiptap/core';
@@ -489,6 +490,8 @@ const AuthenticatedComposePage = () => {
 
 	return (
 		<div class="flex flex-col">
+			<Title>Compose / Langit</Title>
+
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Compose</p>
 			</div>

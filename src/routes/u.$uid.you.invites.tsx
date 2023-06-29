@@ -1,5 +1,7 @@
 import { For, Match, Switch, createMemo } from 'solid-js';
 
+import { Title } from '@solidjs/meta';
+
 import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID } from '~/api/utils.ts';
@@ -24,6 +26,8 @@ const AuthenticatedInviteCodesPage = () => {
 
 	return (
 		<div class="flex flex-col">
+			<Title>Invite codes / Langit</Title>
+
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold leading-5">Invite codes</p>
 			</div>

@@ -1,5 +1,6 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
+import { Title } from '@solidjs/meta';
 import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
 
 import { createQuery } from '~/lib/solid-query/index.ts';
@@ -74,8 +75,25 @@ const AuthenticatedPostPage = () => {
 		});
 	};
 
+	const renderTitle = () => {
+		const $thread = thread();
+
+		if ($thread) {
+			const post = $thread.post;
+
+			const author = post.author;
+			const record = post.record.value;
+
+			return `${author.displayName.value || `@${author.handle.value}`}: "${record.text}" / Langit`;
+		}
+
+		return `Post / Langit`;
+	};
+
 	return (
 		<div class="flex flex-col">
+			<Title>{renderTitle()}</Title>
+
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Post</p>
 			</div>

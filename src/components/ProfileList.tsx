@@ -93,7 +93,7 @@ const ProfileList = (props: ProfileListProps) => {
 			</For>
 
 			<Switch>
-				<Match when={list.loading && list.refetchParam}>
+				<Match when={list.loading}>
 					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />
 					</div>

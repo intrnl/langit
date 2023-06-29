@@ -358,7 +358,7 @@ const AuthenticatedPostPage = () => {
 												{items.map((item, idx) => {
 													if ('$type' in item) {
 														return (
-															<div class="p-3">
+															<div class="border-b border-divider p-3">
 																{item.$type === 'app.bsky.feed.defs#blockedPost' ? (
 																	<EmbedRecordBlocked
 																		uid={uid()}

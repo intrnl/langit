@@ -702,7 +702,7 @@ const AuthenticatedComposePage = () => {
 													}}
 													class="overflow-hidden text-ellipsis whitespace-nowrap rounded-md border border-divider px-3 py-3 text-left text-sm hover:bg-hinted"
 												>
-													<span>Add link card:</span>
+													<span>Add link card: </span>
 													<span class="text-accent">{link}</span>
 												</button>
 											);

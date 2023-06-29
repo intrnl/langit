@@ -9,6 +9,7 @@ import { type DID } from '~/api/utils.ts';
 import { getInviteCodes, getInviteCodesKey } from '~/api/queries/get-invite-codes.ts';
 
 import { useParams } from '~/router.ts';
+import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import ContentCopyIcon from '~/icons/baseline-content-copy.tsx';
@@ -71,15 +72,18 @@ const AuthenticatedInviteCodesPage = () => {
 														{code.code}
 													</p>
 
-													<Switch
-														fallback={
-															<p class="text-muted-fg">
-																Used {code.uses.length}/{code.available} times
-															</p>
-														}
-													>
+													<Switch>
 														<Match when={code.disabled}>
 															<p class="text-muted-fg">Invite code disabled</p>
+														</Match>
+														<Match when>
+															<p class="text-muted-fg">
+																<span>
+																	Used {code.uses.length}/{code.available} times
+																</span>
+																<span class="px-1">·</span>
+																<span>{relformat.formatAbs(code.createdAt)}</span>
+															</p>
 														</Match>
 													</Switch>
 												</div>

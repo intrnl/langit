@@ -4,7 +4,7 @@ import { useNavigate } from '@solidjs/router';
 
 import { type EnhancedResource } from '~/lib/solid-query/index.ts';
 
-import { type PostProfilesListPage } from '~/api/models/profiles-list.ts';
+import { type ProfilesListPage } from '~/api/models/profiles-list.ts';
 import { type Collection, type DID, getCollectionCursor } from '~/api/utils.ts';
 
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
@@ -15,7 +15,8 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 
 export interface ProfileListProps {
 	uid: DID;
-	list: EnhancedResource<Collection<PostProfilesListPage>, string>;
+	list: EnhancedResource<Collection<ProfilesListPage>, string>;
+	hideFollow?: boolean;
 	onLoadMore: (cursor: string) => void;
 }
 
@@ -33,6 +34,8 @@ const ProfileList = (props: ProfileListProps) => {
 			<For each={list()?.pages}>
 				{(page) => {
 					return page.profiles.map((profile) => {
+						const showFollowButton = () => !props.hideFollow && profile.did !== uid();
+
 						const handleClick = (ev: MouseEvent | KeyboardEvent) => {
 							if (!isElementClicked(ev, INTERACTION_TAGS)) {
 								return;
@@ -48,7 +51,7 @@ const ProfileList = (props: ProfileListProps) => {
 						};
 
 						return (
-							<VirtualContainer key="profile" id={profile.did}>
+							<VirtualContainer key="profile" id={`${profile.did}/${+showFollowButton()}`}>
 								<div
 									onClick={handleClick}
 									onAuxClick={handleClick}
@@ -73,7 +76,7 @@ const ProfileList = (props: ProfileListProps) => {
 											</div>
 
 											<div>
-												<Show when={profile.did !== uid()}>
+												<Show when={showFollowButton()}>
 													<FollowButton uid={uid()} profile={profile} />
 												</Show>
 											</div>

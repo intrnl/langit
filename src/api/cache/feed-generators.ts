@@ -21,7 +21,6 @@ export interface SignalizedFeedGenerator {
 	descriptionFacets: Signal<BskyFeedGenerator['descriptionFacets']>;
 	avatar: Signal<BskyFeedGenerator['avatar']>;
 	likeCount: Signal<BskyFeedGenerator['likeCount']>;
-	indexedAt: Signal<BskyFeedGenerator['indexedAt']>;
 	viewer: {
 		like: Signal<NonNullable<BskyFeedGenerator['viewer']>['like']>;
 	};
@@ -41,7 +40,6 @@ const createSignalizedFeedGenerator = (feed: BskyFeedGenerator, key?: number): S
 		descriptionFacets: signal(feed.descriptionFacets),
 		avatar: signal(feed.avatar),
 		likeCount: signal(feed.likeCount),
-		indexedAt: signal(feed.indexedAt),
 		viewer: {
 			like: signal(feed.viewer?.like),
 		},
@@ -73,7 +71,6 @@ export const mergeSignalizedFeedGenerator = (
 		val.descriptionFacets.value = feed.descriptionFacets;
 		val.avatar.value = feed.avatar;
 		val.likeCount.value = feed.likeCount;
-		val.indexedAt.value = feed.indexedAt;
 
 		val.viewer.like.value = feed.viewer?.like;
 	}

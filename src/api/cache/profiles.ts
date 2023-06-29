@@ -21,7 +21,6 @@ export interface SignalizedProfile {
 	followersCount: Signal<BskyProfile['followersCount']>;
 	followsCount: Signal<BskyProfile['followsCount']>;
 	postsCount: Signal<BskyProfile['postsCount']>;
-	indexedAt: Signal<BskyProfile['indexedAt']>;
 	labels: Signal<BskyProfile['labels']>;
 	viewer: {
 		muted: Signal<BskyProfile['viewer']['muted']>;
@@ -52,7 +51,6 @@ const createSignalizedProfile = (
 		followersCount: signal(isProfile ? profile.followersCount : 0),
 		followsCount: signal(isProfile ? profile.followsCount : 0),
 		postsCount: signal(isProfile ? profile.postsCount : 0),
-		indexedAt: signal(isProfileFollow ? profile.indexedAt : ''),
 		labels: signal(profile.labels),
 		viewer: {
 			muted: signal(profile.viewer.muted),
@@ -93,7 +91,6 @@ export const mergeSignalizedProfile = (
 
 		if ('description' in profile) {
 			val.description.value = profile.description;
-			val.indexedAt.value = profile.indexedAt;
 		}
 
 		if ('postsCount' in profile) {

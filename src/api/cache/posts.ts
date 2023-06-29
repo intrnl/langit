@@ -19,7 +19,6 @@ export interface SignalizedPost {
 	replyCount: Signal<BskyPost['replyCount']>;
 	repostCount: Signal<BskyPost['repostCount']>;
 	likeCount: Signal<BskyPost['likeCount']>;
-	indexedAt: Signal<BskyPost['indexedAt']>;
 	labels: Signal<BskyPost['labels']>;
 	viewer: {
 		like: Signal<BskyPost['viewer']['like']>;
@@ -41,7 +40,6 @@ const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
 		replyCount: signal(post.replyCount),
 		repostCount: signal(post.repostCount),
 		likeCount: signal(post.likeCount),
-		indexedAt: signal(post.indexedAt),
 		labels: signal(post.labels),
 		viewer: {
 			like: signal(post.viewer.like),
@@ -71,7 +69,6 @@ export const mergeSignalizedPost = (post: BskyPost, key?: number) => {
 		val.replyCount.value = post.replyCount;
 		val.repostCount.value = post.repostCount;
 		val.likeCount.value = post.likeCount;
-		val.indexedAt.value = post.indexedAt;
 		val.labels.value = post.labels;
 
 		val.viewer.like.value = post.viewer.like;

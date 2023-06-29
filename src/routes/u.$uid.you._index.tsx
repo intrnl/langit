@@ -172,12 +172,12 @@ const AuthenticatedYouPage = () => {
 
 			<div class="flex items-center gap-4 px-4 py-3 text-sm text-muted-fg">
 				<PersonOffIcon class="text-xl" />
-				<span>Muted accounts (coming soon)</span>
+				<span>Muted users (coming soon)</span>
 			</div>
 
 			<div class="flex items-center gap-4 px-4 py-3 text-sm text-muted-fg">
 				<BlockIcon class="text-xl" />
-				<span>Blocked accounts (coming soon)</span>
+				<span>Blocked users (coming soon)</span>
 			</div>
 		</div>
 	);

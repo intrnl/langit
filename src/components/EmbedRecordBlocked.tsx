@@ -14,7 +14,7 @@ const EmbedRecordBlocked = (props: EmbedRecordBlockedProps) => {
 
 	return (
 		<div class="flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
-			<p class="m-3 text-sm text-muted-fg">This post is from an account you blocked.</p>
+			<p class="m-3 text-sm text-muted-fg">This post is from a user you blocked.</p>
 
 			<A
 				href="/u/:uid/profile/:actor/post/:status"

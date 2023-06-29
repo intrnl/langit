@@ -56,8 +56,8 @@ const createSignalizedProfile = (
 		labels: signal(profile.labels),
 		viewer: {
 			muted: signal(profile.viewer.muted),
-			mutedByList: signal(isProfile ? profile.viewer.mutedByList : undefined),
-			blocking: signal(isProfile ? profile.viewer.blocking : undefined),
+			mutedByList: signal(profile.viewer.mutedByList),
+			blocking: signal(profile.viewer.blocking),
 			blockedBy: signal(profile.viewer.blockedBy),
 			following: signal(profile.viewer.following),
 		},
@@ -86,6 +86,8 @@ export const mergeSignalizedProfile = (
 		val.labels.value = profile.labels;
 
 		val.viewer.muted.value = profile.viewer.muted;
+		val.viewer.mutedByList.value = profile.viewer.mutedByList;
+		val.viewer.blocking.value = profile.viewer.blocking;
 		val.viewer.blockedBy.value = profile.viewer.blockedBy;
 		val.viewer.following.value = profile.viewer.following;
 
@@ -99,7 +101,6 @@ export const mergeSignalizedProfile = (
 			val.followersCount.value = profile.followersCount;
 			val.followsCount.value = profile.followsCount;
 			val.postsCount.value = profile.postsCount;
-			val.viewer.mutedByList.value = profile.viewer.mutedByList;
 		}
 	}
 

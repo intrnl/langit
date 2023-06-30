@@ -3,7 +3,7 @@ import { Show } from 'solid-js';
 import { closeModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
 import { languageNamesStrict } from '~/utils/intl/displaynames.ts';
-import { CODE2_TO_CODE3 } from '~/utils/intl/languages.ts';
+import { CODE2S } from '~/utils/intl/languages.ts';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
@@ -22,18 +22,15 @@ const createSortedLanguages = () => {
 		return raw === -1 ? oob : raw;
 	};
 
-	return Object.entries(CODE2_TO_CODE3)
-		.map(([code2, code3]) => {
-			const name = languageNamesStrict.of(code3);
+	return CODE2S.map((code2) => {
+		const name = languageNamesStrict.of(code2);
 
-			return {
-				score: name !== undefined ? score(code2) : oob + 1,
-				value: code2,
-				code: code3,
-				label: name,
-			};
-		})
-		.sort((a, b) => a.score - b.score);
+		return {
+			score: name !== undefined ? score(code2) : oob + 1,
+			value: code2,
+			label: name,
+		};
+	}).sort((a, b) => a.score - b.score);
 };
 
 const LanguagePicker = (props: LanguagePickerProps) => {
@@ -64,13 +61,13 @@ const LanguagePicker = (props: LanguagePickerProps) => {
 				{(() => {
 					const excludes = props.exclude;
 
-					return sortedLanguages.map(({ value, code, label }) =>
+					return sortedLanguages.map(({ value, label }) =>
 						!excludes || !excludes.includes(value) ? (
 							<button data-value={value} onClick={choose} class={/* @once */ menu.item()}>
 								<span class="grow" classList={{ 'text-muted-fg': !label }}>
 									{label || 'N/A'}
 								</span>
-								<span class="font-mono text-muted-fg">{code}</span>
+								<span class="font-mono text-muted-fg">{value}</span>
 							</button>
 						) : null,
 					);

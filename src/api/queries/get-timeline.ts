@@ -308,7 +308,7 @@ const createFeedPostFilter = (uid: DID): PostFilter | undefined => {
 			return true;
 		}
 
-		if (!langs) {
+		if (!langs || langs.length < 1) {
 			return allowUnspecified;
 		}
 

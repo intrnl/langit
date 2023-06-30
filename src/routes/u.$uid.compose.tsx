@@ -63,6 +63,7 @@ import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
 
+import ArrowDropDownIcon from '~/icons/baseline-arrow-drop-down.tsx';
 import CloseIcon from '~/icons/baseline-close.tsx';
 import ImageIcon from '~/icons/baseline-image.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
@@ -70,6 +71,7 @@ import LanguageIcon from '~/icons/baseline-language.tsx';
 import { pm2rt } from '~/utils/composer/pm2rt.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
 import { compress } from '~/utils/image.ts';
+import { languageNames } from '~/utils/intl/displaynames.ts';
 import { formatSize } from '~/utils/intl/relformatter.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
 import { Locker } from '~/utils/lock.ts';
@@ -733,48 +735,52 @@ const AuthenticatedComposePage = () => {
 						</Match>
 					</Switch>
 
-					<div class="flex items-center gap-3 pr-3">
-						<div class="-ml-2 flex items-center gap-1">
-							<Show
-								when={imageProcessing() < 1}
-								fallback={
-									<div class="flex h-9 w-9 items-center justify-center">
-										<CircularProgress />
-									</div>
-								}
-							>
-								<button
-									title="Add image"
-									onClick={() => fileInputRef!.click()}
-									class="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-hinted"
-								>
-									<ImageIcon />
-								</button>
-							</Show>
-
+					<div class="flex flex-wrap items-center justify-end gap-2 pr-3">
+						<Show
+							when={imageProcessing() < 1}
+							fallback={
+								<div class="-ml-2 flex h-9 w-9 items-center justify-center">
+									<CircularProgress />
+								</div>
+							}
+						>
 							<button
-								onClick={() => {
-									openModal(() => <ComposeLanguageMenu languages={languages()} onChange={setLanguages} />);
-								}}
-								class="flex h-9 w-9 items-center justify-center rounded-full hover:bg-hinted"
+								title="Add image"
+								onClick={() => fileInputRef!.click()}
+								class="-ml-2 flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-hinted"
 							>
-								{(() => {
-									const $languages = languages();
-
-									if ($languages.length > 0) {
-										return <span class="text-sm font-medium">{$languages[0]}</span>;
-									} else {
-										return <LanguageIcon />;
-									}
-								})()}
+								<ImageIcon />
 							</button>
-						</div>
+						</Show>
 
 						<div class="grow" />
 
 						<span class="text-sm text-muted-fg" classList={{ 'text-red-600': length() > GRAPHEME_LIMIT }}>
 							{GRAPHEME_LIMIT - length()}
 						</span>
+
+						<button
+							onClick={() => {
+								openModal(() => <ComposeLanguageMenu languages={languages()} onChange={setLanguages} />);
+							}}
+							class="flex h-9 items-center rounded-md px-2 text-sm hover:bg-hinted"
+						>
+							{(() => {
+								const $languages = languages();
+
+								if ($languages.length > 0) {
+									const lang = $languages[0];
+									return (
+										<>
+											<span>{languageNames.of(lang)}</span>
+											<ArrowDropDownIcon class="-mr-1.5 text-lg" />
+										</>
+									);
+								} else {
+									return <LanguageIcon aria-label="Language not set" class="mx-px text-lg" />;
+								}
+							})()}
+						</button>
 
 						<button
 							disabled={!isEnabled()}

@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@floating-ui/dom": "^1.4.2",
+		"@intrnl/sq": "^0.1.0",
 		"@intrnl/use-gesture-solid": "^0.1.0",
 		"@solid-primitives/event-listener": "^2.2.13",
 		"@solidjs/meta": "^0.28.5",

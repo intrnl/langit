@@ -1,9 +1,8 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
-
-import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';

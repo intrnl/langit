@@ -1,8 +1,7 @@
 import { ErrorBoundary, For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-
-import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 

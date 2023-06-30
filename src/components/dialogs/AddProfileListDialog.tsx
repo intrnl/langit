@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch, createSignal } from 'solid-js';
 
-import { createQuery } from '~/lib/solid-query/index.ts';
+import { createQuery } from '@intrnl/sq';
 
 import { type BskyCreateRecordResponse } from '~/api/types.ts';
 import { type DID, getCollectionCursor, getRecordId } from '~/api/utils.ts';

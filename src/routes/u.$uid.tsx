@@ -1,8 +1,7 @@
 import { Show, createEffect } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { Navigate, Outlet, useLocation } from '@solidjs/router';
-
-import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { MultiagentError } from '~/api/multiagent.ts';
 import { XRPCError } from '~/api/rpc/xrpc-utils.ts';

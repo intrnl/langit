@@ -1,5 +1,6 @@
 import { For, Show, Suspense, SuspenseList, createMemo, createSignal } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
 import {
 	DragDropProvider,
@@ -29,7 +30,6 @@ import AddIcon from '~/icons/baseline-add.tsx';
 import DeleteIcon from '~/icons/baseline-delete.tsx';
 import DragHandleIcon from '~/icons/baseline-drag-handle.tsx';
 import PushPinIcon from '~/icons/baseline-push-pin.tsx';
-import { createQuery } from '~/lib/solid-query';
 
 type PinToggleHandler = (uri: string, pinned: boolean) => void;
 type RemoveHandler = (uri: string) => void;

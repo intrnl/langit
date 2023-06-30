@@ -1,6 +1,6 @@
 import { createEffect } from 'solid-js';
 
-import { createQuery } from '~/lib/solid-query/index.ts';
+import { createQuery } from '@intrnl/sq';
 
 import {
 	type ProfileTimelineParams,

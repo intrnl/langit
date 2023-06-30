@@ -1,8 +1,7 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
+import { type EnhancedResource } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
-
-import { type EnhancedResource } from '~/lib/solid-query/index.ts';
 
 import { type ProfilesListPage } from '~/api/models/profiles-list.ts';
 import { type Collection, type DID, getCollectionCursor } from '~/api/utils.ts';

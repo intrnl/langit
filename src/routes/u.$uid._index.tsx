@@ -1,9 +1,8 @@
 import { For, Show, Suspense, createEffect, createMemo } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useSearchParams } from '@solidjs/router';
-
-import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID } from '~/api/utils.ts';
 

@@ -1,8 +1,7 @@
 import { For, Match, Switch, createMemo } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-
-import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID } from '~/api/utils.ts';
 

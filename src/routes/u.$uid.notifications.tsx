@@ -1,8 +1,7 @@
 import { For, Match, Switch, createEffect } from 'solid-js';
 
+import { createMutation, createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-
-import { createMutation, createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID, getCollectionCursor } from '~/api/utils.ts';
 

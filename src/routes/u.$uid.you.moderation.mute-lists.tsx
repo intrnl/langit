@@ -1,4 +1,4 @@
-import { createQuery } from '~/lib/solid-query/index.ts';
+import { createQuery } from '@intrnl/sq';
 
 import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
 import { getSubscribedLists, getSubscribedListsKey } from '~/api/queries/get-subscribed-lists.ts';

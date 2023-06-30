@@ -1,4 +1,4 @@
-import { type EnhancedResource, type QueryFn } from '~/lib/solid-query/index.ts';
+import { type EnhancedResource, type QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { systemLanguages } from '~/globals/platform.ts';

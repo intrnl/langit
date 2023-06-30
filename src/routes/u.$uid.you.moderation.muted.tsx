@@ -1,6 +1,6 @@
 import { Title } from '@solidjs/meta';
 
-import { createQuery } from '~/lib/solid-query/index.ts';
+import { createQuery } from '@intrnl/sq';
 
 import { type DID } from '~/api/utils.ts';
 

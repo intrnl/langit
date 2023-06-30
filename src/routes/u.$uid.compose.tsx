@@ -1,6 +1,7 @@
 import { type Accessor, For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 
+import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
@@ -21,8 +22,6 @@ import {
 	size,
 } from '@floating-ui/dom';
 import { createTiptapEditor } from 'solid-tiptap';
-
-import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID, getRecordId } from '~/api/utils.ts';
 

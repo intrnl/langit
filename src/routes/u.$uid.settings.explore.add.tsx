@@ -1,8 +1,7 @@
 import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
-
-import { createQuery } from '~/lib/solid-query/index.ts';
 
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 

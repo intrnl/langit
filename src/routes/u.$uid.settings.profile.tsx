@@ -1,6 +1,6 @@
 import { Match, Show, Switch } from 'solid-js';
 
-import { createMutation, createQuery } from '~/lib/solid-query/index.ts';
+import { createMutation, createQuery } from '@intrnl/sq';
 
 import { type BskyProfileRecord, type BskyRecord } from '~/api/types';
 import { type DID } from '~/api/utils.ts';

@@ -13,6 +13,9 @@ dependencies:
   '@floating-ui/dom':
     specifier: ^1.4.2
     version: 1.4.2
+  '@intrnl/sq':
+    specifier: ^0.1.0
+    version: 0.1.0(solid-js@1.7.7)
   '@intrnl/use-gesture-solid':
     specifier: ^0.1.0
     version: 0.1.0(solid-js@1.7.7)
@@ -689,6 +692,15 @@ packages:
     resolution: {integrity: sha512-VKmvHVatWnewmGGy+7Mdy4cTJX71Pli6v/Wjb5RQBuq5wjUYx+Ef+kRThi8qggZqDgD8CogCpqhRoVp3+yQk+g==}
     dependencies:
       '@floating-ui/core': 1.3.1
+    dev: false
+
+  /@intrnl/sq@0.1.0(solid-js@1.7.7):
+    resolution: {integrity: sha512-nJUW5ibPg+kU0mNGnMDMzc1eUhYNtrwW6NhkihDDZKtba/yyQnyoJ0Pcf7DhbBQ5aKEi5yzXwr2urqBl2DkzSQ==}
+    peerDependencies:
+      solid-js: ^1.7.6
+    dependencies:
+      '@solid-primitives/event-listener': 2.2.13(solid-js@1.7.7)
+      solid-js: 1.7.7
     dev: false
 
   /@intrnl/use-gesture-solid@0.1.0(solid-js@1.7.7):

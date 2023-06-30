@@ -1,8 +1,7 @@
 import { Show, createSignal } from 'solid-js';
 
+import { createMutation, createQuery } from '@intrnl/sq';
 import { useNavigate, useSearchParams } from '@solidjs/router';
-
-import { createMutation, createQuery } from '~/lib/solid-query/index.ts';
 
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 import { XRPC } from '~/api/rpc/xrpc.ts';

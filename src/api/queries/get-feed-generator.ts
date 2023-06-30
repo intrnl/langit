@@ -1,4 +1,4 @@
-import { type InitialDataFn, type QueryFn } from '~/lib/solid-query/index.ts';
+import { type InitialDataFn, type QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';

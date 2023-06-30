@@ -1,6 +1,6 @@
 import { Match, Switch } from 'solid-js';
 
-import { createQuery } from '~/lib/solid-query/index.ts';
+import { createQuery } from '@intrnl/sq';
 
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 

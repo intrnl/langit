@@ -1,4 +1,4 @@
-import { type QueryFn } from '~/lib/solid-query/index.ts';
+import { type QueryFn } from '@intrnl/sq';
 
 import { compress } from '~/utils/image.ts';
 

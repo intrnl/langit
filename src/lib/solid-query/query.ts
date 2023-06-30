@@ -113,14 +113,16 @@ export const createQuery = <Data, Key extends QueryKey, Param = unknown>(
 		refetchInterval,
 	} = resolvedOptions;
 
+	const isEnabled = typeof enabled === 'function' ? createMemo(enabled) : () => enabled;
+
 	const source = createMemo(
 		() => {
-			const $enabled = typeof enabled === 'function' ? enabled() : enabled;
-
-			if ($enabled) {
-				const $key = key();
-				return { key: $key, hash: hashQueryKey($key) };
+			if (!isEnabled()) {
+				return;
 			}
+
+			const $key = key();
+			return { key: $key, hash: hashQueryKey($key) };
 		},
 		undefined,
 		{ equals: (a, b) => a?.hash === b?.hash },

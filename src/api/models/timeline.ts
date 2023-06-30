@@ -1,11 +1,5 @@
-import { type InfiniteData } from '@tanstack/solid-query';
-
-import {
-	type SignalizedTimelinePost,
-	createSignalizedTimelinePost,
-	mergeSignalizedPost,
-} from '../cache/posts.ts';
-import { type BskyPost, type BskyTimelinePost, type BskyTimelineResponse } from '../types.ts';
+import { type SignalizedTimelinePost, createSignalizedTimelinePost } from '../cache/posts.ts';
+import { type BskyTimelinePost } from '../types.ts';
 
 export interface TimelineSlice {
 	items: SignalizedTimelinePost[];
@@ -39,15 +33,12 @@ export interface TimelinePage {
 export type SliceFilter = (slice: TimelineSlice, seen: Set<string>) => boolean;
 export type PostFilter = (post: BskyTimelinePost) => boolean;
 
-export const createTimelinePage = (
-	data: BskyTimelineResponse,
+export const createTimelineSlices = (
+	arr: BskyTimelinePost[],
 	sliceFilter?: SliceFilter,
 	postFilter?: PostFilter,
-): TimelinePage => {
+) => {
 	const key = Date.now();
-
-	const arr = data.feed;
-	const len = arr.length;
 
 	const seen = new Set<string>();
 	let slices: TimelineSlice[] = [];
@@ -104,63 +95,8 @@ export const createTimelinePage = (
 	}
 
 	if (sliceFilter && jlen > 0) {
-		const finalslices: TimelineSlice[] = [];
-
-		for (let i = 0; i < jlen; i++) {
-			const slice = slices[i];
-
-			if (sliceFilter(slice, seen)) {
-				finalslices.push(slice);
-			}
-		}
-
-		slices = finalslices;
+		slices = slices.filter((slice) => sliceFilter(slice, seen));
 	}
 
-	return {
-		cursor: data.cursor,
-		cid: len > 0 ? arr[0].post.cid : undefined,
-		length: len,
-		slices,
-	};
-};
-
-export const createLikesTimelinePage = (cursor: string, posts: BskyPost[]): TimelinePage => {
-	const key = Date.now();
-
-	const len = posts.length;
-	const slices: TimelineSlice[] = [];
-
-	for (let idx = 0; idx < len; idx++) {
-		const post = posts[idx];
-		const signalized = mergeSignalizedPost(post, key);
-
-		slices.push({ items: [{ post: signalized, reason: undefined }] });
-	}
-
-	return {
-		cursor: cursor,
-		cid: len > 0 ? posts[0].cid : undefined,
-		length: len,
-		slices: slices,
-	};
-};
-
-// Do not automatically fetch the next page if the N last pages have all been empty.
-const MAX_DISTANCE = 3;
-
-export const shouldFetchNextPage = (data: InfiniteData<TimelinePage>) => {
-	const pages = data.pages;
-	const length = pages.length;
-
-	const last = pages[length - 1];
-
-	if (last.slices.length === 0) {
-		return (
-			last.cid &&
-			(length <= MAX_DISTANCE || pages.slice(-MAX_DISTANCE).some((page) => page.slices.length !== 0))
-		);
-	}
-
-	return false;
+	return slices;
 };

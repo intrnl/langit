@@ -1,7 +1,7 @@
 import { For, Show, Suspense, SuspenseList, createMemo, createSignal } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
-import { createQuery } from '@tanstack/solid-query';
 import {
 	DragDropProvider,
 	DragDropSensors,
@@ -10,10 +10,13 @@ import {
 	transformStyle,
 } from '@thisbeyond/solid-dnd';
 
-import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
-import { getRepoId, type DID, getRecordId } from '~/api/utils.ts';
+import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
-import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
+import {
+	getFeedGenerator,
+	getFeedGeneratorKey,
+	getInitialFeedGenerator,
+} from '~/api/queries/get-feed-generator.ts';
 
 import { preferences } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
@@ -49,18 +52,12 @@ const FeedItem = (props: FeedItemProps) => {
 	const pinned = () => props.pinned;
 	const editing = () => props.editing;
 
-	const feedQuery = createQuery({
-		queryKey: () => getFeedGeneratorKey(props.uid, feedUri()),
-		queryFn: getFeedGenerator,
+	const [feed] = createQuery({
+		key: () => getFeedGeneratorKey(props.uid, feedUri()),
+		fetch: getFeedGenerator,
 		staleTime: 30_000,
-		suspense: true,
-		initialData: () => {
-			const ref = feedGeneratorsCache[feedUri()];
-			return ref?.deref();
-		},
+		initialData: getInitialFeedGenerator,
 	});
-
-	const feed = () => feedQuery.data!;
 
 	const click = (ev: MouseEvent | KeyboardEvent) => {
 		if (editing() || !isElementClicked(ev, INTERACTION_TAGS)) {

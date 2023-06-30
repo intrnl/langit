@@ -1,6 +1,6 @@
 import { Match, Switch } from 'solid-js';
 
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
 
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -30,10 +30,10 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 		<div class={/* @once */ dialog.content()}>
 			<Switch>
 				<Match when={profile().viewer.mutedByList.value}>
-					{(list) => {
-						const query = createQuery({
-							queryKey: () => getListKey(uid(), getRepoId(list().uri), getRecordId(list().uri), 1),
-							queryFn: getList,
+					{(record) => {
+						const [list] = createQuery({
+							key: () => getListKey(uid(), getRepoId(record().uri), getRecordId(record().uri), 1),
+							fetch: getList,
 							staleTime: 60_000,
 							refetchOnReconnect: false,
 							refetchOnWindowFocus: false,
@@ -43,19 +43,11 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 							<>
 								<h1 class={/* @once */ dialog.title()}>Cannot unmute @{profile().handle.value}</h1>
 
-								<p class="mt-3 text-sm">
-									To unmute this user, you have to unsubscribe from this mute list.
-								</p>
+								<p class="mt-3 text-sm">To unmute this user, you have to unsubscribe from this mute list.</p>
 
 								<div class="mt-3 rounded-md border border-divider">
 									<Switch>
-										<Match when={query.isLoading}>
-											<div class="flex justify-center p-3">
-												<CircularProgress />
-											</div>
-										</Match>
-
-										<Match when={query.data}>
+										<Match when={list()?.pages[0]}>
 											{(data) => (
 												<ListItem
 													uid={uid()}
@@ -66,6 +58,12 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 													}}
 												/>
 											)}
+										</Match>
+
+										<Match when>
+											<div class="flex justify-center p-3">
+												<CircularProgress />
+											</div>
 										</Match>
 									</Switch>
 								</div>

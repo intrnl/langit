@@ -1,18 +1,18 @@
-import { For, type ComponentProps } from 'solid-js';
+import { type ComponentProps, For } from 'solid-js';
 
 import { type DID } from '~/api/utils.ts';
 
-import { useParams } from '~/router.ts';
 import { systemLanguages } from '~/globals/platform.ts';
 import { preferences } from '~/globals/preferences.ts';
+import { useParams } from '~/router.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 
-import AddIcon from '~/icons/baseline-add.tsx';
-import CheckBoxIcon from '~/icons/baseline-check-box.tsx';
-import CheckBoxOutlineBlankIcon from '~/icons/baseline-check-box-outline-blank.tsx';
-import DeleteIcon from '~/icons/baseline-delete.tsx';
-import { openModal } from '~/globals/modals';
 import LanguagePicker from '~/components/pickers/LanguagePicker';
+import { openModal } from '~/globals/modals';
+import AddIcon from '~/icons/baseline-add.tsx';
+import CheckBoxOutlineBlankIcon from '~/icons/baseline-check-box-outline-blank.tsx';
+import CheckBoxIcon from '~/icons/baseline-check-box.tsx';
+import DeleteIcon from '~/icons/baseline-delete.tsx';
 
 const Checkbox = (props: ComponentProps<'input'>) => {
 	return (

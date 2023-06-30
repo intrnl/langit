@@ -1,4 +1,4 @@
-import { createInfiniteQuery } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
 
 import { type DID } from '~/api/utils.ts';
 
@@ -15,15 +15,14 @@ const AuthenticatedProfileListsPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const listQuery = createInfiniteQuery({
-		queryKey: () => getProfileListsKey(uid(), params.actor, PAGE_SIZE),
-		queryFn: getProfileLists,
-		getNextPageParam: (last) => last.cursor,
+	const [lists, { refetch }] = createQuery({
+		key: () => getProfileListsKey(uid(), params.actor, PAGE_SIZE),
+		fetch: getProfileLists,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 	});
 
-	return <ListList uid={uid()} listQuery={listQuery} onLoadMore={() => listQuery.fetchNextPage()} />;
+	return <ListList uid={uid()} list={lists} onLoadMore={(cursor) => refetch(true, cursor)} />;
 };
 
 export default AuthenticatedProfileListsPage;

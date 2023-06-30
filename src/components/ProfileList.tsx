@@ -1,10 +1,10 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
+import { type EnhancedResource } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
-import { type CreateInfiniteQueryResult } from '@tanstack/solid-query';
 
-import { type PostProfilesListPage } from '~/api/models/profiles-list.ts';
-import { type DID } from '~/api/utils.ts';
+import { type ProfilesListPage } from '~/api/models/profiles-list.ts';
+import { type Collection, type DID, getCollectionCursor } from '~/api/utils.ts';
 
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
@@ -14,14 +14,15 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 
 export interface ProfileListProps {
 	uid: DID;
-	listQuery: CreateInfiniteQueryResult<PostProfilesListPage, unknown>;
-	onLoadMore?: () => void;
+	list: EnhancedResource<Collection<ProfilesListPage>, string>;
+	hideFollow?: boolean;
+	onLoadMore: (cursor: string) => void;
 }
 
 const ProfileList = (props: ProfileListProps) => {
 	// we're destructuring these props because we don't expect these to ever
 	// change, they shouldn't.
-	const { listQuery, onLoadMore } = props;
+	const { list, onLoadMore } = props;
 
 	const navigate = useNavigate();
 
@@ -29,9 +30,11 @@ const ProfileList = (props: ProfileListProps) => {
 
 	return (
 		<>
-			<For each={listQuery.data ? listQuery.data.pages : []}>
+			<For each={list()?.pages}>
 				{(page) => {
 					return page.profiles.map((profile) => {
+						const showFollowButton = () => !props.hideFollow && profile.did !== uid();
+
 						const handleClick = (ev: MouseEvent | KeyboardEvent) => {
 							if (!isElementClicked(ev, INTERACTION_TAGS)) {
 								return;
@@ -47,7 +50,7 @@ const ProfileList = (props: ProfileListProps) => {
 						};
 
 						return (
-							<VirtualContainer key="profile" id={profile.did}>
+							<VirtualContainer key="profile" id={`${profile.did}/${+showFollowButton()}`}>
 								<div
 									onClick={handleClick}
 									onAuxClick={handleClick}
@@ -72,7 +75,7 @@ const ProfileList = (props: ProfileListProps) => {
 											</div>
 
 											<div>
-												<Show when={profile.did !== uid()}>
+												<Show when={showFollowButton()}>
 													<FollowButton uid={uid()} profile={profile} />
 												</Show>
 											</div>
@@ -91,27 +94,29 @@ const ProfileList = (props: ProfileListProps) => {
 				}}
 			</For>
 
-			<Switch
-				fallback={
-					<div class="flex h-13 items-center justify-center">
-						<p class="text-sm text-muted-fg">End of list</p>
-					</div>
-				}
-			>
-				<Match when={listQuery.isFetching}>
+			<Switch>
+				<Match when={list.loading}>
 					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={listQuery.hasNextPage}>
-					<button
-						onClick={onLoadMore}
-						disabled={listQuery.isRefetching}
-						class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
-					>
-						Show more
-					</button>
+				<Match when={getCollectionCursor(list(), 'cursor')}>
+					{(cursor) => (
+						<button
+							onClick={() => onLoadMore(cursor())}
+							disabled={list.loading}
+							class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
+						>
+							Show more
+						</button>
+					)}
+				</Match>
+
+				<Match when={!list.loading}>
+					<div class="flex h-13 items-center justify-center">
+						<p class="text-sm text-muted-fg">End of list</p>
+					</div>
 				</Match>
 			</Switch>
 		</>

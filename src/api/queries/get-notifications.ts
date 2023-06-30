@@ -1,36 +1,46 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
 import { type BskyNotificationsResponse } from '../types.ts';
-import { type DID } from '../utils.ts';
+import { type Collection, type DID, pushCollection } from '../utils.ts';
 
-import { createNotificationsPage } from '../models/notifications.ts';
+import { type NotificationsPage, createNotificationsPage } from '../models/notifications.ts';
 
 export const getNotificationsKey = (uid: DID, limit: number) => ['getNotifications', uid, limit] as const;
-export const getNotifications = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getNotificationsKey>, string>,
-) => {
-	const [, uid, limit] = ctx.queryKey;
+export const getNotifications: QueryFn<
+	Collection<NotificationsPage>,
+	ReturnType<typeof getNotificationsKey>,
+	string
+> = async (key, { data: collection, param }) => {
+	const [, uid, limit] = key;
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
+	const response = await agent.rpc.get<BskyNotificationsResponse>({
 		method: 'app.bsky.notification.listNotifications',
-		params: { limit: limit, cursor: ctx.pageParam },
+		params: {
+			limit: limit,
+			cursor: param,
+		},
 	});
 
-	const data = response.data as BskyNotificationsResponse;
-	const page = createNotificationsPage(data);
+	const page = createNotificationsPage(response.data);
 
-	return page;
+	return pushCollection(collection, page, param);
 };
 
+export interface LatestNotification {
+	cid: string | undefined;
+	read: boolean;
+}
+
 export const getNotificationsLatestKey = (uid: DID) => ['getNotificationsLatest', uid] as const;
-export const getNotificationsLatest = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getNotificationsLatestKey>>,
-) => {
-	const [, uid] = ctx.queryKey;
+export const getNotificationsLatest: QueryFn<
+	LatestNotification,
+	ReturnType<typeof getNotificationsLatestKey>
+> = async (key) => {
+	const [, uid] = key;
 
 	const agent = await multiagent.connect(uid);
 
@@ -48,5 +58,5 @@ export const getNotificationsLatest = async (
 		return { cid: notif.cid, read: notif.isRead };
 	}
 
-	return undefined;
+	return { cid: undefined, read: true };
 };

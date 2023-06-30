@@ -27,6 +27,11 @@ export const format = (time: string | number, base = new Date()) => {
 	return Math.abs(value).toLocaleString('en-US', { style: 'unit', unit, unitDisplay: 'narrow' });
 };
 
+export const formatAbs = (time: string | number) => {
+	const date = new Date(time);
+	return dateFormat.format(date);
+};
+
 export const formatSize = (size: number) => {
 	let num = size;
 	let fractions = 0;

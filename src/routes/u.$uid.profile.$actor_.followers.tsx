@@ -1,6 +1,6 @@
 import { Show, createMemo } from 'solid-js';
 
-import { createInfiniteQuery } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
 
 import { type DID } from '~/api/utils.ts';
 
@@ -8,7 +8,7 @@ import { getProfileFollowers, getProfileFollowersKey } from '~/api/queries/get-p
 
 import { useParams } from '~/router.ts';
 
-import ProfileList from '~/components/ProfileList';
+import ProfileList from '~/components/ProfileList.tsx';
 
 const PAGE_SIZE = 30;
 
@@ -17,17 +17,16 @@ const AuthenticatedProfileFollowersPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const followersQuery = createInfiniteQuery({
-		queryKey: () => getProfileFollowersKey(uid(), params.actor, PAGE_SIZE),
-		queryFn: getProfileFollowers,
-		getNextPageParam: (last) => last.cursor,
+	const [followers, { refetch }] = createQuery({
+		key: () => getProfileFollowersKey(uid(), params.actor, PAGE_SIZE),
+		fetch: getProfileFollowers,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
 	});
 
 	const subject = createMemo(() => {
-		return followersQuery.data?.pages[0].subject;
+		return followers()?.pages[0].subject;
 	});
 
 	return (
@@ -42,7 +41,7 @@ const AuthenticatedProfileFollowersPage = () => {
 				</div>
 			</div>
 
-			<ProfileList uid={uid()} listQuery={followersQuery} onLoadMore={() => followersQuery.fetchNextPage()} />
+			<ProfileList uid={uid()} list={followers} onLoadMore={(cursor) => refetch(true, cursor)} />
 		</div>
 	);
 };

@@ -22,7 +22,7 @@ const DeletePostConfirmDialog = (props: DeletePostConfirmDialogProps) => {
 			<h1 class={/* @once */ dialog.title()}>Delete post?</h1>
 
 			<p class="mt-3 text-sm">
-				This can't be undone, the post will be deleted from your profile, the timeline of any accounts that
+				This can't be undone, the post will be deleted from your profile, the timeline of any users that
 				follow you, and from search results.
 			</p>
 

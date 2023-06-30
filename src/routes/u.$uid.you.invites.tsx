@@ -1,12 +1,14 @@
 import { For, Match, Switch, createMemo } from 'solid-js';
 
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
+import { Title } from '@solidjs/meta';
 
 import { type DID } from '~/api/utils.ts';
 
 import { getInviteCodes, getInviteCodesKey } from '~/api/queries/get-invite-codes.ts';
 
 import { useParams } from '~/router.ts';
+import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import ContentCopyIcon from '~/icons/baseline-content-copy.tsx';
@@ -16,26 +18,22 @@ const AuthenticatedInviteCodesPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const inviteQuery = createQuery({
-		queryKey: () => getInviteCodesKey(uid()),
-		queryFn: getInviteCodes,
+	const [invites] = createQuery({
+		key: () => getInviteCodesKey(uid()),
+		fetch: getInviteCodes,
 		staleTime: 5_000,
 	});
 
 	return (
 		<div class="flex flex-col">
+			<Title>Invite codes / Langit</Title>
+
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold leading-5">Invite codes</p>
 			</div>
 
 			<Switch>
-				<Match when={inviteQuery.isLoading}>
-					<div class="flex h-13 items-center justify-center">
-						<CircularProgress />
-					</div>
-				</Match>
-
-				<Match when={inviteQuery.data}>
+				<Match when={invites()}>
 					{(data) => {
 						const codes = () => data().codes;
 
@@ -73,15 +71,18 @@ const AuthenticatedInviteCodesPage = () => {
 														{code.code}
 													</p>
 
-													<Switch
-														fallback={
-															<p class="text-muted-fg">
-																Used {code.uses.length}/{code.available} times
-															</p>
-														}
-													>
+													<Switch>
 														<Match when={code.disabled}>
 															<p class="text-muted-fg">Invite code disabled</p>
+														</Match>
+														<Match when>
+															<p class="text-muted-fg">
+																<span>
+																	Used {code.uses.length}/{code.available} times
+																</span>
+																<span class="px-1">·</span>
+																<span>{relformat.formatAbs(code.createdAt)}</span>
+															</p>
 														</Match>
 													</Switch>
 												</div>
@@ -101,6 +102,12 @@ const AuthenticatedInviteCodesPage = () => {
 							</div>
 						);
 					}}
+				</Match>
+
+				<Match when>
+					<div class="flex h-13 items-center justify-center">
+						<CircularProgress />
+					</div>
 				</Match>
 			</Switch>
 		</div>

@@ -1,21 +1,21 @@
 import { Match, Show, Switch } from 'solid-js';
 
-import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query';
+import { createMutation, createQuery } from '@intrnl/sq';
 
 import { type BskyProfileRecord, type BskyRecord } from '~/api/types';
 import { type DID } from '~/api/utils.ts';
 
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { useParams } from '~/router.ts';
 import { multiagent } from '~/globals/agent.ts';
+import { useParams } from '~/router.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
 import { createId, model } from '~/utils/misc.ts';
 
+import { uploadBlob } from '~/api/mutations/upload-blob';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input';
-import { uploadBlob } from '~/api/mutations/upload-blob';
 
 const MAX_NAME_LENGTH = 64;
 const MAX_BIO_LENGTH = 256;
@@ -26,23 +26,21 @@ const AuthenticatedProfileSettingsPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const client = useQueryClient();
-
-	const query = createQuery({
-		queryKey: () => getProfileKey(uid(), uid()),
-		queryFn: getProfile,
+	const [profile, { refetch }] = createQuery({
+		key: () => getProfileKey(uid(), uid()),
+		fetch: getProfile,
 		refetchOnMount: false,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
 	});
 
-	const [name, setName] = createDerivedSignal(() => query.data?.displayName.value || '');
-	const [bio, setBio] = createDerivedSignal(() => query.data?.description.value || '');
-	const [avatar, setAvatar] = createDerivedSignal<Blob | string | undefined>(() => query.data?.avatar.value);
-	const [banner, setBanner] = createDerivedSignal<Blob | string | undefined>(() => query.data?.banner.value);
+	const [name, setName] = createDerivedSignal(() => profile()?.displayName.value || '');
+	const [bio, setBio] = createDerivedSignal(() => profile()?.description.value || '');
+	const [avatar, setAvatar] = createDerivedSignal<Blob | string | undefined>(() => profile()?.avatar.value);
+	const [banner, setBanner] = createDerivedSignal<Blob | string | undefined>(() => profile()?.banner.value);
 
 	const mutation = createMutation({
-		mutationFn: async () => {
+		mutate: async () => {
 			const $uid = uid();
 			const agent = await multiagent.connect($uid);
 
@@ -89,9 +87,7 @@ const AuthenticatedProfileSettingsPage = () => {
 				},
 			});
 		},
-		onSuccess: () => {
-			return client.invalidateQueries(getProfileKey(uid(), uid()));
-		},
+		onSuccess: () => refetch(true),
 	});
 
 	return (
@@ -100,14 +96,14 @@ const AuthenticatedProfileSettingsPage = () => {
 				<div class="flex grow flex-col gap-0.5">
 					<p class="text-base font-bold leading-5">Edit profile</p>
 
-					<Show when={query.data}>
+					<Show when={profile()}>
 						{(profile) => <p class="text-xs text-muted-fg">@{profile().handle.value}</p>}
 					</Show>
 				</div>
 
-				<Show when={query.data}>
+				<Show when={profile()}>
 					<button
-						onClick={() => mutation.mutate()}
+						onClick={() => mutation.mutate(null)}
 						disabled={mutation.isLoading}
 						class={/* @once */ button({ color: 'primary', size: 'xs' })}
 					>
@@ -117,13 +113,7 @@ const AuthenticatedProfileSettingsPage = () => {
 			</div>
 
 			<Switch>
-				<Match when={query.isLoading}>
-					<div class="flex h-13 items-center justify-center">
-						<CircularProgress />
-					</div>
-				</Match>
-
-				<Match when={query.data}>
+				<Match when={profile()}>
 					{(profile) => (
 						<fieldset disabled={mutation.isLoading} class="contents">
 							<div class="aspect-banner bg-muted-fg">
@@ -172,6 +162,12 @@ const AuthenticatedProfileSettingsPage = () => {
 							</div>
 						</fieldset>
 					)}
+				</Match>
+
+				<Match when>
+					<div class="flex h-13 items-center justify-center">
+						<CircularProgress />
+					</div>
 				</Match>
 			</Switch>
 		</div>

@@ -1,28 +1,31 @@
-import { Match, Show, Switch, createMemo } from 'solid-js';
+import { Match, Show, Switch, createEffect, createMemo } from 'solid-js';
 
-import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
 
-import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
-import { type TimelinePage, shouldFetchNextPage } from '~/api/models/timeline.ts';
 import { type DID } from '~/api/utils.ts';
 
 import {
 	createFeedGeneratorUri,
 	getFeedGenerator,
 	getFeedGeneratorKey,
+	getInitialFeedGenerator,
 } from '~/api/queries/get-feed-generator.ts';
-import { getFeed, getFeedKey, getFeedLatest, getFeedLatestKey } from '~/api/queries/get-feed.ts';
 import { getProfileDid, getProfileDidKey } from '~/api/queries/get-profile-did.ts';
+import {
+	type CustomTimelineParams,
+	getTimeline,
+	getTimelineKey,
+	getTimelineLatest,
+	getTimelineLatestKey,
+} from '~/api/queries/get-timeline.ts';
 
 import { preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
 
-import Timeline from '~/components/Timeline.tsx';
+import TimelineList from '~/components/TimelineList';
 
 import AddIcon from '~/icons/baseline-add.tsx';
 import DeleteIcon from '~/icons/baseline-delete.tsx';
-
-const PAGE_SIZE = 30;
 
 const AuthenticatedFeedPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/feed/:feed');
@@ -31,65 +34,39 @@ const AuthenticatedFeedPage = () => {
 	const actor = () => params.actor;
 	const feed = () => params.feed;
 
-	const client = useQueryClient();
-
-	const didQuery = createQuery({
-		queryKey: () => getProfileDidKey(uid(), actor()),
-		queryFn: getProfileDid,
+	const [did] = createQuery({
+		key: () => getProfileDidKey(uid(), actor()),
+		fetch: getProfileDid,
 		staleTime: 60_000,
 	});
 
-	const feedUri = () => createFeedGeneratorUri(didQuery.data!, feed());
+	const feedUri = () => createFeedGeneratorUri(did()!, feed());
+	const feedParams = (): CustomTimelineParams => ({ type: 'custom', uri: feedUri() });
 
-	const infoQuery = createQuery({
-		queryKey: () => getFeedGeneratorKey(uid(), feedUri()),
-		queryFn: getFeedGenerator,
-		staleTime: 30_000,
-		initialData: () => {
-			const uri = feedUri();
-			const ref = feedGeneratorsCache[uri];
-
-			return ref?.deref();
-		},
-		get enabled() {
-			return !!didQuery.data;
-		},
+	const [info] = createQuery({
+		key: () => getFeedGeneratorKey(uid(), feedUri()),
+		fetch: getFeedGenerator,
+		staleTime: 60_000,
+		initialData: getInitialFeedGenerator,
+		enabled: () => !!did(),
 	});
 
-	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getFeedKey(uid(), feedUri(), PAGE_SIZE),
-		queryFn: getFeed,
-		getNextPageParam: (last) => last.cursor,
+	const [timeline, { refetch }] = createQuery({
+		key: () => getTimelineKey(uid(), feedParams()),
+		fetch: getTimeline,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
-		onSuccess: (data) => {
-			const pages = data.pages;
-			const length = pages.length;
-
-			// if the page size is 1, that means we've just went through an initial
-			// fetch, or a refetch, since our refetch process involves truncating the
-			// timeline first.
-			if (length === 1) {
-				client.setQueryData(getFeedLatestKey(uid(), feedUri()), pages[0].cid);
-			}
-
-			if (shouldFetchNextPage(data)) {
-				timelineQuery.fetchNextPage();
-			}
-		},
-		get enabled() {
-			return !!didQuery.data;
-		},
+		enabled: () => !!did(),
 	});
 
-	const latestQuery = createQuery({
-		queryKey: () => getFeedLatestKey(uid(), feedUri()),
-		queryFn: getFeedLatest,
+	const [latest, { mutate: mutateLatest }] = createQuery({
+		key: () => getTimelineLatestKey(uid(), feedParams()),
+		fetch: getTimelineLatest,
 		staleTime: 10_000,
 		refetchInterval: 30_000,
-		get enabled() {
-			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
+		enabled: () => {
+			if (!did() || !timeline() || timeline()!.pages.length < 1 || !timeline()!.pages[0].cid) {
 				return false;
 			}
 
@@ -123,18 +100,27 @@ const AuthenticatedFeedPage = () => {
 		}
 	};
 
+	createEffect(() => {
+		const $timeline = timeline();
+
+		if ($timeline) {
+			const pages = $timeline.pages;
+			const length = pages.length;
+
+			if (length === 1) {
+				mutateLatest({ cid: pages[0].cid });
+			}
+		}
+	});
+
 	return (
 		<div class="flex flex-col">
 			<div
 				class="sticky top-0 z-10 flex h-13 items-center justify-end bg-background px-4"
-				classList={{ 'border-b border-divider': !infoQuery.data }}
+				classList={{ 'border-b border-divider': !info() }}
 			>
 				<Switch>
-					<Match when={infoQuery.isLoading}>
-						<p class="grow text-base font-bold">Feed</p>
-					</Match>
-
-					<Match when={infoQuery.data}>
+					<Match when={info()}>
 						<button
 							title={isSaved() ? `Remove feed` : 'Add feed'}
 							onClick={toggleSave}
@@ -143,10 +129,14 @@ const AuthenticatedFeedPage = () => {
 							{isSaved() ? <DeleteIcon /> : <AddIcon />}
 						</button>
 					</Match>
+
+					<Match when>
+						<p class="grow text-base font-bold">Feed</p>
+					</Match>
 				</Switch>
 			</div>
 
-			<Show when={infoQuery.data}>
+			<Show when={info()}>
 				{(feed) => {
 					const creator = () => feed().creator;
 
@@ -181,38 +171,13 @@ const AuthenticatedFeedPage = () => {
 				}}
 			</Show>
 
-			<Show when={!infoQuery.isError}>
-				<Timeline
+			<Show when={!info.error}>
+				<TimelineList
 					uid={uid()}
-					timelineQuery={timelineQuery}
-					latestQuery={latestQuery}
-					onLoadMore={() => timelineQuery.fetchNextPage()}
-					onRefetch={() => {
-						// we want to truncate the timeline here so that the refetch doesn't
-						// also refetching however many pages of timeline that the user has
-						// gone through.
-
-						// this is the only way we can do that in tanstack query
-
-						// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
-						// but unfortunately that breaks the `hasNextPage` check down below
-						// and would also mean the user gets to see nothing for a bit.
-						client.setQueryData(
-							getFeedKey(uid(), feedUri(), PAGE_SIZE),
-							(prev?: InfiniteData<TimelinePage>) => {
-								if (prev) {
-									return {
-										pages: prev.pages.slice(0, 1),
-										pageParams: prev.pageParams.slice(0, 1),
-									};
-								}
-
-								return;
-							},
-						);
-
-						timelineQuery.refetch();
-					}}
+					timeline={timeline}
+					latest={latest}
+					onLoadMore={(cursor) => refetch(true, cursor)}
+					onRefetch={() => refetch(true)}
 				/>
 			</Show>
 		</div>

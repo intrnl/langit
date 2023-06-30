@@ -1,7 +1,7 @@
-import { Show } from 'solid-js';
+import { Show, createEffect } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
 import { Navigate, Outlet, useLocation } from '@solidjs/router';
-import { createQuery } from '@tanstack/solid-query';
 
 import { MultiagentError } from '~/api/multiagent.ts';
 import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
@@ -39,24 +39,34 @@ const AuthenticatedLayout = () => {
 
 	const isDesktop = useMediaQuery('(width >= 640px)');
 
-	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(uid(), uid()),
-		queryFn: getProfile,
+	const [profile] = createQuery({
+		key: () => getProfileKey(uid(), uid()),
+		fetch: getProfile,
 		staleTime: 60_000,
 		refetchOnMount: true,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
-		onError(err) {
-			let invalid = false;
+	});
 
-			if (err instanceof MultiagentError) {
-				err = err.cause || err;
+	const [latestNotification] = createQuery({
+		key: () => getNotificationsLatestKey(uid()),
+		fetch: getNotificationsLatest,
+		staleTime: 10_000,
+	});
+
+	createEffect(() => {
+		let error = profile.error;
+		let invalid = false;
+
+		if (error) {
+			if (error instanceof MultiagentError) {
+				error = error.cause || error;
 			}
 
-			if (err instanceof XRPCError) {
-				invalid = err.error === 'InvalidToken' || err.error === 'ExpiredToken';
-			} else if (err instanceof Error) {
-				invalid = err.message === 'INVALID_TOKEN';
+			if (error instanceof XRPCError) {
+				invalid = error.error === 'InvalidToken' || error.error === 'ExpiredToken';
+			} else if (error instanceof Error) {
+				invalid = error.message === 'INVALID_TOKEN';
 			}
 
 			if (invalid) {
@@ -64,13 +74,7 @@ const AuthenticatedLayout = () => {
 					disableBackdropClose: true,
 				});
 			}
-		},
-	});
-
-	const notificationsQuery = createQuery({
-		queryKey: () => getNotificationsLatestKey(uid()),
-		queryFn: getNotificationsLatest,
-		staleTime: 10_000,
+		}
 	});
 
 	return (
@@ -120,7 +124,7 @@ const AuthenticatedLayout = () => {
 								<NotificationsOutlinedIcon class="text-2xl group-[.is-active]:hidden" />
 								<NotificationsIcon class="hidden text-2xl group-[.is-active]:block" />
 
-								<Show when={notificationsQuery.data && !notificationsQuery.data.read}>
+								<Show when={latestNotification() && !latestNotification()!.read}>
 									<div class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
 								</Show>
 							</div>
@@ -154,14 +158,14 @@ const AuthenticatedLayout = () => {
 						>
 							<div class="p-2">
 								<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg ring-primary group-[.is-active]:ring-2">
-									<Show when={profileQuery.data?.avatar.value}>
+									<Show when={profile()?.avatar.value}>
 										{(avatar) => <img src={avatar()} class="h-full w-full object-cover" />}
 									</Show>
 								</div>
 							</div>
 
 							<span class="hidden overflow-hidden text-ellipsis text-base group-[.is-active]:font-medium xl:inline">
-								<Show when={profileQuery.data} fallback="You">
+								<Show when={profile()} fallback="You">
 									{(profile) => <>{profile().displayName.value || '@' + profile().handle.value}</>}
 								</Show>
 							</span>
@@ -220,7 +224,7 @@ const AuthenticatedLayout = () => {
 							<NotificationsOutlinedIcon class="group-[.is-active]:hidden" />
 							<NotificationsIcon class="hidden group-[.is-active]:block" />
 
-							<Show when={notificationsQuery.data && !notificationsQuery.data.read}>
+							<Show when={latestNotification() && !latestNotification()!.read}>
 								<div class="absolute right-0 top-0 h-2 w-2 rounded-full bg-red-500" />
 							</Show>
 						</div>
@@ -233,7 +237,7 @@ const AuthenticatedLayout = () => {
 						activeClass="is-active"
 					>
 						<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg ring-primary group-[.is-active]:ring-2">
-							<Show when={profileQuery.data?.avatar.value}>
+							<Show when={profile()?.avatar.value}>
 								{(avatar) => <img src={avatar()} class="h-full w-full object-cover" />}
 							</Show>
 						</div>

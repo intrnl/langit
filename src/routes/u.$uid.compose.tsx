@@ -1,8 +1,9 @@
-import { type Accessor, For, Match, Show, Switch, createMemo, createSignal, batch } from 'solid-js';
+import { type Accessor, For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 
+import { createQuery } from '@intrnl/sq';
+import { Title } from '@solidjs/meta';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
-import { createQuery } from '@tanstack/solid-query';
 
 import { Extension } from '@tiptap/core';
 import { History } from '@tiptap/extension-history';
@@ -33,13 +34,16 @@ import {
 	type BskySearchActorTypeaheadResponse,
 } from '~/api/types.ts';
 
-import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
-import { posts as postsCache } from '~/api/cache/posts.ts';
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
-import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
-import { getPost, getPostKey } from '~/api/queries/get-post.ts';
-import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
+import {
+	getFeedGenerator,
+	getFeedGeneratorKey,
+	getInitialFeedGenerator,
+} from '~/api/queries/get-feed-generator.ts';
+import { getLinkMeta, getLinkMetaKey } from '~/api/queries/get-link-meta';
+import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
+import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { useNavigate, useParams } from '~/router.ts';
@@ -49,6 +53,7 @@ import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Dialog from '~/components/Dialog.tsx';
 import EmbedFeed from '~/components/EmbedFeed.tsx';
+import EmbedLink from '~/components/EmbedLink.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
 import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
@@ -57,15 +62,13 @@ import * as dialog from '~/styles/primitives/dialog.ts';
 import CloseIcon from '~/icons/baseline-close.tsx';
 import ImageIcon from '~/icons/baseline-image.tsx';
 
-import { formatSize } from '~/utils/intl/relformatter.ts';
 import { pm2rt } from '~/utils/composer/pm2rt.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
 import { compress } from '~/utils/image.ts';
+import { formatSize } from '~/utils/intl/relformatter.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
 import { Locker } from '~/utils/lock.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
-import { getLinkMeta, getLinkMetaKey } from '~/api/queries/get-link-meta';
-import EmbedLink from '~/components/EmbedLink';
 
 const MENTION_SUGGESTION_LIMIT = 6;
 const GRAPHEME_LIMIT = 300;
@@ -126,67 +129,55 @@ const AuthenticatedComposePage = () => {
 		},
 	});
 
-	const did = createMemo(() => multiagent.accounts[uid()].session.did);
-
-	const replyQuery = createQuery({
-		queryKey: () => getPostKey(uid(), replyUri()!),
-		queryFn: getPost,
-		initialData() {
-			const signalized = postsCache[replyUri()!];
-			return signalized?.deref();
-		},
+	const [reply] = createQuery({
+		key: () => getPostKey(uid(), replyUri()!),
+		fetch: getPost,
 		staleTime: 30_000,
-		get enabled() {
+		initialData: getInitialPost,
+		enabled: () => {
 			return !!replyUri();
 		},
 	});
 
-	const quoteQuery = createQuery({
-		queryKey: () => getPostKey(uid(), recordUri()!),
-		queryFn: getPost,
-		initialData() {
-			const signalized = postsCache[quoteUri()!];
-			return signalized?.deref();
-		},
+	const [quote] = createQuery({
+		key: () => getPostKey(uid(), recordUri()!),
+		fetch: getPost,
 		staleTime: 30_000,
-		get enabled() {
+		initialData: getInitialPost,
+		enabled: () => {
 			const uri = recordUri();
 			return !!uri && (isAtpPostUri(uri) || isBskyPostUrl(uri));
 		},
 	});
 
-	const feedQuery = createQuery({
-		queryKey: () => getFeedGeneratorKey(uid(), recordUri()!),
-		queryFn: getFeedGenerator,
-		initialData() {
-			const signalized = feedGeneratorsCache[recordUri()!];
-			return signalized?.deref();
-		},
+	const [feed] = createQuery({
+		key: () => getFeedGeneratorKey(uid(), recordUri()!),
+		fetch: getFeedGenerator,
 		staleTime: 30_000,
-		get enabled() {
+		initialData: getInitialFeedGenerator,
+		enabled: () => {
 			const uri = recordUri();
 			return !!uri && (isAtpFeedUri(uri) || isBskyFeedUrl(uri));
 		},
 	});
 
-	const linkQuery = createQuery({
-		queryKey: () => getLinkMetaKey(linkUrl()!),
-		queryFn: getLinkMeta,
+	const [link] = createQuery({
+		key: () => getLinkMetaKey(linkUrl()!),
+		fetch: getLinkMeta,
 		staleTime: 30_000,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
-		get enabled() {
-			return !!linkUrl();
-		},
+		enabled: () => !!linkUrl(),
 	});
 
-	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(uid(), did()),
-		queryFn: getProfile,
+	const [profile] = createQuery({
+		key: () => getProfileKey(uid(), uid()),
+		fetch: getProfile,
 		staleTime: 10_000,
 		refetchOnMount: true,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
+		initialData: getInitialProfile,
 	});
 
 	const length = createMemo(() => {
@@ -195,14 +186,12 @@ const AuthenticatedComposePage = () => {
 	});
 
 	const isEnabled = createMemo(() => {
-		const len = length();
-		const image = images();
 		return (
-			!replyQuery.isInitialLoading &&
-			!quoteQuery.isInitialLoading &&
-			!feedQuery.isInitialLoading &&
+			reply.state !== 'pending' &&
+			quote.state !== 'pending' &&
+			feed.state !== 'pending' &&
 			state() === PostState.IDLE &&
-			((len > 0 && len <= 300) || image.length > 0)
+			((length() > 0 && length() <= 300) || images().length > 0)
 		);
 	});
 
@@ -215,21 +204,21 @@ const AuthenticatedComposePage = () => {
 
 		setState(PostState.DISPATCHING);
 
-		const reply = replyQuery.data;
-		const quote = quoteQuery.data || feedQuery.data;
-		const link = linkQuery.data;
-		const image = images();
+		const $reply = reply();
+		const $quote = quote() || feed();
+		const $link = link();
+		const $images = images();
 
 		let replyRecord: BskyPostRecord['reply'];
 		let embedRecord: BskyPostRecord['embed'];
 
-		if (reply) {
+		if ($reply) {
 			const ref: BskyPostRecordReply = {
-				cid: reply.cid,
-				uri: reply.uri,
+				cid: $reply.cid,
+				uri: $reply.uri,
 			};
 
-			const parentRecord = reply.record.peek();
+			const parentRecord = $reply.record.peek();
 			const parentReply = parentRecord.reply;
 
 			replyRecord = {
@@ -238,11 +227,11 @@ const AuthenticatedComposePage = () => {
 			};
 		}
 
-		if (image.length > 0) {
+		if ($images.length > 0) {
 			// iterate through images, upload ones that haven't been uploaded,
 			// they're marked by whether or not it has the blob record saved.
-			for (let idx = 0, len = image.length; idx < len; idx++) {
-				const img = image[idx];
+			for (let idx = 0, len = $images.length; idx < len; idx++) {
+				const img = $images[idx];
 
 				if (img.record) {
 					continue;
@@ -265,16 +254,16 @@ const AuthenticatedComposePage = () => {
 
 			embedRecord = {
 				$type: 'app.bsky.embed.images',
-				images: image.map((img) => ({ alt: img.alt.value, image: img.record! })),
+				images: $images.map((img) => ({ alt: img.alt.value, image: img.record! })),
 			};
-		} else if (link) {
-			if (link.thumb && !link.record) {
+		} else if ($link) {
+			if ($link.thumb && !$link.record) {
 				setMessage(`Uploading link thumbnail`);
 
 				try {
-					const blob = await uploadBlob(uid(), link.thumb);
+					const blob = await uploadBlob(uid(), $link.thumb);
 
-					link.record = blob;
+					$link.record = blob;
 				} catch (err) {
 					console.error(`Failed to upload image`, err);
 
@@ -287,20 +276,20 @@ const AuthenticatedComposePage = () => {
 			embedRecord = {
 				$type: 'app.bsky.embed.external',
 				external: {
-					uri: link.uri,
-					title: link.title,
-					description: link.description,
-					thumb: link.record as any,
+					uri: $link.uri,
+					title: $link.title,
+					description: $link.description,
+					thumb: $link.record as any,
 				},
 			};
 		}
 
-		if (quote) {
+		if ($quote) {
 			const rec: BskyPostRecordEmbedRecord = {
 				$type: 'app.bsky.embed.record',
 				record: {
-					cid: quote.cid,
-					uri: quote.uri,
+					cid: $quote.cid,
+					uri: $quote.uri,
 				},
 			};
 
@@ -336,7 +325,7 @@ const AuthenticatedComposePage = () => {
 				replace: true,
 				params: {
 					uid: uid(),
-					actor: did(),
+					actor: uid(),
 					status: pid,
 				},
 			});
@@ -500,6 +489,8 @@ const AuthenticatedComposePage = () => {
 
 	return (
 		<div class="flex flex-col">
+			<Title>Compose / Langit</Title>
+
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Compose</p>
 			</div>
@@ -514,19 +505,19 @@ const AuthenticatedComposePage = () => {
 			/>
 
 			<Switch>
-				<Match when={replyQuery.isInitialLoading}>
+				<Match when={reply()}>{(reply) => <Post uid={uid()} post={reply()} next />}</Match>
+
+				<Match when={reply.loading}>
 					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />
 					</div>
 				</Match>
-
-				<Match when={replyQuery.data}>{(reply) => <Post uid={uid()} post={reply()} next />}</Match>
 			</Switch>
 
 			<div class="flex pb-4">
 				<div class="shrink-0 p-4">
 					<div class="h-12 w-12 overflow-hidden rounded-full bg-muted-fg">
-						<Show when={profileQuery.data?.avatar.value}>
+						<Show when={profile()?.avatar.value}>
 							{(avatar) => <img src={avatar()} class="h-full w-full" />}
 						</Show>
 					</div>
@@ -542,13 +533,7 @@ const AuthenticatedComposePage = () => {
 					</div>
 
 					<Switch>
-						<Match when={quoteQuery.isInitialLoading || feedQuery.isInitialLoading}>
-							<div class="mb-3 mr-3 flex items-center justify-center rounded-md border border-divider p-4">
-								<CircularProgress />
-							</div>
-						</Match>
-
-						<Match when={quoteQuery.data}>
+						<Match when={quote()}>
 							{(data) => {
 								const author = () => data().author;
 								const record = () => data().record.value;
@@ -580,7 +565,7 @@ const AuthenticatedComposePage = () => {
 							}}
 						</Match>
 
-						<Match when={feedQuery.data}>
+						<Match when={feed()}>
 							{(data) => {
 								return (
 									<div class="mb-3 mr-3 flex flex-col">
@@ -602,6 +587,12 @@ const AuthenticatedComposePage = () => {
 									</div>
 								);
 							}}
+						</Match>
+
+						<Match when={quote.loading || feed.loading}>
+							<div class="mb-3 mr-3 flex items-center justify-center rounded-md border border-divider p-4">
+								<CircularProgress />
+							</div>
 						</Match>
 					</Switch>
 
@@ -632,7 +623,7 @@ const AuthenticatedComposePage = () => {
 							</div>
 						</Match>
 
-						<Match when={linkQuery.isInitialLoading}>
+						<Match when={link.state === 'pending'}>
 							<div class="mb-3 mr-3 flex items-center justify-between gap-3 rounded-md border border-divider p-3 pl-4">
 								<CircularProgress />
 
@@ -646,7 +637,7 @@ const AuthenticatedComposePage = () => {
 							</div>
 						</Match>
 
-						<Match when={linkQuery.error}>
+						<Match when={link.error}>
 							{(error) => (
 								<div class="mb-3 mr-3 flex items-center justify-between gap-3 rounded-md border border-divider p-3">
 									<div class="grow text-sm">
@@ -665,7 +656,7 @@ const AuthenticatedComposePage = () => {
 							)}
 						</Match>
 
-						<Match when={linkQuery.data}>
+						<Match when={link()}>
 							{(data) => {
 								return (
 									<div class="relative mb-3 mr-3 flex flex-col">

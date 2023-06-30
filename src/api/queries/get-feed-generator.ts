@@ -1,10 +1,15 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type InitialDataFn, type QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 import { BSKY_FEED_URL_RE, isBskyFeedUrl } from '~/utils/link.ts';
 
-import { mergeSignalizedFeedGenerator } from '../cache/feed-generators.ts';
+import {
+	type SignalizedFeedGenerator,
+	feedGenerators,
+	mergeSignalizedFeedGenerator,
+} from '../cache/feed-generators.ts';
+
 import { type BskyFeedGenerator, type BskyGetFeedGeneratorsResponse } from '../types.ts';
 import { type DID } from '../utils.ts';
 
@@ -24,14 +29,12 @@ const fetchFeedGenerator = createBatchedFetch<Query, string, BskyFeedGenerator>(
 
 		const agent = await multiagent.connect(uid);
 
-		const response = await agent.rpc.get({
+		const response = await agent.rpc.get<BskyGetFeedGeneratorsResponse>({
 			method: 'app.bsky.feed.getFeedGenerators',
 			params: { feeds: uris },
 		});
 
-		const data = response.data as BskyGetFeedGeneratorsResponse;
-
-		return data.feeds;
+		return response.data.feeds;
 	},
 });
 
@@ -40,8 +43,11 @@ export const createFeedGeneratorUri = (actor: DID, feed: string) => {
 };
 
 export const getFeedGeneratorKey = (uid: DID, uri: string) => ['getFeedGenerator', uid, uri] as const;
-export const getFeedGenerator = async (ctx: QueryFunctionContext<ReturnType<typeof getFeedGeneratorKey>>) => {
-	const [, uid, uri] = ctx.queryKey;
+export const getFeedGenerator: QueryFn<
+	SignalizedFeedGenerator,
+	ReturnType<typeof getFeedGeneratorKey>
+> = async (key) => {
+	const [, uid, uri] = key;
 
 	const bskyMatch = isBskyFeedUrl(uri) && BSKY_FEED_URL_RE.exec(uri);
 
@@ -49,7 +55,7 @@ export const getFeedGenerator = async (ctx: QueryFunctionContext<ReturnType<type
 	if (bskyMatch) {
 		const agent = await multiagent.connect(uid);
 
-		const repo = await _getDid(agent, bskyMatch[1], ctx.signal);
+		const repo = await _getDid(agent, bskyMatch[1]);
 		const record = bskyMatch[2];
 
 		resolvedUri = createFeedGeneratorUri(repo, record);
@@ -60,11 +66,24 @@ export const getFeedGenerator = async (ctx: QueryFunctionContext<ReturnType<type
 	return mergeSignalizedFeedGenerator(feedGenerator);
 };
 
+export const getInitialFeedGenerator: InitialDataFn<
+	SignalizedFeedGenerator,
+	ReturnType<typeof getFeedGeneratorKey>
+> = (key) => {
+	const [, , uri] = key;
+
+	const ref = feedGenerators[uri];
+	const feed = ref?.deref();
+
+	return feed && { data: feed };
+};
+
 export const getPopularFeedGeneratorsKey = (uid: DID) => ['getPopularFeedGenerators', uid] as const;
-export const getPopularFeedGenerators = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getPopularFeedGeneratorsKey>>,
-) => {
-	const [, uid] = ctx.queryKey;
+export const getPopularFeedGenerators: QueryFn<
+	SignalizedFeedGenerator[],
+	ReturnType<typeof getPopularFeedGeneratorsKey>
+> = async (key) => {
+	const [, uid] = key;
 
 	const agent = await multiagent.connect(uid);
 
@@ -74,7 +93,6 @@ export const getPopularFeedGenerators = async (
 
 	// returns the same structure so let's just reuse the type
 	const data = response.data as BskyGetFeedGeneratorsResponse;
-	const key = Date.now();
 
-	return data.feeds.map((feed) => mergeSignalizedFeedGenerator(feed, key));
+	return data.feeds.map((feed) => mergeSignalizedFeedGenerator(feed));
 };

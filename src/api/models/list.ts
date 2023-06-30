@@ -10,7 +10,11 @@ export interface ListsPage {
 	lists: SignalizedList[];
 }
 
-export interface ListPage {
+export interface SubscribedListsPage extends ListsPage {
+	remainingLists: SignalizedList[];
+}
+
+export interface DetailedListPage {
 	cursor?: string;
 	items: SignalizedListSubject[];
 	list: SignalizedList;

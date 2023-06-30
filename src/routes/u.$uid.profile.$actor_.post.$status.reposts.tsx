@@ -1,4 +1,4 @@
-import { createInfiniteQuery } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
 
 import { type DID } from '~/api/utils.ts';
 
@@ -15,10 +15,9 @@ const AuthenticatedPostRespostsPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const likesQuery = createInfiniteQuery({
-		queryKey: () => getPostRepostedByKey(uid(), params.actor, params.status, PAGE_SIZE),
-		queryFn: getPostRepostedBy,
-		getNextPageParam: (last) => last.cursor,
+	const [likes, { refetch }] = createQuery({
+		key: () => getPostRepostedByKey(uid(), params.actor, params.status, PAGE_SIZE),
+		fetch: getPostRepostedBy,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
@@ -30,7 +29,7 @@ const AuthenticatedPostRespostsPage = () => {
 				<p class="text-base font-bold leading-5">Reposts</p>
 			</div>
 
-			<ProfileList uid={uid()} listQuery={likesQuery} onLoadMore={() => likesQuery.fetchNextPage()} />
+			<ProfileList uid={uid()} list={likes} onLoadMore={(cursor) => refetch(true, cursor)} />
 		</div>
 	);
 };

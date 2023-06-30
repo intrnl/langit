@@ -1,66 +1,50 @@
-import { type InfiniteData, createInfiniteQuery, createQuery, useQueryClient } from '@tanstack/solid-query';
+import { createEffect } from 'solid-js';
+
+import { createQuery } from '@intrnl/sq';
+
+import {
+	type ProfileTimelineParams,
+	getTimeline,
+	getTimelineKey,
+	getTimelineLatest,
+	getTimelineLatestKey,
+} from '~/api/queries/get-timeline.ts';
 
 import { type DID } from '~/api/utils.ts';
 
-import { type TimelinePage, shouldFetchNextPage } from '~/api/models/timeline.ts';
-import {
-	getProfileFeed,
-	getProfileFeedKey,
-	getProfileFeedLatest,
-	getProfileFeedLatestKey,
-} from '~/api/queries/get-profile-feed.ts';
-
 import { useParams } from '~/router.ts';
 
-import Timeline from '~/components/Timeline.tsx';
-
-const PAGE_SIZE = 30;
+import TimelineList from '~/components/TimelineList.tsx';
 
 export interface AuthenticatedProfileTimelinePageProps {
-	replies?: boolean;
+	type?: ProfileTimelineParams['tab'];
 }
 
 const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePageProps) => {
 	const params = useParams('/u/:uid/profile/:actor');
-	const client = useQueryClient();
 
-	const withReplies = () => props.replies || false;
+	const type = () => props.type ?? 'posts';
 
 	const uid = () => params.uid as DID;
 	const actor = () => params.actor;
 
-	const timelineQuery = createInfiniteQuery({
-		queryKey: () => getProfileFeedKey(uid(), actor(), withReplies(), PAGE_SIZE),
-		queryFn: getProfileFeed,
-		getNextPageParam: (last) => last.cursor,
+	const feedParams = (): ProfileTimelineParams => ({ type: 'profile', actor: actor(), tab: type() });
+
+	const [timeline, { refetch }] = createQuery({
+		key: () => getTimelineKey(uid(), feedParams()),
+		fetch: getTimeline,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
-		onSuccess: (data) => {
-			const pages = data.pages;
-			const length = pages.length;
-
-			// if the page size is 1, that means we've just went through an initial
-			// fetch, or a refetch, since our refetch process involves truncating the
-			// timeline first.
-			if (length === 1) {
-				client.setQueryData(getProfileFeedLatestKey(uid(), actor()), pages[0].cid);
-			}
-
-			// check if the last page is empty because of its slices being filtered
-			// away, if so, fetch next page
-			if (shouldFetchNextPage(data)) {
-				timelineQuery.fetchNextPage();
-			}
-		},
 	});
 
-	const latestQuery = createQuery({
-		queryKey: () => getProfileFeedLatestKey(uid(), actor()),
-		queryFn: getProfileFeedLatest,
+	const [latest, { mutate: mutateLatest }] = createQuery({
+		key: () => getTimelineLatestKey(uid(), feedParams()),
+		fetch: getTimelineLatest,
 		staleTime: 10_000,
-		get enabled() {
-			if (!timelineQuery.data || timelineQuery.data.pages.length < 1 || !timelineQuery.data.pages[0].cid) {
+		refetchInterval: 30_000,
+		enabled: () => {
+			if (!timeline() || timeline()!.pages.length < 1 || !timeline()!.pages[0].cid) {
 				return false;
 			}
 
@@ -68,38 +52,26 @@ const AuthenticatedProfileTimelinePage = (props: AuthenticatedProfileTimelinePag
 		},
 	});
 
+	createEffect(() => {
+		const $timeline = timeline();
+
+		if ($timeline) {
+			const pages = $timeline.pages;
+			const length = pages.length;
+
+			if (length === 1) {
+				mutateLatest({ cid: pages[0].cid });
+			}
+		}
+	});
+
 	return (
-		<Timeline
+		<TimelineList
 			uid={uid()}
-			timelineQuery={timelineQuery}
-			latestQuery={latestQuery}
-			onLoadMore={() => timelineQuery.fetchNextPage()}
-			onRefetch={() => {
-				// we want to truncate the timeline here so that the refetch doesn't
-				// also refetching however many pages of timeline that the user has
-				// gone through.
-
-				// this is the only way we can do that in tanstack query
-
-				// ideally it would've been `{ pages: [], pageParams: [undefined] }`,
-				// but unfortunately that breaks the `hasNextPage` check down below
-				// and would also mean the user gets to see nothing for a bit.
-				client.setQueryData(
-					getProfileFeedKey(uid(), actor(), withReplies(), PAGE_SIZE),
-					(prev?: InfiniteData<TimelinePage>) => {
-						if (prev) {
-							return {
-								pages: prev.pages.slice(0, 1),
-								pageParams: prev.pageParams.slice(0, 1),
-							};
-						}
-
-						return;
-					},
-				);
-
-				timelineQuery.refetch();
-			}}
+			timeline={timeline}
+			latest={latest}
+			onLoadMore={(cursor) => refetch(true, cursor)}
+			onRefetch={() => refetch(true)}
 		/>
 	);
 };

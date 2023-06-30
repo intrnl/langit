@@ -21,7 +21,6 @@ export interface SignalizedProfile {
 	followersCount: Signal<BskyProfile['followersCount']>;
 	followsCount: Signal<BskyProfile['followsCount']>;
 	postsCount: Signal<BskyProfile['postsCount']>;
-	indexedAt: Signal<BskyProfile['indexedAt']>;
 	labels: Signal<BskyProfile['labels']>;
 	viewer: {
 		muted: Signal<BskyProfile['viewer']['muted']>;
@@ -52,12 +51,11 @@ const createSignalizedProfile = (
 		followersCount: signal(isProfile ? profile.followersCount : 0),
 		followsCount: signal(isProfile ? profile.followsCount : 0),
 		postsCount: signal(isProfile ? profile.postsCount : 0),
-		indexedAt: signal(isProfileFollow ? profile.indexedAt : ''),
 		labels: signal(profile.labels),
 		viewer: {
 			muted: signal(profile.viewer.muted),
-			mutedByList: signal(isProfile ? profile.viewer.mutedByList : undefined),
-			blocking: signal(isProfile ? profile.viewer.blocking : undefined),
+			mutedByList: signal(profile.viewer.mutedByList),
+			blocking: signal(profile.viewer.blocking),
 			blockedBy: signal(profile.viewer.blockedBy),
 			following: signal(profile.viewer.following),
 		},
@@ -86,12 +84,13 @@ export const mergeSignalizedProfile = (
 		val.labels.value = profile.labels;
 
 		val.viewer.muted.value = profile.viewer.muted;
+		val.viewer.mutedByList.value = profile.viewer.mutedByList;
+		val.viewer.blocking.value = profile.viewer.blocking;
 		val.viewer.blockedBy.value = profile.viewer.blockedBy;
 		val.viewer.following.value = profile.viewer.following;
 
 		if ('description' in profile) {
 			val.description.value = profile.description;
-			val.indexedAt.value = profile.indexedAt;
 		}
 
 		if ('postsCount' in profile) {
@@ -99,7 +98,6 @@ export const mergeSignalizedProfile = (
 			val.followersCount.value = profile.followersCount;
 			val.followsCount.value = profile.followsCount;
 			val.postsCount.value = profile.postsCount;
-			val.viewer.mutedByList.value = profile.viewer.mutedByList;
 		}
 	}
 

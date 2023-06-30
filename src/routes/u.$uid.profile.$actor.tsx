@@ -1,28 +1,27 @@
 import { Match, Show, Switch } from 'solid-js';
 
+import { createQuery } from '@intrnl/sq';
+import { Title } from '@solidjs/meta';
 import { Outlet } from '@solidjs/router';
-import { createInfiniteQuery, createQuery } from '@tanstack/solid-query';
 
 import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
 import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
-import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
+import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { A, useParams } from '~/router.ts';
 import { openModal } from '~/globals/modals.tsx';
+import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
-import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
-import ProfileMenu from '~/components/menus/ProfileMenu.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
+import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import FollowButton from '~/components/FollowButton.tsx';
+import ProfileMenu from '~/components/menus/ProfileMenu.tsx';
 import { TabLink } from '~/components/Tab.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
-
-const PAGE_SIZE = 30;
 
 const AuthenticatedProfileLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor');
@@ -30,17 +29,17 @@ const AuthenticatedProfileLayout = () => {
 	const uid = () => params.uid as DID;
 	const actor = () => params.actor;
 
-	const profileQuery = createQuery({
-		queryKey: () => getProfileKey(uid(), actor()),
-		queryFn: getProfile,
+	const [profile] = createQuery({
+		key: () => getProfileKey(uid(), actor()),
+		fetch: getProfile,
 		staleTime: 10_000,
 		refetchOnWindowFocus: false,
+		initialData: getInitialProfile,
 	});
 
-	const listQuery = createInfiniteQuery({
-		queryKey: () => getProfileListsKey(uid(), actor(), PAGE_SIZE),
-		queryFn: getProfileLists,
-		getNextPageParam: (last) => last.cursor,
+	const [lists] = createQuery({
+		key: () => getProfileListsKey(uid(), actor()),
+		fetch: getProfileLists,
 		refetchOnMount: false,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
@@ -49,26 +48,34 @@ const AuthenticatedProfileLayout = () => {
 	return (
 		<div class="flex grow flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
-				<Show when={profileQuery.data} fallback={<p class="text-base font-bold">Profile</p>}>
-					{(profile) => (
-						<div class="flex flex-col gap-0.5">
-							<p class="line-clamp-1 break-all text-base font-bold leading-5">
-								{profile().displayName.value}
-							</p>
-							<p class="text-xs text-muted-fg">{comformat.format(profile().postsCount.value)} posts</p>
-						</div>
-					)}
-				</Show>
+				<Switch>
+					<Match when={profile()}>
+						{(profile) => (
+							<div class="flex flex-col gap-0.5">
+								<Title>
+									{profile().displayName.value
+										? `${profile().displayName.value} (@${profile().handle.value})`
+										: `@${profile().handle.value}`}{' '}
+									/ Langit
+								</Title>
+
+								<p class="line-clamp-1 break-all text-base font-bold leading-5">
+									{profile().displayName.value}
+								</p>
+								<p class="text-xs text-muted-fg">{comformat.format(profile().postsCount.value)} posts</p>
+							</div>
+						)}
+					</Match>
+
+					<Match when>
+						<Title>Profile ({actor()}) / Langit</Title>
+						<p class="text-base font-bold">Profile</p>
+					</Match>
+				</Switch>
 			</div>
 
 			<Switch>
-				<Match when={profileQuery.isLoading}>
-					<div class="flex h-13 items-center justify-center">
-						<CircularProgress />
-					</div>
-				</Match>
-
-				<Match when={profileQuery.error}>
+				<Match when={profile.error}>
 					{(error) => (
 						<Switch fallback={<div class="p-3 text-sm">Something went wrong.</div>}>
 							<Match when={(error() as XRPCError).error === 'InvalidRequest'}>
@@ -83,7 +90,7 @@ const AuthenticatedProfileLayout = () => {
 					)}
 				</Match>
 
-				<Match when={profileQuery.data}>
+				<Match when={profile()}>
 					{(profile) => {
 						return (
 							<>
@@ -221,7 +228,7 @@ const AuthenticatedProfileLayout = () => {
 											Likes
 										</TabLink>
 
-										<Show when={!!listQuery.data?.pages[0]?.lists.length}>
+										<Show when={!!lists()?.pages[0]?.lists.length}>
 											<TabLink href="/u/:uid/profile/:actor/list" params={params} replace>
 												Lists
 											</TabLink>
@@ -233,6 +240,12 @@ const AuthenticatedProfileLayout = () => {
 							</>
 						);
 					}}
+				</Match>
+
+				<Match when>
+					<div class="flex h-13 items-center justify-center">
+						<CircularProgress />
+					</div>
 				</Match>
 			</Switch>
 		</div>

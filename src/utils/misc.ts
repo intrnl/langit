@@ -94,3 +94,9 @@ export const followAbortSignal = (signals: (AbortSignal | undefined)[]) => {
 
 	return own;
 };
+
+export function assert(condition: any, message = 'Assertion failed'): asserts condition {
+	if (import.meta.env.DEV && !condition) {
+		throw new Error(message);
+	}
+}

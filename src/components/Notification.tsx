@@ -1,10 +1,9 @@
-import { type Accessor, Match, Switch, For, Show } from 'solid-js';
+import { type Accessor, For, Match, Show, Switch } from 'solid-js';
 import { type JSX } from 'solid-js/jsx-runtime';
 import { Dynamic } from 'solid-js/web';
 
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
 
-import { posts as postsCache } from '~/api/cache/posts.ts';
 import {
 	type FollowNotificationSlice,
 	type LikeNotificationSlice,
@@ -15,7 +14,7 @@ import {
 } from '~/api/models/notifications.ts';
 import { type DID } from '~/api/utils.ts';
 
-import { getPost, getPostKey } from '~/api/queries/get-post.ts';
+import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 
 import { A } from '~/router.ts';
 
@@ -23,8 +22,8 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
 import Post from '~/components/Post.tsx';
 
-import PersonIcon from '~/icons/baseline-person.tsx';
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';
+import PersonIcon from '~/icons/baseline-person.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
 
 export interface NotificationProps {
@@ -54,50 +53,39 @@ const Notification = (props: NotificationProps) => {
 	return (
 		<Switch>
 			<Match when={_data().type === 'reply' || _data().type === 'quote'}>
-				{/* @ts-expect-error */}
-				{() => {
+				{(_value) => {
 					const data = _data as any as Accessor<ReplyNotificationSlice | QuoteNotificationSlice>;
 
-					const reply = () => data().item;
+					const replyObj = () => data().item;
+					const replyUri = () => replyObj().uri;
 
-					const replyUri = () => reply().uri;
-
-					const replyQuery = createQuery({
-						queryKey: () => getPostKey(uid(), replyUri()),
-						queryFn: getPost,
+					const [reply] = createQuery({
+						key: () => getPostKey(uid(), replyUri()),
+						fetch: getPost,
 						refetchOnMount: false,
-						refetchOnReconnect: false,
-						refetchOnWindowFocus: false,
-						initialData: () => {
-							const ref = postsCache[replyUri()];
-							return ref?.deref();
-						},
+						initialData: getInitialPost,
 					});
 
 					return (
 						<Switch>
-							<Match when={replyQuery.isInitialLoading}>
+							<Match when={reply()}>
+								{(reply) => {
+									return <Post interactive uid={uid()} post={reply()} highlight={!data().read} />;
+								}}
+							</Match>
+
+							<Match when>
 								<div class="flex justify-center border-b border-divider p-3">
 									<CircularProgress />
 								</div>
-							</Match>
-
-							<Match when={replyQuery.data} keyed>
-								{/* @ts-expect-error*/}
-								{() => {
-									const post = () => replyQuery.data!;
-
-									return <Post interactive uid={uid()} post={post()} highlight={!data().read} />;
-								}}
 							</Match>
 						</Switch>
 					);
 				}}
 			</Match>
 
-			<Match when={true}>
-				{/* @ts-expect-error */}
-				{() => {
+			<Match when>
+				{(_value) => {
 					const data = _data as Accessor<
 						FollowNotificationSlice | LikeNotificationSlice | RepostNotificationSlice
 					>;
@@ -108,8 +96,7 @@ const Notification = (props: NotificationProps) => {
 							classList={{ 'bg-accent/20': !data().read }}
 						>
 							<div class="flex w-12 shrink-0 flex-col items-end gap-3">
-								{/* @ts-expect-error */}
-								{() => {
+								{(() => {
 									const map = ICON_MAP[data().type];
 
 									return (
@@ -120,7 +107,7 @@ const Notification = (props: NotificationProps) => {
 											/>
 										</div>
 									);
-								}}
+								})()}
 							</div>
 							<div class="flex min-w-0 grow flex-col gap-3">
 								<div class="flex gap-2">
@@ -146,34 +133,22 @@ const Notification = (props: NotificationProps) => {
 								<div class="break-words text-sm">{renderText(uid(), data())}</div>
 
 								<Show when={data().type === 'like' || data().type === 'repost'}>
-									{/* @ts-expect-error */}
-									{() => {
+									{(_value) => {
 										const data = _data as Accessor<LikeNotificationSlice | RepostNotificationSlice>;
 
 										const subject = () => data().items[0].record.subject;
 										const uri = () => subject().uri;
 
-										const postQuery = createQuery({
-											queryKey: () => getPostKey(uid(), uri()),
-											queryFn: getPost,
+										const [post] = createQuery({
+											key: () => getPostKey(uid(), uri()),
+											fetch: getPost,
 											refetchOnMount: false,
-											refetchOnReconnect: false,
-											refetchOnWindowFocus: false,
-											initialData: () => {
-												const ref = postsCache[uri()];
-												return ref?.deref();
-											},
+											initialData: getInitialPost,
 										});
 
 										return (
 											<Switch>
-												<Match when={postQuery.isLoading}>
-													<div class="flex justify-center rounded-md border border-divider p-3">
-														<CircularProgress />
-													</div>
-												</Match>
-
-												<Match when={postQuery.data}>
+												<Match when={post()}>
 													{(data) => {
 														const author = () => data().author;
 														const record = () => data().record.value;
@@ -202,6 +177,12 @@ const Notification = (props: NotificationProps) => {
 															/>
 														);
 													}}
+												</Match>
+
+												<Match when>
+													<div class="flex justify-center rounded-md border border-divider p-3">
+														<CircularProgress />
+													</div>
 												</Match>
 											</Switch>
 										);

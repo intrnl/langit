@@ -1,33 +1,35 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
 import { mergeSignalizedProfile } from '../cache/profiles.ts';
-import { type ProfilesListPage } from '../models/profiles-list.ts';
+import { type ProfilesListWithSubjectPage } from '../models/profiles-list.ts';
 
 import { type BskyFollowsResponse } from '../types.ts';
-import { type DID } from '../utils.ts';
+import { type Collection, type DID, pushCollection } from '../utils.ts';
 
 export const getProfileFollowsKey = (uid: DID, actor: string, limit: number) =>
 	['getProfileFollows', uid, actor, limit] as const;
-export const getProfileFollows = async (
-	ctx: QueryFunctionContext<ReturnType<typeof getProfileFollowsKey>>,
-): Promise<ProfilesListPage> => {
-	const [, uid, actor, limit] = ctx.queryKey;
+export const getProfileFollows: QueryFn<
+	Collection<ProfilesListWithSubjectPage>,
+	ReturnType<typeof getProfileFollowsKey>,
+	string
+> = async (key, { data: collection, param }) => {
+	const [, uid, actor, limit] = key;
 
 	const agent = await multiagent.connect(uid);
 
 	const response = await agent.rpc.get({
 		method: 'app.bsky.graph.getFollows',
-		signal: ctx.signal,
-		params: { actor, limit, cursor: ctx.pageParam },
+		params: { actor, limit, cursor: param },
 	});
 
 	const data = response.data as BskyFollowsResponse;
-
-	return {
+	const page: ProfilesListWithSubjectPage = {
 		cursor: data.cursor,
 		subject: mergeSignalizedProfile(data.subject),
 		profiles: data.follows.map((profile) => mergeSignalizedProfile(profile)),
 	};
+
+	return pushCollection(collection, page, param);
 };

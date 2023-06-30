@@ -1,12 +1,16 @@
-import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
+import { ErrorBoundary, For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
+import { Title } from '@solidjs/meta';
 
-import { getRecordId, getRepoId, type DID } from '~/api/utils.ts';
+import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
 
-import { feedGenerators as feedGeneratorsCache } from '~/api/cache/feed-generators.ts';
-import { getFeedGenerator, getFeedGeneratorKey } from '~/api/queries/get-feed-generator.ts';
-import { getFeed, getFeedKey } from '~/api/queries/get-feed.ts';
+import {
+	getFeedGenerator,
+	getFeedGeneratorKey,
+	getInitialFeedGenerator,
+} from '~/api/queries/get-feed-generator.ts';
+import { getTimeline, getTimelineKey } from '~/api/queries/get-timeline';
 
 import { preferences } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
@@ -31,10 +35,11 @@ const AuthenticatedExplorePage = () => {
 
 	return (
 		<div class="flex flex-col pb-4">
+			<Title>Explore / Langit</Title>
+
 			<div class="sticky top-0 z-20 flex h-13 items-center gap-4 border-b border-divider bg-background px-4">
 				{/* <input placeholder="Search Bluesky" class={input()} /> */}
 				<p class="grow text-base font-bold">Explore</p>
-
 				<A
 					href="/u/:uid/settings/explore"
 					params={params}
@@ -54,25 +59,18 @@ const AuthenticatedExplorePage = () => {
 					}
 				>
 					{(feedUri) => {
-						const feedQuery = createQuery({
-							queryKey: () => getFeedGeneratorKey(uid(), feedUri),
-							queryFn: getFeedGenerator,
+						const [feed] = createQuery({
+							key: () => getFeedGeneratorKey(uid(), feedUri),
+							fetch: getFeedGenerator,
 							staleTime: 120_000,
-							suspense: true,
-							initialData: () => {
-								const ref = feedGeneratorsCache[feedUri];
-								return ref?.deref();
-							},
+							initialData: getInitialFeedGenerator,
 						});
 
-						const timelineQuery = createQuery({
-							queryKey: () => getFeedKey(uid(), feedUri, MAX_POSTS),
-							queryFn: getFeed,
+						const [timeline] = createQuery({
+							key: () => getTimelineKey(uid(), { type: 'custom', uri: feedUri }, MAX_POSTS),
+							fetch: getTimeline,
 							staleTime: 60_000,
-							suspense: true,
 						});
-
-						const feed = () => feedQuery.data;
 
 						return (
 							<Suspense
@@ -93,52 +91,54 @@ const AuthenticatedExplorePage = () => {
 										<span class="text-base font-bold">{feed()?.displayName.value}</span>
 									</div>
 
-									<For
-										each={timelineQuery.data?.slices}
+									<ErrorBoundary
 										fallback={
-											<div>
-												<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>
-											</div>
+											<p class="p-4 text-sm text-muted-fg">Something went wrong with retrieving the feed</p>
 										}
 									>
-										{(slice) => {
-											const items = slice.items;
-											const len = items.length;
-
-											return items.map((item, idx) => (
-												<VirtualContainer
-													key="posts"
-													id={
-														/* @once */ createPostKey(
-															item.post.cid,
-															(!!item.reply?.parent && idx === 0) || !!item.reason,
-															idx !== len - 1,
-														)
-													}
-												>
-													<Post
-														interactive
-														uid={uid()}
-														post={/* @once */ item.post}
-														parent={/* @once */ item.reply?.parent}
-														reason={/* @once */ item.reason}
-														prev={idx !== 0}
-														next={idx !== len - 1}
-													/>
-												</VirtualContainer>
-											));
-										}}
-									</For>
-
-									<Show when={timelineQuery.data?.cid}>
-										<A
-											href="/u/:uid/profile/:actor/feed/:feed"
-											params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}
-											class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
+										<For
+											each={timeline()?.pages[0].slices}
+											fallback={<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>}
 										>
-											Show more
-										</A>
-									</Show>
+											{(slice) => {
+												const items = slice.items;
+												const len = items.length;
+
+												return items.map((item, idx) => (
+													<VirtualContainer
+														key="posts"
+														id={
+															/* @once */ createPostKey(
+																item.post.cid,
+																(!!item.reply?.parent && idx === 0) || !!item.reason,
+																idx !== len - 1,
+															)
+														}
+													>
+														<Post
+															interactive
+															uid={uid()}
+															post={/* @once */ item.post}
+															parent={/* @once */ item.reply?.parent}
+															reason={/* @once */ item.reason}
+															prev={idx !== 0}
+															next={idx !== len - 1}
+														/>
+													</VirtualContainer>
+												));
+											}}
+										</For>
+
+										<Show when={timeline()?.pages[0].cid}>
+											<A
+												href="/u/:uid/profile/:actor/feed/:feed"
+												params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}
+												class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
+											>
+												Show more
+											</A>
+										</Show>
+									</ErrorBoundary>
 								</div>
 							</Suspense>
 						);

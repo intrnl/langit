@@ -1,7 +1,6 @@
-import { type QueryFunctionContext } from '@tanstack/solid-query';
+import { type QueryFn } from '@intrnl/sq';
 
 import { compress } from '~/utils/image.ts';
-import { followAbortSignal } from '~/utils/misc.ts';
 
 const LINK_PROXY_ENDPOINT = 'https://cardyb.bsky.app/v1/extract';
 
@@ -23,11 +22,11 @@ export interface LinkMeta {
 }
 
 export const getLinkMetaKey = (url: string) => ['getLinkMeta', url] as const;
-export const getLinkMeta = async (ctx: QueryFunctionContext<ReturnType<typeof getLinkMetaKey>>) => {
-	const [, url] = ctx.queryKey;
+export const getLinkMeta: QueryFn<LinkMeta, ReturnType<typeof getLinkMetaKey>> = async (key) => {
+	const [, url] = key;
 
 	const response = await fetch(`${LINK_PROXY_ENDPOINT}?url=${encodeURIComponent(url)}`, {
-		signal: followAbortSignal([ctx.signal, AbortSignal.timeout(5_000)]),
+		signal: AbortSignal.timeout(5_000),
 	});
 
 	if (!response.ok) {
@@ -44,7 +43,7 @@ export const getLinkMeta = async (ctx: QueryFunctionContext<ReturnType<typeof ge
 	if (data.image != '') {
 		try {
 			const response = await fetch(data.image, {
-				signal: followAbortSignal([ctx.signal, AbortSignal.timeout(10_000)]),
+				signal: AbortSignal.timeout(10_000),
 			});
 
 			if (!response.ok) {

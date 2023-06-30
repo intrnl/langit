@@ -1,6 +1,6 @@
 import { Match, Switch } from 'solid-js';
 
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery } from '@intrnl/sq';
 
 import { languageNames } from '~/utils/intl/displaynames.ts';
 
@@ -19,10 +19,10 @@ interface TranslationResult {
 }
 
 const PostTranslation = (props: PostTranslationProps) => {
-	const query = createQuery({
-		queryKey: () => ['getTranslation', props.target, props.text] as const,
-		queryFn: async (ctx) => {
-			const [, target = navigator.language, text] = ctx.queryKey;
+	const [trans, { refetch }] = createQuery({
+		key: () => ['getTranslation', props.target, props.text] as const,
+		fetch: async (key) => {
+			const [, target = navigator.language, text] = key;
 
 			const url = new URL(`/api/translate`, location.href);
 			url.searchParams.set('sl', 'auto');
@@ -44,19 +44,19 @@ const PostTranslation = (props: PostTranslationProps) => {
 	return (
 		<div class="mt-3">
 			<Switch>
-				<Match when={query.isLoading}>
+				<Match when={trans.loading}>
 					<div class="flex justify-center p-2">
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={query.error}>
+				<Match when={trans.error}>
 					{(err) => (
 						<div class="flex flex-col items-center gap-2 p-2">
 							<p class="text-center text-sm text-muted-fg">Unable to retrieve translation</p>
 
 							<div>
-								<button onClick={() => query.refetch()} class={/* @once */ button({ color: 'primary' })}>
+								<button onClick={() => refetch()} class={/* @once */ button({ color: 'primary' })}>
 									Retry
 								</button>
 							</div>
@@ -64,7 +64,7 @@ const PostTranslation = (props: PostTranslationProps) => {
 					)}
 				</Match>
 
-				<Match when={query.data}>
+				<Match when={trans()}>
 					{(data) => (
 						<>
 							<p class="text-sm text-muted-fg">

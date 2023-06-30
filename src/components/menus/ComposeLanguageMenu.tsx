@@ -41,7 +41,7 @@ const ComposeLanguageMenu = (props: ComposeLanguageMenuProps) => {
 
 								props.onChange(next);
 							}}
-							class="-my-1.5 -mr-2 flex h-8 w-8 items-center justify-center rounded-full text-lg text-red-500 hover:bg-secondary"
+							class="-my-1.5 -mr-2 flex h-8 w-8 items-center justify-center rounded-full text-lg text-red-500 hover:bg-hinted"
 						>
 							<DeleteIcon />
 						</button>

@@ -46,9 +46,13 @@ import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { multiagent } from '~/globals/agent.ts';
+import { openModal } from '~/globals/modals.tsx';
+import { systemLanguages } from '~/globals/platform.ts';
+import { preferences } from '~/globals/preferences.ts';
 import { useNavigate, useParams } from '~/router.ts';
 
 import '~/styles/compose.css';
+import ComposeLanguageMenu from '~/components/menus/ComposeLanguageMenu';
 import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Dialog from '~/components/Dialog.tsx';
@@ -61,6 +65,7 @@ import * as dialog from '~/styles/primitives/dialog.ts';
 
 import CloseIcon from '~/icons/baseline-close.tsx';
 import ImageIcon from '~/icons/baseline-image.tsx';
+import LanguageIcon from '~/icons/baseline-language.tsx';
 
 import { pm2rt } from '~/utils/composer/pm2rt.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
@@ -89,6 +94,19 @@ interface ComposedImage {
 
 type PendingImage = Awaited<ReturnType<typeof compress>> & { name: string };
 
+const getLanguages = (uid: DID): Array<'none' | (string & {})> => {
+	const lang = preferences.get(uid)?.cl_defaultLanguage ?? 'system';
+
+	if (lang === 'none') {
+		return [];
+	}
+	if (lang === 'system') {
+		return [systemLanguages[0]];
+	}
+
+	return [lang];
+};
+
 const AuthenticatedComposePage = () => {
 	let editorRef: HTMLDivElement | undefined;
 	let fileInputRef: HTMLInputElement | undefined;
@@ -108,6 +126,8 @@ const AuthenticatedComposePage = () => {
 	const [imageProcessing, setImageProcessing] = createSignal(0);
 	const [images, setImages] = createSignal<ComposedImage[]>([]);
 	const [pendingImages, setPendingImages] = createSignal<PendingImage[]>([]);
+
+	const [languages, setLanguages] = createSignal(getLanguages(uid()));
 
 	const [message, setMessage] = createSignal<string>();
 	const [state, setState] = createSignal(PostState.IDLE);
@@ -313,6 +333,7 @@ const AuthenticatedComposePage = () => {
 			text: rt ? rt.text : '',
 			reply: replyRecord,
 			embed: embedRecord,
+			langs: languages(),
 		};
 
 		try {
@@ -713,26 +734,45 @@ const AuthenticatedComposePage = () => {
 					</Switch>
 
 					<div class="flex items-center gap-3 pr-3">
-						<Show
-							when={imageProcessing() < 1}
-							fallback={
-								<div class="flex h-9 w-9 items-center justify-center">
-									<CircularProgress />
-								</div>
-							}
-						>
-							<button
-								title="Add image"
-								onClick={() => fileInputRef!.click()}
-								class="-ml-2 flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-secondary"
+						<div class="-ml-2 flex items-center gap-1">
+							<Show
+								when={imageProcessing() < 1}
+								fallback={
+									<div class="flex h-9 w-9 items-center justify-center">
+										<CircularProgress />
+									</div>
+								}
 							>
-								<ImageIcon />
+								<button
+									title="Add image"
+									onClick={() => fileInputRef!.click()}
+									class="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-hinted"
+								>
+									<ImageIcon />
+								</button>
+							</Show>
+
+							<button
+								onClick={() => {
+									openModal(() => <ComposeLanguageMenu languages={languages()} onChange={setLanguages} />);
+								}}
+								class="flex h-9 w-9 items-center justify-center rounded-full hover:bg-hinted"
+							>
+								{(() => {
+									const $languages = languages();
+
+									if ($languages.length > 0) {
+										return <span class="text-sm font-medium">{$languages[0]}</span>;
+									} else {
+										return <LanguageIcon />;
+									}
+								})()}
 							</button>
-						</Show>
+						</div>
 
 						<div class="grow" />
 
-						<span class="text-sm" classList={{ 'text-red-600': length() > GRAPHEME_LIMIT }}>
+						<span class="text-sm text-muted-fg" classList={{ 'text-red-600': length() > GRAPHEME_LIMIT }}>
 							{GRAPHEME_LIMIT - length()}
 						</span>
 

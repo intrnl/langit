@@ -60,7 +60,7 @@ export type FeedLatestResource = EnhancedResource<FeedLatestResult>;
 // How many attempts it should try looking for more items before it gives up on empty pages.
 const MAX_EMPTY = 3;
 
-const MAX_POSTS = 15;
+const MAX_POSTS = 20;
 
 const countPosts = (slices: TimelineSlice[], limit?: number) => {
 	let count = 0;

@@ -37,9 +37,6 @@ export default {
 			animation: {
 				indeterminate: 'indeterminate 1s linear infinite',
 			},
-			zIndex: {
-				5: 5,
-			},
 		},
 		colors: {
 			accent: 'rgb(var(--accent))',

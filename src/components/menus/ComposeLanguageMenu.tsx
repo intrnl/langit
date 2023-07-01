@@ -23,7 +23,7 @@ const ComposeLanguageMenu = (props: ComposeLanguageMenuProps) => {
 			<div class={/* @once */ menu.title()}>Post language</div>
 
 			<p class="px-4 pb-3 text-sm text-muted-fg">
-				What languages are you using for this post? You can set up to a maximum of 3 languages.
+				What languages are you using for this post? You can specify up to a maximum of 3 languages.
 			</p>
 
 			<For each={languages()}>

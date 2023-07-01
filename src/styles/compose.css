@@ -3,7 +3,7 @@
 }
 
 .compose-editor .ProseMirror {
-	@apply pb-4 pr-3 pt-6 outline-none;
+	@apply pb-4 pr-3 pt-5 outline-none;
 }
 
 .compose-editor .ProseMirror p {

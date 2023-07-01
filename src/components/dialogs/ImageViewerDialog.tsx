@@ -40,7 +40,7 @@ const ImageViewerDialog = (props: ImageViewerDialogProps) => {
 					<button
 						title="Previous image"
 						onClick={() => setActive(active() - 1)}
-						class="fixed left-2.5 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
+						class="fixed left-2.5 top-1/2 z-5 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
 					>
 						<ArrowLeftIcon />
 					</button>
@@ -50,7 +50,7 @@ const ImageViewerDialog = (props: ImageViewerDialogProps) => {
 					<button
 						title="Next image"
 						onClick={() => setActive(active() + 1)}
-						class="fixed right-2.5 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
+						class="fixed right-2.5 top-1/2 z-5 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
 					>
 						<ArrowLeftIcon class="rotate-180" />
 					</button>
@@ -62,7 +62,7 @@ const ImageViewerDialog = (props: ImageViewerDialogProps) => {
 				onClick={() => {
 					closeModal();
 				}}
-				class="fixed left-2.5 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
+				class="fixed left-2.5 top-2.5 z-5 flex h-8 w-8 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
 			>
 				<CloseIcon />
 			</button>

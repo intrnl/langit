@@ -769,10 +769,11 @@ const AuthenticatedComposePage = () => {
 								const $languages = languages();
 
 								if ($languages.length > 0) {
-									const lang = $languages[0];
 									return (
 										<>
-											<span>{languageNames.of(lang)}</span>
+											<span>
+												{$languages.length > 1 ? $languages.join(', ') : languageNames.of($languages[0])}
+											</span>
 											<ArrowDropDownIcon class="-mr-1.5 text-lg" />
 										</>
 									);

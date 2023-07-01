@@ -46,7 +46,7 @@ import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { multiagent } from '~/globals/agent.ts';
-import { openModal } from '~/globals/modals.tsx';
+import { closeModal, openModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
 import { preferences } from '~/globals/preferences.ts';
 import { useNavigate, useParams } from '~/router.ts';
@@ -55,7 +55,6 @@ import '~/styles/compose.css';
 import ComposeLanguageMenu from '~/components/menus/ComposeLanguageMenu';
 import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
-import Dialog from '~/components/Dialog.tsx';
 import EmbedFeed from '~/components/EmbedFeed.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
@@ -70,7 +69,7 @@ import LanguageIcon from '~/icons/baseline-language.tsx';
 
 import { pm2rt } from '~/utils/composer/pm2rt.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
-import { compress } from '~/utils/image.ts';
+import { type CompressResult, compress } from '~/utils/image.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 import { formatSize } from '~/utils/intl/relformatter.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
@@ -94,7 +93,9 @@ interface ComposedImage {
 	record?: BskyBlob | undefined;
 }
 
-type PendingImage = Awaited<ReturnType<typeof compress>> & { name: string };
+interface PendingImage extends CompressResult {
+	name: string;
+}
 
 const getLanguages = (uid: DID): Array<'none' | (string & {})> => {
 	const lang = preferences.get(uid)?.cl_defaultLanguage ?? 'system';
@@ -127,7 +128,6 @@ const AuthenticatedComposePage = () => {
 
 	const [imageProcessing, setImageProcessing] = createSignal(0);
 	const [images, setImages] = createSignal<ComposedImage[]>([]);
-	const [pendingImages, setPendingImages] = createSignal<PendingImage[]>([]);
 
 	const [languages, setLanguages] = createSignal(getLanguages(uid()));
 
@@ -416,8 +416,16 @@ const AuthenticatedComposePage = () => {
 
 		batch(() => {
 			setImageProcessing(imageProcessing() - 1);
-			setPendingImages(pendingImages().concat(pending));
 			addImagesUncompressed(next);
+
+			if (pending.length > 0) {
+				openModal(() => (
+					<ImageUploadCompressDialog
+						images={pending}
+						onSubmit={() => addImagesUncompressed(pending.map((img) => img.blob))}
+					/>
+				));
+			}
 
 			if (errored) {
 				setMessage(`Failed to add some of your images, please try again.`);
@@ -793,79 +801,75 @@ const AuthenticatedComposePage = () => {
 					</div>
 				</div>
 			</div>
-
-			<Dialog open={pendingImages().length > 0}>
-				<div class={/* @once */ dialog.content()}>
-					<h1 class={/* @once */ dialog.title()}>Image has been adjusted</h1>
-
-					<p class="mt-3 text-sm">
-						The images you tried inserting has been adjusted to fit within the upload limits, would you like
-						to proceed?
-					</p>
-
-					<div class="mt-6 flex flex-col gap-3">
-						<For each={pendingImages()}>
-							{(image) => {
-								const before = image.before;
-								const after = image.after;
-
-								return (
-									<div class="flex items-center gap-3">
-										<BlobImage src={image.blob} class="h-20 w-20 shrink-0 rounded-md object-cover" />
-
-										<div class="flex min-w-0 flex-col gap-0.5 text-sm">
-											<p class="line-clamp-1 break-words font-bold">{image.name}</p>
-											<p>
-												{before.width}x{before.height} → {after.width}x{after.height}
-											</p>
-											<p>
-												<span>
-													{formatSize(before.size)} → {formatSize(after.size)}
-												</span>{' '}
-												<span class="whitespace-nowrap text-muted-fg">({image.quality}% quality)</span>
-											</p>
-										</div>
-									</div>
-								);
-							}}
-						</For>
-					</div>
-
-					<div class={/* @once */ dialog.actions()}>
-						<button
-							onClick={() => {
-								setPendingImages([]);
-							}}
-							class={/* @once */ button({ color: 'ghost' })}
-						>
-							Cancel
-						</button>
-						<button
-							onClick={() => {
-								batch(() => {
-									const next = pendingImages().map((img) => img.blob);
-
-									batch(() => {
-										setPendingImages([]);
-										addImagesUncompressed(next);
-									});
-								});
-							}}
-							class={/* @once */ button({ color: 'primary' })}
-						>
-							Confirm
-						</button>
-					</div>
-				</div>
-			</Dialog>
 		</div>
 	);
 };
 
 export default AuthenticatedComposePage;
 
-// Mentions
+// Image upload compression result
+interface ImageUploadCompressDialogProps {
+	images: PendingImage[];
+	onSubmit: () => void;
+}
 
+const ImageUploadCompressDialog = (props: ImageUploadCompressDialogProps) => {
+	return (
+		<div class={/* @once */ dialog.content()}>
+			<h1 class={/* @once */ dialog.title()}>Image has been adjusted</h1>
+
+			<p class="mt-3 text-sm">
+				The images you tried inserting has been adjusted to fit within the upload limits, would you like to
+				proceed?
+			</p>
+
+			<div class="mt-6 flex flex-col gap-3">
+				<For each={props.images}>
+					{(image) => {
+						const before = image.before;
+						const after = image.after;
+
+						return (
+							<div class="flex items-center gap-3">
+								<BlobImage src={image.blob} class="h-20 w-20 shrink-0 rounded-md object-cover" />
+
+								<div class="flex min-w-0 flex-col gap-0.5 text-sm">
+									<p class="line-clamp-1 break-words font-bold">{image.name}</p>
+									<p>
+										{before.width}x{before.height} → {after.width}x{after.height}
+									</p>
+									<p>
+										<span>
+											{formatSize(before.size)} → {formatSize(after.size)}
+										</span>{' '}
+										<span class="whitespace-nowrap text-muted-fg">({image.quality}% quality)</span>
+									</p>
+								</div>
+							</div>
+						);
+					}}
+				</For>
+			</div>
+
+			<div class={/* @once */ dialog.actions()}>
+				<button onClick={closeModal} class={/* @once */ button({ color: 'ghost' })}>
+					Cancel
+				</button>
+				<button
+					onClick={() => {
+						closeModal();
+						props.onSubmit();
+					}}
+					class={/* @once */ button({ color: 'primary' })}
+				>
+					Confirm
+				</button>
+			</div>
+		</div>
+	);
+};
+
+// Mentions
 const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion'] => {
 	const lock = new Locker<void>(undefined);
 

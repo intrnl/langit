@@ -2,13 +2,13 @@ const MAX_HEIGHT = 2_000;
 const MAX_WIDTH = 2_000;
 const MAX_SIZE = 1_000_000; // 1 MB
 
-interface ImageResult {
+export interface ImageResult {
 	width: number;
 	height: number;
 	size: number;
 }
 
-interface CompressResult {
+export interface CompressResult {
 	blob: Blob;
 	quality: number;
 	after: ImageResult;

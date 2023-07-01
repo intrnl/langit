@@ -83,7 +83,7 @@ const Post = (props: PostProps) => {
 			<div class="flex flex-col gap-1 pt-3">
 				<Show when={reason() && reason()!.$type === 'app.bsky.feed.defs#reasonRepost'}>
 					<div class="-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg">
-						<div class="flex w-12 shrink-0 justify-end">
+						<div class="flex w-10 shrink-0 justify-end">
 							<RepeatIcon />
 						</div>
 						<div class="min-w-0">
@@ -102,7 +102,7 @@ const Post = (props: PostProps) => {
 				<Switch>
 					<Match when={!prev() && parent()}>
 						<div class="-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg">
-							<div class="flex w-12 shrink-0 justify-end">
+							<div class="flex w-10 shrink-0 justify-end">
 								<ChatBubbleOutlinedIcon />
 							</div>
 							<div class="min-w-0">
@@ -122,7 +122,7 @@ const Post = (props: PostProps) => {
 
 					<Match when={!prev() && post().record.value.reply}>
 						<div class="-mt-1 mb-1 flex items-center gap-3 text-[0.8125rem] text-muted-fg">
-							<div class="flex w-12 shrink-0 justify-end">
+							<div class="flex w-10 shrink-0 justify-end">
 								<ChatBubbleOutlinedIcon />
 							</div>
 							<div class="min-w-0">
@@ -144,7 +144,7 @@ const Post = (props: PostProps) => {
 					<A
 						href="/u/:uid/profile/:actor"
 						params={{ uid: uid(), actor: author().did }}
-						class="h-12 w-12 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
+						class="h-10 w-10 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 					>
 						<Show when={author().avatar.value}>
 							{(avatar) => <img src={avatar()} class="h-full w-full" />}

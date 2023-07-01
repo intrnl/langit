@@ -95,7 +95,7 @@ const Notification = (props: NotificationProps) => {
 							class="flex gap-3 border-b border-divider px-4 py-3"
 							classList={{ 'bg-accent/20': !data().read }}
 						>
-							<div class="flex w-12 shrink-0 flex-col items-end gap-3">
+							<div class="flex w-10 shrink-0 flex-col items-end gap-3">
 								{(() => {
 									const map = ICON_MAP[data().type];
 

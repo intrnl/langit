@@ -170,7 +170,7 @@ const AuthenticatedPostPage = () => {
 														}}
 														class="flex h-10 items-center gap-3 px-4 hover:bg-hinted"
 													>
-														<div class="flex h-full w-12 justify-center">
+														<div class="flex h-full w-10 justify-center">
 															<div class="mt-3 border-l-2 border-dashed border-divider" />
 														</div>
 														<span class="text-sm text-accent">Show parent post</span>
@@ -215,7 +215,7 @@ const AuthenticatedPostPage = () => {
 										<A
 											href="/u/:uid/profile/:actor"
 											params={{ uid: uid(), actor: author.did }}
-											class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
+											class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 										>
 											<Show when={author.avatar.value}>
 												{(avatar) => <img src={avatar()} class="h-full w-full" />}
@@ -397,7 +397,7 @@ const AuthenticatedPostPage = () => {
 														}}
 														class="flex h-10 items-center gap-3 border-b border-divider px-4 hover:bg-hinted"
 													>
-														<div class="flex h-full w-12 justify-center">
+														<div class="flex h-full w-10 justify-center">
 															<div class="mb-3 border-l-2 border-dashed border-divider" />
 														</div>
 														<span class="text-sm text-accent">Continue thread</span>

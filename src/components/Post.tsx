@@ -152,7 +152,7 @@ const Post = (props: PostProps) => {
 					</A>
 
 					<Show when={props.next}>
-						<div class="z-10 -mb-2 mt-1 grow border-l-2 border-divider" />
+						<div class="mt-3 grow border-l-2 border-divider" />
 					</Show>
 				</div>
 

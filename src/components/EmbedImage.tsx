@@ -4,6 +4,7 @@ import { type EmbeddedImage } from '~/api/types.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 
+import ImageAltDialog from '~/components/dialogs/ImageAltDialog.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 
 export interface EmbedImageProps {
@@ -20,28 +21,46 @@ const EmbedImage = (props: EmbedImageProps) => {
 
 	const render = (index: number, className?: string) => {
 		const image = images()[index];
+		const alt = image.alt;
 
 		return (
-			<img
-				src={image.thumb}
-				alt={image.alt}
-				onClick={() => {
-					if (interactive()) {
-						openModal(() => (
-							<Suspense
-								fallback={
-									<div class="my-auto">
-										<CircularProgress />
-									</div>
-								}
-							>
-								<LazyImageViewerDialog images={images()} active={index} />
-							</Suspense>
-						));
+			<div class="relative">
+				<img
+					src={/* @once */ image.thumb}
+					alt={alt}
+					onClick={() => {
+						if (interactive()) {
+							openModal(() => (
+								<Suspense
+									fallback={
+										<div class="my-auto">
+											<CircularProgress />
+										</div>
+									}
+								>
+									<LazyImageViewerDialog images={images()} active={index} />
+								</Suspense>
+							));
+						}
+					}}
+					class={
+						(className || 'min-h-0 grow basis-0 object-cover') + (interactive() ? ' cursor-pointer' : '')
 					}
-				}}
-				class={(className || 'min-h-0 grow basis-0 object-cover') + (interactive() ? ' cursor-pointer' : '')}
-			/>
+				/>
+
+				{alt && (
+					<button
+						class="absolute bottom-0 left-0 m-3 h-5 rounded bg-black/70 px-1 text-xs font-medium"
+						classList={{ 'pointer-events-none': !interactive() }}
+						title="Show image description"
+						onClick={() => {
+							openModal(() => <ImageAltDialog alt={alt} />);
+						}}
+					>
+						ALT
+					</button>
+				)}
+			</div>
 		);
 	};
 

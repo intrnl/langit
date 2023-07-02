@@ -98,7 +98,7 @@ const AuthenticatedPostPage = () => {
 			</div>
 
 			<Switch>
-				<Match when={thread.error} keyed>
+				<Match when={!thread.loading && thread.error} keyed>
 					{(error) => (
 						<Switch
 							fallback={

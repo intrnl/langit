@@ -49,7 +49,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 
 				{interactive() && alt && (
 					<button
-						class="absolute bottom-0 left-0 m-3 h-5 rounded bg-black/70 px-1 text-xs font-medium"
+						class="absolute bottom-0 left-0 m-2 h-5 rounded bg-black/70 px-1 text-xs font-medium"
 						classList={{ 'pointer-events-none': !interactive() }}
 						title="Show image description"
 						onClick={() => {

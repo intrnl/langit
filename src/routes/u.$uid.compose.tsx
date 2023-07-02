@@ -641,7 +641,7 @@ const AuthenticatedComposePage = () => {
 
 													setImages(next);
 												}}
-												class="absolute right-1 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-fg"
+												class="absolute right-0 top-0 m-1 flex h-7 w-7 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
 											>
 												<CloseIcon />
 											</button>

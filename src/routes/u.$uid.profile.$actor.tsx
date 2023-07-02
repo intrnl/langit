@@ -23,6 +23,8 @@ import button from '~/styles/primitives/button.ts';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
+const ERROR_NAMES = ['InvalidRequest', 'AccountTakedown'];
+
 const AuthenticatedProfileLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor');
 
@@ -49,7 +51,7 @@ const AuthenticatedProfileLayout = () => {
 		<div class="flex grow flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<Switch>
-					<Match when={profile()}>
+					<Match when={profile.state === 'ready' && profile()}>
 						{(profile) => (
 							<div class="flex flex-col gap-0.5">
 								<Title>
@@ -78,7 +80,7 @@ const AuthenticatedProfileLayout = () => {
 				<Match when={!profile.loading && profile.error}>
 					{(error) => (
 						<Switch fallback={<div class="p-3 text-sm">Something went wrong.</div>}>
-							<Match when={(error() as XRPCError).error === 'InvalidRequest'}>
+							<Match when={ERROR_NAMES.includes((error() as XRPCError).error!)}>
 								<div class="grid grow place-items-center">
 									<div class="max-w-sm p-4">
 										<h1 class="mb-1 text-xl font-bold">Failed to load profile</h1>

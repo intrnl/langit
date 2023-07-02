@@ -26,7 +26,6 @@ import { createTiptapEditor } from 'solid-tiptap';
 import { type DID, getRecordId } from '~/api/utils.ts';
 
 import {
-	type BskyBlob,
 	type BskyPostRecord,
 	type BskyPostRecordEmbedRecord,
 	type BskyPostRecordReply,
@@ -57,7 +56,7 @@ import { compress } from '~/utils/image.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
 import { Locker } from '~/utils/lock.ts';
-import { type Signal, signal } from '~/utils/signals.ts';
+import { signal } from '~/utils/signals.ts';
 
 import '~/styles/compose.css';
 import ComposeLanguageMenu from '~/components/menus/ComposeLanguageMenu';
@@ -69,10 +68,12 @@ import EmbedRecord from '~/components/EmbedRecord.tsx';
 import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
 
-import { type PendingImage } from '~/components/composer/types.ts';
+import { type ComposedImage, type PendingImage } from '~/components/composer/types.ts';
+import ImageAltEditDialog from '~/components/composer/ImageAltEditDialog.tsx';
 import ImageUploadCompressDialog from '~/components/composer/ImageUploadCompressDialog.tsx';
 
 import ArrowDropDownIcon from '~/icons/baseline-arrow-drop-down.tsx';
+import CheckIcon from '~/icons/baseline-check.tsx';
 import CloseIcon from '~/icons/baseline-close.tsx';
 import ImageIcon from '~/icons/baseline-image.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
@@ -85,13 +86,6 @@ const enum PostState {
 	IDLE,
 	DISPATCHING,
 	SENT,
-}
-
-interface ComposedImage {
-	blob: Blob;
-	alt: Signal<string>;
-	failed: Signal<boolean>;
-	record?: BskyBlob | undefined;
 }
 
 const getLanguages = (uid: DID): Array<'none' | (string & {})> => {
@@ -364,7 +358,6 @@ const AuthenticatedComposePage = () => {
 			next.push({
 				blob: file,
 				alt: signal(''),
-				failed: signal(false),
 				record: undefined,
 			});
 		}
@@ -644,6 +637,17 @@ const AuthenticatedComposePage = () => {
 												class="absolute right-0 top-0 m-1 flex h-7 w-7 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
 											>
 												<CloseIcon />
+											</button>
+
+											<button
+												title="Add image description"
+												onClick={() => {
+													openModal(() => <ImageAltEditDialog image={image} />);
+												}}
+												class="absolute bottom-0 left-0 m-1 flex h-5 items-center rounded bg-black/70 px-1 text-xs font-medium"
+											>
+												<span>ALT</span>
+												{image.alt.value && <CheckIcon class="ml-1" />}
 											</button>
 										</div>
 									)}

@@ -24,7 +24,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 		const alt = image.alt;
 
 		return (
-			<div class="relative">
+			<div class={'relative ' + (className || 'min-h-0 grow basis-0')}>
 				<img
 					src={/* @once */ image.thumb}
 					alt={alt}
@@ -43,12 +43,11 @@ const EmbedImage = (props: EmbedImageProps) => {
 							));
 						}
 					}}
-					class={
-						(className || 'min-h-0 grow basis-0 object-cover') + (interactive() ? ' cursor-pointer' : '')
-					}
+					class="h-full w-full object-cover"
+					classList={{ 'cursor-pointer': interactive() }}
 				/>
 
-				{alt && (
+				{interactive() && alt && (
 					<button
 						class="absolute bottom-0 left-0 m-3 h-5 rounded bg-black/70 px-1 text-xs font-medium"
 						classList={{ 'pointer-events-none': !interactive() }}
@@ -99,7 +98,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 					</div>
 				</Match>
 
-				<Match when={images().length === 1}>{render(0, 'aspect-video w-full object-cover')}</Match>
+				<Match when={images().length === 1}>{render(0, 'aspect-video')}</Match>
 			</Switch>
 		</div>
 	);

@@ -75,7 +75,7 @@ const AuthenticatedProfileLayout = () => {
 			</div>
 
 			<Switch>
-				<Match when={profile.error}>
+				<Match when={!profile.loading && profile.error}>
 					{(error) => (
 						<Switch fallback={<div class="p-3 text-sm">Something went wrong.</div>}>
 							<Match when={(error() as XRPCError).error === 'InvalidRequest'}>

@@ -16,6 +16,7 @@ import { uploadBlob } from '~/api/mutations/upload-blob';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input';
+import textarea from '~/styles/primitives/textarea.ts';
 
 const MAX_NAME_LENGTH = 64;
 const MAX_BIO_LENGTH = 256;
@@ -153,7 +154,7 @@ const AuthenticatedProfileSettingsPage = () => {
 										value={profile().description.value}
 										rows={5}
 										maxLength={MAX_BIO_LENGTH}
-										class="block w-full resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+										class={/* @once */ textarea()}
 									/>
 									<span class="self-end text-xs text-muted-fg">
 										{bio().length} / {MAX_BIO_LENGTH}

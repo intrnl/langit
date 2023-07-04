@@ -22,7 +22,7 @@ const ImageAltEditDialog = (props: ImageAltEditDialogProps) => {
 	const finalText = createMemo(() => text().trim());
 
 	return (
-		<div class={/* @once */ dialog.content()}>
+		<div class={/* @once */ dialog.content({ class: 'overflow-y-auto' })}>
 			<h1 class={/* @once */ dialog.title()}>Add image description</h1>
 
 			<BlobImage src={image().blob} class="my-4 h-full w-full object-contain" />
@@ -31,7 +31,7 @@ const ImageAltEditDialog = (props: ImageAltEditDialogProps) => {
 				ref={model(text, setText)}
 				placeholder="Add description..."
 				rows={4}
-				class={/* @once */ textarea()}
+				class={/* @once */ textarea({ class: 'shrink-0' })}
 			/>
 
 			<div class={/* @once */ dialog.actions()}>

@@ -1,21 +1,16 @@
-.compose-editor {
-	@apply text-xl;
+.lexical-container {
+	@apply relative;
 }
 
-.compose-editor .ProseMirror {
-	@apply pb-4 pr-3 pt-5 outline-none;
+.lexical-content {
+	@apply pb-4 pr-3 pt-5 text-xl outline-none;
 }
 
-.compose-editor .ProseMirror p {
-	@apply whitespace-pre-wrap break-words;
+.lexical-placeholder {
+	@apply pointer-events-none absolute top-5 text-xl text-muted-fg;
 }
 
-.compose-editor .ProseMirror p.is-editor-empty:first-child::before {
-	@apply pointer-events-none float-left h-0 text-muted-fg;
-	content: attr(data-placeholder);
-}
-
-.compose-editor .ProseMirror span[data-type='mention'],
-.compose-editor .ProseMirror a {
+.lexical-link,
+.lexical-mention {
 	@apply text-accent;
 }

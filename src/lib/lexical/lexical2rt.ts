@@ -38,7 +38,7 @@ export const lexical2rt = (state: EditorState) => {
 	let leading = true;
 	let ascii = true;
 
-	const delve = (node: LexicalNode, end: boolean) => {
+	const delve = (node: LexicalNode /* , end: boolean */) => {
 		const $type = node.getType();
 
 		if ($type === 'root' || $type === 'paragraph') {
@@ -47,10 +47,15 @@ export const lexical2rt = (state: EditorState) => {
 
 			for (let idx = 0, len = children.length; idx < len; idx++) {
 				const child = children[idx];
-				delve(child, idx === len - 1);
+				delve(child /* , idx === len - 1 */);
 			}
 
-			if (!end && !leading && $type === 'paragraph') {
+			// if (!end && !leading && $type === 'paragraph') {
+			// 	text += '\n';
+			// 	length += 1;
+			// }
+		} else if ($type === 'linebreak') {
+			if (!leading) {
 				text += '\n';
 				length += 1;
 			}
@@ -139,7 +144,7 @@ export const lexical2rt = (state: EditorState) => {
 		}
 	};
 
-	state.read(() => delve($getRoot(), true));
+	state.read(() => delve($getRoot() /* , true */));
 
 	const trimmed = text.trimEnd();
 

@@ -61,19 +61,6 @@ export interface BskyProfileRecord {
 	banner?: BskyBlob;
 }
 
-export interface BskyProfileTypeaheadSearch {
-	did: string;
-	handle: string;
-	displayName: string;
-	avatar?: string;
-	labels: BskyLabel[];
-	viewer: {
-		muted: boolean;
-		blockedBy: boolean;
-		following?: string;
-	};
-}
-
 export interface BskyPostRecordEmbedImage {
 	$type: 'app.bsky.embed.images';
 	images: Array<{
@@ -265,7 +252,7 @@ export interface BskyCreateRecordResponse {
 }
 
 export interface BskySearchActorTypeaheadResponse {
-	actors: BskyProfileTypeaheadSearch[];
+	actors: BskyProfileBasic[];
 }
 
 export interface BskyGetPostsResponse {

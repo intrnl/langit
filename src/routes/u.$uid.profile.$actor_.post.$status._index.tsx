@@ -56,7 +56,7 @@ const AuthenticatedPostPage = () => {
 	const [thread, { refetch }] = createQuery({
 		key: () => getPostThreadKey(uid(), actor(), status(), MAX_DESCENDANTS + 1, MAX_ANCESTORS + 1),
 		fetch: getPostThread,
-		staleTime: 60_000,
+		staleTime: 10_000,
 		refetchOnMount: true,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,

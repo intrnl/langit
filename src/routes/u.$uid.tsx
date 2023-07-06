@@ -158,14 +158,14 @@ const AuthenticatedLayout = () => {
 						>
 							<div class="p-2">
 								<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg ring-primary group-[.is-active]:ring-2">
-									<Show when={profile()?.avatar.value}>
+									<Show when={!profile.error && profile()?.avatar.value}>
 										{(avatar) => <img src={avatar()} class="h-full w-full object-cover" />}
 									</Show>
 								</div>
 							</div>
 
 							<span class="hidden overflow-hidden text-ellipsis text-base group-[.is-active]:font-medium xl:inline">
-								<Show when={profile()} fallback="You">
+								<Show when={!profile.error && profile()} fallback="You">
 									{(profile) => <>{profile().displayName.value || '@' + profile().handle.value}</>}
 								</Show>
 							</span>
@@ -237,7 +237,7 @@ const AuthenticatedLayout = () => {
 						activeClass="is-active"
 					>
 						<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg ring-primary group-[.is-active]:ring-2">
-							<Show when={profile()?.avatar.value}>
+							<Show when={!profile.error && profile()?.avatar.value}>
 								{(avatar) => <img src={avatar()} class="h-full w-full object-cover" />}
 							</Show>
 						</div>

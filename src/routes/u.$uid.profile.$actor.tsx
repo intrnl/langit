@@ -16,6 +16,7 @@ import * as comformat from '~/utils/intl/comformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
+import ProfileIdentifierDialog from '~/components/dialogs/ProfileIdentifierDialog';
 import FollowButton from '~/components/FollowButton.tsx';
 import ProfileMenu from '~/components/menus/ProfileMenu.tsx';
 import { TabLink } from '~/components/Tab.tsx';
@@ -145,7 +146,14 @@ const AuthenticatedProfileLayout = () => {
 										<p class="line-clamp-1 break-all text-xl font-bold">
 											{profile().displayName.value || profile().handle.value}
 										</p>
-										<p class="line-clamp-1 break-all text-sm text-muted-fg">@{profile().handle.value}</p>
+										<button
+											onClick={() => {
+												openModal(() => <ProfileIdentifierDialog profile={profile()} />);
+											}}
+											class="line-clamp-1 break-all text-sm text-muted-fg hover:underline"
+										>
+											@{profile().handle.value}
+										</button>
 									</div>
 
 									<Show when={profile().description.value}>

@@ -62,6 +62,7 @@ export default {
 
 			transparent: 'transparent',
 			black: colors.black,
+			white: colors.white,
 			red: colors.red,
 			green: colors.green,
 		},

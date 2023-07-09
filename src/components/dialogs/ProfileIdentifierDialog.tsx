@@ -25,7 +25,12 @@ const COLORS = [
 ];
 
 const color = (str: string) => {
-	const seed = cyrb53a(str);
+	let seed = 0;
+
+	for (let idx = 0, len = str.length; idx < len; idx++) {
+		seed += str.charCodeAt(idx);
+	}
+
 	return COLORS[seed % COLORS.length];
 };
 
@@ -84,25 +89,3 @@ const ProfileIdentifierDialog = (props: ProfileIdentifierDialogProps) => {
 };
 
 export default ProfileIdentifierDialog;
-
-/**
- * cyrb53a (c) 2023 bryc (github.com/bryc)
- * https://github.com/bryc/code/blob/6ea6fb59526d6e24d815cb076434868bbd5b8892/jshash/experimental/cyrb53.js
- */
-export const cyrb53a = (str: string, seed = 0) => {
-	let h1 = 0xdeadbeef ^ seed;
-	let h2 = 0x41c6ce57 ^ seed;
-
-	for (let i = 0, ch; i < str.length; i++) {
-		ch = str.charCodeAt(i);
-		h1 = Math.imul(h1 ^ ch, 0x85ebca77);
-		h2 = Math.imul(h2 ^ ch, 0xc2b2ae3d);
-	}
-
-	h1 ^= Math.imul(h1 ^ (h2 >>> 15), 0x735a2d97);
-	h2 ^= Math.imul(h2 ^ (h1 >>> 15), 0xcaf649a9);
-	h1 ^= h2 >>> 16;
-	h2 ^= h1 >>> 16;
-
-	return 2097152 * (h2 >>> 0) + (h1 >>> 11);
-};

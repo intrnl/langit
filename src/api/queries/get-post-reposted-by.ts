@@ -29,9 +29,11 @@ export const getPostRepostedBy: QueryFn<
 	});
 
 	const data = response.data as BskyGetRepostedByResponse;
+	const reposts = data.repostedBy;
+
 	const page: ProfilesListPage = {
-		cursor: data.cursor,
-		profiles: data.repostedBy.map((profile) => mergeSignalizedProfile(profile)),
+		cursor: reposts.length >= limit ? data.cursor : undefined,
+		profiles: reposts.map((profile) => mergeSignalizedProfile(profile)),
 	};
 
 	return pushCollection(collection, page, param);

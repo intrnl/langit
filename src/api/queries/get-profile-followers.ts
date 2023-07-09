@@ -25,10 +25,12 @@ export const getProfileFollowers: QueryFn<
 	});
 
 	const data = response.data as BskyFollowersResponse;
+	const followers = data.followers;
+
 	const page: ProfilesListWithSubjectPage = {
-		cursor: data.cursor,
+		cursor: followers.length >= limit ? data.cursor : undefined,
 		subject: mergeSignalizedProfile(data.subject),
-		profiles: data.followers.map((profile) => mergeSignalizedProfile(profile)),
+		profiles: followers.map((profile) => mergeSignalizedProfile(profile)),
 	};
 
 	return pushCollection(collection, page, param);

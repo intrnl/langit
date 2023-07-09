@@ -29,9 +29,11 @@ export const getPostLikedBy: QueryFn<
 	});
 
 	const data = response.data as BskyGetLikesResponse;
+	const likes = data.likes;
+
 	const page: ProfilesListPage = {
-		cursor: data.cursor,
-		profiles: data.likes.map((record) => mergeSignalizedProfile(record.actor)),
+		cursor: likes.length >= limit ? data.cursor : undefined,
+		profiles: likes.map((record) => mergeSignalizedProfile(record.actor)),
 	};
 
 	return pushCollection(collection, page, param);

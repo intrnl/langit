@@ -51,7 +51,7 @@ const ProfileIdentifierDialog = (props: ProfileIdentifierDialogProps) => {
 		<div class={/* @once */ dialog.content()}>
 			<h1 class={/* @once */ dialog.title()}>User identifier for @{profile().handle.value}</h1>
 
-			<div class="mb-2 mt-4 flex flex-wrap justify-center gap-3 rounded bg-white p-4 font-mono text-base font-bold text-black">
+			<div class="mb-2 mt-4 flex flex-wrap justify-center gap-1 rounded py-2 font-mono text-base font-bold text-black">
 				{(() => {
 					const [_prefix, method, id] = profile().did.split(':');
 
@@ -60,7 +60,8 @@ const ProfileIdentifierDialog = (props: ProfileIdentifierDialogProps) => {
 							const span = document.createElement('span');
 
 							span.textContent = part;
-							span.style.color = color(part);
+							span.style.backgroundColor = color(part);
+							span.className = `text-white px-1.5 py-1 rounded`;
 
 							return span;
 						});

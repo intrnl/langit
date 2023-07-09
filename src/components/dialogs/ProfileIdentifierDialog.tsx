@@ -28,10 +28,10 @@ const color = (str: string) => {
 	let seed = 0;
 
 	for (let idx = 0, len = str.length; idx < len; idx++) {
-		seed += str.charCodeAt(idx);
+		seed += str.charCodeAt(idx) * (1 + idx * 0.1);
 	}
 
-	return COLORS[seed % COLORS.length];
+	return COLORS[Math.floor(seed) % COLORS.length];
 };
 
 const chunked = (str: string, size: number): string[] => {

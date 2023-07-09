@@ -52,7 +52,7 @@ const AuthenticatedProfileLayout = () => {
 		<div class="flex grow flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<Switch>
-					<Match when={profile.state === 'ready' && profile()}>
+					<Match when={!profile.error && profile()}>
 						{(profile) => (
 							<div class="flex flex-col gap-0.5">
 								<Title>
@@ -78,7 +78,7 @@ const AuthenticatedProfileLayout = () => {
 			</div>
 
 			<Switch>
-				<Match when={!profile.loading && profile.error}>
+				<Match when={profile.error}>
 					{(error) => (
 						<Switch fallback={<div class="p-3 text-sm">Something went wrong.</div>}>
 							<Match when={ERROR_NAMES.includes((error() as XRPCError).error!)}>

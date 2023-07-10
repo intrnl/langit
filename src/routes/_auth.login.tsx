@@ -1,6 +1,6 @@
 import { Show, createSignal } from 'solid-js';
 
-import { createMutation, createQuery } from '@intrnl/sq';
+import { createMutation, createQuery, useQueryMutation } from '@intrnl/sq';
 import { useNavigate, useSearchParams } from '@solidjs/router';
 
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
@@ -25,6 +25,8 @@ const AuthLoginPage = () => {
 	const [identifier, setIdentifier] = createSignal('');
 	const [password, setPassword] = createSignal('');
 
+	const mutate = useQueryMutation();
+
 	const [description] = createQuery({
 		key: () => ['describeServer', service().url] as const,
 		fetch: async () => {
@@ -48,6 +50,8 @@ const AuthLoginPage = () => {
 		},
 		onSuccess: (uid) => {
 			const to = searchParams.to;
+
+			mutate(true, (key) => key.length >= 2 && key[1] === uid, undefined);
 
 			if (to) {
 				navigate(to.replace(`@uid/`, `/u/${uid}/`));

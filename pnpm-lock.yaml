@@ -14,8 +14,8 @@ dependencies:
     specifier: ^1.4.4
     version: 1.4.4
   '@intrnl/sq':
-    specifier: ^0.1.0
-    version: 0.1.0(solid-js@1.7.7)
+    specifier: ^0.1.1
+    version: 0.1.1(solid-js@1.7.7)
   '@intrnl/use-gesture-solid':
     specifier: ^0.1.0
     version: 0.1.0(solid-js@1.7.7)
@@ -694,8 +694,8 @@ packages:
       '@floating-ui/core': 1.3.1
     dev: false
 
-  /@intrnl/sq@0.1.0(solid-js@1.7.7):
-    resolution: {integrity: sha512-nJUW5ibPg+kU0mNGnMDMzc1eUhYNtrwW6NhkihDDZKtba/yyQnyoJ0Pcf7DhbBQ5aKEi5yzXwr2urqBl2DkzSQ==}
+  /@intrnl/sq@0.1.1(solid-js@1.7.7):
+    resolution: {integrity: sha512-3//ajVNy6Is5mBlSXN2Tq6jAiNjsg4ZC6GjKXYJL4d0GrzTp48VFb4pisANFYxcC5NNiNyP2cZ1PdM0uYWgORQ==}
     peerDependencies:
       solid-js: ^1.7.6
     dependencies:

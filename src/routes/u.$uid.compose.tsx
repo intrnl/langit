@@ -744,11 +744,11 @@ const AuthenticatedComposePage = () => {
 						</Match>
 					</Switch>
 
-					<div class="flex flex-wrap items-center justify-end gap-2 pr-3">
+					<div class="mr-3 flex flex-wrap items-center justify-end gap-2 border-t border-divider pt-3">
 						<Show
 							when={imageProcessing() < 1}
 							fallback={
-								<div class="-ml-2 flex h-9 w-9 items-center justify-center">
+								<div class="flex h-9 w-9 items-center justify-center">
 									<CircularProgress />
 								</div>
 							}
@@ -756,7 +756,7 @@ const AuthenticatedComposePage = () => {
 							<button
 								title="Add image"
 								onClick={() => fileInputRef!.click()}
-								class="-ml-2 flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-hinted"
+								class="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-hinted"
 							>
 								<ImageIcon />
 							</button>

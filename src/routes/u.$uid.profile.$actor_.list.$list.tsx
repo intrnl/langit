@@ -1,6 +1,7 @@
 import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import { createQuery } from '@intrnl/sq';
+import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
 
 import { type DID, getCollectionCursor } from '~/api/utils.ts';
@@ -13,9 +14,7 @@ import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import SubscribeListConfirmDialog from '~/components/dialogs/SubscribeListConfirmDialog.tsx';
-
-import PlaylistAddCheckIcon from '~/icons/baseline-playlist-add-check.tsx';
-import PlaylistAddIcon from '~/icons/baseline-playlist-add.tsx';
+import button from '~/styles/primitives/button.ts';
 
 const PAGE_SIZE = 30;
 
@@ -39,25 +38,22 @@ const AuthenticatedListPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<div
-				class="sticky top-0 z-10 flex h-13 items-center justify-end bg-background px-4"
-				classList={{ 'border-b border-divider': !list() }}
-			>
-				<Show when={list()} fallback={<p class="grow text-base font-bold">List</p>}>
-					{(list) => (
-						<>
-							<button
-								title={isSubscribed() ? `Unsubscribe from list` : 'Subscribe to list'}
-								onClick={() => {
-									openModal(() => <SubscribeListConfirmDialog uid={uid()} list={list()} />);
-								}}
-								class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary"
-							>
-								{isSubscribed() ? <PlaylistAddCheckIcon /> : <PlaylistAddIcon />}
-							</button>
-						</>
-					)}
-				</Show>
+			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
+				<Switch>
+					<Match when={!listing.error && list()}>
+						{(info) => (
+							<>
+								<Title>Feed ({info().name.value}) / Langit</Title>
+								<p class="text-base font-bold">{info().name.value}</p>
+							</>
+						)}
+					</Match>
+
+					<Match when>
+						<Title>Feed ({params.list})</Title>
+						<p class="text-base font-bold">List</p>
+					</Match>
+				</Switch>
 			</div>
 
 			<Show when={list()}>
@@ -66,7 +62,7 @@ const AuthenticatedListPage = () => {
 
 					return (
 						<>
-							<div class="flex flex-col gap-3 px-4 pb-4 pt-3">
+							<div class="flex flex-col gap-3 border-b border-divider px-4 pb-4 pt-3">
 								<div class="flex gap-4">
 									<div class="mt-2 grow">
 										<p class="break-words text-lg font-bold">{list().name.value}</p>
@@ -85,9 +81,18 @@ const AuthenticatedListPage = () => {
 										{list().$renderedDescription(uid())}
 									</div>
 								</Show>
-							</div>
 
-							<hr class="sticky z-10 border-divider" style={{ top: `calc(3.25rem - 1px)` }} />
+								<div class="flex gap-2">
+									<button
+										onClick={() => {
+											openModal(() => <SubscribeListConfirmDialog uid={uid()} list={list()} />);
+										}}
+										class={button({ color: isSubscribed() ? 'outline' : 'primary' })}
+									>
+										{isSubscribed() ? 'Unsubscribe list' : 'Subscribe list'}
+									</button>
+								</div>
+							</div>
 						</>
 					);
 				}}

@@ -5,6 +5,7 @@ import { Title } from '@solidjs/meta';
 
 import { type DID } from '~/api/utils.ts';
 
+import { favoriteFeed } from '~/api/mutations/favorite-feed.ts';
 import {
 	createFeedGeneratorUri,
 	getFeedGenerator,
@@ -25,6 +26,9 @@ import { A, useParams } from '~/router.ts';
 
 import TimelineList from '~/components/TimelineList.tsx';
 import button from '~/styles/primitives/button.ts';
+
+import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
+import FavoriteIcon from '~/icons/baseline-favorite';
 
 const AuthenticatedFeedPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/feed/:feed');
@@ -133,15 +137,15 @@ const AuthenticatedFeedPage = () => {
 			</div>
 
 			<Show when={info()}>
-				{(feed) => {
-					const creator = () => feed().creator;
+				{(info) => {
+					const creator = () => info().creator;
 
 					return (
 						<>
 							<div class="flex flex-col gap-3 border-b border-divider px-4 pb-4 pt-3">
 								<div class="flex gap-4">
 									<div class="mt-2 grow">
-										<p class="break-words text-lg font-bold">{feed().displayName.value}</p>
+										<p class="break-words text-lg font-bold">{info().displayName.value}</p>
 										<p class="text-sm text-muted-fg">
 											<span>by </span>
 											<A
@@ -155,23 +159,34 @@ const AuthenticatedFeedPage = () => {
 									</div>
 
 									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted-fg">
-										<Show when={feed().avatar.value}>
+										<Show when={info().avatar.value}>
 											{(avatar) => <img src={avatar()} class="h-full w-full" />}
 										</Show>
 									</div>
 								</div>
 
-								<Show when={feed().description.value}>
+								<Show when={info().description.value}>
 									<div class="whitespace-pre-wrap break-words text-sm">
-										{feed().$renderedDescription(uid())}
+										{info().$renderedDescription(uid())}
 									</div>
 								</Show>
 
-								<p class="text-sm text-muted-fg">Liked by {feed().likeCount.value} users</p>
+								<p class="text-sm text-muted-fg">Liked by {info().likeCount.value} users</p>
 
-								<div>
+								<div class="flex gap-2">
 									<button onClick={toggleSave} class={button({ color: isSaved() ? 'outline' : 'primary' })}>
 										{isSaved() ? 'Remove feed' : 'Add feed'}
+									</button>
+
+									<button
+										onClick={() => favoriteFeed(uid(), info())}
+										class={/* @once */ button({ color: 'outline' })}
+									>
+										{info().viewer.like.value ? (
+											<FavoriteIcon class="-mx-1.5 text-base text-red-600" />
+										) : (
+											<FavoriteOutlinedIcon class="-mx-1.5 text-base" />
+										)}
 									</button>
 								</div>
 							</div>

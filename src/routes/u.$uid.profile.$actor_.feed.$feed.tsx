@@ -21,7 +21,7 @@ import {
 } from '~/api/queries/get-timeline.ts';
 
 import { preferences } from '~/globals/preferences.ts';
-import { useParams } from '~/router.ts';
+import { A, useParams } from '~/router.ts';
 
 import TimelineList from '~/components/TimelineList.tsx';
 import button from '~/styles/primitives/button.ts';
@@ -142,7 +142,16 @@ const AuthenticatedFeedPage = () => {
 								<div class="flex gap-4">
 									<div class="mt-2 grow">
 										<p class="break-words text-lg font-bold">{feed().displayName.value}</p>
-										<p class="text-sm text-muted-fg">by @{creator().handle.value}</p>
+										<p class="text-sm text-muted-fg">
+											<span>by </span>
+											<A
+												href="/u/:uid/profile/:actor"
+												params={{ uid: uid(), actor: creator().did }}
+												class="hover:underline"
+											>
+												@{creator().handle.value}
+											</A>
+										</p>
 									</div>
 
 									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted-fg">

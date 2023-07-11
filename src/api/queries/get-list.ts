@@ -34,11 +34,12 @@ export const getList: QueryFn<Collection<ListPage>, ReturnType<typeof getListKey
 	});
 
 	const data = response.data as BskyGetListResponse;
+	const items = data.items;
 
 	const page: ListPage = {
-		cursor: data.cursor,
+		cursor: items.length >= limit ? data.cursor : undefined,
 		list: mergeSignalizedList(data.list),
-		items: data.items.map((item) => ({ subject: mergeSignalizedProfile(item.subject) })),
+		items: items.map((item) => ({ subject: mergeSignalizedProfile(item.subject) })),
 	};
 
 	return pushCollection(collection, page, param);

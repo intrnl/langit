@@ -138,7 +138,6 @@ const AuthenticatedProfileSettingsPage = () => {
 										ref={model(name, setName)}
 										type="text"
 										id={'name' + id}
-										value={profile().displayName.value}
 										maxLength={MAX_NAME_LENGTH}
 										class={/* @once */ input()}
 									/>
@@ -151,7 +150,6 @@ const AuthenticatedProfileSettingsPage = () => {
 									<textarea
 										ref={model(bio, setBio)}
 										id={'bio' + id}
-										value={profile().description.value}
 										rows={5}
 										maxLength={MAX_BIO_LENGTH}
 										class={/* @once */ textarea()}

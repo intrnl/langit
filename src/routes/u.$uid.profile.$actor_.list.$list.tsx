@@ -9,7 +9,7 @@ import { type DID, getCollectionCursor } from '~/api/utils.ts';
 import { getList, getListKey } from '~/api/queries/get-list.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import { useParams } from '~/router.ts';
+import { A, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -66,7 +66,16 @@ const AuthenticatedListPage = () => {
 								<div class="flex gap-4">
 									<div class="mt-2 grow">
 										<p class="break-words text-lg font-bold">{list().name.value}</p>
-										<p class="text-sm text-muted-fg">by @{creator().handle.value}</p>
+										<p class="text-sm text-muted-fg">
+											<span>by </span>
+											<A
+												href="/u/:uid/profile/:actor"
+												params={{ uid: uid(), actor: creator().did }}
+												class="hover:underline"
+											>
+												@{creator().handle.value}
+											</A>
+										</p>
 									</div>
 
 									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted-fg">

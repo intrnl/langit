@@ -1,6 +1,7 @@
 import { Match, Show, Switch, createEffect, createMemo } from 'solid-js';
 
 import { createQuery } from '@intrnl/sq';
+import { Title } from '@solidjs/meta';
 
 import { type DID } from '~/api/utils.ts';
 
@@ -22,10 +23,8 @@ import {
 import { preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
 
-import TimelineList from '~/components/TimelineList';
-
-import AddIcon from '~/icons/baseline-add.tsx';
-import DeleteIcon from '~/icons/baseline-delete.tsx';
+import TimelineList from '~/components/TimelineList.tsx';
+import button from '~/styles/primitives/button.ts';
 
 const AuthenticatedFeedPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/feed/:feed');
@@ -115,23 +114,20 @@ const AuthenticatedFeedPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<div
-				class="sticky top-0 z-10 flex h-13 items-center justify-end bg-background px-4"
-				classList={{ 'border-b border-divider': !info() }}
-			>
+			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<Switch>
-					<Match when={info()}>
-						<button
-							title={isSaved() ? `Remove feed` : 'Add feed'}
-							onClick={toggleSave}
-							class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary"
-						>
-							{isSaved() ? <DeleteIcon /> : <AddIcon />}
-						</button>
+					<Match when={!info.error && info()}>
+						{(info) => (
+							<>
+								<Title>Feed ({info().displayName.value}) / Langit</Title>
+								<p class="text-base font-bold">{info().displayName.value}</p>
+							</>
+						)}
 					</Match>
 
 					<Match when>
-						<p class="grow text-base font-bold">Feed</p>
+						<Title>Feed ({feed()})</Title>
+						<p class="text-base font-bold">Feed</p>
 					</Match>
 				</Switch>
 			</div>
@@ -142,7 +138,7 @@ const AuthenticatedFeedPage = () => {
 
 					return (
 						<>
-							<div class="flex flex-col gap-3 px-4 pb-4 pt-3">
+							<div class="flex flex-col gap-3 border-b border-divider px-4 pb-4 pt-3">
 								<div class="flex gap-4">
 									<div class="mt-2 grow">
 										<p class="break-words text-lg font-bold">{feed().displayName.value}</p>
@@ -163,9 +159,13 @@ const AuthenticatedFeedPage = () => {
 								</Show>
 
 								<p class="text-sm text-muted-fg">Liked by {feed().likeCount.value} users</p>
-							</div>
 
-							<hr class="sticky z-10 border-divider" style={{ top: `calc(3.25rem - 1px)` }} />
+								<div>
+									<button onClick={toggleSave} class={button({ color: isSaved() ? 'outline' : 'primary' })}>
+										{isSaved() ? 'Remove feed' : 'Add feed'}
+									</button>
+								</div>
+							</div>
 						</>
 					);
 				}}

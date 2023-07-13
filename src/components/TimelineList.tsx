@@ -27,6 +27,14 @@ const TimelineList = (props: TimelineListProps) => {
 		return timeline()?.pages[0].cid;
 	};
 
+	const flattenedSlices = () => {
+		if (timeline.error || !timeline()) {
+			return [];
+		}
+
+		return timeline()!.pages.flatMap((page) => page.slices);
+	};
+
 	return (
 		<>
 			<Switch>
@@ -50,33 +58,31 @@ const TimelineList = (props: TimelineListProps) => {
 			</Switch>
 
 			<div>
-				<For each={timeline()?.pages}>
-					{(page) => {
-						return page.slices.map((slice) => {
-							const items = slice.items;
-							const len = items.length;
+				<For each={flattenedSlices()}>
+					{(slice) => {
+						const items = slice.items;
+						const len = items.length;
 
-							return items.map((item, idx) => (
-								<VirtualContainer
-									key="posts"
-									id={createPostKey(
-										item.post.cid.value,
-										(!!item.reply?.parent && idx === 0) || !!item.reason,
-										idx !== len - 1,
-									)}
-								>
-									<Post
-										interactive
-										uid={props.uid}
-										post={/* @once */ item.post}
-										parent={/* @once */ item.reply?.parent}
-										reason={/* @once */ item.reason}
-										prev={idx !== 0}
-										next={idx !== len - 1}
-									/>
-								</VirtualContainer>
-							));
-						});
+						return items.map((item, idx) => (
+							<VirtualContainer
+								key="posts"
+								id={createPostKey(
+									item.post.cid.value,
+									(!!item.reply?.parent && idx === 0) || !!item.reason,
+									idx !== len - 1,
+								)}
+							>
+								<Post
+									interactive
+									uid={props.uid}
+									post={/* @once */ item.post}
+									parent={/* @once */ item.reply?.parent}
+									reason={/* @once */ item.reason}
+									prev={idx !== 0}
+									next={idx !== len - 1}
+								/>
+							</VirtualContainer>
+						));
 					}}
 				</For>
 			</div>

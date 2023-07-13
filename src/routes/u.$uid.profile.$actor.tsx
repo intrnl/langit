@@ -26,7 +26,7 @@ import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
 const ERROR_NAMES = ['InvalidRequest', 'AccountTakedown'];
 
-const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'))
+const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'));
 
 const AuthenticatedProfileLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor');

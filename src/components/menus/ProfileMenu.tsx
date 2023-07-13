@@ -23,7 +23,7 @@ export interface ProfileMenuProps {
 	profile: SignalizedProfile;
 }
 
-const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'))
+const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'));
 
 const ProfileMenu = (props: ProfileMenuProps) => {
 	const uid = () => props.uid;

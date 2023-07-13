@@ -25,7 +25,7 @@ export interface PostMenuProps {
 	onTranslate: (ev: MouseEvent) => void;
 }
 
-const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'))
+const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'));
 
 const PostMenu = (props: PostMenuProps) => {
 	const uid = () => props.uid;

@@ -1,4 +1,4 @@
-import { Show } from 'solid-js';
+import { Show, lazy } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
@@ -9,7 +9,6 @@ import { closeModal, openModal } from '~/globals/modals.tsx';
 
 import AddProfileListDialog from '~/components/dialogs/AddProfileListDialog.tsx';
 import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog';
-import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
 
@@ -23,6 +22,8 @@ export interface ProfileMenuProps {
 	uid: DID;
 	profile: SignalizedProfile;
 }
+
+const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'))
 
 const ProfileMenu = (props: ProfileMenuProps) => {
 	const uid = () => props.uid;
@@ -63,7 +64,7 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 			<button
 				onClick={() => {
 					closeModal();
-					openModal(() => <MuteConfirmDialog uid={uid()} profile={profile()} />);
+					openModal(() => <LazyMuteConfirmDialog uid={uid()} profile={profile()} />);
 				}}
 				class={/* @once */ menu.item()}
 			>

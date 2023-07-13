@@ -1,6 +1,7 @@
-import { For, createContext, createSignal, useContext } from 'solid-js';
+import { For, Suspense, createContext, createSignal, useContext } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 
+import CircularProgress from '~/components/CircularProgress.tsx';
 import Dialog from '~/components/Dialog.tsx';
 
 type ModalComponent = () => JSX.Element;
@@ -49,9 +50,17 @@ export const ModalProvider = () => {
 		<For each={modals()}>
 			{(modal) => (
 				<Dialog open onClose={!modal.disableBackdropClose ? closeModal : undefined}>
-					<StateContext.Provider value={{ id: modal.id, close: () => closeModalId(modal.id) }}>
-						{modal.render()}
-					</StateContext.Provider>
+					<Suspense
+						fallback={
+							<div class="my-auto">
+								<CircularProgress />
+							</div>
+						}
+					>
+						<StateContext.Provider value={{ id: modal.id, close: () => closeModalId(modal.id) }}>
+							{modal.render()}
+						</StateContext.Provider>
+					</Suspense>
 				</Dialog>
 			)}
 		</For>

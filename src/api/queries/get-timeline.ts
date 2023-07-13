@@ -123,8 +123,9 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 
 	if (type === 'home') {
 		sliceFilter = createHomeSliceFilter(uid);
+		postFilter = createTempMutePostFilter(uid);
 	} else if (type === 'custom') {
-		postFilter = createFeedPostFilter(uid);
+		postFilter = createLanguagePostFilter(uid);
 	} else if (type === 'profile') {
 		_did = await _getDid(agent, params.actor);
 
@@ -271,31 +272,7 @@ const fetchPage = async (
 };
 
 //// Feed filters
-const createHomeSliceFilter = (uid: DID): SliceFilter | undefined => {
-	return (slice) => {
-		const items = slice.items;
-		const first = items[0];
-
-		// skip any posts that are in reply to non-followed
-		if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
-			const root = first.reply.root;
-			const parent = first.reply.parent;
-
-			if (
-				(root.author.did !== uid && !root.author.viewer.following.peek()) ||
-				(parent.author.did !== uid && !parent.author.viewer.following.peek())
-			) {
-				return false;
-			}
-		} else if (first.post.record.peek().reply) {
-			return false;
-		}
-
-		return true;
-	};
-};
-
-const createFeedPostFilter = (uid: DID): PostFilter | undefined => {
+const createLanguagePostFilter = (uid: DID): PostFilter | undefined => {
 	const pref = preferences.get(uid);
 
 	const allowUnspecified = pref?.cl_unspecified ?? true;
@@ -322,6 +299,95 @@ const createFeedPostFilter = (uid: DID): PostFilter | undefined => {
 		}
 
 		return langs.some((code) => languages!.includes(code));
+	};
+};
+
+const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
+	const pref = preferences.get(uid);
+
+	let mutes = pref?.pf_tempMutes;
+
+	// check if there are any outdated mutes before proceeding
+	if (mutes) {
+		const now = Date.now();
+
+		let size = 0;
+		let outdated = false;
+
+		for (const did in mutes) {
+			const date = mutes[did as DID];
+
+			if (date === undefined || now >= date) {
+				// this is the first time encountering an outdated mute, we'll clone the
+				// object so we can delete it.
+				if (!outdated) {
+					mutes = { ...mutes };
+					outdated = true;
+				}
+
+				delete mutes[did as DID];
+				continue;
+			}
+
+			size++;
+		}
+
+		// set mutes to undefined if we no longer have any
+		if (size < 1) {
+			mutes = undefined;
+		}
+
+		if (outdated) {
+			preferences.merge(uid, { pf_tempMutes: mutes });
+		}
+	}
+
+	if (!mutes) {
+		return undefined;
+	}
+
+	return (item) => {
+		const reason = item.reason;
+
+		if (reason) {
+			const byDid = reason.by.did;
+
+			if (mutes![byDid] && Date.now() < mutes![byDid]!) {
+				return false;
+			}
+		}
+
+		const did = item.post.author.did;
+
+		if (mutes![did] && Date.now() < mutes![did]!) {
+			return false;
+		}
+
+		return true;
+	};
+};
+
+const createHomeSliceFilter = (uid: DID): SliceFilter | undefined => {
+	return (slice) => {
+		const items = slice.items;
+		const first = items[0];
+
+		// skip any posts that are in reply to non-followed
+		if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+			const root = first.reply.root;
+			const parent = first.reply.parent;
+
+			if (
+				(root.author.did !== uid && !root.author.viewer.following.peek()) ||
+				(parent.author.did !== uid && !parent.author.viewer.following.peek())
+			) {
+				return false;
+			}
+		} else if (first.post.record.peek().reply) {
+			return false;
+		}
+
+		return true;
 	};
 };
 

@@ -16,8 +16,13 @@ export interface LocalSettings {
 export interface AccountSettings {
 	savedFeeds?: string[];
 	pinnedFeeds?: string[];
+
+	// content languages
 	cl_defaultLanguage?: 'none' | 'system' | (string & {});
 	cl_systemLanguage?: boolean;
 	cl_unspecified?: boolean;
 	cl_codes?: string[];
+
+	// post filters
+	pf_tempMutes?: { [user: DID]: number | undefined };
 }

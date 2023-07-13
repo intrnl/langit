@@ -1,11 +1,10 @@
-import { Match, Suspense, Switch, lazy } from 'solid-js';
+import { Match, Switch, lazy } from 'solid-js';
 
 import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { openModal } from '~/globals/modals.tsx';
 
 import ImageAltDialog from '~/components/dialogs/ImageAltDialog.tsx';
-import CircularProgress from '~/components/CircularProgress.tsx';
 
 type EmbeddedImage = RefOf<'app.bsky.embed.images#viewImage'>;
 
@@ -32,17 +31,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 					alt={alt}
 					onClick={() => {
 						if (interactive()) {
-							openModal(() => (
-								<Suspense
-									fallback={
-										<div class="my-auto">
-											<CircularProgress />
-										</div>
-									}
-								>
-									<LazyImageViewerDialog images={images()} active={index} />
-								</Suspense>
-							));
+							openModal(() => <LazyImageViewerDialog images={images()} active={index} />);
 						}
 					}}
 					class="h-full w-full object-cover"

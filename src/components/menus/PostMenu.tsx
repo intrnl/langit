@@ -1,4 +1,4 @@
-import { Show } from 'solid-js';
+import { Show, lazy } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
@@ -10,7 +10,6 @@ import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
 import DeletePostConfirmDialog from '~/components/dialogs/DeletePostConfirmDialog.tsx';
-import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
 
@@ -25,6 +24,8 @@ export interface PostMenuProps {
 	post: SignalizedPost;
 	onTranslate: (ev: MouseEvent) => void;
 }
+
+const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'))
 
 const PostMenu = (props: PostMenuProps) => {
 	const uid = () => props.uid;
@@ -70,7 +71,7 @@ const PostMenu = (props: PostMenuProps) => {
 				<button
 					onClick={() => {
 						closeModal();
-						openModal(() => <MuteConfirmDialog uid={uid()} profile={author()} />);
+						openModal(() => <LazyMuteConfirmDialog uid={uid()} profile={author()} />);
 					}}
 					class={/* @once */ menu.item()}
 				>

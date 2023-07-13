@@ -1,7 +1,8 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
 import { multiagent } from '~/globals/agent.ts';
 
-import { type SignalizedProfile } from '../cache/profiles.ts';
-import { type DID } from '../utils.ts';
+import type { SignalizedProfile } from '../cache/profiles.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -12,8 +13,7 @@ export const muteProfile = (uid: DID, profile: SignalizedProfile) => {
 		const prev = profile.viewer.muted.peek();
 
 		if (prev) {
-			await agent.rpc.post({
-				method: 'app.bsky.graph.unmuteActor',
+			await agent.rpc.call('app.bsky.graph.unmuteActor', {
 				data: {
 					actor: profile.did,
 				},
@@ -21,8 +21,7 @@ export const muteProfile = (uid: DID, profile: SignalizedProfile) => {
 
 			profile.viewer.muted.value = false;
 		} else {
-			await agent.rpc.post({
-				method: 'app.bsky.graph.muteActor',
+			await agent.rpc.call('app.bsky.graph.muteActor', {
 				data: {
 					actor: profile.did,
 				},

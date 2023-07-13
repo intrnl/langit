@@ -1,10 +1,11 @@
 import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
 
-import { type DID, getCollectionCursor } from '~/api/utils.ts';
+import { getCollectionCursor } from '~/api/utils.ts';
 
 import { getList, getListKey } from '~/api/queries/get-list.ts';
 

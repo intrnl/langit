@@ -1,12 +1,12 @@
-import { type EnhancedResource, type QueryFn } from '@intrnl/sq';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { EnhancedResource, QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
 import { type SignalizedList, mergeSignalizedList } from '../cache/lists.ts';
-import { type SubscribedListsPage } from '../models/list.ts';
+import type { SubscribedListsPage } from '../models/list.ts';
 
-import { type BskyGetListsResponse } from '../types.ts';
-import { type Collection, type DID, pushCollection } from '../utils.ts';
+import { type Collection, pushCollection } from '../utils.ts';
 
 // How many attempts it should try looking for more items before it gives up on empty pages.
 const MAX_EMPTY = 3;
@@ -39,12 +39,14 @@ export const getSubscribedLists: QueryFn<
 	}
 
 	while (lists.length < limit) {
-		const response = await agent.rpc.get({
-			method: 'app.bsky.graph.getListMutes',
-			params: { limit, cursor },
+		const response = await agent.rpc.get('app.bsky.graph.getListMutes', {
+			params: {
+				limit: limit,
+				cursor: cursor,
+			},
 		});
 
-		const data = response.data as BskyGetListsResponse;
+		const data = response.data;
 
 		const arr = data.lists;
 		const filtered = others ? arr.filter((list) => list.creator.did !== uid) : arr;

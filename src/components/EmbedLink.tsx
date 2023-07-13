@@ -1,9 +1,11 @@
 import { Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
-import { type EmbeddedLink } from '~/api/types.ts';
+import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import BlobImage from '~/components/BlobImage.tsx';
+
+type EmbeddedLink = RefOf<'app.bsky.embed.external#viewExternal'>;
 
 export interface EmbedLinkData extends Omit<EmbeddedLink, 'thumb'> {
 	thumb?: string | Blob;

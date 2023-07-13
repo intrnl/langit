@@ -1,11 +1,11 @@
 import { For, Match, Show, Switch, createSignal } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
-import { type BskyCreateRecordResponse } from '~/api/types.ts';
-import { type DID, getCollectionCursor, getRecordId } from '~/api/utils.ts';
+import { getCollectionCursor, getRecordId } from '~/api/utils.ts';
 
-import { type SignalizedProfile } from '~/api/cache/profiles.ts';
+import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import {
 	type ProfileExistsResult,
 	getProfileInList,
@@ -73,8 +73,7 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 			}
 
 			if (record) {
-				await agent.rpc.post({
-					method: 'com.atproto.repo.deleteRecord',
+				await agent.rpc.call('com.atproto.repo.deleteRecord', {
 					data: {
 						collection: 'app.bsky.graph.listitem',
 						repo: $uid,
@@ -84,8 +83,7 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 
 				result.exists.value = undefined;
 			} else {
-				const response = await agent.rpc.post({
-					method: 'com.atproto.repo.createRecord',
+				const response = await agent.rpc.call('com.atproto.repo.createRecord', {
 					data: {
 						collection: 'app.bsky.graph.listitem',
 						repo: $uid,
@@ -98,9 +96,7 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 					},
 				});
 
-				const data = response.data as BskyCreateRecordResponse;
-
-				result.exists.value = data.uri;
+				result.exists.value = response.data.uri;
 			}
 		});
 

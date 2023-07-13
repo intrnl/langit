@@ -1,9 +1,9 @@
-import { type QueryFn } from '@intrnl/sq';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
-import { type BskyNotificationsResponse } from '../types.ts';
-import { type Collection, type DID, pushCollection } from '../utils.ts';
+import { type Collection, pushCollection } from '../utils.ts';
 
 import { type NotificationsPage, createNotificationsPage } from '../models/notifications.ts';
 
@@ -17,8 +17,7 @@ export const getNotifications: QueryFn<
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get<BskyNotificationsResponse>({
-		method: 'app.bsky.notification.listNotifications',
+	const response = await agent.rpc.get('app.bsky.notification.listNotifications', {
 		params: {
 			limit: limit,
 			cursor: param,
@@ -44,13 +43,11 @@ export const getNotificationsLatest: QueryFn<
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
-		method: 'app.bsky.notification.listNotifications',
+	const response = await agent.rpc.get('app.bsky.notification.listNotifications', {
 		params: { limit: 1 },
 	});
 
-	const data = response.data as BskyNotificationsResponse;
-	const notifications = data.notifications;
+	const notifications = response.data.notifications;
 
 	if (notifications.length > 0) {
 		const notif = notifications[0];

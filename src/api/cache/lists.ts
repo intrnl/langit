@@ -1,32 +1,35 @@
+import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
-import { type Facet } from '../richtext/types.ts';
-import { type BskyList } from '../types.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
 
 import { type Signal, signal } from '~/utils/signals.ts';
+
+type Facet = RefOf<'app.bsky.richtext.facet'>;
+type List = RefOf<'app.bsky.graph.defs#listView'>;
 
 export const lists: Record<string, WeakRef<SignalizedList>> = {};
 
 /** @see BskyList */
 export interface SignalizedList {
 	_key?: number;
-	uri: BskyList['uri'];
+	uri: List['uri'];
 	creator: SignalizedProfile;
-	name: Signal<BskyList['name']>;
-	purpose: Signal<BskyList['purpose']>;
-	description: Signal<BskyList['description']>;
-	descriptionFacets: Signal<BskyList['descriptionFacets']>;
-	avatar: Signal<BskyList['avatar']>;
+	name: Signal<List['name']>;
+	purpose: Signal<List['purpose']>;
+	description: Signal<List['description']>;
+	descriptionFacets: Signal<List['descriptionFacets']>;
+	avatar: Signal<List['avatar']>;
 	viewer: {
-		muted: Signal<NonNullable<BskyList['viewer']>['muted']>;
+		muted: Signal<NonNullable<List['viewer']>['muted']>;
 	};
 
 	$renderedDescription: ReturnType<typeof createListRenderer>;
 }
 
-const createSignalizedList = (list: BskyList, key?: number): SignalizedList => {
+const createSignalizedList = (list: List, key?: number): SignalizedList => {
 	return {
 		_key: key,
 		uri: list.uri,
@@ -43,7 +46,7 @@ const createSignalizedList = (list: BskyList, key?: number): SignalizedList => {
 	};
 };
 
-export const mergeSignalizedList = (list: BskyList, key?: number) => {
+export const mergeSignalizedList = (list: List, key?: number) => {
 	let uri = list.uri;
 
 	let ref: WeakRef<SignalizedList> | undefined = lists[uri];

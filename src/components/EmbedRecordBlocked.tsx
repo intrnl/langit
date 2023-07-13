@@ -1,11 +1,14 @@
-import { type EmbeddedRecordBlocked } from '~/api/types.ts';
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import type { DID, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+
+import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { A } from '~/router.ts';
 
+type EmbeddedBlockedRecord = UnionOf<'app.bsky.embed.record#viewBlocked'>;
+
 export interface EmbedRecordBlockedProps {
 	uid: DID;
-	record: EmbeddedRecordBlocked;
+	record: EmbeddedBlockedRecord;
 }
 
 const EmbedRecordBlocked = (props: EmbedRecordBlockedProps) => {

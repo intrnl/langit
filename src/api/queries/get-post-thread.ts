@@ -1,10 +1,9 @@
-import { type QueryFn } from '@intrnl/sq';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
 import { type ThreadPage, createThreadPage } from '../models/thread.ts';
-import { type BskyThreadResponse } from '../types.ts';
-import { type DID } from '../utils.ts';
 
 import _getDid from './_did.ts';
 
@@ -19,8 +18,7 @@ export const getPostThread: QueryFn<ThreadPage, ReturnType<typeof getPostThreadK
 	const did = await _getDid(agent, actor);
 
 	const uri = `at://${did}/app.bsky.feed.post/${post}`;
-	const response = await agent.rpc.get({
-		method: 'app.bsky.feed.getPostThread',
+	const response = await agent.rpc.get('app.bsky.feed.getPostThread', {
 		params: {
 			uri: uri,
 			depth: depth,
@@ -28,13 +26,14 @@ export const getPostThread: QueryFn<ThreadPage, ReturnType<typeof getPostThreadK
 		},
 	});
 
-	const data = response.data as BskyThreadResponse;
+	const data = response.data;
 
-	if (data.thread.$type === 'app.bsky.feed.defs#blockedPost') {
-		throw new BlockedThreadError();
+	switch (data.thread.$type) {
+		case 'app.bsky.feed.defs#blockedPost':
+			throw new BlockedThreadError();
+		case 'app.bsky.feed.defs#notFoundPost':
+			throw new Error(`Post not found`);
+		case 'app.bsky.feed.defs#threadViewPost':
+			return createThreadPage(data.thread);
 	}
-
-	const page = createThreadPage(data.thread);
-
-	return page;
 };

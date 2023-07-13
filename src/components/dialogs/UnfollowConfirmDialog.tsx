@@ -1,6 +1,6 @@
-import { type DID } from '~/api/utils.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type SignalizedProfile } from '~/api/cache/profiles.ts';
+import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import { followProfile } from '~/api/mutations/follow-profile.ts';
 
 import { closeModal } from '~/globals/modals.tsx';

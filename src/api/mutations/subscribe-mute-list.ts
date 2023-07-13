@@ -1,7 +1,8 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
 import { multiagent } from '~/globals/agent.ts';
 
-import { type SignalizedList } from '../cache/lists.ts';
-import { type DID } from '../utils.ts';
+import type { SignalizedList } from '../cache/lists.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -13,8 +14,7 @@ export const subscribeMuteList = (uid: DID, list: SignalizedList) => {
 		const uri = list.uri;
 
 		if (prev) {
-			await agent.rpc.post({
-				method: 'app.bsky.graph.unmuteActorList',
+			await agent.rpc.call('app.bsky.graph.unmuteActorList', {
 				data: {
 					list: uri,
 				},
@@ -22,8 +22,7 @@ export const subscribeMuteList = (uid: DID, list: SignalizedList) => {
 
 			list.viewer.muted.value = false;
 		} else {
-			await agent.rpc.post({
-				method: 'app.bsky.graph.muteActorList',
+			await agent.rpc.call('app.bsky.graph.muteActorList', {
 				data: {
 					list: uri,
 				},

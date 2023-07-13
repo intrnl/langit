@@ -1,4 +1,5 @@
-import { type InitialDataFn, type QueryFn } from '@intrnl/sq';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { InitialDataFn, QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
@@ -10,14 +11,13 @@ import {
 	mergeSignalizedFeedGenerator,
 } from '../cache/feed-generators.ts';
 
-import { type BskyFeedGenerator, type BskyGetFeedGeneratorsResponse } from '../types.ts';
-import { type DID } from '../utils.ts';
-
 import _getDid from './_did.ts';
+
+type FeedGenerator = RefOf<'app.bsky.feed.defs#generatorView'>;
 
 type Query = [uid: DID, uri: string];
 
-const fetchFeedGenerator = createBatchedFetch<Query, string, BskyFeedGenerator>({
+const fetchFeedGenerator = createBatchedFetch<Query, string, FeedGenerator>({
 	limit: 25,
 	timeout: 0,
 	key: (query) => query[0],
@@ -29,8 +29,7 @@ const fetchFeedGenerator = createBatchedFetch<Query, string, BskyFeedGenerator>(
 
 		const agent = await multiagent.connect(uid);
 
-		const response = await agent.rpc.get<BskyGetFeedGeneratorsResponse>({
-			method: 'app.bsky.feed.getFeedGenerators',
+		const response = await agent.rpc.get('app.bsky.feed.getFeedGenerators', {
 			params: { feeds: uris },
 		});
 
@@ -87,12 +86,9 @@ export const getPopularFeedGenerators: QueryFn<
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
-		method: 'app.bsky.unspecced.getPopularFeedGenerators',
+	const response = await agent.rpc.get('app.bsky.unspecced.getPopularFeedGenerators', {
+		params: {},
 	});
 
-	// returns the same structure so let's just reuse the type
-	const data = response.data as BskyGetFeedGeneratorsResponse;
-
-	return data.feeds.map((feed) => mergeSignalizedFeedGenerator(feed));
+	return response.data.feeds.map((feed) => mergeSignalizedFeedGenerator(feed));
 };

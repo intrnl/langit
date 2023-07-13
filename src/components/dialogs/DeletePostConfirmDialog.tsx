@@ -1,6 +1,6 @@
-import { type DID } from '~/api/utils.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type SignalizedPost } from '~/api/cache/posts.ts';
+import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { deletePost } from '~/api/mutations/delete-post.ts';
 
 import { closeModal } from '~/globals/modals.tsx';

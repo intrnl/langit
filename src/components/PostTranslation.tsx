@@ -51,7 +51,7 @@ const PostTranslation = (props: PostTranslationProps) => {
 				</Match>
 
 				<Match when={trans.error}>
-					{(err) => (
+					{(_err) => (
 						<div class="flex flex-col items-center gap-2 p-2">
 							<p class="text-center text-sm text-muted-fg">Unable to retrieve translation</p>
 

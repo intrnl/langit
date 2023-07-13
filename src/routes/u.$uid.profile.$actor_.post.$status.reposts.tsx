@@ -1,6 +1,5 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-
-import { type DID } from '~/api/utils.ts';
 
 import { getPostRepostedBy, getPostRepostedByKey } from '~/api/queries/get-post-reposted-by.ts';
 

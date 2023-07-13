@@ -1,21 +1,19 @@
-import { type Agent } from '../agent.ts';
-import { type DID, isDid } from '../utils.ts';
+import type { Agent } from '@intrnl/bluesky-client/agent';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type BskyResolvedDidResponse } from '../types.ts';
+import { isDid } from '../utils.ts';
 
 const _getDid = async (agent: Agent, actor: string, signal?: AbortSignal) => {
 	let did: DID;
 	if (isDid(actor)) {
 		did = actor;
 	} else {
-		const res = await agent.rpc.get({
-			method: 'com.atproto.identity.resolveHandle',
+		const response = await agent.rpc.get('com.atproto.identity.resolveHandle', {
 			signal: signal,
 			params: { handle: actor },
 		});
 
-		const data = res.data as BskyResolvedDidResponse;
-		did = data.did;
+		did = response.data.did;
 	}
 
 	return did;

@@ -1,4 +1,6 @@
-import { type EnhancedResource, type QueryFn } from '@intrnl/sq';
+import type { Agent } from '@intrnl/bluesky-client/agent';
+import type { DID, Records, RefOf, ResponseOf } from '@intrnl/bluesky-client/atp-schema';
+import type { EnhancedResource, QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { systemLanguages } from '~/globals/platform.ts';
@@ -12,14 +14,7 @@ import {
 	createTimelineSlices,
 } from '../models/timeline.ts';
 
-import { type Agent } from '../agent.ts';
-import {
-	type BskyLikeRecord,
-	type BskyListRecordsResponse,
-	type BskyPost,
-	type BskyTimelineResponse,
-} from '../types.ts';
-import { type Collection, type DID, pushCollection } from '../utils.ts';
+import { type Collection, pushCollection } from '../utils.ts';
 
 import _getDid from './_did.ts';
 import { fetchPost } from './get-post.ts';
@@ -55,6 +50,13 @@ export interface FeedLatestResult {
 
 export type FeedResource = EnhancedResource<Collection<FeedPage>, string>;
 export type FeedLatestResource = EnhancedResource<FeedLatestResult>;
+
+type TimelineResponse = ResponseOf<'app.bsky.feed.getTimeline'>;
+
+type Post = RefOf<'app.bsky.feed.defs#postView'>;
+
+type PostRecord = Records['app.bsky.feed.post'];
+type LikeRecord = Records['app.bsky.feed.like'];
 
 //// Feed query
 // How many attempts it should try looking for more items before it gives up on empty pages.
@@ -177,8 +179,7 @@ export const getTimelineLatest: QueryFn<FeedLatestResult, ReturnType<typeof getT
 	if (params.type === 'profile' && params.tab === 'likes') {
 		const did = await _getDid(agent, params.actor);
 
-		const response = await agent.rpc.get<BskyListRecordsResponse<BskyLikeRecord>>({
-			method: 'com.atproto.repo.listRecords',
+		const response = await agent.rpc.get('com.atproto.repo.listRecords', {
 			params: {
 				collection: 'app.bsky.feed.like',
 				repo: did,
@@ -204,27 +205,32 @@ const fetchPage = async (
 	limit: number,
 	cursor: string | undefined,
 	_did: DID | undefined,
-): Promise<BskyTimelineResponse & { cid?: string }> => {
+): Promise<TimelineResponse & { cid?: string }> => {
 	const type = params.type;
 
 	if (type === 'home') {
-		const response = await agent.rpc.get<BskyTimelineResponse>({
-			method: 'app.bsky.feed.getTimeline',
-			params: { algorithm: params.algorithm, cursor, limit },
+		const response = await agent.rpc.get('app.bsky.feed.getTimeline', {
+			params: {
+				algorithm: params.algorithm,
+				cursor: cursor,
+				limit: limit,
+			},
 		});
 
 		return response.data;
 	} else if (type === 'custom') {
-		const response = await agent.rpc.get<BskyTimelineResponse>({
-			method: 'app.bsky.feed.getFeed',
-			params: { feed: params.uri, cursor, limit },
+		const response = await agent.rpc.get('app.bsky.feed.getFeed', {
+			params: {
+				feed: params.uri,
+				cursor: cursor,
+				limit: limit,
+			},
 		});
 
 		return response.data;
 	} else if (type === 'profile') {
 		if (params.tab === 'likes') {
-			const response = await agent.rpc.get<BskyListRecordsResponse<BskyLikeRecord>>({
-				method: 'com.atproto.repo.listRecords',
+			const response = await agent.rpc.get('com.atproto.repo.listRecords', {
 				params: {
 					collection: 'app.bsky.feed.like',
 					repo: _did!,
@@ -236,22 +242,25 @@ const fetchPage = async (
 			const data = response.data;
 			const records = data.records;
 
-			const postUris = records.map((record) => record.value.subject.uri);
+			const postUris = records.map((record) => (record.value as LikeRecord).subject.uri);
 
-			const uid = agent.session.peek()!.did;
+			const uid = agent.session!.did;
 			const queries = await Promise.allSettled(postUris.map((uri) => fetchPost([uid, uri])));
 
 			return {
 				cid: records.length > 0 ? records[0].cid : undefined,
 				cursor: data.cursor,
 				feed: queries
-					.filter((result): result is PromiseFulfilledResult<BskyPost> => result.status === 'fulfilled')
+					.filter((result): result is PromiseFulfilledResult<Post> => result.status === 'fulfilled')
 					.map((result) => ({ post: result.value })),
 			};
 		} else {
-			const response = await agent.rpc.get<BskyTimelineResponse>({
-				method: 'app.bsky.feed.getAuthorFeed',
-				params: { actor: params.actor, cursor, limit },
+			const response = await agent.rpc.get('app.bsky.feed.getAuthorFeed', {
+				params: {
+					actor: params.actor,
+					cursor: cursor,
+					limit: limit,
+				},
 			});
 
 			return response.data;
@@ -301,7 +310,7 @@ const createFeedPostFilter = (uid: DID): PostFilter | undefined => {
 	}
 
 	return (item) => {
-		const record = item.post.record;
+		const record = item.post.record as PostRecord;
 		const langs = record.langs;
 
 		if (!record.text) {

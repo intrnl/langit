@@ -1,5 +1,6 @@
 import { For, Show, Suspense, SuspenseList, createMemo, createSignal } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
 import {
@@ -10,7 +11,7 @@ import {
 	transformStyle,
 } from '@thisbeyond/solid-dnd';
 
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import {
 	getFeedGenerator,

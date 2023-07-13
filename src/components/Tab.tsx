@@ -1,5 +1,5 @@
 import { type ComponentProps, type ValidComponent, splitProps } from 'solid-js';
-import { type JSX } from 'solid-js/jsx-runtime';
+import type { JSX } from 'solid-js/jsx-runtime';
 import { Dynamic } from 'solid-js/web';
 
 import { A, type AnchorWithParamProps, type Paths } from '~/router';

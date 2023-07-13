@@ -1,8 +1,8 @@
 import { Show } from 'solid-js';
 
-import { type DID } from '~/api/utils.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type SignalizedProfile } from '~/api/cache/profiles.ts';
+import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';

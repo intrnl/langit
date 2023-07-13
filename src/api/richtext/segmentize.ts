@@ -1,5 +1,16 @@
-import { type Facet, type FacetLink, type FacetMention, type RichTextSegment } from './types.ts';
+import type { RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+
 import { UnicodeString } from './unicode.ts';
+
+type Facet = RefOf<'app.bsky.richtext.facet'>;
+type MentionFacet = UnionOf<'app.bsky.richtext.facet#mention'>;
+type LinkFacet = UnionOf<'app.bsky.richtext.facet#link'>;
+
+export interface RichTextSegment {
+	text: string;
+	link?: LinkFacet;
+	mention?: MentionFacet;
+}
 
 export interface RichTextOptions {
 	text: string;
@@ -7,9 +18,9 @@ export interface RichTextOptions {
 	cleanNewLines?: boolean;
 }
 
-const createSegment = (text: string, facet?: Facet) => {
-	let link: FacetLink | undefined;
-	let mention: FacetMention | undefined;
+const createSegment = (text: string, facet?: Facet): RichTextSegment => {
+	let link: LinkFacet | undefined;
+	let mention: MentionFacet | undefined;
 
 	if (facet) {
 		const features = facet.features;

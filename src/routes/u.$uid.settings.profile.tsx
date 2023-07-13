@@ -1,9 +1,7 @@
 import { Match, Show, Switch } from 'solid-js';
 
+import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
-
-import { type BskyProfileRecord, type BskyRecord } from '~/api/types';
-import { type DID } from '~/api/utils.ts';
 
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
@@ -21,6 +19,8 @@ import textarea from '~/styles/primitives/textarea.ts';
 const MAX_NAME_LENGTH = 64;
 const MAX_BIO_LENGTH = 256;
 
+type ProfileRecord = Records['app.bsky.actor.profile'];
+
 const AuthenticatedProfileSettingsPage = () => {
 	const params = useParams('/u/:uid/settings/profile');
 	const id = createId();
@@ -37,16 +37,15 @@ const AuthenticatedProfileSettingsPage = () => {
 
 	const [name, setName] = createDerivedSignal(() => profile()?.displayName.value || '');
 	const [bio, setBio] = createDerivedSignal(() => profile()?.description.value || '');
-	const [avatar, setAvatar] = createDerivedSignal<Blob | string | undefined>(() => profile()?.avatar.value);
-	const [banner, setBanner] = createDerivedSignal<Blob | string | undefined>(() => profile()?.banner.value);
+	const [avatar, _setAvatar] = createDerivedSignal<Blob | string | undefined>(() => profile()?.avatar.value);
+	const [banner, _setBanner] = createDerivedSignal<Blob | string | undefined>(() => profile()?.banner.value);
 
 	const mutation = createMutation({
 		mutate: async () => {
 			const $uid = uid();
 			const agent = await multiagent.connect($uid);
 
-			const existing = await agent.rpc.get<BskyRecord<BskyProfileRecord>>({
-				method: 'com.atproto.repo.getRecord',
+			const existing = await agent.rpc.get('com.atproto.repo.getRecord', {
 				params: {
 					collection: 'app.bsky.actor.profile',
 					repo: $uid,
@@ -54,13 +53,12 @@ const AuthenticatedProfileSettingsPage = () => {
 				},
 			});
 
-			const rec = existing.data.value;
+			const rec = existing.data.value as ProfileRecord;
 
 			const $avatar = avatar();
 			const $banner = banner();
 
-			const record: BskyProfileRecord = {
-				$type: 'app.bsky.actor.profile',
+			const record: ProfileRecord = {
 				displayName: name(),
 				description: bio(),
 				avatar:
@@ -77,13 +75,12 @@ const AuthenticatedProfileSettingsPage = () => {
 						: rec?.banner,
 			};
 
-			await agent.rpc.post({
-				method: 'com.atproto.repo.putRecord',
+			await agent.rpc.call('com.atproto.repo.putRecord', {
 				data: {
 					collection: 'app.bsky.actor.profile',
 					repo: $uid,
 					rkey: 'self',
-					swapRecord: existing?.data.cid || null,
+					swapRecord: existing?.data.cid || undefined,
 					record: record,
 				},
 			});

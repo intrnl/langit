@@ -1,4 +1,4 @@
-import { type SignalizedPost } from '~/api/cache/posts.ts';
+import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { getRecordId } from '~/api/utils';
 
 import { closeModal } from '~/globals/modals.tsx';

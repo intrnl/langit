@@ -1,6 +1,7 @@
 import { type Accessor, For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 
+import type { AtBlob, DID, Records, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
@@ -23,15 +24,7 @@ import {
 } from '@floating-ui/dom';
 import { createTiptapEditor } from 'solid-tiptap';
 
-import { type DID, getRecordId } from '~/api/utils.ts';
-
-import {
-	type BskyPostRecord,
-	type BskyPostRecordEmbedRecord,
-	type BskyPostRecordReply,
-	type BskyProfileTypeaheadSearch,
-	type BskySearchActorTypeaheadResponse,
-} from '~/api/types.ts';
+import { getRecordId } from '~/api/utils.ts';
 
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
@@ -77,6 +70,11 @@ import CheckIcon from '~/icons/baseline-check.tsx';
 import CloseIcon from '~/icons/baseline-close.tsx';
 import ImageIcon from '~/icons/baseline-image.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
+
+type PostRecord = Records['app.bsky.feed.post'];
+type StrongRef = RefOf<'com.atproto.repo.strongRef'>;
+
+type PostRecordEmbed = UnionOf<'app.bsky.embed.record'>;
 
 const MENTION_SUGGESTION_LIMIT = 6;
 const GRAPHEME_LIMIT = 300;
@@ -222,12 +220,12 @@ const AuthenticatedComposePage = () => {
 		const $link = link();
 		const $images = images();
 
-		let replyRecord: BskyPostRecord['reply'];
-		let embedRecord: BskyPostRecord['embed'];
+		let replyRecord: PostRecord['reply'];
+		let embedRecord: PostRecord['embed'];
 
 		if ($reply) {
-			const ref: BskyPostRecordReply = {
-				cid: $reply.cid,
+			const ref: StrongRef = {
+				cid: $reply.cid.value,
 				uri: $reply.uri,
 			};
 
@@ -267,7 +265,10 @@ const AuthenticatedComposePage = () => {
 
 			embedRecord = {
 				$type: 'app.bsky.embed.images',
-				images: $images.map((img) => ({ alt: img.alt.value, image: img.record! })),
+				images: $images.map((img) => ({
+					alt: img.alt.value,
+					image: img.record! as AtBlob<`image/${string}`>,
+				})),
 			};
 		} else if ($link) {
 			if ($link.thumb && !$link.record) {
@@ -298,10 +299,10 @@ const AuthenticatedComposePage = () => {
 		}
 
 		if ($quote) {
-			const rec: BskyPostRecordEmbedRecord = {
+			const rec: PostRecordEmbed = {
 				$type: 'app.bsky.embed.record',
 				record: {
-					cid: $quote.cid,
+					cid: $quote.cid.value,
 					uri: $quote.uri,
 				},
 			};
@@ -319,8 +320,7 @@ const AuthenticatedComposePage = () => {
 
 		setMessage(undefined);
 
-		const record: BskyPostRecord = {
-			$type: 'app.bsky.feed.post',
+		const record: PostRecord = {
 			createdAt: new Date().toISOString(),
 			facets: rt ? rt.facets : undefined,
 			text: rt ? rt.text : '',
@@ -470,7 +470,7 @@ const AuthenticatedComposePage = () => {
 			}),
 		],
 		editorProps: {
-			handlePaste(view, event) {
+			handlePaste(_view, event) {
 				const items = event.clipboardData?.items;
 
 				if (!items) {
@@ -563,11 +563,13 @@ const AuthenticatedComposePage = () => {
 									<div class="mb-3 mr-3 flex flex-col">
 										<EmbedRecord
 											uid={uid()}
-											// lol
 											record={{
 												$type: 'app.bsky.embed.record#viewRecord',
+												// @ts-expect-error
+												cid: null,
+												// @ts-expect-error
+												indexedAt: null,
 												uri: data().uri,
-												// @ts-expect-error this is the only values required for author object
 												author: {
 													did: author().did,
 													avatar: author().avatar.value,
@@ -594,10 +596,15 @@ const AuthenticatedComposePage = () => {
 											uid={uid()}
 											feed={{
 												$type: 'app.bsky.feed.defs#generatorView',
+												// @ts-expect-error
+												cid: null,
+												// @ts-expect-error
+												did: null,
+												// @ts-expect-error
+												indexedAt: null,
 												uri: data().uri,
 												avatar: data().avatar.value,
 												displayName: data().displayName.value,
-												// @ts-expect-error
 												creator: {
 													did: data().creator.did,
 													handle: data().creator.handle.value,
@@ -694,7 +701,6 @@ const AuthenticatedComposePage = () => {
 									<div class="relative mb-3 mr-3 flex flex-col">
 										<EmbedLink
 											link={{
-												$type: 'app.bsky.embed.external#viewExternal',
 												title: data().title,
 												description: data().description,
 												uri: data().uri,
@@ -813,7 +819,7 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 	const lock = new Locker<void>(undefined);
 
 	let current = '';
-	let suggestions: BskyProfileTypeaheadSearch[] = [];
+	let suggestions: RefOf<'app.bsky.actor.defs#profileViewBasic'>[] = [];
 
 	return {
 		char: '@',
@@ -829,13 +835,14 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 					return suggestions;
 				}
 
-				const response = await agent.rpc.get({
-					method: 'app.bsky.actor.searchActorsTypeahead',
-					params: { term: query, limit: MENTION_SUGGESTION_LIMIT },
+				const response = await agent.rpc.get('app.bsky.actor.searchActorsTypeahead', {
+					params: {
+						term: query,
+						limit: MENTION_SUGGESTION_LIMIT,
+					},
 				});
 
-				const data = response.data as BskySearchActorTypeaheadResponse;
-				return (suggestions = data.actors);
+				return (suggestions = response.data.actors);
 			} finally {
 				handle.release();
 			}
@@ -845,7 +852,7 @@ const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion
 			let onKeyDownRef: ((ev: KeyboardEvent) => boolean) | undefined;
 			let popper: HTMLDivElement | undefined;
 
-			const [items, setItems] = createSignal<BskyProfileTypeaheadSearch[]>([]);
+			const [items, setItems] = createSignal<RefOf<'app.bsky.actor.defs#profileViewBasic'>[]>([]);
 
 			const floatOptions: Partial<ComputePositionConfig> = {
 				strategy: 'fixed',

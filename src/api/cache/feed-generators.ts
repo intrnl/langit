@@ -1,11 +1,14 @@
+import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
-import { type Facet } from '../richtext/types.ts';
-import { type BskyFeedGenerator } from '../types.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
 
 import { type Signal, signal } from '~/utils/signals.ts';
+
+type Facet = RefOf<'app.bsky.richtext.facet'>;
+type FeedGenerator = RefOf<'app.bsky.feed.defs#generatorView'>;
 
 export const feedGenerators: Record<string, WeakRef<SignalizedFeedGenerator>> = {};
 
@@ -13,26 +16,26 @@ export const feedGenerators: Record<string, WeakRef<SignalizedFeedGenerator>> = 
 export interface SignalizedFeedGenerator {
 	_key?: number;
 	uri: string;
-	cid: string;
-	did: Signal<BskyFeedGenerator['did']>;
+	cid: Signal<FeedGenerator['cid']>;
+	did: Signal<FeedGenerator['did']>;
 	creator: SignalizedProfile;
-	displayName: Signal<BskyFeedGenerator['displayName']>;
-	description: Signal<BskyFeedGenerator['description']>;
-	descriptionFacets: Signal<BskyFeedGenerator['descriptionFacets']>;
-	avatar: Signal<BskyFeedGenerator['avatar']>;
-	likeCount: Signal<NonNullable<BskyFeedGenerator['likeCount']>>;
+	displayName: Signal<FeedGenerator['displayName']>;
+	description: Signal<FeedGenerator['description']>;
+	descriptionFacets: Signal<FeedGenerator['descriptionFacets']>;
+	avatar: Signal<FeedGenerator['avatar']>;
+	likeCount: Signal<NonNullable<FeedGenerator['likeCount']>>;
 	viewer: {
-		like: Signal<NonNullable<BskyFeedGenerator['viewer']>['like']>;
+		like: Signal<NonNullable<FeedGenerator['viewer']>['like']>;
 	};
 
 	$renderedDescription: ReturnType<typeof createFeedDescriptionRenderer>;
 }
 
-const createSignalizedFeedGenerator = (feed: BskyFeedGenerator, key?: number): SignalizedFeedGenerator => {
+const createSignalizedFeedGenerator = (feed: FeedGenerator, key?: number): SignalizedFeedGenerator => {
 	return {
 		_key: key,
 		uri: feed.uri,
-		cid: feed.cid,
+		cid: signal(feed.cid),
 		did: signal(feed.did),
 		creator: mergeSignalizedProfile(feed.creator, key),
 		displayName: signal(feed.displayName),
@@ -47,10 +50,7 @@ const createSignalizedFeedGenerator = (feed: BskyFeedGenerator, key?: number): S
 	};
 };
 
-export const mergeSignalizedFeedGenerator = (
-	feed: BskyFeedGenerator,
-	key?: number,
-): SignalizedFeedGenerator => {
+export const mergeSignalizedFeedGenerator = (feed: FeedGenerator, key?: number): SignalizedFeedGenerator => {
 	let uri = feed.uri;
 
 	let ref: WeakRef<SignalizedFeedGenerator> | undefined = feedGenerators[uri];
@@ -62,6 +62,7 @@ export const mergeSignalizedFeedGenerator = (
 	} else if (!key || val._key !== key) {
 		val._key = key;
 
+		val.cid.value = feed.cid;
 		val.did.value = feed.did;
 
 		val.creator = mergeSignalizedProfile(feed.creator, key);

@@ -1,9 +1,9 @@
-import { type QueryFn } from '@intrnl/sq';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
-import { type BskyResolvedDidResponse } from '../types.ts';
-import { type DID, isDid } from '../utils.ts';
+import { isDid } from '../utils.ts';
 
 export const getProfileDidKey = (uid: DID, actor: string) => ['getProfileDid', uid, actor] as const;
 export const getProfileDid: QueryFn<DID, ReturnType<typeof getProfileDidKey>> = async (key) => {
@@ -15,12 +15,11 @@ export const getProfileDid: QueryFn<DID, ReturnType<typeof getProfileDidKey>> = 
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
-		method: 'com.atproto.identity.resolveHandle',
-		params: { handle: actor },
+	const response = await agent.rpc.get('com.atproto.identity.resolveHandle', {
+		params: {
+			handle: actor,
+		},
 	});
 
-	const data = response.data as BskyResolvedDidResponse;
-
-	return data.did;
+	return response.data.did;
 };

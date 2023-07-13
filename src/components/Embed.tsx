@@ -1,12 +1,6 @@
 import { Show, createMemo } from 'solid-js';
 
-import {
-	type BskyPost,
-	type BskyPostEmbedRecord,
-	type EmbeddedImage,
-	type EmbeddedLink,
-} from '~/api/types.ts';
-import { type DID } from '~/api/utils.ts';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import EmbedFeed from '~/components/EmbedFeed.tsx';
 import EmbedImage from '~/components/EmbedImage.tsx';
@@ -15,9 +9,15 @@ import EmbedRecord from '~/components/EmbedRecord.tsx';
 import EmbedRecordBlocked from '~/components/EmbedRecordBlocked.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 
+type BskyEmbed = NonNullable<RefOf<'app.bsky.feed.defs#postView'>['embed']>;
+type EmbeddedRecord = RefOf<'app.bsky.embed.record#view'>['record'];
+
+type EmbeddedImage = RefOf<'app.bsky.embed.images#viewImage'>;
+type EmbeddedLink = RefOf<'app.bsky.embed.external#viewExternal'>;
+
 export interface EmbedProps {
 	uid: DID;
-	embed: NonNullable<BskyPost['embed']>;
+	embed: BskyEmbed;
 	/** Whether it should show a large UI for certain embeds */
 	large?: boolean;
 }
@@ -31,7 +31,7 @@ const Embed = (props: EmbedProps) => {
 
 		let images: EmbeddedImage[] | undefined;
 		let link: EmbeddedLink | undefined;
-		let record: BskyPostEmbedRecord['record'] | undefined;
+		let record: EmbeddedRecord | undefined;
 
 		if (type === 'app.bsky.embed.external#view') {
 			link = embed.external;

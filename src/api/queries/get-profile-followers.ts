@@ -1,12 +1,12 @@
-import { type QueryFn } from '@intrnl/sq';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
 import { mergeSignalizedProfile } from '../cache/profiles.ts';
-import { type ProfilesListWithSubjectPage } from '../models/profiles-list.ts';
+import type { ProfilesListWithSubjectPage } from '../models/profiles-list.ts';
 
-import { type BskyFollowersResponse } from '../types.ts';
-import { type Collection, type DID, pushCollection } from '../utils.ts';
+import { type Collection, pushCollection } from '../utils.ts';
 
 export const getProfileFollowersKey = (uid: DID, actor: string, limit: number) =>
 	['getProfileFollowers', uid, actor, limit] as const;
@@ -19,12 +19,15 @@ export const getProfileFollowers: QueryFn<
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
-		method: 'app.bsky.graph.getFollowers',
-		params: { actor, limit, cursor: param },
+	const response = await agent.rpc.get('app.bsky.graph.getFollowers', {
+		params: {
+			actor: actor,
+			limit: limit,
+			cursor: param,
+		},
 	});
 
-	const data = response.data as BskyFollowersResponse;
+	const data = response.data;
 	const followers = data.followers;
 
 	const page: ProfilesListWithSubjectPage = {

@@ -1,18 +1,14 @@
-import { multiagent } from '~/globals/agent.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type BskyBlob } from '../types.ts';
-import { type DID } from '../utils.ts';
+import { multiagent } from '~/globals/agent.ts';
 
 export const uploadBlob = async (uid: DID, blob: Blob) => {
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.post({
-		method: 'com.atproto.repo.uploadBlob',
+	const response = await agent.rpc.call('com.atproto.repo.uploadBlob', {
 		data: blob,
 		encoding: blob.type,
 	});
 
-	const data = response.data.blob as BskyBlob;
-
-	return data;
+	return response.data.blob;
 };

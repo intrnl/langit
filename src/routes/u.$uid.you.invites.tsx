@@ -1,9 +1,8 @@
 import { For, Match, Switch, createMemo } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-
-import { type DID } from '~/api/utils.ts';
 
 import { getInviteCodes, getInviteCodesKey } from '~/api/queries/get-invite-codes.ts';
 

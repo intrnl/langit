@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@floating-ui/dom": "^1.4.4",
+		"@intrnl/bluesky-client": "^0.1.0",
 		"@intrnl/sq": "^0.1.1",
 		"@intrnl/use-gesture-solid": "^0.1.0",
 		"@solid-primitives/event-listener": "^2.2.13",

@@ -1,6 +1,6 @@
-import { type DID } from '~/api/utils.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type SignalizedList } from '~/api/cache/lists.ts';
+import type { SignalizedList } from '~/api/cache/lists.ts';
 import { subscribeMuteList } from '~/api/mutations/subscribe-mute-list.ts';
 
 import { closeModal } from '~/globals/modals.tsx';

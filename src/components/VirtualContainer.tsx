@@ -1,6 +1,6 @@
 // This isn't a full-blown virtual list solution, but it's close to being one.
 
-import { type JSX } from 'solid-js/jsx-runtime';
+import type { JSX } from 'solid-js/jsx-runtime';
 
 import { Show, batch, createSignal } from 'solid-js';
 

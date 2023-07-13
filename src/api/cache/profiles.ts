@@ -1,72 +1,76 @@
+import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+
 import { detectFacets } from '../richtext/detection.ts';
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 import { UnicodeString } from '../richtext/unicode.ts';
 
-import { type BskyProfile, type BskyProfileBasic, type BskyProfileFollow } from '../types.ts';
-
 import { type Signal, signal } from '~/utils/signals.ts';
+
+type Profile = RefOf<'app.bsky.actor.defs#profileView'>;
+type ProfileBasic = RefOf<'app.bsky.actor.defs#profileViewBasic'>;
+type ProfileDetailed = RefOf<'app.bsky.actor.defs#profileViewDetailed'>;
 
 export const profiles: Record<string, WeakRef<SignalizedProfile>> = {};
 
 /** @see BskyProfile */
 export interface SignalizedProfile {
 	_key?: number;
-	did: BskyProfile['did'];
-	handle: Signal<BskyProfile['handle']>;
-	displayName: Signal<BskyProfile['displayName']>;
-	description: Signal<BskyProfile['description']>;
-	avatar: Signal<BskyProfile['avatar']>;
-	banner: Signal<BskyProfile['banner']>;
-	followersCount: Signal<BskyProfile['followersCount']>;
-	followsCount: Signal<BskyProfile['followsCount']>;
-	postsCount: Signal<BskyProfile['postsCount']>;
-	labels: Signal<BskyProfile['labels']>;
+	did: ProfileDetailed['did'];
+	handle: Signal<ProfileDetailed['handle']>;
+	displayName: Signal<ProfileDetailed['displayName']>;
+	description: Signal<ProfileDetailed['description']>;
+	avatar: Signal<ProfileDetailed['avatar']>;
+	banner: Signal<ProfileDetailed['banner']>;
+	followersCount: Signal<NonNullable<ProfileDetailed['followersCount']>>;
+	followsCount: Signal<NonNullable<ProfileDetailed['followsCount']>>;
+	postsCount: Signal<NonNullable<ProfileDetailed['postsCount']>>;
+	labels: Signal<ProfileDetailed['labels']>;
 	viewer: {
-		muted: Signal<BskyProfile['viewer']['muted']>;
-		mutedByList: Signal<BskyProfile['viewer']['mutedByList']>;
-		blocking: Signal<BskyProfile['viewer']['blocking']>;
-		blockedBy: Signal<BskyProfile['viewer']['blockedBy']>;
-		following: Signal<BskyProfile['viewer']['following']>;
+		muted: Signal<NonNullable<ProfileDetailed['viewer']>['muted']>;
+		mutedByList: Signal<NonNullable<ProfileDetailed['viewer']>['mutedByList']>;
+		blockedBy: Signal<NonNullable<ProfileDetailed['viewer']>['blockedBy']>;
+		blocking: Signal<NonNullable<ProfileDetailed['viewer']>['blocking']>;
+		following: Signal<NonNullable<ProfileDetailed['viewer']>['following']>;
+		followedBy: Signal<NonNullable<ProfileDetailed['viewer']>['followedBy']>;
 	};
 
 	$renderedDescription: ReturnType<typeof createProfileDescriptionRenderer>;
 }
 
 const createSignalizedProfile = (
-	profile: BskyProfile | BskyProfileBasic | BskyProfileFollow,
+	profile: Profile | ProfileBasic | ProfileDetailed,
 	key?: number,
 ): SignalizedProfile => {
-	const isProfileFollow = 'description' in profile;
-	const isProfile = 'postsCount' in profile;
+	const isProfile = 'description' in profile;
+	const isDetailed = 'postsCount' in profile;
 
 	return {
 		_key: key,
 		did: profile.did,
 		handle: signal(profile.handle),
 		displayName: signal(profile.displayName),
-		description: signal(isProfileFollow ? profile.description : ''),
+		description: signal(isProfile ? profile.description : ''),
 		avatar: signal(profile.avatar),
-		banner: signal(isProfile ? profile.banner : ''),
-		followersCount: signal(isProfile ? profile.followersCount : 0),
-		followsCount: signal(isProfile ? profile.followsCount : 0),
-		postsCount: signal(isProfile ? profile.postsCount : 0),
+		banner: signal(isDetailed ? profile.banner : ''),
+		followersCount: signal((isDetailed && profile.followersCount) || 0),
+		followsCount: signal((isDetailed && profile.followsCount) || 0),
+		postsCount: signal((isDetailed && profile.postsCount) || 0),
 		labels: signal(profile.labels),
 		viewer: {
-			muted: signal(profile.viewer.muted),
-			mutedByList: signal(profile.viewer.mutedByList),
-			blocking: signal(profile.viewer.blocking),
-			blockedBy: signal(profile.viewer.blockedBy),
-			following: signal(profile.viewer.following),
+			muted: signal(profile.viewer?.muted),
+			mutedByList: signal(profile.viewer?.mutedByList),
+			blockedBy: signal(profile.viewer?.blockedBy),
+			blocking: signal(profile.viewer?.blocking),
+			following: signal(profile.viewer?.following),
+			followedBy: signal(profile.viewer?.followedBy),
 		},
+
 		$renderedDescription: createProfileDescriptionRenderer(),
 	};
 };
 
-export const mergeSignalizedProfile = (
-	profile: BskyProfile | BskyProfileBasic | BskyProfileFollow,
-	key?: number,
-) => {
+export const mergeSignalizedProfile = (profile: Profile | ProfileBasic | ProfileDetailed, key?: number) => {
 	let did = profile.did;
 
 	let ref: WeakRef<SignalizedProfile> | undefined = profiles[did];
@@ -83,11 +87,12 @@ export const mergeSignalizedProfile = (
 		val.avatar.value = profile.avatar;
 		val.labels.value = profile.labels;
 
-		val.viewer.muted.value = profile.viewer.muted;
-		val.viewer.mutedByList.value = profile.viewer.mutedByList;
-		val.viewer.blocking.value = profile.viewer.blocking;
-		val.viewer.blockedBy.value = profile.viewer.blockedBy;
-		val.viewer.following.value = profile.viewer.following;
+		val.viewer.muted.value = profile.viewer?.muted;
+		val.viewer.mutedByList.value = profile.viewer?.mutedByList;
+		val.viewer.blocking.value = profile.viewer?.blocking;
+		val.viewer.blockedBy.value = profile.viewer?.blockedBy;
+		val.viewer.following.value = profile.viewer?.following;
+		val.viewer.followedBy.value = profile.viewer?.followedBy;
 
 		if ('description' in profile) {
 			val.description.value = profile.description;
@@ -95,9 +100,9 @@ export const mergeSignalizedProfile = (
 
 		if ('postsCount' in profile) {
 			val.banner.value = profile.banner;
-			val.followersCount.value = profile.followersCount;
-			val.followsCount.value = profile.followsCount;
-			val.postsCount.value = profile.postsCount;
+			val.followersCount.value = profile.followersCount ?? 0;
+			val.followsCount.value = profile.followsCount ?? 0;
+			val.postsCount.value = profile.postsCount ?? 0;
 		}
 	}
 
@@ -113,7 +118,9 @@ const createProfileDescriptionRenderer = () => {
 	return function (this: SignalizedProfile, uid: string) {
 		const curr = this.description.value;
 
-		if (description === undefined || description !== curr) {
+		if (curr === undefined) {
+			template = undefined;
+		} else if (description === undefined || description !== curr) {
 			const text = new UnicodeString(curr);
 			const facets = detectFacets(text);
 

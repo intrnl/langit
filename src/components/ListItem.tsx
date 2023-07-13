@@ -1,8 +1,10 @@
 import { Show } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
 import { type SignalizedList } from '~/api/cache/lists.ts';
 
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { A } from '~/router.ts';
 

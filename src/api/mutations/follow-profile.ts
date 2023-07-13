@@ -1,8 +1,9 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
 import { multiagent } from '~/globals/agent.ts';
 
-import { type SignalizedProfile } from '../cache/profiles.ts';
-import { type BskyCreateRecordResponse } from '../types.ts';
-import { type DID, getRecordId } from '../utils.ts';
+import type { SignalizedProfile } from '../cache/profiles.ts';
+import { getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -13,8 +14,7 @@ export const followProfile = (uid: DID, profile: SignalizedProfile) => {
 		const prev = profile.viewer.following.peek();
 
 		if (prev) {
-			await agent.rpc.post({
-				method: 'com.atproto.repo.deleteRecord',
+			await agent.rpc.call('com.atproto.repo.deleteRecord', {
 				data: {
 					collection: 'app.bsky.graph.follow',
 					repo: uid,
@@ -25,8 +25,7 @@ export const followProfile = (uid: DID, profile: SignalizedProfile) => {
 			profile.viewer.following.value = undefined;
 			profile.followersCount.value--;
 		} else {
-			const response = await agent.rpc.post({
-				method: 'com.atproto.repo.createRecord',
+			const response = await agent.rpc.call('com.atproto.repo.createRecord', {
 				data: {
 					repo: uid,
 					collection: 'app.bsky.graph.follow',
@@ -38,9 +37,7 @@ export const followProfile = (uid: DID, profile: SignalizedProfile) => {
 				},
 			});
 
-			const data = response.data as BskyCreateRecordResponse;
-
-			profile.viewer.following.value = data.uri;
+			profile.viewer.following.value = response.data.uri;
 			profile.followersCount.value++;
 		}
 	});

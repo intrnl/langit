@@ -1,26 +1,31 @@
+import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+
 import { type SignalizedTimelinePost, createSignalizedTimelinePost } from '../cache/posts.ts';
-import { type BskyTimelinePost } from '../types.ts';
+
+type FeedPost = RefOf<'app.bsky.feed.defs#feedViewPost'>;
 
 export interface TimelineSlice {
 	items: SignalizedTimelinePost[];
 }
 
-const isNextInThread = (slice: TimelineSlice, item: BskyTimelinePost) => {
+const isNextInThread = (slice: TimelineSlice, item: FeedPost) => {
 	const items = slice.items;
 	const last = items[items.length - 1];
 
 	const reply = item.reply;
 
-	return !!reply && last.post.cid == reply.parent.cid;
+	return (
+		!!reply && reply.parent.$type === 'app.bsky.feed.defs#postView' && last.post.cid.value == reply.parent.cid
+	);
 };
 
-const isFirstInThread = (slice: TimelineSlice, item: BskyTimelinePost) => {
+const isFirstInThread = (slice: TimelineSlice, item: FeedPost) => {
 	const items = slice.items;
 	const first = items[0];
 
 	const reply = first.reply;
 
-	return !!reply && reply.parent.cid === item.post.cid;
+	return !!reply && reply.parent.cid.value === item.post.cid;
 };
 
 export interface TimelinePage {
@@ -31,13 +36,9 @@ export interface TimelinePage {
 }
 
 export type SliceFilter = (slice: TimelineSlice, seen: Set<string>) => boolean;
-export type PostFilter = (post: BskyTimelinePost) => boolean;
+export type PostFilter = (post: FeedPost) => boolean;
 
-export const createTimelineSlices = (
-	arr: BskyTimelinePost[],
-	sliceFilter?: SliceFilter,
-	postFilter?: PostFilter,
-) => {
+export const createTimelineSlices = (arr: FeedPost[], sliceFilter?: SliceFilter, postFilter?: PostFilter) => {
 	const key = Date.now();
 
 	const seen = new Set<string>();

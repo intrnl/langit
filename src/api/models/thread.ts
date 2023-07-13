@@ -1,39 +1,41 @@
+import type { RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+
 import { type SignalizedPost, mergeSignalizedPost } from '../cache/posts.ts';
-import {
-	type BskyPost,
-	type BskyThread,
-	type BskyThreadBlockedPost,
-	type BskyThreadNotFound,
-} from '../types.ts';
 
 import { Stack } from '~/utils/stack.ts';
 
-const calculatePostScore = (post: BskyPost, parent: BskyPost) => {
+type Post = RefOf<'app.bsky.feed.defs#postView'>;
+type Thread = RefOf<'app.bsky.feed.defs#threadViewPost'>;
+
+type BlockedPost = UnionOf<'app.bsky.feed.defs#blockedPost'>;
+type NotFoundPost = UnionOf<'app.bsky.feed.defs#notFoundPost'>;
+
+const calculatePostScore = (post: Post, parent: Post) => {
 	const isSameAuthor = parent.author.did === post.author.did;
-	const isFollowing = !!post.author.viewer.following;
+	const isFollowing = !!post.author.viewer?.following;
 
 	return (
 		1 *
-		(post.replyCount * 0.5 + post.repostCount * 1 + post.likeCount * 1) *
+		((post.replyCount ?? 0) * 0.5 + (post.repostCount ?? 0) * 1 + (post.likeCount ?? 0) * 1) *
 		(isSameAuthor ? 1.5 : 1) *
 		(isFollowing ? 1.35 : 1)
 	);
 };
 
 export interface ThreadSlice {
-	items: [...items: SignalizedPost[], last: SignalizedPost | BskyThreadBlockedPost];
+	items: [...items: SignalizedPost[], last: SignalizedPost | NotFoundPost | BlockedPost];
 }
 
 export interface ThreadPage {
 	post: SignalizedPost;
-	ancestors: [first: SignalizedPost | BskyThreadNotFound | BskyThreadBlockedPost, ...items: SignalizedPost[]];
+	ancestors: [first: SignalizedPost | NotFoundPost | BlockedPost, ...items: SignalizedPost[]];
 	descendants: ThreadSlice[];
 }
 
-type ThreadStackNode = { thread: BskyThread; slice: ThreadSlice | undefined };
+type ThreadStackNode = { thread: Thread; slice: ThreadSlice | undefined };
 
-export const createThreadPage = (data: BskyThread): ThreadPage => {
-	const ancestors: (SignalizedPost | BskyThreadNotFound | BskyThreadBlockedPost)[] = [];
+export const createThreadPage = (data: Thread): ThreadPage => {
+	const ancestors: (SignalizedPost | NotFoundPost | BlockedPost)[] = [];
 	const descendants: ThreadSlice[] = [];
 
 	const stack = new Stack<ThreadStackNode>();
@@ -65,7 +67,12 @@ export const createThreadPage = (data: BskyThread): ThreadPage => {
 		const scores: Record<string, number> = {};
 
 		const replies = thread.replies.slice().sort((a, b) => {
-			if (a.$type === 'app.bsky.feed.defs#blockedPost' || b.$type === 'app.bsky.feed.defs#blockedPost') {
+			if (
+				a.$type === 'app.bsky.feed.defs#blockedPost' ||
+				b.$type === 'app.bsky.feed.defs#blockedPost' ||
+				a.$type === 'app.bsky.feed.defs#notFoundPost' ||
+				b.$type === 'app.bsky.feed.defs#notFoundPost'
+			) {
 				return 0;
 			}
 

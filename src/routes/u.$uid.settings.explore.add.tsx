@@ -1,9 +1,10 @@
 import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
 
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { getPopularFeedGenerators, getPopularFeedGeneratorsKey } from '~/api/queries/get-feed-generator.ts';
 

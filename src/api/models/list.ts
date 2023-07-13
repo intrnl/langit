@@ -1,5 +1,5 @@
-import { type SignalizedList } from '../cache/lists.ts';
-import { type SignalizedProfile } from '../cache/profiles.ts';
+import type { SignalizedList } from '../cache/lists.ts';
+import type { SignalizedProfile } from '../cache/profiles.ts';
 
 export interface SignalizedListSubject {
 	subject: SignalizedProfile;

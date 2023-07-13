@@ -1,4 +1,4 @@
-import { type SignalizedProfile } from '~/api/cache/profiles.ts';
+import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
 

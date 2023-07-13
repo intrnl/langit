@@ -1,8 +1,9 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
 import { multiagent } from '~/globals/agent.ts';
 
-import { type SignalizedProfile } from '../cache/profiles.ts';
-import { type BskyCreateRecordResponse } from '../types.ts';
-import { type DID, getRecordId } from '../utils.ts';
+import type { SignalizedProfile } from '../cache/profiles.ts';
+import { getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -13,8 +14,7 @@ export const blockProfile = (uid: DID, profile: SignalizedProfile) => {
 		const prev = profile.viewer.blocking.peek();
 
 		if (prev) {
-			await agent.rpc.post({
-				method: 'com.atproto.repo.deleteRecord',
+			await agent.rpc.call('com.atproto.repo.deleteRecord', {
 				data: {
 					collection: 'app.bsky.graph.block',
 					repo: uid,
@@ -24,8 +24,7 @@ export const blockProfile = (uid: DID, profile: SignalizedProfile) => {
 
 			profile.viewer.blocking.value = undefined;
 		} else {
-			const response = await agent.rpc.post({
-				method: 'com.atproto.repo.createRecord',
+			const response = await agent.rpc.call('com.atproto.repo.createRecord', {
 				data: {
 					repo: uid,
 					collection: 'app.bsky.graph.block',
@@ -37,9 +36,7 @@ export const blockProfile = (uid: DID, profile: SignalizedProfile) => {
 				},
 			});
 
-			const data = response.data as BskyCreateRecordResponse;
-
-			profile.viewer.blocking.value = data.uri;
+			profile.viewer.blocking.value = response.data.uri;
 		}
 	});
 };

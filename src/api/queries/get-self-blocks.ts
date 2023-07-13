@@ -1,12 +1,12 @@
-import { type QueryFn } from '@intrnl/sq';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
 import { mergeSignalizedProfile } from '../cache/profiles.ts';
-import { type ProfilesListPage } from '../models/profiles-list.ts';
+import type { ProfilesListPage } from '../models/profiles-list.ts';
 
-import { type BskyProfileFollow } from '../types.ts';
-import { type Collection, type DID, pushCollection } from '../utils.ts';
+import { type Collection, pushCollection } from '../utils.ts';
 
 export const getSelfBlocksKey = (uid: DID, limit: number) => ['getSelfBlocks', uid, limit] as const;
 export const getSelfBlocks: QueryFn<
@@ -18,17 +18,16 @@ export const getSelfBlocks: QueryFn<
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
-		method: 'app.bsky.graph.getBlocks',
+	const response = await agent.rpc.get('app.bsky.graph.getBlocks', {
 		params: { limit, cursor: param },
 	});
 
 	const data = response.data;
-	const blocks = data.blocks as BskyProfileFollow[];
+	const blocks = data.blocks;
 
 	const page: ProfilesListPage = {
 		cursor: blocks.length >= limit ? data.cursor : undefined,
-		profiles: blocks.map((profile: BskyProfileFollow) => mergeSignalizedProfile(profile)),
+		profiles: blocks.map((profile) => mergeSignalizedProfile(profile)),
 	};
 
 	return pushCollection(collection, page, param);

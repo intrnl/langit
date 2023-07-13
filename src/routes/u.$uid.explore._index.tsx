@@ -1,9 +1,10 @@
 import { ErrorBoundary, For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import {
 	getFeedGenerator,
@@ -107,13 +108,11 @@ const AuthenticatedExplorePage = () => {
 												return items.map((item, idx) => (
 													<VirtualContainer
 														key="posts"
-														id={
-															/* @once */ createPostKey(
-																item.post.cid,
-																(!!item.reply?.parent && idx === 0) || !!item.reason,
-																idx !== len - 1,
-															)
-														}
+														id={createPostKey(
+															item.post.cid.value,
+															(!!item.reply?.parent && idx === 0) || !!item.reason,
+															idx !== len - 1,
+														)}
 													>
 														<Post
 															interactive

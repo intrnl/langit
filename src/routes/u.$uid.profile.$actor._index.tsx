@@ -1,5 +1,6 @@
 import { createEffect } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import {
@@ -9,8 +10,6 @@ import {
 	getTimelineLatest,
 	getTimelineLatestKey,
 } from '~/api/queries/get-timeline.ts';
-
-import { type DID } from '~/api/utils.ts';
 
 import { useParams } from '~/router.ts';
 

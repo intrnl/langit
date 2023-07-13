@@ -1,13 +1,13 @@
-import { type JSONContent } from '@tiptap/core';
+import type { JSONContent } from '@tiptap/core';
 
 import { graphemeLen } from '~/api/richtext/intl.ts';
-import { type Facet, type FacetLink } from '~/api/richtext/types.ts';
+import type { Facet, LinkFacet } from '~/api/richtext/types.ts';
 
 const encoder = new TextEncoder();
 
 type SerializedMarks = NonNullable<JSONContent['marks']>;
 
-const findFeature = (marks?: SerializedMarks): FacetLink | undefined => {
+const findFeature = (marks?: SerializedMarks): LinkFacet | undefined => {
 	if (marks && marks.length) {
 		for (let idx = 0, len = marks.length; idx < len; idx++) {
 			const mark = marks[idx];
@@ -93,7 +93,6 @@ export const pm2rt = (json: JSONContent) => {
 				}
 
 				facets.push({
-					$type: 'app.bsky.richtext.facet',
 					index: {
 						byteStart: start,
 						byteEnd: length,
@@ -111,7 +110,6 @@ export const pm2rt = (json: JSONContent) => {
 			text += handle;
 
 			facets.push({
-				$type: 'app.bsky.richtext.facet',
 				index: {
 					byteStart: start,
 					byteEnd: length,

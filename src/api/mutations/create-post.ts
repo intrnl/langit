@@ -1,13 +1,13 @@
+import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
+
 import { multiagent } from '~/globals/agent.ts';
 
-import { type BskyCreateRecordResponse, type BskyPostRecord } from '../types.ts';
-import { type DID } from '../utils.ts';
+type PostRecord = Records['app.bsky.feed.post'];
 
-export const createPost = async (uid: DID, record: BskyPostRecord) => {
+export const createPost = async (uid: DID, record: PostRecord) => {
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.post({
-		method: 'com.atproto.repo.createRecord',
+	const response = await agent.rpc.call('com.atproto.repo.createRecord', {
 		data: {
 			repo: uid,
 			collection: 'app.bsky.feed.post',
@@ -15,7 +15,5 @@ export const createPost = async (uid: DID, record: BskyPostRecord) => {
 		},
 	});
 
-	const data = response.data as BskyCreateRecordResponse;
-
-	return data;
+	return response.data;
 };

@@ -1,8 +1,7 @@
 import { Show, createMemo } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-
-import { type DID } from '~/api/utils.ts';
 
 import { getProfileFollowers, getProfileFollowersKey } from '~/api/queries/get-profile-followers.ts';
 

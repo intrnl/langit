@@ -1,9 +1,10 @@
 import { Match, Show, Switch } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { A as UntypedAnchor, useNavigate } from '@solidjs/router';
 
-import { type SignalizedPost, type SignalizedTimelinePost } from '~/api/cache/posts.ts';
-import { type DID, getRecordId } from '~/api/utils.ts';
+import type { SignalizedPost, SignalizedTimelinePost } from '~/api/cache/posts.ts';
+import { getRecordId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 

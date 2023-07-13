@@ -9,7 +9,7 @@ import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
 import textarea from '~/styles/primitives/textarea.ts';
 
-import { type ComposedImage } from './types.ts';
+import type { ComposedImage } from './types.ts';
 
 interface ImageAltEditDialogProps {
 	image: ComposedImage;

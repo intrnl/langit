@@ -1,10 +1,10 @@
 import { Show, createSignal } from 'solid-js';
 
+import { Agent } from '@intrnl/bluesky-client/agent';
 import { createMutation, createQuery, useQueryMutation } from '@intrnl/sq';
 import { useNavigate, useSearchParams } from '@solidjs/router';
 
 import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
-import { XRPC } from '~/api/rpc/xrpc.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
@@ -20,7 +20,7 @@ const AuthLoginPage = () => {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams<{ to?: string }>();
 
-	const [service, setService] = createSignal(DEFAULT_DATA_SERVERS[0]);
+	const [service, _setService] = createSignal(DEFAULT_DATA_SERVERS[0]);
 
 	const [identifier, setIdentifier] = createSignal('');
 	const [password, setPassword] = createSignal('');
@@ -29,14 +29,11 @@ const AuthLoginPage = () => {
 
 	const [description] = createQuery({
 		key: () => ['describeServer', service().url] as const,
-		fetch: async () => {
-			const rpc = new XRPC(service().url);
+		fetch: async ([, serviceUri]) => {
+			const agent = new Agent({ serviceUri: serviceUri });
+			const response = await agent.rpc.get('com.atproto.server.describeServer', {});
 
-			const res = await rpc.get({
-				method: 'com.atproto.server.describeServer',
-			});
-
-			return res.data;
+			return response.data;
 		},
 	});
 
@@ -136,11 +133,11 @@ const AuthLoginPage = () => {
 					{(data) => (
 						<p class="text-sm leading-6 text-muted-fg">
 							By continuing, you agree to the service's{' '}
-							<a href={data().links.termsOfService} class="text-primary hover:underline">
+							<a href={data().links?.termsOfService} class="text-primary hover:underline">
 								Terms of Service
 							</a>{' '}
 							and{' '}
-							<a href={data().links.privacyPolicy} class="text-primary hover:underline">
+							<a href={data().links?.privacyPolicy} class="text-primary hover:underline">
 								Privacy Policy
 							</a>
 							.

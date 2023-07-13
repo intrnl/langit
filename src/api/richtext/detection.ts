@@ -1,10 +1,18 @@
-import { type Facet } from './types';
-import { UnicodeString, utf16IndexToUtf8Index } from './unicode';
+import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+
+import { UnicodeString, utf16IndexToUtf8Index } from './unicode.ts';
+
+type Facet = RefOf<'app.bsky.richtext.facet'>;
 
 export const MENTION_RE = /(^|\s|\()(@)([a-zA-Z0-9.-]+)(\b)/g;
 export const LINK_RE = /(^|\s|\()((https?:\/\/[\S]+)|(([a-z][a-z0-9]*(\.[a-z0-9]+)+)[\S]*))/gim;
 
 export const INVALID_TLD_RE = /\.(?:example|internal|invalid|local|localhost|test)$/i;
+
+export interface UnresolvedMention {
+	$type: 'io.github.intrnl.langit#unresolvedMention';
+	handle: string;
+}
 
 export const detectFacets = (text: UnicodeString): Facet[] | undefined => {
 	const facets: Facet[] = [];
@@ -18,7 +26,6 @@ export const detectFacets = (text: UnicodeString): Facet[] | undefined => {
 		const start = text.utf16.indexOf(match[3], match.index) - 1;
 
 		facets.push({
-			$type: 'app.bsky.richtext.facet',
 			index: {
 				byteStart: utf16IndexToUtf8Index(text, start),
 				byteEnd: utf16IndexToUtf8Index(text, start + match[3].length + 1),
@@ -27,7 +34,7 @@ export const detectFacets = (text: UnicodeString): Facet[] | undefined => {
 				{
 					$type: 'io.github.intrnl.langit#unresolvedMention',
 					handle: match[3],
-				},
+				} satisfies UnresolvedMention as any,
 			],
 		});
 	}
@@ -60,7 +67,6 @@ export const detectFacets = (text: UnicodeString): Facet[] | undefined => {
 		}
 
 		facets.push({
-			$type: 'app.bsky.richtext.facet',
 			index: {
 				byteStart: utf16IndexToUtf8Index(text, start),
 				byteEnd: utf16IndexToUtf8Index(text, end),

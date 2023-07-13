@@ -1,11 +1,12 @@
-import { type QueryFn } from '@intrnl/sq';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
+import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
 import { type SignalizedList, mergeSignalizedList } from '../cache/lists.ts';
 import { type SignalizedProfile, mergeSignalizedProfile } from '../cache/profiles.ts';
-import { type BskyGetListResponse } from '../types.ts';
-import { type Collection, type DID, pushCollection } from '../utils.ts';
+import { type Collection, pushCollection } from '../utils.ts';
 
 import _getDid from './_did.ts';
 
@@ -28,12 +29,11 @@ export const getList: QueryFn<Collection<ListPage>, ReturnType<typeof getListKey
 	const did = await _getDid(agent, actor);
 
 	const uri = `at://${did}/app.bsky.graph.list/${list}`;
-	const response = await agent.rpc.get({
-		method: 'app.bsky.graph.getList',
+	const response = await agent.rpc.get('app.bsky.graph.getList', {
 		params: { list: uri, limit, cursor: param },
 	});
 
-	const data = response.data as BskyGetListResponse;
+	const data = response.data;
 	const items = data.items;
 
 	const page: ListPage = {

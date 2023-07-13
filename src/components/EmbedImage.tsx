@@ -1,11 +1,13 @@
 import { Match, Suspense, Switch, lazy } from 'solid-js';
 
-import { type EmbeddedImage } from '~/api/types.ts';
+import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { openModal } from '~/globals/modals.tsx';
 
 import ImageAltDialog from '~/components/dialogs/ImageAltDialog.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
+
+type EmbeddedImage = RefOf<'app.bsky.embed.images#viewImage'>;
 
 export interface EmbedImageProps {
 	images: EmbeddedImage[];

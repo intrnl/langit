@@ -1,10 +1,11 @@
 import { Match, Switch } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import { getRecordId, getRepoId } from '~/api/utils.ts';
 
-import { type SignalizedProfile } from '~/api/cache/profiles.ts';
+import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import { muteProfile } from '~/api/mutations/mute-profile.ts';
 import { getList, getListKey } from '~/api/queries/get-list.ts';
 

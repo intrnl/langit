@@ -1,8 +1,7 @@
-import { type DID } from '~/api/utils.ts';
-
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { useNavigate } from '@solidjs/router';
 
-import { type SignalizedPost } from '~/api/cache/posts.ts';
+import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
 
 import { closeModal } from '~/globals/modals.tsx';

@@ -1,9 +1,8 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
 import { getSubscribedLists, getSubscribedListsKey } from '~/api/queries/get-subscribed-lists.ts';
-
-import { type DID } from '~/api/utils.ts';
 
 import { useParams } from '~/router.ts';
 

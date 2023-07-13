@@ -1,8 +1,9 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
 import { multiagent } from '~/globals/agent.ts';
 
-import { type SignalizedPost } from '../cache/posts.ts';
-import { type BskyCreateRecordResponse } from '../types.ts';
-import { type DID, getRecordId } from '../utils.ts';
+import type { SignalizedPost } from '../cache/posts.ts';
+import { getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -13,8 +14,7 @@ export const repostPost = (uid: DID, post: SignalizedPost) => {
 		const prev = post.viewer.repost.peek();
 
 		if (prev) {
-			await agent.rpc.post({
-				method: 'com.atproto.repo.deleteRecord',
+			await agent.rpc.call('com.atproto.repo.deleteRecord', {
 				data: {
 					collection: 'app.bsky.feed.repost',
 					repo: uid,
@@ -25,8 +25,7 @@ export const repostPost = (uid: DID, post: SignalizedPost) => {
 			post.viewer.repost.value = undefined;
 			post.repostCount.value--;
 		} else {
-			const response = await agent.rpc.post({
-				method: 'com.atproto.repo.createRecord',
+			const response = await agent.rpc.call('com.atproto.repo.createRecord', {
 				data: {
 					repo: uid,
 					collection: 'app.bsky.feed.repost',
@@ -34,16 +33,14 @@ export const repostPost = (uid: DID, post: SignalizedPost) => {
 						$type: 'app.bsky.feed.repost',
 						createdAt: new Date(),
 						subject: {
-							cid: post.cid,
+							cid: post.cid.value,
 							uri: post.uri,
 						},
 					},
 				},
 			});
 
-			const data = response.data as BskyCreateRecordResponse;
-
-			post.viewer.repost.value = data.uri;
+			post.viewer.repost.value = response.data.uri;
 			post.repostCount.value++;
 		}
 	});

@@ -1,11 +1,12 @@
 import { Match, Show, Switch } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { Outlet } from '@solidjs/router';
 
-import { type XRPCError } from '~/api/rpc/xrpc-utils.ts';
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';

@@ -1,11 +1,11 @@
 import { Show, createEffect } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Navigate, Outlet, useLocation } from '@solidjs/router';
 
 import { MultiagentError } from '~/api/multiagent.ts';
-import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
-import { type DID } from '~/api/utils.ts';
 
 import { getNotificationsLatest, getNotificationsLatestKey } from '~/api/queries/get-notifications.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';

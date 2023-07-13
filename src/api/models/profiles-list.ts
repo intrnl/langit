@@ -1,4 +1,4 @@
-import { type SignalizedProfile } from '../cache/profiles.ts';
+import type { SignalizedProfile } from '../cache/profiles.ts';
 
 export interface ProfilesListWithSubjectPage {
 	cursor?: string;

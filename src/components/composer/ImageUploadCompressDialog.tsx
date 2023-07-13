@@ -7,7 +7,7 @@ import BlobImage from '~/components/BlobImage.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
 
-import { type PendingImage } from './types.ts';
+import type { PendingImage } from './types.ts';
 
 interface ImageUploadCompressDialogProps {
 	images: PendingImage[];

@@ -1,18 +1,19 @@
-import { type InitialDataFn, type QueryFn } from '@intrnl/sq';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { InitialDataFn, QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 import { BSKY_POST_URL_RE, isAppUrl } from '~/utils/link.ts';
 
 import { type SignalizedPost, mergeSignalizedPost, posts } from '../cache/posts.ts';
-import { type BskyGetPostsResponse, type BskyPost } from '../types.ts';
-import { type DID } from '../utils.ts';
 
 import _getDid from './_did.ts';
 
+type Post = RefOf<'app.bsky.feed.defs#postView'>;
+
 type Query = [uid: DID, uri: string];
 
-export const fetchPost = createBatchedFetch<Query, string, BskyPost>({
+export const fetchPost = createBatchedFetch<Query, string, Post>({
 	limit: 25,
 	timeout: 0,
 	key: (query) => query[0],
@@ -24,14 +25,13 @@ export const fetchPost = createBatchedFetch<Query, string, BskyPost>({
 
 		const agent = await multiagent.connect(uid);
 
-		const response = await agent.rpc.get({
-			method: 'app.bsky.feed.getPosts',
-			params: { uris: uris },
+		const response = await agent.rpc.get('app.bsky.feed.getPosts', {
+			params: {
+				uris: uris,
+			},
 		});
 
-		const data = response.data as BskyGetPostsResponse;
-
-		return data.posts;
+		return response.data.posts;
 	},
 });
 

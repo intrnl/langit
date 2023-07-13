@@ -1,10 +1,9 @@
 import { For, Show, Suspense, createEffect, createMemo } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useSearchParams } from '@solidjs/router';
-
-import { type DID } from '~/api/utils.ts';
 
 import {
 	getFeedGenerator,

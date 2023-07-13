@@ -1,11 +1,11 @@
-import { type QueryFn } from '@intrnl/sq';
+import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
+import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
 
-import { type BskyListRecordsResponse, type BskyListSubjectRecord } from '../types.ts';
-import { type DID } from '../utils.ts';
+type ListItem = Records['app.bsky.graph.listitem'];
 
 type Query = [uid: DID, actor: DID, list: string];
 type Key = `${DID}|${string}`;
@@ -40,8 +40,7 @@ export const fetchIsProfileInList = createBatchedFetch<Query, Key, ProfileExists
 		while (remaining.size > 0) {
 			const limit = 100;
 
-			const response = await agent.rpc.get({
-				method: 'com.atproto.repo.listRecords',
+			const response = await agent.rpc.get('com.atproto.repo.listRecords', {
 				params: {
 					repo: uid,
 					collection: 'app.bsky.graph.listitem',
@@ -50,12 +49,12 @@ export const fetchIsProfileInList = createBatchedFetch<Query, Key, ProfileExists
 				},
 			});
 
-			const data = response.data as BskyListRecordsResponse<BskyListSubjectRecord>;
+			const data = response.data;
 			const records = data.records;
 
 			for (let idx = 0, len = records.length; idx < len; idx++) {
 				const record = records[idx];
-				const value = record.value;
+				const value = record.value as ListItem;
 
 				const key: Key = `${value.subject}|${value.list}`;
 				const match = remaining.get(key);

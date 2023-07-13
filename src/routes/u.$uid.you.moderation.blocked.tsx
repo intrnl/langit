@@ -1,7 +1,6 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-
-import { type DID } from '~/api/utils.ts';
 
 import { getSelfBlocks, getSelfBlocksKey } from '~/api/queries/get-self-blocks.ts';
 

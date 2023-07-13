@@ -1,9 +1,11 @@
 import { For, Match, Switch } from 'solid-js';
-import { type JSX } from 'solid-js/jsx-runtime';
+import type { JSX } from 'solid-js/jsx-runtime';
 
-import { type ProfileListsResource } from '~/api/queries/get-profile-lists.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type DID, getCollectionCursor } from '~/api/utils.ts';
+import type { ProfileListsResource } from '~/api/queries/get-profile-lists.ts';
+
+import { getCollectionCursor } from '~/api/utils.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import ListItem from '~/components/ListItem.tsx';

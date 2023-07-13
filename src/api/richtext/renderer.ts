@@ -1,6 +1,6 @@
 import { BSKY_FEED_URL_RE, BSKY_POST_URL_RE, BSKY_PROFILE_URL_RE, isAppUrl } from '~/utils/link.ts';
 
-import { type RichTextSegment } from './types.ts';
+import type { RichTextSegment } from './types.ts';
 
 export const createRenderedRichText = (uid: string, segments: RichTextSegment[]) => {
 	const div = document.createElement('div');

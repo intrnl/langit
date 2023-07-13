@@ -1,31 +1,17 @@
-export interface ByteSlice {
-	byteStart: number;
-	byteEnd: number;
-}
+import type { RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 
-/** This is a non-standard facet so that we don't mix up FacetMention for unresolved handles */
-export interface FacetUnresolvedMention {
+export type Facet = RefOf<'app.bsky.richtext.facet'>;
+export type LinkFacet = UnionOf<'app.bsky.richtext.facet#link'>;
+export type MentionFacet = UnionOf<'app.bsky.richtext.facet#mention'>;
+
+/** This is a non-standard facet so that we don't mix up MentionFacet for unresolved handles */
+export interface UnresolvedMentionFacet {
 	$type: 'io.github.intrnl.langit#unresolvedMention';
 	handle: string;
 }
 
-export interface FacetMention {
-	$type: 'app.bsky.richtext.facet#mention';
-	did: string;
-}
-export interface FacetLink {
-	$type: 'app.bsky.richtext.facet#link';
-	uri: string;
-}
-
-export interface Facet {
-	$type: 'app.bsky.richtext.facet';
-	index: ByteSlice;
-	features: Array<FacetUnresolvedMention | FacetMention | FacetLink>;
-}
-
 export interface RichTextSegment {
 	text: string;
-	link?: FacetLink;
-	mention?: FacetMention;
+	link?: LinkFacet;
+	mention?: MentionFacet;
 }

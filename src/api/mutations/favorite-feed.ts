@@ -1,8 +1,9 @@
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
 import { multiagent } from '~/globals/agent.ts';
 
-import { type SignalizedFeedGenerator } from '../cache/feed-generators.ts';
-import { type BskyCreateRecordResponse } from '../types.ts';
-import { type DID, getRecordId } from '../utils.ts';
+import type { SignalizedFeedGenerator } from '../cache/feed-generators.ts';
+import { getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -13,8 +14,7 @@ export const favoriteFeed = (uid: DID, feed: SignalizedFeedGenerator) => {
 		const prev = feed.viewer.like.peek();
 
 		if (prev) {
-			await agent.rpc.post({
-				method: 'com.atproto.repo.deleteRecord',
+			await agent.rpc.call('com.atproto.repo.deleteRecord', {
 				data: {
 					collection: 'app.bsky.feed.like',
 					repo: uid,
@@ -25,8 +25,7 @@ export const favoriteFeed = (uid: DID, feed: SignalizedFeedGenerator) => {
 			feed.viewer.like.value = undefined;
 			feed.likeCount.value--;
 		} else {
-			const response = await agent.rpc.post({
-				method: 'com.atproto.repo.createRecord',
+			const response = await agent.rpc.call('com.atproto.repo.createRecord', {
 				data: {
 					repo: uid,
 					collection: 'app.bsky.feed.like',
@@ -34,16 +33,14 @@ export const favoriteFeed = (uid: DID, feed: SignalizedFeedGenerator) => {
 						$type: 'app.bsky.feed.like',
 						createdAt: new Date(),
 						subject: {
-							cid: feed.cid,
+							cid: feed.cid.value,
 							uri: feed.uri,
 						},
 					},
 				},
 			});
 
-			const data = response.data as BskyCreateRecordResponse;
-
-			feed.viewer.like.value = data.uri;
+			feed.viewer.like.value = response.data.uri;
 			feed.likeCount.value++;
 		}
 	});

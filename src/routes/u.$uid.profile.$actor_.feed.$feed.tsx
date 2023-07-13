@@ -1,9 +1,8 @@
 import { Match, Show, Switch, createEffect, createMemo } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-
-import { type DID } from '~/api/utils.ts';
 
 import { favoriteFeed } from '~/api/mutations/favorite-feed.ts';
 import {

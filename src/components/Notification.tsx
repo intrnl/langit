@@ -1,7 +1,8 @@
 import { type Accessor, For, Match, Show, Switch } from 'solid-js';
-import { type JSX } from 'solid-js/jsx-runtime';
+import type { JSX } from 'solid-js/jsx-runtime';
 import { Dynamic } from 'solid-js/web';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import {
@@ -12,7 +13,6 @@ import {
 	type ReplyNotificationSlice,
 	type RepostNotificationSlice,
 } from '~/api/models/notifications.ts';
-import { type DID } from '~/api/utils.ts';
 
 import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 
@@ -156,11 +156,13 @@ const Notification = (props: NotificationProps) => {
 														return (
 															<EmbedRecord
 																uid={uid()}
-																// lol
 																record={{
 																	$type: 'app.bsky.embed.record#viewRecord',
 																	uri: data().uri,
-																	// @ts-expect-error this is the only values required for author object
+																	// @ts-expect-error
+																	cid: null,
+																	// @ts-expect-error
+																	indexedAt: null,
 																	author: {
 																		did: author().did,
 																		avatar: author().avatar.value,

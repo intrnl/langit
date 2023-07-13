@@ -1,6 +1,7 @@
-import { Agent, type AtpLoginOptions, type AtpSessionData } from './agent.ts';
+import { Agent, type AtpLoginOptions, type AtpSessionData } from '@intrnl/bluesky-client/agent';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+
 import { ReactiveLocalStorage } from './storage.ts';
-import { type DID } from './utils.ts';
 
 export enum MultiagentState {
 	PRISTINE,
@@ -12,8 +13,6 @@ export enum MultiagentState {
 export interface MultiagentLoginOptions extends AtpLoginOptions {
 	service: string;
 }
-
-export { type DID };
 
 export interface MultiagentProfileData {
 	displayName: string;
@@ -70,7 +69,7 @@ export class Multiagent {
 		try {
 			await agent.login({ identifier, password });
 
-			const session = agent.session.value!;
+			const session = agent.session!;
 			const did = session.did;
 
 			this.storage.set('active', did);
@@ -153,23 +152,22 @@ export class Multiagent {
 
 	#createAgent(serviceUri: string) {
 		const agent = new Agent({
-			service: serviceUri,
-			persistSession: (type, session) => {
-				if (type === 'update') {
-					const did = session!.did;
-					const prev = this.storage.get('accounts');
+			serviceUri: serviceUri,
+		});
 
-					this.storage.set('accounts', {
-						...prev,
-						[did]: {
-							...prev[did],
-							did: session!.did,
-							service: serviceUri,
-							session: session!,
-						},
-					});
-				}
-			},
+		agent.on('sessionUpdate', (session) => {
+			const did = session!.did;
+			const prev = this.storage.get('accounts');
+
+			this.storage.set('accounts', {
+				...prev,
+				[did]: {
+					...prev[did],
+					did: session!.did,
+					service: serviceUri,
+					session: session!,
+				},
+			});
 		});
 
 		return agent;

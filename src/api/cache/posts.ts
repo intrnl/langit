@@ -1,56 +1,62 @@
+import type { Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
+
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
-import { type BskyPost, type BskyTimelinePost } from '../types.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
 
 import { type Signal, signal } from '~/utils/signals.ts';
+
+type Post = RefOf<'app.bsky.feed.defs#postView'>;
+type FeedPost = RefOf<'app.bsky.feed.defs#feedViewPost'>;
+
+type PostRecord = Records['app.bsky.feed.post'];
 
 export const posts: Record<string, WeakRef<SignalizedPost>> = {};
 
 /** @see BskyPost */
 export interface SignalizedPost {
 	_key?: number;
-	uri: BskyPost['uri'];
-	cid: BskyPost['cid'];
+	uri: Post['uri'];
+	cid: Signal<Post['cid']>;
 	author: SignalizedProfile;
-	record: Signal<BskyPost['record']>;
-	embed: Signal<BskyPost['embed']>;
-	replyCount: Signal<BskyPost['replyCount']>;
-	repostCount: Signal<BskyPost['repostCount']>;
-	likeCount: Signal<BskyPost['likeCount']>;
-	labels: Signal<BskyPost['labels']>;
+	record: Signal<PostRecord>;
+	embed: Signal<Post['embed']>;
+	replyCount: Signal<NonNullable<Post['replyCount']>>;
+	repostCount: Signal<NonNullable<Post['repostCount']>>;
+	likeCount: Signal<NonNullable<Post['likeCount']>>;
+	labels: Signal<Post['labels']>;
 	viewer: {
-		like: Signal<BskyPost['viewer']['like']>;
-		repost: Signal<BskyPost['viewer']['repost']>;
+		like: Signal<NonNullable<Post['viewer']>['like']>;
+		repost: Signal<NonNullable<Post['viewer']>['repost']>;
 	};
 
 	$deleted: Signal<boolean>;
 	$renderedContent: ReturnType<typeof createPostRenderer>;
 }
 
-const createSignalizedPost = (post: BskyPost, key?: number): SignalizedPost => {
+const createSignalizedPost = (post: Post, key?: number): SignalizedPost => {
 	return {
 		_key: key,
 		uri: post.uri,
-		cid: post.cid,
+		cid: signal(post.cid),
 		author: mergeSignalizedProfile(post.author, key),
-		record: signal(post.record),
+		record: signal(post.record as PostRecord),
 		embed: signal(post.embed),
-		replyCount: signal(post.replyCount),
-		repostCount: signal(post.repostCount),
-		likeCount: signal(post.likeCount),
+		replyCount: signal(post.replyCount ?? 0),
+		repostCount: signal(post.repostCount ?? 0),
+		likeCount: signal(post.likeCount ?? 0),
 		labels: signal(post.labels),
 		viewer: {
-			like: signal(post.viewer.like),
-			repost: signal(post.viewer.repost),
+			like: signal(post.viewer?.like),
+			repost: signal(post.viewer?.repost),
 		},
 		$deleted: signal(false),
 		$renderedContent: createPostRenderer(),
 	};
 };
 
-export const mergeSignalizedPost = (post: BskyPost, key?: number) => {
+export const mergeSignalizedPost = (post: Post, key?: number) => {
 	let uri = post.uri;
 
 	let ref: WeakRef<SignalizedPost> | undefined = posts[uri];
@@ -62,17 +68,18 @@ export const mergeSignalizedPost = (post: BskyPost, key?: number) => {
 	} else if (!key || val._key !== key) {
 		val._key = key;
 
+		val.cid.value = post.cid;
 		val.author = mergeSignalizedProfile(post.author, key);
 
-		// val.record.value = post.record;
+		val.record.value = post.record as PostRecord;
 		val.embed.value = post.embed;
-		val.replyCount.value = post.replyCount;
-		val.repostCount.value = post.repostCount;
-		val.likeCount.value = post.likeCount;
+		val.replyCount.value = post.replyCount ?? 0;
+		val.repostCount.value = post.repostCount ?? 0;
+		val.likeCount.value = post.likeCount ?? 0;
 		val.labels.value = post.labels;
 
-		val.viewer.like.value = post.viewer.like;
-		val.viewer.repost.value = post.viewer.repost;
+		val.viewer.like.value = post.viewer?.like;
+		val.viewer.repost.value = post.viewer?.repost;
 	}
 
 	return val;
@@ -85,33 +92,30 @@ export interface SignalizedTimelinePost {
 		root: SignalizedPost;
 		parent: SignalizedPost;
 	};
-	reason: BskyTimelinePost['reason'];
+	reason: FeedPost['reason'];
 }
 
-export const createSignalizedTimelinePost = (
-	item: BskyTimelinePost,
-	key?: number,
-): SignalizedTimelinePost => {
+export const createSignalizedTimelinePost = (item: FeedPost, key?: number): SignalizedTimelinePost => {
 	const reply = item.reply;
 
 	return {
 		post: mergeSignalizedPost(item.post, key),
 		reply: reply && {
-			root: mergeSignalizedPost(reply.root, key),
-			parent: mergeSignalizedPost(reply.parent, key),
+			root: mergeSignalizedPost(reply.root as Post, key),
+			parent: mergeSignalizedPost(reply.parent as Post, key),
 		},
 		reason: item.reason,
 	};
 };
 
 const createPostRenderer = () => {
-	let record: BskyPost['record'] | undefined;
+	let record: PostRecord | undefined;
 	let cuid: string | undefined;
 
 	let template: HTMLElement | undefined;
 
 	return function (this: SignalizedPost, uid: string) {
-		const curr = this.record.value;
+		const curr = this.record.value as PostRecord;
 
 		if (!record || record !== curr) {
 			record = curr;

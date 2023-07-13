@@ -1,7 +1,7 @@
-import { type BskyBlob } from '~/api/types.ts';
+import type { AtBlob } from '@intrnl/bluesky-client/atp-schema';
 
-import { type CompressResult } from '~/utils/image.ts';
-import { type Signal } from '~/utils/signals.ts';
+import type { CompressResult } from '~/utils/image.ts';
+import type { Signal } from '~/utils/signals.ts';
 
 export interface PendingImage extends CompressResult {
 	name: string;
@@ -10,5 +10,5 @@ export interface PendingImage extends CompressResult {
 export interface ComposedImage {
 	blob: Blob;
 	alt: Signal<string>;
-	record?: BskyBlob | undefined;
+	record?: AtBlob | undefined;
 }

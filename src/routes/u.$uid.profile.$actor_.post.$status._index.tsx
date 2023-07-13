@@ -1,11 +1,12 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
 
-import { XRPCError } from '~/api/rpc/xrpc-utils.ts';
-import { type DID, getRecordId, getRepoId } from '~/api/utils.ts';
+import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
@@ -197,10 +198,7 @@ const AuthenticatedPostPage = () => {
 													}
 
 													return (
-														<VirtualContainer
-															key="posts"
-															id={/* @once */ createPostKey(item.cid, false, true)}
-														>
+														<VirtualContainer key="posts" id={createPostKey(item.cid.value, false, true)}>
 															<Post interactive uid={uid()} post={item} prev next />
 														</VirtualContainer>
 													);
@@ -374,7 +372,7 @@ const AuthenticatedPostPage = () => {
 													return (
 														<VirtualContainer
 															key="posts"
-															id={/* @once */ createPostKey(item.cid, false, overflowing || idx !== len - 1)}
+															id={createPostKey(item.cid.value, false, overflowing || idx !== len - 1)}
 														>
 															<Post
 																interactive

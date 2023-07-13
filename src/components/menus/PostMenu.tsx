@@ -1,8 +1,10 @@
 import { Show } from 'solid-js';
 
-import { type DID, getRecordId } from '~/api/utils.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type SignalizedPost } from '~/api/cache/posts.ts';
+import { getRecordId } from '~/api/utils.ts';
+
+import type { SignalizedPost } from '~/api/cache/posts.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';

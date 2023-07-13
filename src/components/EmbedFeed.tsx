@@ -1,9 +1,12 @@
 import { Show } from 'solid-js';
 
-import { type EmbeddedGeneratorRecord } from '~/api/types.ts';
-import { type DID, getRecordId } from '~/api/utils.ts';
+import type { DID, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+
+import { getRecordId } from '~/api/utils.ts';
 
 import { A } from '~/router.ts';
+
+type EmbeddedGeneratorRecord = UnionOf<'app.bsky.feed.defs#generatorView'>;
 
 export interface EmbedFeedProps {
 	uid: DID;

@@ -1,12 +1,12 @@
-import { type EnhancedResource, type QueryFn } from '@intrnl/sq';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { EnhancedResource, QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
 import { mergeSignalizedList } from '../cache/lists.ts';
-import { type ListsPage } from '../models/list.ts';
+import type { ListsPage } from '../models/list.ts';
 
-import { type BskyGetListsResponse } from '../types.ts';
-import { type Collection, type DID, pushCollection } from '../utils.ts';
+import { type Collection, pushCollection } from '../utils.ts';
 
 export type ProfileListsResource = EnhancedResource<Collection<ListsPage>, string>;
 
@@ -23,12 +23,11 @@ export const getProfileLists: QueryFn<
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
-		method: 'app.bsky.graph.getLists',
+	const response = await agent.rpc.get('app.bsky.graph.getLists', {
 		params: { actor, limit, cursor: param },
 	});
 
-	const data = response.data as BskyGetListsResponse;
+	const data = response.data;
 
 	const page: ListsPage = {
 		cursor: data.lists.length >= limit ? data.cursor : undefined,

@@ -1,24 +1,22 @@
-import { type QueryFn } from '@intrnl/sq';
+import type { DID, ResponseOf } from '@intrnl/bluesky-client/atp-schema';
+import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
-import { type BskyGetInviteCodesResponse } from '../types.ts';
-import { type DID } from '../utils.ts';
-
 export const getInviteCodesKey = (uid: DID) => ['getInviteCodes', uid] as const;
 export const getInviteCodes: QueryFn<
-	BskyGetInviteCodesResponse,
+	ResponseOf<'com.atproto.server.getAccountInviteCodes'>,
 	ReturnType<typeof getInviteCodesKey>
 > = async (key) => {
 	const [, uid] = key;
 
 	const agent = await multiagent.connect(uid);
 
-	const response = await agent.rpc.get({
-		method: 'com.atproto.server.getAccountInviteCodes',
+	const response = await agent.rpc.get('com.atproto.server.getAccountInviteCodes', {
+		params: {},
 	});
 
-	const data = response.data as BskyGetInviteCodesResponse;
+	const data = response.data;
 
 	data.codes.sort((a, b) => {
 		const aUsed = a.uses.length >= a.available;

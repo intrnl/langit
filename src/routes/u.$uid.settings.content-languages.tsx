@@ -1,6 +1,6 @@
 import { type ComponentProps, For } from 'solid-js';
 
-import { type DID } from '~/api/utils.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
 import { systemLanguages } from '~/globals/platform.ts';
 import { preferences } from '~/globals/preferences.ts';

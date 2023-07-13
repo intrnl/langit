@@ -1,8 +1,10 @@
 import { For, Match, Switch } from 'solid-js';
 
-import { type FeedLatestResource, type FeedResource } from '~/api/queries/get-timeline.ts';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { type DID, getCollectionCursor } from '~/api/utils.ts';
+import type { FeedLatestResource, FeedResource } from '~/api/queries/get-timeline.ts';
+
+import { getCollectionCursor } from '~/api/utils.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
@@ -57,13 +59,11 @@ const TimelineList = (props: TimelineListProps) => {
 							return items.map((item, idx) => (
 								<VirtualContainer
 									key="posts"
-									id={
-										/* @once */ createPostKey(
-											item.post.cid,
-											(!!item.reply?.parent && idx === 0) || !!item.reason,
-											idx !== len - 1,
-										)
-									}
+									id={createPostKey(
+										item.post.cid.value,
+										(!!item.reply?.parent && idx === 0) || !!item.reason,
+										idx !== len - 1,
+									)}
 								>
 									<Post
 										interactive

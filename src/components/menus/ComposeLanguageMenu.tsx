@@ -8,7 +8,6 @@ import * as menu from '~/styles/primitives/menu.ts';
 
 import AddIcon from '~/icons/baseline-add.tsx';
 import DeleteIcon from '~/icons/baseline-delete.tsx';
-import DragHandleIcon from '~/icons/baseline-drag-handle.tsx';
 
 export interface ComposeLanguageMenuProps {
 	languages: string[];
@@ -51,7 +50,7 @@ const ComposeLanguageMenu = (props: ComposeLanguageMenuProps) => {
 
 			<button
 				disabled={languages().length >= 3}
-				onClick={(ev) => {
+				onClick={() => {
 					openModal(() => (
 						<LanguagePicker
 							exclude={languages()}

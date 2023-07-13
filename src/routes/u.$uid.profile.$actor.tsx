@@ -148,14 +148,22 @@ const AuthenticatedProfileLayout = () => {
 										<p class="line-clamp-1 break-all text-xl font-bold">
 											{profile().displayName.value || profile().handle.value}
 										</p>
-										<button
-											onClick={() => {
-												openModal(() => <ProfileIdentifierDialog profile={profile()} />);
-											}}
-											class="line-clamp-1 break-all text-sm text-muted-fg hover:underline"
-										>
-											@{profile().handle.value}
-										</button>
+										<p class="line-clamp-1 break-all text-sm text-muted-fg">
+											<button
+												onClick={() => {
+													openModal(() => <ProfileIdentifierDialog profile={profile()} />);
+												}}
+												class="hover:underline"
+											>
+												@{profile().handle.value}
+											</button>
+
+											<Show when={profile().viewer.followedBy.value}>
+												<span class="ml-2 rounded bg-muted px-1 py-px text-xs font-medium text-primary">
+													Follows you
+												</span>
+											</Show>
+										</p>
 									</div>
 
 									<Show when={profile().description.value}>

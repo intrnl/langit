@@ -35,7 +35,9 @@ const ListItem = (props: ListItemProps) => {
 					<span class="font-bold">{list().name.value}</span>
 
 					<Show when={list().viewer.muted.value && !props.hideSubscribedBadge}>
-						<span class="ml-2 rounded bg-muted px-1 py-0.5 align-[1px] text-xs font-medium">Subscribed</span>
+						<span class="ml-2 rounded bg-muted px-1 py-px align-[1px] text-xs font-medium">
+							Subscribed
+						</span>
 					</Show>
 				</div>
 				<p class="text-sm text-muted-fg">Mute list by @{list().creator.handle.value}</p>

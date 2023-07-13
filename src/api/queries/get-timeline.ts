@@ -125,7 +125,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 		sliceFilter = createHomeSliceFilter(uid);
 		postFilter = createTempMutePostFilter(uid);
 	} else if (type === 'custom') {
-		postFilter = createLanguagePostFilter(uid);
+		postFilter = combine([createTempMutePostFilter(uid), createLanguagePostFilter(uid)]);
 	} else if (type === 'profile') {
 		_did = await _getDid(agent, params.actor);
 
@@ -272,6 +272,20 @@ const fetchPage = async (
 };
 
 //// Feed filters
+const combine = <T>(filters: Array<undefined | ((data: T) => boolean)>): ((data: T) => boolean) => {
+	return (data: T) => {
+		for (let idx = 0, len = filters.length; idx < len; idx++) {
+			const filter = filters[idx];
+
+			if (filter && !filter(data)) {
+				return false;
+			}
+		}
+
+		return true;
+	};
+};
+
 const createLanguagePostFilter = (uid: DID): PostFilter | undefined => {
 	const pref = preferences.get(uid);
 

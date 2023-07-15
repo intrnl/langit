@@ -9,7 +9,7 @@
 		"fmt": "prettier --cache --write ."
 	},
 	"dependencies": {
-		"@floating-ui/dom": "^1.4.4",
+		"@floating-ui/dom": "^1.4.5",
 		"@intrnl/bluesky-client": "^0.1.0",
 		"@intrnl/sq": "^0.1.1",
 		"@intrnl/use-gesture-solid": "^0.1.0",
@@ -31,22 +31,22 @@
 		"class-variance-authority": "^0.6.1",
 		"dequal": "^2.0.3",
 		"immer": "^10.0.2",
-		"solid-js": "^1.7.7",
+		"solid-js": "^1.7.8",
 		"solid-tiptap": "^0.6.0"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20230628.0",
-		"@tailwindcss/forms": "^0.5.3",
-		"@types/node": "^20.4.1",
+		"@cloudflare/workers-types": "^4.20230710.1",
+		"@tailwindcss/forms": "^0.5.4",
+		"@types/node": "^20.4.2",
 		"autoprefixer": "^10.4.14",
 		"glob-to-regexp": "^0.4.1",
-		"postcss": "^8.4.25",
-		"prettier": "^2.8.8",
-		"prettier-plugin-tailwindcss": "^0.3.0",
-		"tailwindcss": "^3.3.2",
-		"terser": "^5.18.2",
+		"postcss": "^8.4.26",
+		"prettier": "^3.0.0",
+		"prettier-plugin-tailwindcss": "^0.4.1",
+		"tailwindcss": "^3.3.3",
+		"terser": "^5.19.0",
 		"typescript": "^5.1.6",
-		"vite": "4.4.2",
+		"vite": "^4.4.4",
 		"vite-plugin-solid": "^2.7.0"
 	},
 	"pnpm": {

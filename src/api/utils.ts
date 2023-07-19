@@ -55,3 +55,7 @@ export const getCollectionCursor = <Data, Key extends keyof Data>(
 		return last[key];
 	}
 };
+
+export const getCurrentDate = () => {
+	return new Date(Math.floor(Date.now() / 1000) * 1000).toISOString();
+};

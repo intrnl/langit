@@ -24,7 +24,7 @@ import {
 } from '@floating-ui/dom';
 import { createTiptapEditor } from 'solid-tiptap';
 
-import { getRecordId } from '~/api/utils.ts';
+import { getCurrentDate, getRecordId } from '~/api/utils.ts';
 
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
@@ -321,7 +321,7 @@ const AuthenticatedComposePage = () => {
 		setMessage(undefined);
 
 		const record: PostRecord = {
-			createdAt: new Date().toISOString(),
+			createdAt: getCurrentDate(),
 			facets: rt ? rt.facets : undefined,
 			text: rt ? rt.text : '',
 			reply: replyRecord,

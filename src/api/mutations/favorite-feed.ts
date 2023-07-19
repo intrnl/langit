@@ -3,7 +3,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { multiagent } from '~/globals/agent.ts';
 
 import type { SignalizedFeedGenerator } from '../cache/feed-generators.ts';
-import { getRecordId } from '../utils.ts';
+import { getCurrentDate, getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -31,7 +31,7 @@ export const favoriteFeed = (uid: DID, feed: SignalizedFeedGenerator) => {
 					collection: 'app.bsky.feed.like',
 					record: {
 						$type: 'app.bsky.feed.like',
-						createdAt: new Date(),
+						createdAt: getCurrentDate(),
 						subject: {
 							cid: feed.cid.value,
 							uri: feed.uri,

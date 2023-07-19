@@ -3,7 +3,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { multiagent } from '~/globals/agent.ts';
 
 import type { SignalizedPost } from '../cache/posts.ts';
-import { getRecordId } from '../utils.ts';
+import { getCurrentDate, getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -31,7 +31,7 @@ export const repostPost = (uid: DID, post: SignalizedPost) => {
 					collection: 'app.bsky.feed.repost',
 					record: {
 						$type: 'app.bsky.feed.repost',
-						createdAt: new Date(),
+						createdAt: getCurrentDate(),
 						subject: {
 							cid: post.cid.value,
 							uri: post.uri,

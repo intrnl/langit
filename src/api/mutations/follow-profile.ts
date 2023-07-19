@@ -3,7 +3,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { multiagent } from '~/globals/agent.ts';
 
 import type { SignalizedProfile } from '../cache/profiles.ts';
-import { getRecordId } from '../utils.ts';
+import { getCurrentDate, getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
 
@@ -31,7 +31,7 @@ export const followProfile = (uid: DID, profile: SignalizedProfile) => {
 					collection: 'app.bsky.graph.follow',
 					record: {
 						$type: 'app.bsky.graph.follow',
-						createdAt: new Date(),
+						createdAt: getCurrentDate(),
 						subject: profile.did,
 					},
 				},

@@ -42,6 +42,8 @@ const handleError = (error: any, reset: () => void) => {
 	};
 
 	const renderError = (error: any) => {
+		console.error(`Caught error:`, error);
+
 		if (error instanceof Error) {
 			const frames = parseStackTrace(error.stack);
 

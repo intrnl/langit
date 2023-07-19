@@ -65,7 +65,7 @@ const AuthenticatedPostPage = () => {
 
 	const focusRef = (node: HTMLDivElement) => {
 		requestAnimationFrame(() => {
-			const $thread = thread();
+			const $thread = !thread.error && thread();
 			const key = location.key;
 
 			if ($thread && key && !seen.has(key)) {
@@ -76,7 +76,7 @@ const AuthenticatedPostPage = () => {
 	};
 
 	const renderTitle = () => {
-		const $thread = thread();
+		const $thread = !thread.error && thread();
 
 		if ($thread) {
 			const post = $thread.post;

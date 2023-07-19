@@ -1,4 +1,4 @@
-import { Show, createEffect } from 'solid-js';
+import { ErrorBoundary, Show, createEffect } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
@@ -13,9 +13,11 @@ import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { A, useParams } from '~/router.ts';
+import { parseStackTrace } from '~/utils/errorstacks.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 
 import InvalidSessionNoticeDialog from '~/components/dialogs/InvalidSessionNoticeDialog.tsx';
+import button from '~/styles/primitives/button.ts';
 
 import AddBoxIcon from '~/icons/baseline-add-box.tsx';
 import ExploreIcon from '~/icons/baseline-explore.tsx';
@@ -25,6 +27,53 @@ import AddBoxOutlinedIcon from '~/icons/outline-add-box.tsx';
 import ExploreOutlinedIcon from '~/icons/outline-explore.tsx';
 import HomeOutlinedIcon from '~/icons/outline-home.tsx';
 import NotificationsOutlinedIcon from '~/icons/outline-notifications.tsx';
+
+const handleError = (error: any, reset: () => void) => {
+	const parseFileName = (file: string) => {
+		try {
+			const url = new URL(file);
+
+			if (url.host === location.host) {
+				return url.pathname + url.search;
+			}
+		} catch {}
+
+		return file;
+	};
+
+	const renderError = (error: any) => {
+		if (error instanceof Error) {
+			const frames = parseStackTrace(error.stack);
+
+			const renderedFrames = frames
+				.map(({ fileName: file, name, line, column }) => {
+					return `  at ${parseFileName(file)} @ ${name || '<unknown>'} (${line}:${column})`;
+				})
+				.join('\n');
+
+			return `${error.name}: ${error.message}\n${renderedFrames}`;
+		}
+
+		return '' + error + '\nThis thrown value is not of an Error object!';
+	};
+
+	return (
+		<div class="p-4">
+			<h1 class="mb-4 font-bold">Something went wrong</h1>
+
+			<pre class="overflow-x-auto text-sm">{renderError(error)}</pre>
+
+			<div class="mt-4 flex gap-4">
+				<button onClick={reset} class={/* @once */ button({ color: 'primary' })}>
+					Try again
+				</button>
+				<button onClick={() => location.reload()} class={/* @once */ button({ color: 'outline' })}>
+					Reload page
+				</button>
+			</div>
+		</div>
+	);
+};
 
 const AuthenticatedLayout = () => {
 	const location = useLocation();
@@ -175,7 +224,9 @@ const AuthenticatedLayout = () => {
 			</Show>
 
 			<div class="flex min-w-0 max-w-2xl shrink grow flex-col border-divider sm:border-x xl:max-w-none xl:basis-2/4">
-				<Outlet />
+				<ErrorBoundary fallback={handleError}>
+					<Outlet />
+				</ErrorBoundary>
 			</div>
 
 			<div class="hidden basis-1/4 xl:block"></div>

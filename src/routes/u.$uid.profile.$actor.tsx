@@ -137,7 +137,7 @@ const AuthenticatedProfileLayout = () => {
 													<MoreHorizIcon class="-mx-1.5 text-base" />
 												</button>
 
-												<Show when={!profile().viewer.blocking.value}>
+												<Show when={!profile().viewer.blocking.value && !profile().viewer.blockedBy.value}>
 													<FollowButton uid={uid()} profile={profile()} />
 												</Show>
 											</Match>
@@ -224,9 +224,19 @@ const AuthenticatedProfileLayout = () => {
 									</Switch>
 								</div>
 
-								<Show
-									when={!profile().viewer.blocking.value}
-									fallback={
+								<Switch>
+									<Match when={profile().viewer.blockedBy.value}>
+										<div class="grid grow place-items-center">
+											<div class="max-w-sm p-4 py-24">
+												<h1 class="mb-1 text-xl font-bold">You are blocked</h1>
+												<p class="text-sm text-muted-fg">
+													You can't view any of the posts if you are blocked.
+												</p>
+											</div>
+										</div>
+									</Match>
+
+									<Match when={profile().viewer.blocking.value}>
 										<div class="grid grow place-items-center">
 											<div class="max-w-sm p-4 py-24">
 												<h1 class="mb-1 text-xl font-bold">@{profile().handle.value} is blocked</h1>
@@ -235,28 +245,30 @@ const AuthenticatedProfileLayout = () => {
 												</p>
 											</div>
 										</div>
-									}
-								>
-									<div class="flex h-13 overflow-x-auto border-b border-divider">
-										<TabLink href="/u/:uid/profile/:actor" params={params} replace end>
-											Posts
-										</TabLink>
-										<TabLink href="/u/:uid/profile/:actor/with_replies" params={params} replace>
-											Replies
-										</TabLink>
-										<TabLink href="/u/:uid/profile/:actor/likes" params={params} replace>
-											Likes
-										</TabLink>
+									</Match>
 
-										<Show when={!!lists()?.pages[0]?.lists.length}>
-											<TabLink href="/u/:uid/profile/:actor/list" params={params} replace>
-												Lists
+									<Match when>
+										<div class="flex h-13 overflow-x-auto border-b border-divider">
+											<TabLink href="/u/:uid/profile/:actor" params={params} replace end>
+												Posts
 											</TabLink>
-										</Show>
-									</div>
+											<TabLink href="/u/:uid/profile/:actor/with_replies" params={params} replace>
+												Replies
+											</TabLink>
+											<TabLink href="/u/:uid/profile/:actor/likes" params={params} replace>
+												Likes
+											</TabLink>
 
-									<Outlet />
-								</Show>
+											<Show when={!!lists()?.pages[0]?.lists.length}>
+												<TabLink href="/u/:uid/profile/:actor/list" params={params} replace>
+													Lists
+												</TabLink>
+											</Show>
+										</div>
+
+										<Outlet />
+									</Match>
+								</Switch>
 							</>
 						);
 					}}

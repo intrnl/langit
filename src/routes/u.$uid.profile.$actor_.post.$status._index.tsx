@@ -10,6 +10,7 @@ import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
+import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { A, useParams } from '~/router.ts';
@@ -121,21 +122,66 @@ const AuthenticatedPostPage = () => {
 								</div>
 							</Match>
 
-							<Match when={error instanceof BlockedThreadError}>
-								<div class="p-4">
-									<div class="mb-4 text-sm">
-										<p class="font-bold">This post is from a user you blocked</p>
-										<p class="text-muted-fg">You need to unblock the user to view the post.</p>
-									</div>
+							<Match when={error instanceof BlockedThreadError && error}>
+								{(err) => {
+									const [profile] = createQuery({
+										key: () => getProfileKey(uid(), getRepoId(err().uri)),
+										fetch: getProfile,
+										staleTime: Infinity,
+									});
 
-									<A
-										href="/u/:uid/profile/:actor"
-										params={{ uid: uid(), actor: actor() }}
-										class={/* @once */ button({ color: 'primary' })}
-									>
-										View profile
-									</A>
-								</div>
+									return (
+										<div class="p-4">
+											<Switch>
+												<Match when={!profile.error && profile()} keyed>
+													{(profile) => {
+														const isBlocking = profile.viewer.blocking;
+														const isBlocked = profile.viewer.blockedBy;
+
+														if (isBlocked) {
+															return (
+																<div class="mb-4 text-sm">
+																	<p>You are blocked from viewing this post</p>
+																</div>
+															);
+														}
+
+														if (isBlocking) {
+															return (
+																<div class="mb-4 text-sm">
+																	<p class="font-bold">This post is from a user you blocked</p>
+																	<p class="text-muted-fg">You need to unblock the user to view the post.</p>
+																</div>
+															);
+														}
+
+														return null;
+													}}
+												</Match>
+
+												<Match when={profile.error}>
+													<div class="mb-4 text-sm">
+														<p>Something went wrong while retrieving profile status</p>
+													</div>
+												</Match>
+
+												<Match when>
+													<div class="mb-4 flex justify-center">
+														<CircularProgress />
+													</div>
+												</Match>
+											</Switch>
+
+											<A
+												href="/u/:uid/profile/:actor"
+												params={{ uid: uid(), actor: actor() }}
+												class={/* @once */ button({ color: 'primary' })}
+											>
+												View profile
+											</A>
+										</div>
+									);
+								}}
 							</Match>
 						</Switch>
 					)}

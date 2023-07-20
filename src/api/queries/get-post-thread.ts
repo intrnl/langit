@@ -7,7 +7,11 @@ import { type ThreadPage, createThreadPage } from '../models/thread.ts';
 
 import _getDid from './_did.ts';
 
-export class BlockedThreadError extends Error {}
+export class BlockedThreadError extends Error {
+	constructor(public uri: string) {
+		super();
+	}
+}
 
 export const getPostThreadKey = (uid: DID, actor: string, post: string, depth: number, height: number) =>
 	['getPostThread', uid, actor, post, depth, height] as const;
@@ -30,7 +34,7 @@ export const getPostThread: QueryFn<ThreadPage, ReturnType<typeof getPostThreadK
 
 	switch (data.thread.$type) {
 		case 'app.bsky.feed.defs#blockedPost':
-			throw new BlockedThreadError();
+			throw new BlockedThreadError(data.thread.uri);
 		case 'app.bsky.feed.defs#notFoundPost':
 			throw new Error(`Post not found`);
 		case 'app.bsky.feed.defs#threadViewPost':

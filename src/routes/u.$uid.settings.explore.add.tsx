@@ -4,7 +4,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
 
-import { getRecordId, getRepoId } from '~/api/utils.ts';
+import { getCollectionCursor, getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { getPopularFeedGenerators, getPopularFeedGeneratorsKey } from '~/api/queries/get-feed-generator.ts';
 
@@ -28,10 +28,12 @@ const AuthenticatedAddFeedPage = () => {
 	const [search, setSearch] = createSignal('');
 	const debouncedSearch = useDebouncedValue(search, 150);
 
-	const [feeds] = createQuery({
+	const [feeds, { refetch }] = createQuery({
 		key: () => getPopularFeedGeneratorsKey(uid()),
 		fetch: getPopularFeedGenerators,
-		staleTime: 120_000,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		refetchOnReconnect: false,
 	});
 
 	const list = createMemo(() => {
@@ -42,7 +44,9 @@ const AuthenticatedAddFeedPage = () => {
 			return [];
 		}
 
-		return data.filter((item) => item.displayName.peek().toLowerCase().includes(text));
+		return data.pages
+			.flatMap((page) => page.feeds)
+			.filter((item) => item.displayName.peek().toLowerCase().includes(text));
 	});
 
 	return (
@@ -145,15 +149,26 @@ const AuthenticatedAddFeedPage = () => {
 			</For>
 
 			<Switch>
-				<Match when={feeds()}>
-					<div class="flex h-13 items-center justify-center">
-						<p class="text-sm text-muted-fg">End of list</p>
+				<Match when={feeds.loading}>
+					<div class="flex h-13 items-center justify-center border-divider">
+						<CircularProgress />
 					</div>
 				</Match>
 
+				<Match when={!feeds.error && getCollectionCursor(feeds(), 'cursor')}>
+					{(cursor) => (
+						<button
+							onClick={() => refetch(true, cursor())}
+							class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
+						>
+							Show more
+						</button>
+					)}
+				</Match>
+
 				<Match when>
-					<div class="flex h-13 items-center justify-center border-divider">
-						<CircularProgress />
+					<div class="flex h-13 items-center justify-center">
+						<p class="text-sm text-muted-fg">End of list</p>
 					</div>
 				</Match>
 			</Switch>

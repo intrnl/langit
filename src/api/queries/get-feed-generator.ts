@@ -5,6 +5,8 @@ import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 import { BSKY_FEED_URL_RE, isBskyFeedUrl } from '~/utils/link.ts';
 
+import { pushCollection, type Collection } from '../utils.ts';
+
 import {
 	type SignalizedFeedGenerator,
 	feedGenerators,
@@ -77,18 +79,35 @@ export const getInitialFeedGenerator: InitialDataFn<
 	return feed && { data: feed };
 };
 
-export const getPopularFeedGeneratorsKey = (uid: DID) => ['getPopularFeedGenerators', uid] as const;
+export interface PopularFeedGeneratorsPage {
+	cursor?: string;
+	feeds: SignalizedFeedGenerator[];
+}
+
+export const getPopularFeedGeneratorsKey = (uid: DID, limit = 50) =>
+	['getPopularFeedGenerators', uid, limit] as const;
 export const getPopularFeedGenerators: QueryFn<
-	SignalizedFeedGenerator[],
-	ReturnType<typeof getPopularFeedGeneratorsKey>
-> = async (key) => {
-	const [, uid] = key;
+	Collection<PopularFeedGeneratorsPage>,
+	ReturnType<typeof getPopularFeedGeneratorsKey>,
+	string
+> = async (key, { data: collection, param }) => {
+	const [, uid, limit] = key;
 
 	const agent = await multiagent.connect(uid);
 
 	const response = await agent.rpc.get('app.bsky.unspecced.getPopularFeedGenerators', {
-		params: {},
+		params: {
+			cursor: param,
+		},
 	});
 
-	return response.data.feeds.map((feed) => mergeSignalizedFeedGenerator(feed));
+	const data = response.data;
+	const feeds = data.feeds;
+
+	const page: PopularFeedGeneratorsPage = {
+		cursor: feeds.length >= limit ? data.cursor : undefined,
+		feeds: feeds.map((feed) => mergeSignalizedFeedGenerator(feed)),
+	};
+
+	return pushCollection(collection, page, param);
 };

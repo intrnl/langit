@@ -1,6 +1,8 @@
 import { For, Suspense, createContext, createSignal, useContext } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 
+import { type Signal, signal } from '~/utils/signals.ts';
+
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Dialog from '~/components/Dialog.tsx';
 
@@ -10,14 +12,16 @@ export interface ModalOptions {
 	disableBackdropClose?: boolean;
 }
 
-interface ModalState extends ModalOptions {
+interface ModalState {
 	id: number;
 	render: ModalComponent;
+	disableBackdropClose: Signal<boolean>;
 }
 
 interface ModalContextState {
 	id: number;
 	close: () => void;
+	disableBackdropClose: Signal<boolean>;
 }
 
 const [modals, setModals] = createSignal<ModalState[]>([]);
@@ -26,7 +30,13 @@ let _id = 0;
 const StateContext = createContext<ModalContextState>();
 
 export const openModal = (fn: ModalComponent, options?: ModalOptions) => {
-	setModals(($modals) => $modals.concat({ id: _id++, render: fn, ...options }));
+	setModals(($modals) => {
+		return $modals.concat({
+			id: _id++,
+			render: fn,
+			disableBackdropClose: signal(options?.disableBackdropClose ?? false),
+		});
+	});
 };
 
 export const closeModal = () => {
@@ -49,7 +59,7 @@ export const ModalProvider = () => {
 	return (
 		<For each={modals()}>
 			{(modal) => (
-				<Dialog open onClose={!modal.disableBackdropClose ? closeModal : undefined}>
+				<Dialog open onClose={() => modal.disableBackdropClose.value || closeModal()}>
 					<Suspense
 						fallback={
 							<div class="my-auto">
@@ -57,7 +67,13 @@ export const ModalProvider = () => {
 							</div>
 						}
 					>
-						<StateContext.Provider value={{ id: modal.id, close: () => closeModalId(modal.id) }}>
+						<StateContext.Provider
+							value={{
+								id: modal.id,
+								close: () => closeModalId(modal.id),
+								disableBackdropClose: modal.disableBackdropClose,
+							}}
+						>
 							{modal.render()}
 						</StateContext.Provider>
 					</Suspense>

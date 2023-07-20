@@ -10,12 +10,14 @@ import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
 import DeletePostConfirmDialog from '~/components/dialogs/DeletePostConfirmDialog.tsx';
+import ReportDialog, { REPORT_POST } from '~/components/dialogs/ReportDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import DeleteIcon from '~/icons/baseline-delete.tsx';
 import LaunchIcon from '~/icons/baseline-launch.tsx';
+import ReportIcon from '~/icons/baseline-report.tsx';
 import TranslateIcon from '~/icons/baseline-translate.tsx';
 import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
 
@@ -67,6 +69,17 @@ const PostMenu = (props: PostMenuProps) => {
 				</button>
 			</Show>
 
+			<button
+				onClick={(ev) => {
+					props.onTranslate(ev);
+					closeModal();
+				}}
+				class={/* @once */ menu.item()}
+			>
+				<TranslateIcon class="text-lg" />
+				<span>Translate</span>
+			</button>
+
 			<Show when={author().did !== uid()}>
 				<button
 					onClick={() => {
@@ -80,18 +93,23 @@ const PostMenu = (props: PostMenuProps) => {
 						{isMuted() ? 'Unmute' : 'Mute'} @{author().handle.value}
 					</span>
 				</button>
-			</Show>
 
-			<button
-				onClick={(ev) => {
-					props.onTranslate(ev);
-					closeModal();
-				}}
-				class={/* @once */ menu.item()}
-			>
-				<TranslateIcon class="text-lg" />
-				<span>Translate</span>
-			</button>
+				<button
+					onClick={() => {
+						closeModal();
+						openModal(() => (
+							<ReportDialog
+								uid={uid()}
+								report={{ type: REPORT_POST, uri: post().uri, cid: post().cid.value }}
+							/>
+						));
+					}}
+					class={/* @once */ menu.item()}
+				>
+					<ReportIcon class="shrink-0 text-lg" />
+					<span class="line-clamp-1 break-all">Report post</span>
+				</button>
+			</Show>
 
 			<Show when={author().did === uid()}>
 				<button

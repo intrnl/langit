@@ -135,27 +135,24 @@ const AuthenticatedPostPage = () => {
 											<Switch>
 												<Match when={!profile.error && profile()} keyed>
 													{(profile) => {
-														const isBlocking = profile.viewer.blocking;
-														const isBlocked = profile.viewer.blockedBy;
+														return (
+															<Switch>
+																<Match when={profile.viewer.blockedBy.value}>
+																	<div class="mb-4 text-sm">
+																		<p>You are blocked from viewing this post</p>
+																	</div>
+																</Match>
 
-														if (isBlocked) {
-															return (
-																<div class="mb-4 text-sm">
-																	<p>You are blocked from viewing this post</p>
-																</div>
-															);
-														}
-
-														if (isBlocking) {
-															return (
-																<div class="mb-4 text-sm">
-																	<p class="font-bold">This post is from a user you blocked</p>
-																	<p class="text-muted-fg">You need to unblock the user to view the post.</p>
-																</div>
-															);
-														}
-
-														return null;
+																<Match when={profile.viewer.blocking.value}>
+																	<div class="mb-4 text-sm">
+																		<p class="font-bold">This post is from a user you blocked</p>
+																		<p class="text-muted-fg">
+																			You need to unblock the user to view the post.
+																		</p>
+																	</div>
+																</Match>
+															</Switch>
+														);
 													}}
 												</Match>
 

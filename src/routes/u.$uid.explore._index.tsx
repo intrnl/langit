@@ -146,7 +146,7 @@ const AuthenticatedExplorePage = () => {
 							</Match>
 
 							<Match when>
-								<div class="flex h-13 items-center justify-center">
+								<div class="flex h-13 items-center justify-center border-b border-divider">
 									<CircularProgress />
 								</div>
 							</Match>

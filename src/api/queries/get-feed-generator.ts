@@ -84,7 +84,7 @@ export interface PopularFeedGeneratorsPage {
 	feeds: SignalizedFeedGenerator[];
 }
 
-export const getPopularFeedGeneratorsKey = (uid: DID, search?: string, limit = 50) =>
+export const getPopularFeedGeneratorsKey = (uid: DID, search?: string, limit = 20) =>
 	['getPopularFeedGenerators', uid, search, limit] as const;
 export const getPopularFeedGenerators: QueryFn<
 	Collection<PopularFeedGeneratorsPage>,

@@ -84,20 +84,22 @@ export interface PopularFeedGeneratorsPage {
 	feeds: SignalizedFeedGenerator[];
 }
 
-export const getPopularFeedGeneratorsKey = (uid: DID, limit = 50) =>
-	['getPopularFeedGenerators', uid, limit] as const;
+export const getPopularFeedGeneratorsKey = (uid: DID, search?: string, limit = 50) =>
+	['getPopularFeedGenerators', uid, search, limit] as const;
 export const getPopularFeedGenerators: QueryFn<
 	Collection<PopularFeedGeneratorsPage>,
 	ReturnType<typeof getPopularFeedGeneratorsKey>,
 	string
 > = async (key, { data: collection, param }) => {
-	const [, uid, limit] = key;
+	const [, uid, search, limit] = key;
 
 	const agent = await multiagent.connect(uid);
 
 	const response = await agent.rpc.get('app.bsky.unspecced.getPopularFeedGenerators', {
 		params: {
 			cursor: param,
+			limit: limit,
+			query: search,
 		},
 	});
 

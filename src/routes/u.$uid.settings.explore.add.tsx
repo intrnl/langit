@@ -1,8 +1,8 @@
-import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
+import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { useNavigate } from '@solidjs/router';
+import { useNavigate, useSearchParams } from '@solidjs/router';
 
 import { getCollectionCursor, getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -10,8 +10,7 @@ import { getPopularFeedGenerators, getPopularFeedGeneratorsKey } from '~/api/que
 
 import { preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
-import { useDebouncedValue } from '~/utils/hooks.ts';
-import { INTERACTION_TAGS, isElementAltClicked, isElementClicked, model } from '~/utils/misc.ts';
+import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import input from '~/styles/primitives/input.ts';
@@ -25,29 +24,20 @@ const AuthenticatedAddFeedPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const [search, setSearch] = createSignal('');
-	const debouncedSearch = useDebouncedValue(search, 150);
+	const [searchParams, setSearchParams] = useSearchParams<{ q?: string }>();
 
 	const [feeds, { refetch }] = createQuery({
-		key: () => getPopularFeedGeneratorsKey(uid()),
+		key: () => getPopularFeedGeneratorsKey(uid(), searchParams.q),
 		fetch: getPopularFeedGenerators,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
 	});
 
-	const list = createMemo(() => {
-		const data = feeds();
-		const text = debouncedSearch();
-
-		if (!data) {
-			return [];
-		}
-
-		return data.pages
-			.flatMap((page) => page.feeds)
-			.filter((item) => item.displayName.peek().toLowerCase().includes(text));
-	});
+	const list = () => {
+		const data = !feeds.error && feeds();
+		return data ? data.pages.flatMap((page) => page.feeds) : [];
+	};
 
 	return (
 		<div class="flex flex-col">
@@ -57,12 +47,26 @@ const AuthenticatedAddFeedPage = () => {
 
 			<div class="p-4 pb-1">
 				<input
-					ref={model(search, setSearch)}
-					type="text"
+					value={searchParams.q ?? ''}
+					onKeyDown={(ev) => {
+						if (ev.key === 'Enter') {
+							const value = ev.currentTarget.value;
+							setSearchParams({ q: value }, { replace: true });
+						}
+					}}
+					type="search"
 					placeholder="Search..."
 					class={/* @once */ input()}
 				/>
 			</div>
+
+			<Show when={searchParams.q}>
+				{(q) => (
+					<p class="px-4 pb-2 pt-3 text-sm text-muted-fg">
+						Searching for "<span class="whitespace-pre-wrap">{q()}</span>"
+					</p>
+				)}
+			</Show>
 
 			<For each={list()}>
 				{(feed) => {

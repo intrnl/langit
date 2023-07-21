@@ -1,4 +1,4 @@
-import { ErrorBoundary, For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
+import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
@@ -50,100 +50,110 @@ const AuthenticatedExplorePage = () => {
 				</A>
 			</div>
 
-			<SuspenseList revealOrder="forwards" tail="collapsed">
-				<For
-					each={savedFeeds()}
-					fallback={
-						<div>
-							<p class="p-4 text-sm text-muted-fg">It's empty, how about adding some feeds here?</p>
-						</div>
-					}
-				>
-					{(feedUri) => {
-						const [feed] = createQuery({
-							key: () => getFeedGeneratorKey(uid(), feedUri),
-							fetch: getFeedGenerator,
-							staleTime: 120_000,
-							initialData: getInitialFeedGenerator,
-						});
+			<For
+				each={savedFeeds()}
+				fallback={
+					<div>
+						<p class="p-4 text-sm text-muted-fg">It's empty, how about adding some feeds here?</p>
+					</div>
+				}
+			>
+				{(feedUri) => {
+					const [feed] = createQuery({
+						key: () => getFeedGeneratorKey(uid(), feedUri),
+						fetch: getFeedGenerator,
+						staleTime: 120_000,
+						initialData: getInitialFeedGenerator,
+					});
 
-						const [timeline] = createQuery({
-							key: () => getTimelineKey(uid(), { type: 'custom', uri: feedUri }, MAX_POSTS),
-							fetch: getTimeline,
-							staleTime: 60_000,
-						});
+					const [timeline] = createQuery({
+						key: () => getTimelineKey(uid(), { type: 'custom', uri: feedUri }, MAX_POSTS),
+						fetch: getTimeline,
+						staleTime: 60_000,
+					});
 
-						return (
-							<Suspense
-								fallback={
-									<div class="flex h-13 items-center justify-center border-divider">
-										<CircularProgress />
-									</div>
-								}
-							>
+					return (
+						<Switch>
+							<Match when={!feed.error && feed()}>
 								<div class="border-b border-divider">
 									<div class="sticky top-13 z-10 flex h-13 items-center gap-4 bg-background px-4">
 										<div class="h-6 w-6 overflow-hidden rounded-md bg-muted-fg">
-											<Show when={feed()?.avatar.value}>
+											<Show when={feed()!.avatar.value}>
 												{(avatar) => <img src={avatar()} class="h-full w-full" />}
 											</Show>
 										</div>
 
-										<span class="text-base font-bold">{feed()?.displayName.value}</span>
+										<span class="text-base font-bold">{feed()!.displayName.value}</span>
 									</div>
 
-									<ErrorBoundary
-										fallback={
+									<Switch>
+										<Match when={timeline.error}>
 											<p class="p-4 text-sm text-muted-fg">Something went wrong with retrieving the feed</p>
-										}
-									>
-										<For
-											each={timeline()?.pages[0].slices}
-											fallback={<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>}
-										>
-											{(slice) => {
-												const items = slice.items;
-												const len = items.length;
+										</Match>
 
-												return items.map((item, idx) => (
-													<VirtualContainer
-														key="posts"
-														id={createPostKey(
-															item.post.cid.value,
-															(!!item.reply?.parent && idx === 0) || !!item.reason,
-															idx !== len - 1,
-														)}
-													>
-														<Post
-															interactive
-															uid={uid()}
-															post={/* @once */ item.post}
-															parent={/* @once */ item.reply?.parent}
-															reason={/* @once */ item.reason}
-															prev={idx !== 0}
-															next={idx !== len - 1}
-														/>
-													</VirtualContainer>
-												));
-											}}
-										</For>
-
-										<Show when={timeline()?.pages[0].cid}>
-											<A
-												href="/u/:uid/profile/:actor/feed/:feed"
-												params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}
-												class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
+										<Match when={timeline()}>
+											<For
+												each={timeline()!.pages[0].slices}
+												fallback={
+													<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>
+												}
 											>
-												Show more
-											</A>
-										</Show>
-									</ErrorBoundary>
+												{(slice) => {
+													const items = slice.items;
+													const len = items.length;
+
+													return items.map((item, idx) => (
+														<VirtualContainer
+															key="posts"
+															id={createPostKey(
+																item.post.cid.value,
+																(!!item.reply?.parent && idx === 0) || !!item.reason,
+																idx !== len - 1,
+															)}
+														>
+															<Post
+																interactive
+																uid={uid()}
+																post={/* @once */ item.post}
+																parent={/* @once */ item.reply?.parent}
+																reason={/* @once */ item.reason}
+																prev={idx !== 0}
+																next={idx !== len - 1}
+															/>
+														</VirtualContainer>
+													));
+												}}
+											</For>
+
+											<Show when={timeline()?.pages[0].cid}>
+												<A
+													href="/u/:uid/profile/:actor/feed/:feed"
+													params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}
+													class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
+												>
+													Show more
+												</A>
+											</Show>
+										</Match>
+
+										<Match when>
+											<div class="flex h-13 items-center justify-center">
+												<CircularProgress />
+											</div>
+										</Match>
+									</Switch>
 								</div>
-							</Suspense>
-						);
-					}}
-				</For>
-			</SuspenseList>
+							</Match>
+
+							<Match when>
+								<div class="flex h-13 items-center justify-center">
+									<CircularProgress />
+								</div>
+							</Match>
+						</Switch>
+					);
+				}}
+			</For>
 		</div>
 	);
 };

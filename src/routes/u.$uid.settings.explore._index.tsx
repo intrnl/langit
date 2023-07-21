@@ -150,7 +150,10 @@ const AuthenticatedExploreSettingsPage = () => {
 	});
 
 	const handleFeedPin = (uri: string, pinned: boolean) => {
-		const set = new Set(pinnedFeeds());
+		const $savedFeeds = savedFeeds();
+		const $pinnedFeeds = pinnedFeeds();
+
+		const set = new Set($pinnedFeeds);
 
 		if (pinned) {
 			set.add(uri);
@@ -158,7 +161,7 @@ const AuthenticatedExploreSettingsPage = () => {
 			set.delete(uri);
 		}
 
-		preferences.merge(uid(), { pinnedFeeds: [...set] });
+		preferences.merge(uid(), { pinnedFeeds: $savedFeeds.filter((uri) => set.has(uri)) });
 	};
 
 	const handleFeedRemove = (uri: string) => {
@@ -174,7 +177,7 @@ const AuthenticatedExploreSettingsPage = () => {
 
 		pinned.delete(uri);
 
-		preferences.merge(uid(), { pinnedFeeds: [...pinned], savedFeeds: saved });
+		preferences.merge(uid(), { savedFeeds: saved, pinnedFeeds: saved.filter((uri) => pinned.has(uri)) });
 	};
 
 	return (
@@ -194,15 +197,20 @@ const AuthenticatedExploreSettingsPage = () => {
 			<DragDropProvider
 				onDragEnd={({ draggable, droppable }) => {
 					if (draggable && droppable) {
-						const curr = savedFeeds();
-						const fromIndex = curr.indexOf(draggable.id as string);
-						const toIndex = curr.indexOf(droppable.id as string);
+						const $savedFeeds = savedFeeds();
+						const fromIndex = $savedFeeds.indexOf(draggable.id as string);
+						const toIndex = $savedFeeds.indexOf(droppable.id as string);
 
 						if (fromIndex !== toIndex) {
-							const next = curr.slice();
+							const $pinnedFeeds = pinnedFeeds();
+
+							const next = $savedFeeds.slice();
 							next.splice(toIndex, 0, ...next.splice(fromIndex, 1));
 
-							preferences.merge(uid(), { savedFeeds: next });
+							preferences.merge(uid(), {
+								savedFeeds: next,
+								pinnedFeeds: next.filter((uri) => $pinnedFeeds.has(uri)),
+							});
 						}
 					}
 				}}

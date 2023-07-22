@@ -36,7 +36,7 @@ const createRawFrame = (raw: string): StackFrame => {
 		sourceLine: -1,
 		type: '',
 	};
-}
+};
 
 const FIREFOX_WEBKIT = /([^@]+|^)@(.*):(\d+):(\d+)/;
 const WEBKIT_ADDRESS_UNNAMED = /^(http(s)?:\/\/.*):(\d+):(\d+)$/;
@@ -76,7 +76,7 @@ const parseWebkit = (str: string): StackFrame => {
 	}
 
 	return createRawFrame(str);
-}
+};
 
 const parseFirefoxWebkit = (lines: string[]): StackFrame[] => {
 	return lines.map((str) => {
@@ -101,12 +101,12 @@ const parseFirefoxWebkit = (lines: string[]): StackFrame[] => {
 			sourceLine: -1,
 		};
 	});
-}
+};
 
 // foo.bar.js:123:39
 // foo.bar.js:123:39 <- original.js:123:34
 const CHROME_MAPPED = /(.*?):(\d+):(\d+)(\s<-\s(.+):(\d+):(\d+))?/;
-const parseMapped= (frame: StackFrame, maybeMapped: string) => {
+const parseMapped = (frame: StackFrame, maybeMapped: string) => {
 	const match = maybeMapped.match(CHROME_MAPPED);
 	if (match) {
 		frame.fileName = match[1];
@@ -117,7 +117,7 @@ const parseMapped= (frame: StackFrame, maybeMapped: string) => {
 		if (match[6]) frame.sourceLine = +match[6];
 		if (match[7]) frame.sourceColumn = +match[7];
 	}
-}
+};
 
 // at <SomeFramework>
 const CHROME_IE_NATIVE_NO_LINE = /^at\s(<.*>)$/;
@@ -199,7 +199,7 @@ const parseChromeIe = (lines: string[]): StackFrame[] => {
 	}
 
 	return frames;
-}
+};
 
 export const parseStackTrace = (stack: string | undefined): StackFrame[] => {
 	if (!stack) return [];
@@ -214,4 +214,4 @@ export const parseStackTrace = (stack: string | undefined): StackFrame[] => {
 	}
 
 	return parseFirefoxWebkit(lines);
-}
+};

@@ -4,17 +4,13 @@ import type { JSX } from 'solid-js/jsx-runtime';
 
 import { Show, batch, createSignal } from 'solid-js';
 
-import { createStore, reconcile } from 'solid-js/store';
+import { createMutable, modifyMutable, reconcile } from 'solid-js/store';
 
 import { scheduleIdleTask } from '~/utils/idle.ts';
 import { scrollObserver } from '~/utils/intersection-observer.ts';
 import { debounce } from '~/utils/misc.ts';
 
-interface CachedHeightStore {
-	[key: string]: { [id: string]: number };
-}
-
-const [store, setStore] = createStore<CachedHeightStore>({});
+const mutable = createMutable<Record<string, number>>({});
 const makeEmpty = reconcile({});
 
 let cachedWidth: number | undefined = undefined;
@@ -24,7 +20,7 @@ const resizeListener = () => {
 
 	if (cachedWidth !== next) {
 		cachedWidth = next;
-		setStore(makeEmpty);
+		modifyMutable(mutable, makeEmpty);
 	}
 };
 
@@ -64,7 +60,8 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const [intersecting, setIntersecting] = createSignal(false);
 	const [hidden, setHidden] = createSignal(false);
 
-	const cachedHeight = () => store[props.key]?.[props.id];
+	const id = () => props.key + '//' + props.id;
+	const cachedHeight = () => mutable[id()];
 
 	let height: number | undefined;
 	let entry: IntersectionObserverEntry | undefined;
@@ -74,12 +71,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 
 		if (next !== height) {
 			height = next;
-
-			if (props.key in store) {
-				setStore(props.key, props.id, height);
-			} else {
-				setStore(props.key, { [props.id]: height });
-			}
+			mutable[id()] = height;
 		}
 	};
 

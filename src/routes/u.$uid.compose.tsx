@@ -87,7 +87,7 @@ const enum PostState {
 }
 
 const getLanguages = (uid: DID): Array<'none' | (string & {})> => {
-	const lang = preferences.get(uid)?.cl_defaultLanguage ?? 'system';
+	const lang = preferences[uid]?.cl_defaultLanguage ?? 'system';
 
 	if (lang === 'none') {
 		return [];

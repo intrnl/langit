@@ -77,14 +77,14 @@ const AuthenticatedFeedPage = () => {
 	});
 
 	const isSaved = createMemo(() => {
-		const prefs = preferences.get(uid());
+		const prefs = preferences[uid()];
 		const saved = prefs?.savedFeeds;
 
 		return !!saved && saved.includes(feedUri());
 	});
 
 	const toggleSave = () => {
-		const prefs = preferences.get(uid());
+		const prefs = (preferences[uid()] ||= {});
 		const saved = prefs?.savedFeeds;
 
 		const uri = feedUri();
@@ -94,11 +94,12 @@ const AuthenticatedFeedPage = () => {
 			const next = saved!.slice();
 
 			next.splice(idx, 1);
-			preferences.merge(uid(), { savedFeeds: next });
+
+			prefs.savedFeeds = next;
 		} else {
 			const next = saved ? saved.concat(uri) : [uri];
 
-			preferences.merge(uid(), { savedFeeds: next });
+			prefs.savedFeeds = next;
 		}
 	};
 

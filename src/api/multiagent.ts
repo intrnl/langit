@@ -1,7 +1,9 @@
+import { batch } from 'solid-js';
+
 import { Agent, type AtpLoginOptions, type AtpSessionData } from '@intrnl/bluesky-client/agent';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { ReactiveLocalStorage } from './storage.ts';
+import { createReactiveLocalStorage } from './storage.ts';
 
 export enum MultiagentState {
 	PRISTINE,
@@ -15,9 +17,10 @@ export interface MultiagentLoginOptions extends AtpLoginOptions {
 }
 
 export interface MultiagentProfileData {
-	displayName: string;
+	displayName?: string;
 	handle: string;
 	avatar?: string;
+	indexedAt?: string;
 }
 
 export interface MultiagentAccountData {
@@ -35,29 +38,29 @@ interface MultiagentStorage {
 export class MultiagentError extends Error {}
 
 export class Multiagent {
-	storage: ReactiveLocalStorage<MultiagentStorage>;
+	store: MultiagentStorage;
 
 	#agents: Record<DID, Promise<Agent>> = {};
 
 	constructor(name: string) {
-		this.storage = new ReactiveLocalStorage(name);
+		this.store = createReactiveLocalStorage(name);
 	}
 
 	/**
 	 * A record of registered accounts
 	 */
 	get accounts() {
-		return this.storage.get('accounts');
+		return this.store.accounts;
 	}
 
 	/**
 	 * Active UID set as default
 	 */
 	get active() {
-		return this.storage.get('active');
+		return this.store.active;
 	}
 	set active(next: DID | undefined) {
-		this.storage.set('active', next);
+		this.store.active = next;
 	}
 
 	/**
@@ -72,14 +75,16 @@ export class Multiagent {
 			const session = agent.session!;
 			const did = session.did;
 
-			this.storage.set('active', did);
-			this.storage.set('accounts', {
-				...this.storage.get('accounts'),
-				[did]: {
+			batch(() => {
+				const $store = this.store;
+				const $accounts = ($store.accounts ||= {});
+
+				$store.active = did;
+				$accounts[did] = {
 					did: did,
 					service: service,
 					session: session,
-				},
+				};
 			});
 
 			this.#agents[did] = Promise.resolve(agent);
@@ -112,12 +117,10 @@ export class Multiagent {
 			this.active = nextActiveId;
 		}
 
-		const next = { ...this.storage.get('accounts') };
+		const $accounts = (this.store.accounts ||= {});
 
-		delete next[did];
+		delete $accounts[did];
 		delete this.#agents[did];
-
-		this.storage.set('accounts', next);
 	}
 
 	/**
@@ -128,7 +131,7 @@ export class Multiagent {
 			return this.#agents[did];
 		}
 
-		const accounts = this.storage.get('accounts');
+		const accounts = this.store.accounts;
 		const data = accounts && accounts[did];
 
 		if (!data) {
@@ -151,23 +154,21 @@ export class Multiagent {
 	}
 
 	#createAgent(serviceUri: string) {
+		const $accounts = (this.store.accounts ||= {});
+
 		const agent = new Agent({
 			serviceUri: serviceUri,
 		});
 
 		agent.on('sessionUpdate', (session) => {
 			const did = session!.did;
-			const prev = this.storage.get('accounts');
 
-			this.storage.set('accounts', {
-				...prev,
-				[did]: {
-					...prev[did],
-					did: session!.did,
-					service: serviceUri,
-					session: session!,
-				},
-			});
+			$accounts[did] = {
+				...$accounts[did],
+				did: session!.did,
+				service: serviceUri,
+				session: session!,
+			};
 		});
 
 		return agent;

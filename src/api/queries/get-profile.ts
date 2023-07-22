@@ -21,19 +21,17 @@ export const getProfile: QueryFn<SignalizedProfile, ReturnType<typeof getProfile
 	const profile = mergeSignalizedProfile(data);
 
 	if (profile.did === uid) {
-		const accounts = multiagent.storage.get('accounts');
+		const $accounts = multiagent.store.accounts;
+		const $account = $accounts[uid];
 
-		multiagent.storage.set('accounts', {
-			...accounts,
-			[uid]: {
-				...accounts[uid],
-				profile: {
-					displayName: data.displayName,
-					handle: data.handle,
-					avatar: data.avatar,
-				},
-			},
-		});
+		if (!$account.profile || $account.profile.indexedAt !== data.indexedAt) {
+			$account.profile = {
+				displayName: data.displayName,
+				handle: data.handle,
+				avatar: data.avatar,
+				indexedAt: data.indexedAt,
+			};
+		}
 	}
 
 	return profile;

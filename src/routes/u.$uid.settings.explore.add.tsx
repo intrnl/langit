@@ -34,6 +34,10 @@ const AuthenticatedAddFeedPage = () => {
 		refetchOnReconnect: false,
 	});
 
+	const prefs = createMemo(() => {
+		return (preferences[uid()] ||= {});
+	});
+
 	const list = () => {
 		const data = !feeds.error && feeds();
 		return data ? data.pages.flatMap((page) => page.feeds) : [];
@@ -71,28 +75,25 @@ const AuthenticatedAddFeedPage = () => {
 			<For each={list()}>
 				{(feed) => {
 					const isSaved = createMemo(() => {
-						const prefs = preferences.get(uid());
-						const saved = prefs?.savedFeeds;
+						const $prefs = prefs();
+
+						const saved = $prefs.savedFeeds;
 
 						return !!saved && saved.includes(feed.uri);
 					});
 
 					const toggleSave = () => {
-						const prefs = preferences.get(uid());
-						const saved = prefs?.savedFeeds;
+						const $prefs = prefs();
+						const saved = ($prefs.savedFeeds ||= []);
 
 						const uri = feed.uri;
 
 						if (isSaved()) {
-							const idx = saved!.indexOf(uri);
-							const next = saved!.slice();
+							const idx = saved.indexOf(uri);
 
-							next.splice(idx, 1);
-							preferences.merge(uid(), { savedFeeds: next });
+							saved.splice(idx, 1);
 						} else {
-							const next = saved ? saved.concat(uri) : [uri];
-
-							preferences.merge(uid(), { savedFeeds: next });
+							saved.push(uri);
 						}
 					};
 

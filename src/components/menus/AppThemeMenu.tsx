@@ -8,13 +8,18 @@ import * as menu from '~/styles/primitives/menu.ts';
 import CheckIcon from '~/icons/baseline-check.tsx';
 
 const AppThemeMenu = () => {
+	const prefs = createMemo(() => {
+		return (preferences.local ||= {});
+	});
+
 	const theme = createMemo(() => {
-		const prefs = preferences.get('local');
-		return prefs?.theme ?? 'auto';
+		const $prefs = prefs();
+		return $prefs.theme ?? 'auto';
 	});
 
 	const setTheme = (next: NonNullable<LocalSettings['theme']>) => {
-		preferences.merge('local', { theme: next });
+		const $prefs = prefs();
+		$prefs.theme = next;
 	};
 
 	return (

@@ -1,4 +1,4 @@
-import { For, Show, Suspense, SuspenseList, createMemo, createSignal } from 'solid-js';
+import { For, Show, Suspense, SuspenseList, batch, createMemo, createSignal } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
@@ -141,15 +141,21 @@ const AuthenticatedExploreSettingsPage = () => {
 
 	const isCoarse = useMediaQuery('(pointer: coarse)');
 
+	const prefs = createMemo(() => {
+		return (preferences[uid()] ||= {});
+	});
+
 	const pinnedFeeds = createMemo(() => {
-		return new Set(preferences.get(uid())?.pinnedFeeds);
+		return new Set(prefs().pinnedFeeds);
 	});
 
 	const savedFeeds = createMemo(() => {
-		return preferences.get(uid())?.savedFeeds || [];
+		return prefs().savedFeeds || [];
 	});
 
 	const handleFeedPin = (uri: string, pinned: boolean) => {
+		const $prefs = prefs();
+
 		const $savedFeeds = savedFeeds();
 		const $pinnedFeeds = pinnedFeeds();
 
@@ -161,7 +167,7 @@ const AuthenticatedExploreSettingsPage = () => {
 			set.delete(uri);
 		}
 
-		preferences.merge(uid(), { pinnedFeeds: $savedFeeds.filter((uri) => set.has(uri)) });
+		$prefs.pinnedFeeds = $savedFeeds.filter((uri) => set.has(uri));
 	};
 
 	const handleFeedRemove = (uri: string) => {
@@ -170,6 +176,8 @@ const AuthenticatedExploreSettingsPage = () => {
 		const pinned = new Set(pinnedFeeds());
 		const savedIdx = saved.indexOf(uri);
 
+		const $prefs = prefs();
+
 		if (savedIdx !== -1) {
 			saved = saved.slice();
 			saved.splice(savedIdx, 1);
@@ -177,7 +185,10 @@ const AuthenticatedExploreSettingsPage = () => {
 
 		pinned.delete(uri);
 
-		preferences.merge(uid(), { savedFeeds: saved, pinnedFeeds: saved.filter((uri) => pinned.has(uri)) });
+		batch(() => {
+			$prefs.savedFeeds = saved;
+			$prefs.pinnedFeeds = saved.filter((uri) => pinned.has(uri));
+		});
 	};
 
 	return (
@@ -198,18 +209,20 @@ const AuthenticatedExploreSettingsPage = () => {
 				onDragEnd={({ draggable, droppable }) => {
 					if (draggable && droppable) {
 						const $savedFeeds = savedFeeds();
+
 						const fromIndex = $savedFeeds.indexOf(draggable.id as string);
 						const toIndex = $savedFeeds.indexOf(droppable.id as string);
 
 						if (fromIndex !== toIndex) {
 							const $pinnedFeeds = pinnedFeeds();
+							const $prefs = prefs();
 
 							const next = $savedFeeds.slice();
 							next.splice(toIndex, 0, ...next.splice(fromIndex, 1));
 
-							preferences.merge(uid(), {
-								savedFeeds: next,
-								pinnedFeeds: next.filter((uri) => $pinnedFeeds.has(uri)),
+							batch(() => {
+								$prefs.savedFeeds = next;
+								$prefs.pinnedFeeds = next.filter((uri) => $pinnedFeeds.has(uri));
 							});
 						}
 					}

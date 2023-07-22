@@ -189,9 +189,11 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 									});
 
 									const date = Date.now() + parsedDuration;
-									const next = { ...preferences.get(uid())?.pf_tempMutes, [profile().did]: date };
 
-									preferences.merge(uid(), { pf_tempMutes: next });
+									const accountPref = (preferences[uid()] ||= {});
+									const tempMutes = (accountPref.pf_tempMutes ||= {});
+
+									tempMutes[profile().did] = date;
 
 									mutate(false, ['getFeed', uid()], updateFeed);
 									closeModal();

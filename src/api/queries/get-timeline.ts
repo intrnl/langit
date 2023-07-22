@@ -287,12 +287,12 @@ const combine = <T>(filters: Array<undefined | ((data: T) => boolean)>): ((data:
 };
 
 const createLanguagePostFilter = (uid: DID): PostFilter | undefined => {
-	const pref = preferences.get(uid);
+	const $prefs = (preferences[uid] ||= {});
 
-	const allowUnspecified = pref?.cl_unspecified ?? true;
-	let languages = pref?.cl_codes;
+	const allowUnspecified = $prefs.cl_unspecified ?? true;
+	let languages = $prefs.cl_codes;
 
-	if (pref?.cl_systemLanguage ?? true) {
+	if ($prefs.cl_systemLanguage ?? true) {
 		languages = languages ? systemLanguages.concat(languages) : systemLanguages;
 	}
 
@@ -317,9 +317,9 @@ const createLanguagePostFilter = (uid: DID): PostFilter | undefined => {
 };
 
 const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
-	const pref = preferences.get(uid);
+	const $prefs = (preferences[uid] ||= {});
 
-	let mutes = pref?.pf_tempMutes;
+	let mutes = $prefs.pf_tempMutes;
 
 	// check if there are any outdated mutes before proceeding
 	if (mutes) {
@@ -352,7 +352,7 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 		}
 
 		if (outdated) {
-			preferences.merge(uid, { pf_tempMutes: mutes });
+			$prefs.pf_tempMutes = mutes;
 		}
 	}
 

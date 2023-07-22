@@ -1,4 +1,4 @@
-import { type ComponentProps, For } from 'solid-js';
+import { type ComponentProps, For, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
@@ -32,6 +32,10 @@ const AuthenticatedLanguagesSettingsPage = () => {
 
 	const uid = () => params.uid as DID;
 
+	const prefs = createMemo(() => {
+		return (preferences[uid()] ||= {});
+	});
+
 	return (
 		<div class="flex flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
@@ -43,7 +47,7 @@ const AuthenticatedLanguagesSettingsPage = () => {
 				all languages reveals posts from all languages.
 			</p>
 
-			<For each={preferences.get(uid())?.cl_codes}>
+			<For each={prefs().cl_codes}>
 				{(code, idx) => (
 					<div class="flex items-center gap-4 px-4 py-3 text-sm">
 						<span class="grow">{languageNames.of(code)}</span>
@@ -51,10 +55,9 @@ const AuthenticatedLanguagesSettingsPage = () => {
 						<button
 							title="Remove language"
 							onClick={() => {
-								const next = preferences.get(uid())!.cl_codes!.slice();
-								next.splice(idx(), 1);
+								const arr = prefs().cl_codes!;
 
-								preferences.merge(uid(), { cl_codes: next });
+								arr.splice(idx(), 1);
 							}}
 							class="-my-1 -mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-xl text-muted-fg hover:bg-hinted"
 						>
@@ -66,14 +69,13 @@ const AuthenticatedLanguagesSettingsPage = () => {
 
 			<button
 				onClick={() => {
-					const codes = preferences.get(uid())?.cl_codes;
+					const codes = (prefs().cl_codes ||= []);
 
 					openModal(() => (
 						<LanguagePicker
 							exclude={codes}
 							onPick={(next) => {
-								const array = codes || [];
-								preferences.merge(uid(), { cl_codes: array.concat(next) });
+								codes.push(next);
 							}}
 						/>
 					));
@@ -88,10 +90,10 @@ const AuthenticatedLanguagesSettingsPage = () => {
 				<label class="flex justify-between gap-4">
 					<span class="text-sm">Use system languages</span>
 					<Checkbox
-						checked={preferences.get(uid())?.cl_systemLanguage ?? true}
+						checked={prefs().cl_systemLanguage ?? true}
 						onChange={(ev) => {
 							const next = ev.target.checked;
-							preferences.merge(uid(), { cl_systemLanguage: next });
+							prefs().cl_systemLanguage = next;
 						}}
 					/>
 				</label>
@@ -107,10 +109,10 @@ const AuthenticatedLanguagesSettingsPage = () => {
 				<label class="flex justify-between gap-4">
 					<span class="text-sm">Show unspecified posts</span>
 					<Checkbox
-						checked={preferences.get(uid())?.cl_unspecified ?? true}
+						checked={prefs().cl_unspecified ?? true}
 						onChange={(ev) => {
 							const next = ev.target.checked;
-							preferences.merge(uid(), { cl_unspecified: next });
+							prefs().cl_unspecified = next;
 						}}
 					/>
 				</label>
@@ -126,7 +128,7 @@ const AuthenticatedLanguagesSettingsPage = () => {
 						<LanguagePicker
 							post
 							onPick={(next) => {
-								preferences.merge(uid(), { cl_defaultLanguage: next });
+								prefs().cl_defaultLanguage = next;
 							}}
 						/>
 					));
@@ -137,7 +139,7 @@ const AuthenticatedLanguagesSettingsPage = () => {
 
 				<p class="pt-1 text-[0.8125rem] text-muted-fg">
 					{(() => {
-						const pref = preferences.get(uid())?.cl_defaultLanguage ?? 'system';
+						const pref = prefs().cl_defaultLanguage ?? 'system';
 
 						if (pref === 'none') {
 							return `None`;

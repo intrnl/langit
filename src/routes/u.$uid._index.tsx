@@ -98,7 +98,7 @@ const AuthenticatedHome = () => {
 	const feed = () => searchParams.feed;
 
 	const pinnedFeeds = createMemo(() => {
-		const arr = preferences.get(uid())?.pinnedFeeds;
+		const arr = preferences[uid()]?.pinnedFeeds;
 		return arr && arr.length > 0 ? arr : undefined;
 	});
 

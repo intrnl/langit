@@ -31,7 +31,7 @@ const AuthenticatedExplorePage = () => {
 	const uid = () => params.uid as DID;
 
 	const savedFeeds = createMemo(() => {
-		return preferences.get(uid())?.savedFeeds || [];
+		return preferences[uid()]?.savedFeeds || [];
 	});
 
 	return (

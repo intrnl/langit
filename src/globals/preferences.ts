@@ -1,8 +1,12 @@
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { ReactiveLocalStorage } from '~/api/storage.ts';
+import { createReactiveLocalStorage } from '~/api/storage.ts';
 
-export const preferences = new ReactiveLocalStorage<PreferencesStore>('prefs');
+export const preferences = createReactiveLocalStorage<PreferencesStore>('prefs');
+
+export const getAccountPreferences = (uid: DID) => {
+	return (preferences[uid] ||= {});
+};
 
 export interface PreferencesStore {
 	local?: LocalSettings;

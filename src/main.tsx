@@ -27,7 +27,7 @@ const App = () => {
 
 createRoot(() => {
 	createRenderEffect((prev: LocalSettings['theme']) => {
-		const prefs = preferences.get('local');
+		const prefs = preferences.local;
 		const theme = prefs?.theme ?? 'auto';
 
 		if (prev === theme) {

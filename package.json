@@ -13,6 +13,7 @@
 		"@intrnl/bluesky-client": "^0.1.1",
 		"@intrnl/sq": "^0.1.1",
 		"@intrnl/use-gesture-solid": "^0.1.0",
+		"@solid-primitives/deep": "^0.2.1",
 		"@solidjs/meta": "^0.28.5",
 		"@solidjs/router": "^0.8.2",
 		"@thisbeyond/solid-dnd": "^0.7.4",

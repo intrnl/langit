@@ -1,11 +1,12 @@
-import { Navigate } from '@solidjs/router';
+import { Navigate, useLocation } from '@solidjs/router';
 
 import { multiagent } from '~/globals/agent.ts';
-import { useParams } from '~/router';
+import { useParams } from '~/router.ts';
 
 const RedirectPage = () => {
+	const location = useLocation();
 	const params = useParams('/r/*');
-	const path = params['*'];
+	const path = params['*'] + location.search;
 
 	// Attempt to redirect signed-in users.
 	let activeId = multiagent.active;

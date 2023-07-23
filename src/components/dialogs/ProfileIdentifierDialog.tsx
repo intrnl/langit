@@ -24,12 +24,20 @@ const COLORS = [
 	'#008000',
 ];
 
-const color = (str: string) => {
-	let seed = 0;
+const hash = (str: string) => {
+	let l = str.length;
+	let i = 0;
+	let h = 5381;
 
-	for (let idx = 0, len = str.length; idx < len; idx++) {
-		seed += str.charCodeAt(idx) * (1 + idx * 0.1);
+	for (; i < l; i++) {
+		h = (h * 33) ^ str.charCodeAt(i);
 	}
+
+	return h >>> 0;
+};
+
+const color = (str: string) => {
+	const seed = hash(str);
 
 	return COLORS[Math.floor(seed) % COLORS.length];
 };

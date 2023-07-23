@@ -11,8 +11,6 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 		const mention = segment.mention;
 		const link = segment.link;
 
-		let match: RegExpExecArray | null | undefined;
-
 		if (mention) {
 			const did = mention.did;
 			const anchor = document.createElement('a');
@@ -27,6 +25,8 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			const uri = link.uri;
 			const anchor = document.createElement('a');
 
+			let match: RegExpExecArray | null | undefined;
+
 			anchor.className = 'text-accent hover:underline';
 			anchor.textContent = toShortUrl(segment.text);
 
@@ -40,12 +40,10 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 				} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
 					anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
 					anchor.toggleAttribute('link', true);
-				} else {
-					anchor.href = uri;
-					anchor.rel = 'noopener noreferrer nofollow';
-					anchor.target = '_blank';
 				}
-			} else {
+			}
+
+			if (!match) {
 				anchor.href = uri;
 				anchor.rel = 'noopener noreferrer nofollow';
 				anchor.target = '_blank';

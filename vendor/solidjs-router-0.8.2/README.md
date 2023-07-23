@@ -1,3 +1,12 @@
+A modified, vendored copy of @solidjs/router@0.8.2
+
+Bun doesn't support patched dependencies at the moment, so the best way to do this for the time being would to be to just vendor them in for now.
+
+---
+
+Adds proper location keys to uniquely identify history entries.
+
+```patch
 diff --git a/dist/routing.js b/dist/routing.js
 index 0a33e859ba30d467e5fc098f562c7119513dfb43..3913c1b69c5ee75ebe78eda0f9a9e4539954c5f5 100644
 --- a/dist/routing.js
@@ -93,3 +102,4 @@ index 0a33e859ba30d467e5fc098f562c7119513dfb43..3913c1b69c5ee75ebe78eda0f9a9e453
  export function createRouteContext(router, parent, child, match, params) {
      const { base, location, navigatorFactory } = router;
      const { pattern, element: outlet, preload, data } = match().route;
+```

@@ -1,6 +1,5 @@
-node_modules/
-dist/
-deploy/
+/node_modules/
+/dist/
 
 .npm-*.log
 .pnpm-*.log

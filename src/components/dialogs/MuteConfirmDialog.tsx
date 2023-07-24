@@ -1,4 +1,4 @@
-import { Match, Switch, createSignal } from 'solid-js';
+import { Match, Switch, batch, createSignal } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery, useQueryMutation } from '@intrnl/sq';
@@ -190,10 +190,12 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 
 									const date = Date.now() + parsedDuration;
 
-									const accountPref = (preferences[uid()] ||= {});
-									const tempMutes = (accountPref.pf_tempMutes ||= {});
+									batch(() => {
+										const accountPref = (preferences[uid()] ||= {});
+										const tempMutes = (accountPref.pf_tempMutes ||= {});
 
-									tempMutes[profile().did] = date;
+										tempMutes[profile().did] = date;
+									});
 
 									mutate(false, ['getFeed', uid()], updateFeed);
 									closeModal();

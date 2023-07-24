@@ -8,9 +8,6 @@ import { openModal } from '~/globals/modals.tsx';
 import { A, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
-import AccountActionMenu from '~/components/menus/AccountActionMenu.tsx';
-import AppThemeMenu from '~/components/menus/AppThemeMenu.tsx';
-
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import AddIcon from '~/icons/baseline-add.tsx';
 import BlockIcon from '~/icons/baseline-block.tsx';
@@ -21,6 +18,9 @@ import LanguageIcon from '~/icons/baseline-language.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import PersonOffIcon from '~/icons/baseline-person-off.tsx';
 import VisibilityIcon from '~/icons/baseline-visibility.tsx';
+
+import AccountActionMenu from './AccountActionMenu.tsx';
+import AppThemeMenu from './AppThemeMenu.tsx';
 
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');

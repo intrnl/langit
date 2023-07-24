@@ -17,9 +17,10 @@ import {
 import { useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
-import Notification from '~/components/Notification.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
+
+import Notification from './Notification.tsx';
 
 const PAGE_SIZE = 30;
 

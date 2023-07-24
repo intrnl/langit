@@ -10,9 +10,10 @@ import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { model } from '~/utils/misc.ts';
 
-import AppPasswordNoticeDialog from '~/components/dialogs/AppPasswordNoticeDialog.tsx';
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input.ts';
+
+import AppPasswordNoticeDialog from './AppPasswordNoticeDialog.tsx';
 
 const APP_PASSWORD_REGEX = /^[a-zA-Z\d]{4}(-[a-zA-Z\d]{4}){3}$/;
 

@@ -24,7 +24,6 @@ import PostMenu from '~/components/menus/PostMenu.tsx';
 import PostRepostMenu from '~/components/menus/PostRepostMenu.tsx';
 import PostShareMenu from '~/components/menus/PostShareMenu.tsx';
 import Post from '~/components/Post.tsx';
-import PostTranslation from '~/components/PostTranslation.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
@@ -34,6 +33,8 @@ import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import ShareIcon from '~/icons/baseline-share.tsx';
 import ChatBubbleOutlinedIcon from '~/icons/outline-chat-bubble.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
+
+import PostTranslation from './PostTranslation.tsx';
 
 const seen = new Set<string>();
 

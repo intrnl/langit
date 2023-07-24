@@ -14,8 +14,9 @@ import { A, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
-import SubscribeListConfirmDialog from '~/components/dialogs/SubscribeListConfirmDialog.tsx';
 import button from '~/styles/primitives/button.ts';
+
+import SubscribeListConfirmDialog from './SubscribeListConfirmDialog.tsx';
 
 const PAGE_SIZE = 30;
 

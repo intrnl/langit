@@ -12,7 +12,7 @@ const routes: RouteDefinition[] = [
   },
   {
     path: "u/:uid",
-    component: lazy(() => import("./routes/u.$uid.tsx")),
+    component: lazy(() => import("./routes/u.$uid/route.tsx")),
     children: [
       {
         path: "profile/:actor/post/:status/reposts",
@@ -20,7 +20,7 @@ const routes: RouteDefinition[] = [
       },
       {
         path: "profile/:actor/post/:status",
-        component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status._index.tsx")),
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status._index/route.tsx")),
       },
       {
         path: "profile/:actor/post/:status/likes",
@@ -32,7 +32,7 @@ const routes: RouteDefinition[] = [
       },
       {
         path: "profile/:actor/list/:list",
-        component: lazy(() => import("./routes/u.$uid.profile.$actor_.list.$list.tsx")),
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.list.$list/route.tsx")),
       },
       {
         path: "settings/content-languages",
@@ -80,7 +80,7 @@ const routes: RouteDefinition[] = [
       },
       {
         path: "profile/:actor",
-        component: lazy(() => import("./routes/u.$uid.profile.$actor.tsx")),
+        component: lazy(() => import("./routes/u.$uid.profile.$actor/route.tsx")),
         children: [
           {
             path: "with_replies",
@@ -102,7 +102,7 @@ const routes: RouteDefinition[] = [
       },
       {
         path: "notifications",
-        component: lazy(() => import("./routes/u.$uid.notifications.tsx")),
+        component: lazy(() => import("./routes/u.$uid.notifications/route.tsx")),
       },
       {
         path: "you/invites",
@@ -110,11 +110,11 @@ const routes: RouteDefinition[] = [
       },
       {
         path: "you",
-        component: lazy(() => import("./routes/u.$uid.you._index.tsx")),
+        component: lazy(() => import("./routes/u.$uid.you._index/route.tsx")),
       },
       {
         path: "compose",
-        component: lazy(() => import("./routes/u.$uid.compose.tsx")),
+        component: lazy(() => import("./routes/u.$uid.compose/route.tsx")),
       },
       {
         path: "/",
@@ -128,7 +128,7 @@ const routes: RouteDefinition[] = [
     children: [
       {
         path: "login",
-        component: lazy(() => import("./routes/_auth.login.tsx")),
+        component: lazy(() => import("./routes/_auth.login/route.tsx")),
       },
     ],
   },

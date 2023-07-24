@@ -16,7 +16,6 @@ import { A, useParams } from '~/router.ts';
 import { parseStackTrace } from '~/utils/errorstacks.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 
-import InvalidSessionNoticeDialog from '~/components/dialogs/InvalidSessionNoticeDialog.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import AddBoxIcon from '~/icons/baseline-add-box.tsx';
@@ -27,6 +26,8 @@ import AddBoxOutlinedIcon from '~/icons/outline-add-box.tsx';
 import ExploreOutlinedIcon from '~/icons/outline-explore.tsx';
 import HomeOutlinedIcon from '~/icons/outline-home.tsx';
 import NotificationsOutlinedIcon from '~/icons/outline-notifications.tsx';
+
+import InvalidSessionNoticeDialog from './InvalidSessionNoticeDialog.tsx';
 
 const handleError = (error: any, reset: () => void) => {
 	const parseFileName = (file: string) => {

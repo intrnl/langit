@@ -7,7 +7,6 @@ import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
-import AddProfileListDialog from '~/components/dialogs/AddProfileListDialog.tsx';
 import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog.tsx';
 import ReportDialog, { REPORT_PROFILE } from '~/components/dialogs/ReportDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
@@ -19,6 +18,8 @@ import LaunchIcon from '~/icons/baseline-launch.tsx';
 import PlaylistAddIcon from '~/icons/baseline-playlist-add.tsx';
 import ReportIcon from '~/icons/baseline-report.tsx';
 import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
+
+import AddProfileListDialog from './AddProfileListDialog.tsx';
 
 export interface ProfileMenuProps {
 	uid: DID;

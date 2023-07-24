@@ -5,8 +5,9 @@ import type { MultiagentAccountData } from '~/api/multiagent.ts';
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 
-import LogoutConfirmDialog from '~/components/dialogs/LogoutConfirmDialog.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
+
+import LogoutConfirmDialog from './LogoutConfirmDialog.tsx';
 
 export interface AccountActionMenuProps {
 	uid: DID;

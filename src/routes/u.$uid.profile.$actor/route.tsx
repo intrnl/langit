@@ -16,13 +16,14 @@ import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
-import ProfileIdentifierDialog from '~/components/dialogs/ProfileIdentifierDialog';
 import FollowButton from '~/components/FollowButton.tsx';
-import ProfileMenu from '~/components/menus/ProfileMenu.tsx';
 import { TabLink } from '~/components/Tab.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+
+import ProfileIdentifierDialog from './ProfileIdentifierDialog.tsx';
+import ProfileMenu from './ProfileMenu.tsx';
 
 const ERROR_NAMES = ['InvalidRequest', 'AccountTakedown'];
 

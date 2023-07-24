@@ -51,8 +51,6 @@ import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/util
 import { Locker } from '~/utils/lock.ts';
 import { signal } from '~/utils/signals.ts';
 
-import '~/styles/compose.css';
-import ComposeLanguageMenu from '~/components/menus/ComposeLanguageMenu';
 import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import EmbedFeed from '~/components/EmbedFeed.tsx';
@@ -61,15 +59,18 @@ import EmbedRecord from '~/components/EmbedRecord.tsx';
 import Post from '~/components/Post.tsx';
 import button from '~/styles/primitives/button.ts';
 
-import { type ComposedImage, type PendingImage } from '~/components/composer/types.ts';
-import ImageAltEditDialog from '~/components/composer/ImageAltEditDialog.tsx';
-import ImageUploadCompressDialog from '~/components/composer/ImageUploadCompressDialog.tsx';
-
 import ArrowDropDownIcon from '~/icons/baseline-arrow-drop-down.tsx';
 import CheckIcon from '~/icons/baseline-check.tsx';
 import CloseIcon from '~/icons/baseline-close.tsx';
 import ImageIcon from '~/icons/baseline-image.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
+
+import { type ComposedImage, type PendingImage } from './types.ts';
+import ComposeLanguageMenu from './ComposeLanguageMenu.tsx';
+import ImageAltEditDialog from './ImageAltEditDialog.tsx';
+import ImageUploadCompressDialog from './ImageUploadCompressDialog.tsx';
+
+import './compose.css';
 
 type PostRecord = Records['app.bsky.feed.post'];
 type StrongRef = RefOf<'com.atproto.repo.strongRef'>;

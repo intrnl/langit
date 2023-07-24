@@ -30,6 +30,7 @@ export type PathsWithParams =
 	| "/u/:uid/you/moderation/muted"
 	| "/u/:uid/settings/profile"
 	| "/u/:uid/explore"
+	| "/u/:uid/explore/search"
 	| "/u/:uid/profile/:actor"
 	| "/u/:uid/profile/:actor/with_replies"
 	| "/u/:uid/profile/:actor/list"
@@ -61,6 +62,7 @@ export interface Params {
 	"/u/:uid/you/moderation/muted": { "uid": string };
 	"/u/:uid/settings/profile": { "uid": string };
 	"/u/:uid/explore": { "uid": string };
+	"/u/:uid/explore/search": { "uid": string };
 	"/u/:uid/profile/:actor": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/with_replies": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/list": { "uid": string, "actor": string };

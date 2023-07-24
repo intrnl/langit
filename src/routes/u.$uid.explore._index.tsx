@@ -3,6 +3,7 @@ import { For, Match, Show, Switch, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
+import { useNavigate } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -18,8 +19,8 @@ import { A, useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
+import SearchInput from '~/components/SearchInput.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
-// import input from '~/styles/primitives/input.ts';
 
 import SettingsIcon from '~/icons/baseline-settings.tsx';
 
@@ -27,6 +28,7 @@ const MAX_POSTS = 5;
 
 const AuthenticatedExplorePage = () => {
 	const params = useParams('/u/:uid/explore');
+	const navigate = useNavigate();
 
 	const uid = () => params.uid as DID;
 
@@ -38,9 +40,13 @@ const AuthenticatedExplorePage = () => {
 		<div class="flex flex-col pb-4">
 			<Title>Explore / Langit</Title>
 
-			<div class="sticky top-0 z-20 flex h-13 items-center gap-4 border-b border-divider bg-background px-4">
-				{/* <input placeholder="Search Bluesky" class={input()} /> */}
-				<p class="grow text-base font-bold">Explore</p>
+			<div class="sticky top-0 z-20 flex h-13 items-center gap-2 border-b border-divider bg-background px-4">
+				<SearchInput
+					onEnter={(next) => {
+						navigate(`/u/${uid()}/explore/search?t=user&q=${encodeURIComponent(next)}`);
+					}}
+				/>
+
 				<A
 					href="/u/:uid/settings/explore"
 					params={params}
@@ -49,7 +55,6 @@ const AuthenticatedExplorePage = () => {
 					<SettingsIcon />
 				</A>
 			</div>
-
 			<For
 				each={savedFeeds()}
 				fallback={

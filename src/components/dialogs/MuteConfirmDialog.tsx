@@ -8,6 +8,7 @@ import { produce, setAutoFreeze } from 'immer';
 import { getRecordId, getRepoId, type Collection } from '~/api/utils.ts';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
+import type { TimelineSlice } from '~/api/models/timeline.ts';
 import { muteProfile } from '~/api/mutations/mute-profile.ts';
 import { getList, getListKey } from '~/api/queries/get-list.ts';
 import type { FeedPage } from '~/api/queries/get-timeline.ts';
@@ -19,7 +20,6 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import ListItem from '~/components/ListItem.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
-import type { TimelineSlice } from '~/api/models/timeline';
 
 export interface MuteConfirmDialogProps {
 	uid: DID;
@@ -36,6 +36,72 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 	const mutate = useQueryMutation();
 
 	const isMuted = () => profile().viewer.muted.value;
+
+	const handleMute = () => {
+		const $uid = uid();
+		const $did = profile().did;
+
+		const parsedDuration = parseInt(duration());
+
+		const isSliceMatching = (slice: TimelineSlice) => {
+			const items = slice.items;
+
+			for (let k = items.length - 1; k >= 0; k--) {
+				const item = items[k];
+
+				if (item.reason?.by.did === $did || item.post.author.did === $did) {
+					return true;
+				}
+			}
+		};
+
+		const updateFeed = produce((data: Collection<FeedPage>) => {
+			const pages = data.pages;
+
+			for (let i = 0, il = pages.length; i < il; i++) {
+				const page = pages[i];
+
+				const slices = page.slices;
+				const remainingSlices = page.remainingSlices;
+
+				for (let j = slices.length - 1; j >= 0; j--) {
+					const slice = slices[j];
+
+					if (isSliceMatching(slice)) {
+						slices.splice(j, 1);
+					}
+				}
+
+				for (let j = remainingSlices.length - 1; j >= 0; j--) {
+					const slice = remainingSlices[j];
+
+					if (isSliceMatching(slice)) {
+						remainingSlices.splice(j, 1);
+					}
+				}
+			}
+		});
+
+		const filterQueryKey = ([t, u, p]: any): boolean => {
+			return t === 'getFeed' && u === $uid && (p.type !== 'profile' || p.actor !== $did);
+		};
+
+		if (Number.isNaN(parsedDuration) || parsedDuration < 0) {
+			muteProfile(uid(), profile());
+		} else {
+			const date = Date.now() + parsedDuration;
+
+			batch(() => {
+				const accountPref = (preferences[uid()] ||= {});
+				const tempMutes = (accountPref.pf_tempMutes ||= {});
+
+				tempMutes[$did] = date;
+			});
+		}
+
+		mutate(false, filterQueryKey, updateFeed);
+		closeModal();
+	};
 
 	return (
 		<div class={/* @once */ dialog.content()}>
@@ -131,78 +197,10 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 					)}
 
 					<div class={/* @once */ dialog.actions()}>
-						<button
-							onClick={() => {
-								closeModal();
-							}}
-							class={/* @once */ button({ color: 'ghost' })}
-						>
+						<button onClick={closeModal} class={/* @once */ button({ color: 'ghost' })}>
 							Cancel
 						</button>
-						<button
-							onClick={() => {
-								const parsedDuration = parseInt(duration());
-
-								if (Number.isNaN(parsedDuration) || parsedDuration < 0) {
-									muteProfile(uid(), profile());
-									closeModal();
-								} else {
-									const $did = profile().did;
-
-									const isSliceMatching = (slice: TimelineSlice) => {
-										const items = slice.items;
-
-										for (let k = items.length - 1; k >= 0; k--) {
-											const item = items[k];
-
-											if (item.reason?.by.did === $did || item.post.author.did === $did) {
-												return true;
-											}
-										}
-									};
-
-									const updateFeed = produce((data: Collection<FeedPage>) => {
-										const pages = data.pages;
-
-										for (let i = 0, il = pages.length; i < il; i++) {
-											const page = pages[i];
-
-											const slices = page.slices;
-											const remainingSlices = page.remainingSlices;
-
-											for (let j = slices.length - 1; j >= 0; j--) {
-												const slice = slices[j];
-
-												if (isSliceMatching(slice)) {
-													slices.splice(j, 1);
-												}
-											}
-
-											for (let j = remainingSlices.length - 1; j >= 0; j--) {
-												const slice = remainingSlices[j];
-
-												if (isSliceMatching(slice)) {
-													remainingSlices.splice(j, 1);
-												}
-											}
-										}
-									});
-
-									const date = Date.now() + parsedDuration;
-
-									batch(() => {
-										const accountPref = (preferences[uid()] ||= {});
-										const tempMutes = (accountPref.pf_tempMutes ||= {});
-
-										tempMutes[profile().did] = date;
-									});
-
-									mutate(false, ['getFeed', uid()], updateFeed);
-									closeModal();
-								}
-							}}
-							class={/* @once */ button({ color: 'primary' })}
-						>
+						<button onClick={handleMute} class={/* @once */ button({ color: 'primary' })}>
 							{isMuted() ? 'Unmute' : 'Mute'}
 						</button>
 					</div>

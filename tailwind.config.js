@@ -71,6 +71,9 @@ export default {
 			mono: `"JetBrains Mono NL", ui-monospace, monospace`,
 		},
 	},
+	corePlugins: {
+		outlineStyle: false,
+	},
 	plugins: [
 		plugin(({ addVariant, addUtilities }) => {
 			addVariant('modal', '&:modal');
@@ -85,6 +88,12 @@ export default {
 						display: 'none',
 					},
 				},
+
+				'.outline-none': { 'outline-style': 'none' },
+				'.outline': { 'outline-style': 'solid' },
+				'.outline-dashed': { 'outline-style': 'dashed' },
+				'.outline-dotted': { 'outline-style': 'dotted' },
+				'.outline-double': { 'outline-style': 'double' },
 			});
 		}),
 	],

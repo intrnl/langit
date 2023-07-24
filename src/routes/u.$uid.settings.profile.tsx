@@ -121,7 +121,7 @@ const AuthenticatedProfileSettingsPage = () => {
 							</div>
 
 							<div class="flex flex-col gap-4 p-4">
-								<div class="-mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted-fg ring-2 ring-background">
+								<div class="-mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted-fg outline-2 outline-background outline">
 									<Show when={profile().avatar.value}>
 										{(avatar) => <img src={avatar()} class="h-full w-full" />}
 									</Show>

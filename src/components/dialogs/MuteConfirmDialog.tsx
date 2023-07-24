@@ -180,7 +180,7 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 									<select
 										value={duration()}
 										onChange={(el) => setDuration(el.currentTarget.value)}
-										class="rounded-md border border-input bg-background px-3 py-2 text-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+										class="rounded-md border border-input bg-background px-3 py-2 text-primary outline-2 -outline-offset-1 outline-accent outline-none focus:outline disabled:opacity-50"
 									>
 										<option value={-1}>Indefinite</option>
 										<option value={1 * 60 * 60 * 1_000}>1 hour</option>

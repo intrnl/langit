@@ -208,7 +208,7 @@ const AuthenticatedLayout = () => {
 							activeClass="is-active"
 						>
 							<div class="p-2">
-								<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg ring-primary group-[.is-active]:ring-2">
+								<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg outline-2 outline-primary group-[.is-active]:outline">
 									<Show when={!profile.error && profile()?.avatar.value}>
 										{(avatar) => <img src={avatar()} class="h-full w-full object-cover" />}
 									</Show>
@@ -289,7 +289,7 @@ const AuthenticatedLayout = () => {
 						class="group flex grow basis-0 items-center justify-center text-2xl"
 						activeClass="is-active"
 					>
-						<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg ring-primary group-[.is-active]:ring-2">
+						<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg outline-2 outline-primary group-[.is-active]:outline">
 							<Show when={!profile.error && profile()?.avatar.value}>
 								{(avatar) => <img src={avatar()} class="h-full w-full object-cover" />}
 							</Show>

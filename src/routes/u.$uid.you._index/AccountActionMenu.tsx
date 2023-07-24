@@ -4,6 +4,7 @@ import type { MultiagentAccountData } from '~/api/multiagent.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
+import { useNavigate } from '~/router.ts';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
@@ -15,6 +16,8 @@ export interface AccountActionMenuProps {
 }
 
 const AccountActionMenu = (props: AccountActionMenuProps) => {
+	const navigate = useNavigate();
+
 	const uid = () => props.uid;
 	const account = () => props.account;
 
@@ -24,6 +27,16 @@ const AccountActionMenu = (props: AccountActionMenuProps) => {
 	return (
 		<div class={/* @once */ menu.content()}>
 			<div class={/* @once */ menu.title()}>{profile() ? `@${profile()!.handle}` : did()}</div>
+
+			<button
+				onClick={() => {
+					closeModal();
+					navigate(`/u/:uid/profile/:actor`, { params: { uid: uid(), actor: did() } });
+				}}
+				class={/* @once */ menu.item()}
+			>
+				View profile
+			</button>
 
 			<button
 				onClick={() => {

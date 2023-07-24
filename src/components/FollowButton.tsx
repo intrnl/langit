@@ -13,24 +13,34 @@ export interface FollowButtonProps {
 	profile: SignalizedProfile;
 }
 
+// TODO: differentiate blockedBy and blocking
 const FollowButton = (props: FollowButtonProps) => {
 	const uid = () => props.uid;
 	const profile = () => props.profile;
 
 	const isFollowing = () => profile().viewer.following.value;
 
+	const isBlocked = () => {
+		const $viewer = profile().viewer;
+		return $viewer.blockedBy.value || !!$viewer.blocking.value;
+	};
+
 	return (
 		<button
 			onClick={() => {
+				if (isBlocked()) {
+					return;
+				}
+
 				if (isFollowing()) {
 					openModal(() => <UnfollowConfirmDialog uid={uid()} profile={profile()} />);
 				} else {
 					followProfile(uid(), profile());
 				}
 			}}
-			class={button({ color: isFollowing() ? 'outline' : 'primary' })}
+			class={button({ color: isBlocked() ? 'danger' : isFollowing() ? 'outline' : 'primary' })}
 		>
-			{isFollowing() ? 'Following' : 'Follow'}
+			{isBlocked() ? 'Blocked' : isFollowing() ? 'Following' : 'Follow'}
 		</button>
 	);
 };

@@ -17,8 +17,12 @@ export interface EmbedLinkProps {
 }
 
 const getDomain = (url: string) => {
-	const host = new URL(url).host;
-	return host.startsWith('www.') ? host.slice(4) : host;
+	try {
+		const host = new URL(url).host;
+		return host.startsWith('www.') ? host.slice(4) : host;
+	} catch {
+		return url;
+	}
 };
 
 const EmbedLink = (props: EmbedLinkProps) => {

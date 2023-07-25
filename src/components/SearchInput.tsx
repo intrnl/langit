@@ -7,7 +7,7 @@ export interface SearchInputProps {
 
 const SearchInput = (props: SearchInputProps) => {
 	return (
-		<div class="flex h-8 flex-grow rounded-full border border-input bg-hinted outline-2 -outline-offset-1 outline-accent outline-none focus-within:outline dark:border-[#272d34] dark:bg-[#0d0f11]">
+		<div class="flex h-8 flex-grow rounded-full bg-hinted outline-2 -outline-offset-1 outline-accent outline-none focus-within:outline dark:bg-[#202327]">
 			<input
 				type="text"
 				value={props.value ?? ''}

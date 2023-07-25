@@ -58,7 +58,7 @@ export const getLinkMeta: QueryFn<LinkMeta, ReturnType<typeof getLinkMetaKey>> =
 	}
 
 	const meta: LinkMeta = {
-		uri: data.url,
+		uri: url,
 		title: data.title,
 		description: data.description,
 		thumb: thumb,

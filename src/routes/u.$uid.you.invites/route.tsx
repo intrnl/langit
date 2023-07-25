@@ -6,18 +6,22 @@ import { Title } from '@solidjs/meta';
 
 import { getInviteCodes, getInviteCodesKey } from '~/api/queries/get-invite-codes.ts';
 
+import { openModal } from '~/globals/modals.tsx';
 import { useParams } from '~/router.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import ContentCopyIcon from '~/icons/baseline-content-copy.tsx';
+import PeopleIcon from '~/icons/baseline-people.tsx';
+
+import InvitedUsersDialog from './InvitedUsersDialog.tsx';
 
 const AuthenticatedInviteCodesPage = () => {
 	const params = useParams('/u/:uid/you/invites');
 
 	const uid = () => params.uid as DID;
 
-	const [invites] = createQuery({
+	const [inviteCodes] = createQuery({
 		key: () => getInviteCodesKey(uid()),
 		fetch: getInviteCodes,
 		staleTime: 5_000,
@@ -32,12 +36,12 @@ const AuthenticatedInviteCodesPage = () => {
 			</div>
 
 			<Switch>
-				<Match when={invites()}>
+				<Match when={inviteCodes()}>
 					{(data) => {
-						const codes = () => data().codes;
+						const invites = () => data().codes;
 
 						const availableCount = createMemo(() => {
-							const array = codes();
+							const array = invites();
 							let count = 0;
 
 							for (let idx = 0, len = array.length; idx < len; idx++) {
@@ -59,37 +63,46 @@ const AuthenticatedInviteCodesPage = () => {
 									You have <span class="font-bold">{availableCount()}</span> invite codes remaining.
 								</p>
 
-								<For each={codes()}>
-									{(code) => {
-										const used = code.available - code.uses.length <= 0 || code.disabled;
+								<For each={invites()}>
+									{(invite) => {
+										const used = invite.available - invite.uses.length <= 0 || invite.disabled;
 
 										return (
 											<div class="flex items-center gap-4 border-b border-divider p-4">
 												<div class="grow text-sm">
 													<p class="font-bold" classList={{ 'line-through': used }}>
-														{code.code}
+														{invite.code}
 													</p>
 
 													<Switch>
-														<Match when={code.disabled}>
+														<Match when={invite.disabled}>
 															<p class="text-muted-fg">Invite code disabled</p>
 														</Match>
 														<Match when>
 															<p class="text-muted-fg">
 																<span>
-																	Used {code.uses.length}/{code.available} times
+																	Used {invite.uses.length}/{invite.available} times
 																</span>
 																<span class="px-1">·</span>
-																<span>{relformat.formatAbs(code.createdAt)}</span>
+																<span>{relformat.formatAbs(invite.createdAt)}</span>
 															</p>
 														</Match>
 													</Switch>
 												</div>
 
-												<div>
+												<div class="-mr-2 flex gap-2">
 													<button
-														onClick={() => navigator.clipboard.writeText(code.code)}
-														class="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
+														onClick={() => {
+															openModal(() => <InvitedUsersDialog uid={uid()} invite={invite} />);
+														}}
+														class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
+													>
+														<PeopleIcon />
+													</button>
+
+													<button
+														onClick={() => navigator.clipboard.writeText(invite.code)}
+														class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 													>
 														<ContentCopyIcon />
 													</button>

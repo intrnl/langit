@@ -106,7 +106,7 @@ const routes: RouteDefinition[] = [
       },
       {
         path: "you/invites",
-        component: lazy(() => import("./routes/u.$uid.you.invites.tsx")),
+        component: lazy(() => import("./routes/u.$uid.you.invites/route.tsx")),
       },
       {
         path: "you",

@@ -43,7 +43,9 @@ const AuthenticatedExplorePage = () => {
 			<div class="sticky top-0 z-20 flex h-13 items-center gap-2 border-b border-divider bg-background px-4">
 				<SearchInput
 					onEnter={(next) => {
-						navigate(`/u/${uid()}/explore/search?t=user&q=${encodeURIComponent(next)}`);
+						if (next.trim()) {
+							navigate(`/u/${uid()}/explore/search?t=user&q=${encodeURIComponent(next)}`);
+						}
 					}}
 				/>
 

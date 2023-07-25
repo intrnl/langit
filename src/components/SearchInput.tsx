@@ -2,6 +2,7 @@ import CloseIcon from '~/icons/baseline-close';
 
 export interface SearchInputProps {
 	value?: string;
+	placeholder?: string;
 	onEnter: (next: string) => void;
 }
 
@@ -11,11 +12,11 @@ const SearchInput = (props: SearchInputProps) => {
 			<input
 				type="text"
 				value={props.value ?? ''}
-				placeholder="Search Bluesky"
+				placeholder={props.placeholder ?? 'Search Bluesky'}
 				onKeyDown={(ev) => {
 					const value = ev.currentTarget.value;
 
-					if (ev.key === 'Enter' && value.trim().length > 0) {
+					if (ev.key === 'Enter') {
 						props.onEnter(value);
 					}
 				}}
@@ -29,6 +30,7 @@ const SearchInput = (props: SearchInputProps) => {
 
 					if (input) {
 						input.value = '';
+						input.focus();
 					}
 				}}
 				class="pl-2 pr-2 text-muted-fg hover:text-primary peer-placeholder-shown:hidden"

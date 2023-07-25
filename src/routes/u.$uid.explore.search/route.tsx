@@ -35,7 +35,14 @@ const AuthenticatedSearchPage = () => {
 		<div class="flex flex-col">
 			<div class="sticky top-0 z-20 bg-background">
 				<div class="flex h-13 items-center gap-2 px-4">
-					<SearchInput value={query()} onEnter={(next) => setSearchParams({ q: next }, { replace: true })} />
+					<SearchInput
+						value={query()}
+						onEnter={(next) => {
+							if (next.trim()) {
+								setSearchParams({ q: next }, { replace: true });
+							}
+						}}
+					/>
 				</div>
 
 				<div class="flex h-13 overflow-x-auto border-b border-divider">

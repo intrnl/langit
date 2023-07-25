@@ -13,7 +13,7 @@ import { useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
-import input from '~/styles/primitives/input.ts';
+import SearchInput from '~/components/SearchInput.tsx';
 
 import AddIcon from '~/icons/baseline-add.tsx';
 import DeleteIcon from '~/icons/baseline-delete.tsx';
@@ -50,17 +50,10 @@ const AuthenticatedAddFeedPage = () => {
 			</div>
 
 			<div class="p-4 pb-1">
-				<input
-					value={searchParams.q ?? ''}
-					onKeyDown={(ev) => {
-						if (ev.key === 'Enter') {
-							const value = ev.currentTarget.value;
-							setSearchParams({ q: value }, { replace: true });
-						}
-					}}
-					type="search"
-					placeholder="Search..."
-					class={/* @once */ input()}
+				<SearchInput
+					value={searchParams.q}
+					placeholder="Search custom feeds"
+					onEnter={(next) => setSearchParams({ q: next }, { replace: true })}
 				/>
 			</div>
 

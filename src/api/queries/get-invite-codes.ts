@@ -25,12 +25,12 @@ export const getInviteCodes: QueryFn<
 		const aCode = a.code;
 		const bCode = b.code;
 
-		const aUsed = (used[aCode] ||= a.uses.length >= a.available);
-		const bUsed = (used[bCode] ||= b.uses.length >= b.available);
+		const aUsed = (used[aCode] ??= a.uses.length >= a.available);
+		const bUsed = (used[bCode] ??= b.uses.length >= b.available);
 
 		if (aUsed === bUsed) {
-			const aDate = (date[aCode] ||= new Date(a.createdAt).getTime());
-			const bDate = (date[bCode] ||= new Date(b.createdAt).getTime());
+			const aDate = (date[aCode] ??= new Date(a.createdAt).getTime());
+			const bDate = (date[bCode] ??= new Date(b.createdAt).getTime());
 
 			return bDate - aDate;
 		}

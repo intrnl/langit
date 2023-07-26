@@ -20,4 +20,4 @@ Only latest versions of Chrome and Firefox is supported, Safari is not supported
 
 UI icons taken from [Material Icons](https://icones.js.org/collection/ic) (`ic`) set
 
-App icon taken from [Mutant Standard emoji set](https://mutant.tech)
+App icon taken from [Mutant Standard 2022.12 emoji set](https://mutant.tech), licensed under [CC BY-NC-SA](https://creativecommons.org/licenses/by-nc-sa/4.0/)

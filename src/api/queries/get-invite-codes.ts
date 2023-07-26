@@ -18,15 +18,21 @@ export const getInviteCodes: QueryFn<
 
 	const data = response.data;
 
+	const used: Record<string, boolean> = {};
+	const date: Record<string, number> = {};
+
 	data.codes.sort((a, b) => {
-		const aUsed = a.uses.length >= a.available;
-		const bUsed = b.uses.length >= b.available;
+		const aCode = a.code;
+		const bCode = b.code;
+
+		const aUsed = (used[aCode] ||= a.uses.length >= a.available);
+		const bUsed = (used[bCode] ||= b.uses.length >= b.available);
 
 		if (aUsed === bUsed) {
-			const aDate = new Date(a.createdAt);
-			const bDate = new Date(b.createdAt);
+			const aDate = (date[aCode] ||= new Date(a.createdAt).getTime());
+			const bDate = (date[bCode] ||= new Date(b.createdAt).getTime());
 
-			return bDate.getTime() - aDate.getTime();
+			return bDate - aDate;
 		}
 
 		return aUsed ? 1 : -1;

@@ -76,16 +76,21 @@ const TRIM_HOST_RE = /^www\./;
 export const toShortUrl = (uri: string): string => {
 	try {
 		const url = new URL(uri);
+		const protocol = url.protocol;
 
 		const host = url.host.replace(TRIM_HOST_RE, '');
 		const short = host + (url.pathname === '/' ? '' : url.pathname) + url.search + url.hash;
 
-		if (short.length > 30) {
-			return short.slice(0, 27) + '...';
-		}
+		if (protocol === 'http:' || protocol === 'https:') {
+			if (short.length > 30) {
+				return short.slice(0, 27) + '...';
+			}
 
-		return short;
-	} catch (e) {
-		return uri;
-	}
+			if (short.length > 0) {
+				return short;
+			}
+		}
+	} catch {}
+
+	return uri;
 };

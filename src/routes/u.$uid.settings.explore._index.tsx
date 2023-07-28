@@ -200,9 +200,11 @@ const AuthenticatedExploreSettingsPage = () => {
 			<div class="flex items-center justify-between gap-4 px-4 py-4">
 				<p class="text-base font-bold leading-5">Feeds</p>
 
-				<button class="text-sm text-accent hover:underline" onClick={() => setIsEditing(!isEditing())}>
-					{!isEditing() ? 'Edit' : 'Done'}
-				</button>
+				<Show when={savedFeeds().length > 0}>
+					<button class="text-sm text-accent hover:underline" onClick={() => setIsEditing(!isEditing())}>
+						{!isEditing() ? 'Edit' : 'Done'}
+					</button>
+				</Show>
 			</div>
 
 			<DragDropProvider

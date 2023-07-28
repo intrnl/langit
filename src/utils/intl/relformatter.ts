@@ -11,7 +11,8 @@ const KILOBYTE = BYTE * 1000;
 const MEGABYTE = KILOBYTE * 1000;
 const GIGABYTE = MEGABYTE * 1000;
 
-const dateFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+const absFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+const absTimeFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeStyle: 'short' });
 
 export const format = (time: string | number, base = new Date()) => {
 	const date = new Date(time);
@@ -19,7 +20,7 @@ export const format = (time: string | number, base = new Date()) => {
 	const delta = Math.abs(num - base.getTime());
 
 	if (delta > WEEK) {
-		return dateFormat.format(date);
+		return absFormat.format(date);
 	}
 
 	const [value, unit] = lookupReltime(delta);
@@ -29,7 +30,12 @@ export const format = (time: string | number, base = new Date()) => {
 
 export const formatAbs = (time: string | number) => {
 	const date = new Date(time);
-	return dateFormat.format(date);
+	return absFormat.format(date);
+};
+
+export const formatAbsWithTime = (time: string | number) => {
+	const date = new Date(time);
+	return absTimeFormat.format(date);
 };
 
 export const formatSize = (size: number) => {

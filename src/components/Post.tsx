@@ -176,6 +176,7 @@ const Post = (props: PostProps) => {
 							<span class="text-muted-fg">
 								<span class="px-1">·</span>
 								<A
+									title={relformat.formatAbsWithTime(record().createdAt)}
 									href="/u/:uid/profile/:actor/post/:status"
 									params={{
 										uid: uid(),

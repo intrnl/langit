@@ -15,6 +15,7 @@ import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
+import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
@@ -40,11 +41,6 @@ const seen = new Set<string>();
 
 const MAX_ANCESTORS = 10;
 const MAX_DESCENDANTS = 4;
-
-const formatter = new Intl.DateTimeFormat('en-US', {
-	dateStyle: 'long',
-	timeStyle: 'short',
-});
 
 const AuthenticatedPostPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
@@ -313,7 +309,7 @@ const AuthenticatedPostPage = () => {
 
 									<div class="my-3">
 										<span class="text-sm text-muted-fg">
-											{formatter.format(new Date(record().createdAt))}
+											{relformat.formatAbsWithTime(record().createdAt)}
 										</span>
 									</div>
 

@@ -10,6 +10,12 @@ type Thread = RefOf<'app.bsky.feed.defs#threadViewPost'>;
 type BlockedPost = UnionOf<'app.bsky.feed.defs#blockedPost'>;
 type NotFoundPost = UnionOf<'app.bsky.feed.defs#notFoundPost'>;
 
+const TypeSortOrder = {
+	'app.bsky.feed.defs#notFoundPost': 0,
+	'app.bsky.feed.defs#blockedPost': 1,
+	'app.bsky.feed.defs#threadViewPost': 2,
+};
+
 const calculatePostScore = (post: Post, parent: Post) => {
 	const isSameAuthor = parent.author.did === post.author.did;
 	const isFollowing = !!post.author.viewer?.following;
@@ -67,22 +73,20 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 		const scores: Record<string, number> = {};
 
 		const replies = thread.replies.slice().sort((a, b) => {
-			if (
-				a.$type === 'app.bsky.feed.defs#blockedPost' ||
-				b.$type === 'app.bsky.feed.defs#blockedPost' ||
-				a.$type === 'app.bsky.feed.defs#notFoundPost' ||
-				b.$type === 'app.bsky.feed.defs#notFoundPost'
-			) {
-				return 0;
+			const aType = a.$type;
+			const bType = b.$type;
+
+			if (aType === 'app.bsky.feed.defs#threadViewPost' && bType === 'app.bsky.feed.defs#threadViewPost') {
+				const aPost = a.post;
+				const bPost = b.post;
+
+				const aScore = (scores[aPost.cid] ??= calculatePostScore(aPost, post));
+				const bScore = (scores[bPost.cid] ??= calculatePostScore(bPost, post));
+
+				return bScore - aScore;
 			}
 
-			const aPost = a.post;
-			const bPost = b.post;
-
-			const aScore = (scores[aPost.cid] ??= calculatePostScore(aPost, post));
-			const bScore = (scores[bPost.cid] ??= calculatePostScore(bPost, post));
-
-			return bScore - aScore;
+			return TypeSortOrder[bType] - TypeSortOrder[aType];
 		});
 
 		if (!slice) {

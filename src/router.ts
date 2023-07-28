@@ -35,6 +35,7 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/with_replies"
 	| "/u/:uid/profile/:actor/list"
 	| "/u/:uid/profile/:actor/likes"
+	| "/u/:uid/profile/:actor/media"
 	| "/u/:uid/notifications"
 	| "/u/:uid/you/invites"
 	| "/u/:uid/you"
@@ -67,6 +68,7 @@ export interface Params {
 	"/u/:uid/profile/:actor/with_replies": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/list": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/likes": { "uid": string, "actor": string };
+	"/u/:uid/profile/:actor/media": { "uid": string, "actor": string };
 	"/u/:uid/notifications": { "uid": string };
 	"/u/:uid/you/invites": { "uid": string };
 	"/u/:uid/you": { "uid": string };

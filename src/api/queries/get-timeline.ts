@@ -32,7 +32,7 @@ export interface CustomTimelineParams {
 export interface ProfileTimelineParams {
 	type: 'profile';
 	actor: string;
-	tab: 'posts' | 'replies' | 'likes';
+	tab: 'posts' | 'replies' | 'likes' | 'media';
 }
 
 export type FeedParams = HomeTimelineParams | CustomTimelineParams | ProfileTimelineParams;
@@ -129,7 +129,9 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 	} else if (type === 'profile') {
 		_did = await _getDid(agent, params.actor);
 
-		if (params.tab !== 'likes') {
+		if (params.tab === 'media') {
+			postFilter = createMediaPostFilter();
+		} else if (params.tab !== 'likes') {
 			sliceFilter = createProfileSliceFilter(_did, params.tab === 'replies');
 		}
 	}
@@ -378,6 +380,29 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 		}
 
 		return true;
+	};
+};
+
+const createMediaPostFilter = (): PostFilter => {
+	return (item) => {
+		const post = item.post;
+		const embed = post.embed;
+
+		const reason = item.reason;
+
+		// skip reposts that aren't coming from original author
+		if (reason) {
+			if (reason.$type === 'app.bsky.feed.defs#reasonRepost' && reason.by.did !== post.author.did) {
+				return false;
+			}
+		}
+
+		return (
+			!!embed &&
+			(embed.$type === 'app.bsky.embed.images#view' ||
+				(embed.$type === 'app.bsky.embed.recordWithMedia#view' &&
+					embed.media.$type === 'app.bsky.embed.images#view'))
+		);
 	};
 };
 

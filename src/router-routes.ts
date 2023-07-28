@@ -87,6 +87,10 @@ const routes: RouteDefinition[] = [
             component: lazy(() => import("./routes/u.$uid.profile.$actor.with_replies.tsx")),
           },
           {
+            path: "feed",
+            component: lazy(() => import("./routes/u.$uid.profile.$actor.feed._index.tsx")),
+          },
+          {
             path: "list",
             component: lazy(() => import("./routes/u.$uid.profile.$actor.list._index.tsx")),
           },

@@ -7,15 +7,13 @@ import { useParams } from '~/router.ts';
 
 import ListList from '~/components/ListList';
 
-const PAGE_SIZE = 30;
-
 const AuthenticatedProfileListsPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/list');
 
 	const uid = () => params.uid as DID;
 
 	const [lists, { refetch }] = createQuery({
-		key: () => getProfileListsKey(uid(), params.actor, PAGE_SIZE),
+		key: () => getProfileListsKey(uid(), params.actor),
 		fetch: getProfileLists,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,

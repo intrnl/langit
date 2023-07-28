@@ -8,6 +8,7 @@ import { Outlet } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
+import { getProfileFeeds, getProfileFeedsKey } from '~/api/queries/get-profile-feeds.ts';
 import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-lists.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
@@ -46,6 +47,14 @@ const AuthenticatedProfileLayout = () => {
 	const [lists] = createQuery({
 		key: () => getProfileListsKey(uid(), actor()),
 		fetch: getProfileLists,
+		refetchOnMount: false,
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
+	});
+
+	const [feeds] = createQuery({
+		key: () => getProfileFeedsKey(uid(), actor()),
+		fetch: getProfileFeeds,
 		refetchOnMount: false,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
@@ -266,6 +275,12 @@ const AuthenticatedProfileLayout = () => {
 											<Show when={!!lists()?.pages[0]?.lists.length}>
 												<TabLink href="/u/:uid/profile/:actor/list" params={params} replace>
 													Lists
+												</TabLink>
+											</Show>
+
+											<Show when={!!feeds()?.pages[0]?.feeds.length}>
+												<TabLink href="/u/:uid/profile/:actor/feed" params={params} replace>
+													Feeds
 												</TabLink>
 											</Show>
 										</div>

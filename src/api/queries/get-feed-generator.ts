@@ -5,13 +5,14 @@ import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 import { BSKY_FEED_URL_RE, isBskyFeedUrl } from '~/utils/link.ts';
 
-import { pushCollection, type Collection } from '../utils.ts';
+import { type Collection, pushCollection } from '~/api/utils.ts';
 
 import {
 	type SignalizedFeedGenerator,
 	feedGenerators,
 	mergeSignalizedFeedGenerator,
-} from '../cache/feed-generators.ts';
+} from '~/api/cache/feed-generators.ts';
+import type { FeedsPage } from '~/api/models/feeds.ts';
 
 import _getDid from './_did.ts';
 
@@ -79,15 +80,10 @@ export const getInitialFeedGenerator: InitialDataFn<
 	return feed && { data: feed };
 };
 
-export interface PopularFeedGeneratorsPage {
-	cursor?: string;
-	feeds: SignalizedFeedGenerator[];
-}
-
 export const getPopularFeedGeneratorsKey = (uid: DID, search?: string, limit = 20) =>
 	['getPopularFeedGenerators', uid, search, limit] as const;
 export const getPopularFeedGenerators: QueryFn<
-	Collection<PopularFeedGeneratorsPage>,
+	Collection<FeedsPage>,
 	ReturnType<typeof getPopularFeedGeneratorsKey>,
 	string
 > = async (key, { data: collection, param }) => {
@@ -106,7 +102,7 @@ export const getPopularFeedGenerators: QueryFn<
 	const data = response.data;
 	const feeds = data.feeds;
 
-	const page: PopularFeedGeneratorsPage = {
+	const page: FeedsPage = {
 		cursor: feeds.length >= limit ? data.cursor : undefined,
 		feeds: feeds.map((feed) => mergeSignalizedFeedGenerator(feed)),
 	};

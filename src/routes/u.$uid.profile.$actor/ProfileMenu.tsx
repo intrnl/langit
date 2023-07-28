@@ -1,4 +1,4 @@
-import { Show, lazy } from 'solid-js';
+import { Show, batch, createMemo, lazy } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
@@ -6,6 +6,7 @@ import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
+import { preferences } from '~/globals/preferences.ts';
 
 import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog.tsx';
 import ReportDialog, { REPORT_PROFILE } from '~/components/dialogs/ReportDialog.tsx';
@@ -16,6 +17,7 @@ import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import BlockIcon from '~/icons/baseline-block';
 import LaunchIcon from '~/icons/baseline-launch.tsx';
 import PlaylistAddIcon from '~/icons/baseline-playlist-add.tsx';
+import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import ReportIcon from '~/icons/baseline-report.tsx';
 import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
 
@@ -32,8 +34,17 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 	const uid = () => props.uid;
 	const profile = () => props.profile;
 
+	const prefs = createMemo(() => {
+		return (preferences[uid()] ||= {});
+	});
+
 	const isMuted = () => profile().viewer.muted.value;
 	const isBlocked = () => profile().viewer.blocking.value;
+
+	const isRepostHidden = () => {
+		const $prefs = prefs();
+		return !!$prefs.pf_hideReposts?.includes(profile().did);
+	};
 
 	return (
 		<div class={/* @once */ menu.content()}>
@@ -73,6 +84,45 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 			>
 				<PlaylistAddIcon class="shrink-0 text-lg" />
 				<span class="line-clamp-1 break-all">Add/remove @{profile().handle.value} from Lists</span>
+			</button>
+
+			<button
+				onClick={() => {
+					const $prefs = prefs();
+					const $did = profile().did;
+
+					const curr = $prefs.pf_hideReposts;
+
+					if (isRepostHidden()) {
+						if (curr) {
+							const index = curr.indexOf($did);
+
+							batch(() => {
+								if (index !== -1) {
+									curr.splice(index, 1);
+								}
+
+								if (curr.length < 1) {
+									$prefs.pf_hideReposts = undefined;
+								}
+							});
+						}
+					} else {
+						if (curr) {
+							curr.push($did);
+						} else {
+							$prefs.pf_hideReposts = [$did];
+						}
+					}
+
+					closeModal();
+				}}
+				class={/* @once */ menu.item()}
+			>
+				<RepeatIcon class="shrink-0 text-lg" />
+				<span class="line-clamp-1 break-all">
+					{isRepostHidden() ? 'Show' : 'Hide'} reposts from @{profile().handle.value}
+				</span>
 			</button>
 
 			<button

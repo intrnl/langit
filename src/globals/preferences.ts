@@ -28,5 +28,6 @@ export interface AccountSettings {
 	cl_codes?: string[];
 
 	// post filters
+	pf_hideReposts?: DID[];
 	pf_tempMutes?: { [user: DID]: number | undefined };
 }

@@ -123,7 +123,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 
 	if (type === 'home') {
 		sliceFilter = createHomeSliceFilter(uid);
-		postFilter = createTempMutePostFilter(uid);
+		postFilter = combine([createTempMutePostFilter(uid), createHiddenRepostFilter(uid)]);
 	} else if (type === 'custom') {
 		postFilter = combine([createTempMutePostFilter(uid), createLanguagePostFilter(uid)]);
 	} else if (type === 'profile') {
@@ -318,10 +318,26 @@ const createLanguagePostFilter = (uid: DID): PostFilter | undefined => {
 	};
 };
 
-const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
-	const $prefs = (preferences[uid] ||= {});
+const createHiddenRepostFilter = (uid: DID): PostFilter | undefined => {
+	const $prefs = preferences[uid];
 
-	let mutes = $prefs.pf_tempMutes;
+	const hidden = $prefs?.pf_hideReposts;
+
+	if (!hidden) {
+		return;
+	}
+
+	return (item) => {
+		const reason = item.reason;
+
+		return !reason || reason.$type !== 'app.bsky.feed.defs#reasonRepost' || !hidden.includes(reason.by.did);
+	};
+};
+
+const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
+	const $prefs = preferences[uid];
+
+	let mutes = $prefs?.pf_tempMutes;
 
 	// check if there are any outdated mutes before proceeding
 	if (mutes) {
@@ -354,7 +370,7 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 		}
 
 		if (outdated) {
-			$prefs.pf_tempMutes = mutes;
+			$prefs!.pf_tempMutes = mutes;
 		}
 	}
 

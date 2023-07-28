@@ -274,12 +274,21 @@ const fetchPage = async (
 };
 
 //// Feed filters
-const combine = <T>(filters: Array<undefined | ((data: T) => boolean)>): ((data: T) => boolean) => {
-	return (data: T) => {
-		for (let idx = 0, len = filters.length; idx < len; idx++) {
-			const filter = filters[idx];
+type FilterFn<T> = (data: T) => boolean;
 
-			if (filter && !filter(data)) {
+const combine = <T>(filters: Array<undefined | FilterFn<T>>): FilterFn<T> | undefined => {
+	const filtered = filters.filter((filter): filter is FilterFn<T> => filter !== undefined);
+	const len = filtered.length;
+
+	if (len < 1) {
+		return;
+	}
+
+	return (data: T) => {
+		for (let idx = 0; idx < len; idx++) {
+			const filter = filtered[idx];
+
+			if (!filter(data)) {
 				return false;
 			}
 		}

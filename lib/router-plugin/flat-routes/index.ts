@@ -73,6 +73,8 @@ class PrefixLookupTrie {
 	}
 }
 
+const collator = new Intl.Collator('en-US');
+
 export const flatRoutes = (routesDir: string, ignoredFilePatterns: string[] = []) => {
 	const ignoredFileRegex = ignoredFilePatterns.map((pattern) => {
 		return globToRegex(pattern);
@@ -101,6 +103,8 @@ export const flatRoutes = (routesDir: string, ignoredFilePatterns: string[] = []
 			routes.push(route);
 		}
 	}
+
+	routes.sort((a, b) => collator.compare(a, b));
 
 	const routeManifest = flatRoutesUniversal(routesDir, routes);
 	return routeManifest;

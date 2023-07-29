@@ -27,16 +27,16 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status.likes.tsx")),
       },
       {
-        path: "settings/content-languages",
-        component: lazy(() => import("./routes/u.$uid.settings.content-languages.tsx")),
+        path: "profile/:actor/feed/:feed",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.feed.$feed.tsx")),
       },
       {
         path: "profile/:actor/list/:list",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.list.$list/route.tsx")),
       },
       {
-        path: "profile/:actor/feed/:feed",
-        component: lazy(() => import("./routes/u.$uid.profile.$actor_.feed.$feed.tsx")),
+        path: "settings/content-languages",
+        component: lazy(() => import("./routes/u.$uid.settings.content-languages.tsx")),
       },
       {
         path: "profile/:actor/followers",
@@ -47,12 +47,12 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.you.moderation.mute-lists.tsx")),
       },
       {
-        path: "settings/explore",
-        component: lazy(() => import("./routes/u.$uid.settings.explore._index.tsx")),
-      },
-      {
         path: "profile/:actor/follows",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.follows.tsx")),
+      },
+      {
+        path: "settings/explore",
+        component: lazy(() => import("./routes/u.$uid.settings.explore._index.tsx")),
       },
       {
         path: "you/moderation/blocked",
@@ -99,12 +99,12 @@ const routes: RouteDefinition[] = [
             component: lazy(() => import("./routes/u.$uid.profile.$actor._index.tsx")),
           },
           {
-            path: "media",
-            component: lazy(() => import("./routes/u.$uid.profile.$actor.media.tsx")),
-          },
-          {
             path: "likes",
             component: lazy(() => import("./routes/u.$uid.profile.$actor.likes.tsx")),
+          },
+          {
+            path: "media",
+            component: lazy(() => import("./routes/u.$uid.profile.$actor.media.tsx")),
           },
         ],
       },

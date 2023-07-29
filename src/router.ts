@@ -18,13 +18,13 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/post/:status/reposts"
 	| "/u/:uid/profile/:actor/post/:status"
 	| "/u/:uid/profile/:actor/post/:status/likes"
-	| "/u/:uid/settings/content-languages"
-	| "/u/:uid/profile/:actor/list/:list"
 	| "/u/:uid/profile/:actor/feed/:feed"
+	| "/u/:uid/profile/:actor/list/:list"
+	| "/u/:uid/settings/content-languages"
 	| "/u/:uid/profile/:actor/followers"
 	| "/u/:uid/you/moderation/mute-lists"
-	| "/u/:uid/settings/explore"
 	| "/u/:uid/profile/:actor/follows"
+	| "/u/:uid/settings/explore"
 	| "/u/:uid/you/moderation/blocked"
 	| "/u/:uid/settings/explore/add"
 	| "/u/:uid/you/moderation/muted"
@@ -35,8 +35,8 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/with_replies"
 	| "/u/:uid/profile/:actor/feed"
 	| "/u/:uid/profile/:actor/list"
-	| "/u/:uid/profile/:actor/media"
 	| "/u/:uid/profile/:actor/likes"
+	| "/u/:uid/profile/:actor/media"
 	| "/u/:uid/notifications"
 	| "/u/:uid/you/invites"
 	| "/u/:uid/you"
@@ -52,13 +52,13 @@ export interface Params {
 	"/u/:uid/profile/:actor/post/:status/reposts": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/post/:status": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/post/:status/likes": { "uid": string, "actor": string, "status": string };
-	"/u/:uid/settings/content-languages": { "uid": string };
-	"/u/:uid/profile/:actor/list/:list": { "uid": string, "actor": string, "list": string };
 	"/u/:uid/profile/:actor/feed/:feed": { "uid": string, "actor": string, "feed": string };
+	"/u/:uid/profile/:actor/list/:list": { "uid": string, "actor": string, "list": string };
+	"/u/:uid/settings/content-languages": { "uid": string };
 	"/u/:uid/profile/:actor/followers": { "uid": string, "actor": string };
 	"/u/:uid/you/moderation/mute-lists": { "uid": string };
-	"/u/:uid/settings/explore": { "uid": string };
 	"/u/:uid/profile/:actor/follows": { "uid": string, "actor": string };
+	"/u/:uid/settings/explore": { "uid": string };
 	"/u/:uid/you/moderation/blocked": { "uid": string };
 	"/u/:uid/settings/explore/add": { "uid": string };
 	"/u/:uid/you/moderation/muted": { "uid": string };
@@ -69,8 +69,8 @@ export interface Params {
 	"/u/:uid/profile/:actor/with_replies": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/feed": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/list": { "uid": string, "actor": string };
-	"/u/:uid/profile/:actor/media": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/likes": { "uid": string, "actor": string };
+	"/u/:uid/profile/:actor/media": { "uid": string, "actor": string };
 	"/u/:uid/notifications": { "uid": string };
 	"/u/:uid/you/invites": { "uid": string };
 	"/u/:uid/you": { "uid": string };

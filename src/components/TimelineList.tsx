@@ -13,7 +13,7 @@ import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.t
 export interface TimelineListProps {
 	uid: DID;
 	timeline: FeedResource;
-	latest: FeedLatestResource;
+	latest?: FeedLatestResource;
 	onRefetch: () => void;
 	onLoadMore: (cursor: string) => void;
 }
@@ -47,7 +47,7 @@ const TimelineList = (props: TimelineListProps) => {
 					</div>
 				</Match>
 
-				<Match when={latest() && latest()!.cid !== getLatestCid()}>
+				<Match when={latest?.() && latest()!.cid !== getLatestCid()}>
 					<button
 						onClick={onRefetch}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"

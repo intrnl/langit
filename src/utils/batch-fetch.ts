@@ -51,7 +51,7 @@ export const createBatchedFetch = <Query, Id extends QueryId, Data>(
 
 		let map = curr;
 
-		if (!map || map.queries.length > limit || map.key !== key) {
+		if (!map || map.queries.length >= limit || map.key !== key) {
 			map = curr = {
 				key,
 				timeout: undefined,

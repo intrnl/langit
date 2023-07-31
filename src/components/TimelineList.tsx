@@ -94,6 +94,12 @@ const TimelineList = (props: TimelineListProps) => {
 			</div>
 
 			<Switch>
+				<Match when={timeline.loading && timeline.refetchParam}>
+					<div class="flex h-13 items-center justify-center">
+						<CircularProgress />
+					</div>
+				</Match>
+
 				<Match when={timeline.error}>
 					<Show when={!timeline.loading}>
 						<div class="flex flex-col items-center px-4 py-6 text-sm text-muted-fg">
@@ -115,12 +121,6 @@ const TimelineList = (props: TimelineListProps) => {
 							</button>
 						</div>
 					</Show>
-				</Match>
-
-				<Match when={timeline.loading && timeline.refetchParam}>
-					<div class="flex h-13 items-center justify-center">
-						<CircularProgress />
-					</div>
 				</Match>
 
 				<Match when={getCollectionCursor(timeline(), 'cursor')}>

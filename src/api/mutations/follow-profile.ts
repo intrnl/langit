@@ -1,4 +1,4 @@
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
 
 import { multiagent } from '~/globals/agent.ts';
 
@@ -6,6 +6,8 @@ import type { SignalizedProfile } from '../cache/profiles.ts';
 import { getCurrentDate, getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
+
+type FollowRecord = Records['app.bsky.graph.follow'];
 
 export const followProfile = (uid: DID, profile: SignalizedProfile) => {
 	return acquire(profile.viewer.following, async () => {
@@ -25,15 +27,16 @@ export const followProfile = (uid: DID, profile: SignalizedProfile) => {
 			profile.viewer.following.value = undefined;
 			profile.followersCount.value--;
 		} else {
+			const record: FollowRecord = {
+				createdAt: getCurrentDate(),
+				subject: profile.did,
+			};
+
 			const response = await agent.rpc.call('com.atproto.repo.createRecord', {
 				data: {
 					repo: uid,
 					collection: 'app.bsky.graph.follow',
-					record: {
-						$type: 'app.bsky.graph.follow',
-						createdAt: getCurrentDate(),
-						subject: profile.did,
-					},
+					record: record,
 				},
 			});
 

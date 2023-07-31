@@ -1,4 +1,4 @@
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
 
 import { multiagent } from '~/globals/agent.ts';
 
@@ -6,6 +6,8 @@ import type { SignalizedPost } from '../cache/posts.ts';
 import { getCurrentDate, getRecordId } from '../utils.ts';
 
 import { acquire } from './_locker.ts';
+
+type RepostRecord = Records['app.bsky.feed.repost'];
 
 export const repostPost = (uid: DID, post: SignalizedPost) => {
 	return acquire(post.viewer.repost, async () => {
@@ -25,18 +27,19 @@ export const repostPost = (uid: DID, post: SignalizedPost) => {
 			post.viewer.repost.value = undefined;
 			post.repostCount.value--;
 		} else {
+			const record: RepostRecord = {
+				createdAt: getCurrentDate(),
+				subject: {
+					cid: post.cid.value,
+					uri: post.uri,
+				},
+			};
+
 			const response = await agent.rpc.call('com.atproto.repo.createRecord', {
 				data: {
 					repo: uid,
 					collection: 'app.bsky.feed.repost',
-					record: {
-						$type: 'app.bsky.feed.repost',
-						createdAt: getCurrentDate(),
-						subject: {
-							cid: post.cid.value,
-							uri: post.uri,
-						},
-					},
+					record: record,
 				},
 			});
 

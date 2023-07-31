@@ -10,6 +10,7 @@ import _getDid from './_did.ts';
 export class BlockedThreadError extends Error {
 	constructor(public uri: string) {
 		super();
+		this.name = 'BlockedThreadError';
 	}
 }
 

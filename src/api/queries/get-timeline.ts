@@ -98,7 +98,12 @@ const countPosts = (slices: TimelineSlice[], limit?: number) => {
 // Error thrown when post search is being used outside of bsky.social, since we
 // are currently unable to determine the BGS affiliation of other instances.
 // ref: https://github.com/bluesky-social/atproto/issues/1307
-export class IncompatibleSearchError extends Error {}
+export class IncompatibleSearchError extends Error {
+	constructor(message?: string, options?: ErrorOptions) {
+		super(message, options);
+		this.name = 'IncompatibleSearchError';
+	}
+}
 
 export const getTimelineKey = (uid: DID, params: FeedParams, limit = MAX_POSTS) => {
 	return ['getFeed', uid, params, limit] as const;

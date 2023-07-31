@@ -35,7 +35,12 @@ interface MultiagentStorage {
 	accounts: Record<DID, MultiagentAccountData>;
 }
 
-export class MultiagentError extends Error {}
+export class MultiagentError extends Error {
+	constructor(message: string, options?: ErrorOptions) {
+		super(message, options);
+		this.name = 'MultiagentError';
+	}
+}
 
 export class Multiagent {
 	store: MultiagentStorage;

@@ -58,7 +58,7 @@ const Feed = (props: { uid: DID; params: HomeTimelineParams | CustomTimelinePara
 		staleTime: 10_000,
 		refetchInterval: 30_000,
 		enabled: () => {
-			if (!timeline() || timeline()!.pages.length < 1 || !timeline()!.pages[0].cid) {
+			if (timeline.error || !timeline() || timeline()!.pages.length < 1 || !timeline()!.pages[0].cid) {
 				return false;
 			}
 
@@ -67,7 +67,7 @@ const Feed = (props: { uid: DID; params: HomeTimelineParams | CustomTimelinePara
 	});
 
 	createEffect(() => {
-		const $timeline = timeline();
+		const $timeline = !timeline.error && timeline();
 
 		if ($timeline) {
 			const pages = $timeline.pages;

@@ -1,4 +1,4 @@
-import { For, Match, Switch } from 'solid-js';
+import { For, Match, Show, Switch } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
@@ -9,6 +9,7 @@ import { getCollectionCursor } from '~/api/utils.ts';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
+import button from '~/styles/primitives/button.ts';
 
 export interface TimelineListProps {
 	uid: DID;
@@ -23,8 +24,12 @@ const TimelineList = (props: TimelineListProps) => {
 	// change, they shouldn't.
 	const { timeline, latest, onRefetch, onLoadMore } = props;
 
+	const getTimelineCid = () => {
+		return !timeline.error ? timeline()?.pages[0].cid : undefined;
+	};
+
 	const getLatestCid = () => {
-		return timeline()?.pages[0].cid;
+		return latest && !latest.error ? latest()?.cid : undefined;
 	};
 
 	const flattenedSlices = () => {
@@ -41,13 +46,13 @@ const TimelineList = (props: TimelineListProps) => {
 				<Match when={timeline.loading && !timeline.refetchParam}>
 					<div
 						class="flex h-13 items-center justify-center border-divider"
-						classList={{ 'border-b': !!timeline() }}
+						classList={{ 'border-b': !timeline.error && !!timeline() }}
 					>
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={latest?.() && latest()!.cid !== getLatestCid()}>
+				<Match when={getLatestCid() !== getTimelineCid()}>
 					<button
 						onClick={onRefetch}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"
@@ -88,6 +93,29 @@ const TimelineList = (props: TimelineListProps) => {
 			</div>
 
 			<Switch>
+				<Match when={timeline.error}>
+					<Show when={!timeline.loading}>
+						<div class="flex flex-col items-center px-4 py-6 text-sm text-muted-fg">
+							<p>Something went wrong</p>
+							<p class="mb-4">{'' + timeline.error}</p>
+
+							<button
+								onClick={() => {
+									const param = timeline.refetchParam;
+									if (param != null) {
+										onLoadMore(param);
+									} else {
+										onRefetch();
+									}
+								}}
+								class={/* @once */ button({ color: 'primary' })}
+							>
+								Reload
+							</button>
+						</div>
+					</Show>
+				</Match>
+
 				<Match when={timeline.loading && timeline.refetchParam}>
 					<div class="flex h-13 items-center justify-center">
 						<CircularProgress />

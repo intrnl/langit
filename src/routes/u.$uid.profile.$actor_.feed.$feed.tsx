@@ -68,7 +68,14 @@ const AuthenticatedFeedPage = () => {
 		staleTime: 10_000,
 		refetchInterval: 30_000,
 		enabled: () => {
-			if (!did() || !timeline() || timeline()!.pages.length < 1 || !timeline()!.pages[0].cid) {
+			if (
+				did.error ||
+				timeline.error ||
+				!did() ||
+				!timeline() ||
+				timeline()!.pages.length < 1 ||
+				!timeline()!.pages[0].cid
+			) {
 				return false;
 			}
 
@@ -104,7 +111,7 @@ const AuthenticatedFeedPage = () => {
 	};
 
 	createEffect(() => {
-		const $timeline = timeline();
+		const $timeline = !timeline.error && timeline();
 
 		if ($timeline) {
 			const pages = $timeline.pages;
@@ -136,7 +143,7 @@ const AuthenticatedFeedPage = () => {
 				</Switch>
 			</div>
 
-			<Show when={info()}>
+			<Show when={!info.error && info()}>
 				{(info) => {
 					const creator = () => info().creator;
 

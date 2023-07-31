@@ -64,7 +64,7 @@ const AuthenticatedProfileLayout = () => {
 		<div class="flex grow flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<Switch>
-					<Match when={!profile.error && profile()}>
+					<Match when={profile()}>
 						{(profile) => (
 							<div class="flex flex-col gap-0.5">
 								<Title>

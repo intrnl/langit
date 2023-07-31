@@ -111,7 +111,7 @@ const AuthenticatedFeedPage = () => {
 	};
 
 	createEffect(() => {
-		const $timeline = !timeline.error && timeline();
+		const $timeline = timeline();
 
 		if ($timeline) {
 			const pages = $timeline.pages;
@@ -127,7 +127,7 @@ const AuthenticatedFeedPage = () => {
 		<div class="flex flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<Switch>
-					<Match when={!info.error && info()}>
+					<Match when={info()}>
 						{(info) => (
 							<>
 								<Title>Feed ({info().displayName.value}) / Langit</Title>
@@ -143,7 +143,7 @@ const AuthenticatedFeedPage = () => {
 				</Switch>
 			</div>
 
-			<Show when={!info.error && info()}>
+			<Show when={info()}>
 				{(info) => {
 					const creator = () => info().creator;
 

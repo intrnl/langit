@@ -11,7 +11,7 @@
 	"dependencies": {
 		"@floating-ui/dom": "^1.5.1",
 		"@intrnl/bluesky-client": "^0.1.4",
-		"@intrnl/sq": "^0.1.1",
+		"@intrnl/sq": "^0.2.0",
 		"@intrnl/use-gesture-solid": "^0.1.0",
 		"@solid-primitives/deep": "^0.2.1",
 		"@solidjs/meta": "^0.28.6",

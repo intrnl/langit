@@ -80,8 +80,13 @@ const AuthenticatedNotificationsPage = () => {
 		}
 	});
 
-	const getLatestCid = () => {
-		return !notifications.error && notifications()?.pages[0].cid;
+	const getNotificationsCid = () => {
+		return notifications()?.pages[0].cid;
+	};
+
+	const isNotificationsStale = () => {
+		const $latest = latest();
+		return $latest && $latest.cid !== getNotificationsCid();
 	};
 
 	return (
@@ -104,13 +109,13 @@ const AuthenticatedNotificationsPage = () => {
 				<Match when={notifications.loading && !notifications.refetchParam}>
 					<div
 						class="flex h-13 items-center justify-center border-divider"
-						classList={{ 'border-b': !notifications.error && !!notifications() }}
+						classList={{ 'border-b': !!notifications() }}
 					>
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={!latest.error && latest() && latest()!.cid !== getLatestCid()}>
+				<Match when={isNotificationsStale()}>
 					<button
 						onClick={() => refetch(true)}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"
@@ -121,7 +126,7 @@ const AuthenticatedNotificationsPage = () => {
 			</Switch>
 
 			<div>
-				<For each={!notifications.error && notifications()?.pages}>
+				<For each={notifications()?.pages}>
 					{(page) =>
 						page.slices.map((slice) => {
 							return (

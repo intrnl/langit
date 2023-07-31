@@ -46,6 +46,7 @@ const InvitedUsersDialog = (props: InvitedUsersDialogProps) => {
 								initialData: getInitialProfile,
 								refetchOnReconnect: false,
 								refetchOnWindowFocus: false,
+								throwOnAccess: true,
 							});
 
 							return (

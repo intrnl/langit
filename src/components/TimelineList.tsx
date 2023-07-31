@@ -25,11 +25,12 @@ const TimelineList = (props: TimelineListProps) => {
 	const { timeline, latest, onRefetch, onLoadMore } = props;
 
 	const getTimelineCid = () => {
-		return !timeline.error ? timeline()?.pages[0].cid : undefined;
+		return timeline()?.pages[0].cid;
 	};
 
-	const getLatestCid = () => {
-		return latest && !latest.error ? latest()?.cid : undefined;
+	const isTimelineStale = () => {
+		const $latest = latest?.();
+		return $latest && $latest.cid !== getTimelineCid();
 	};
 
 	const flattenedSlices = () => {
@@ -46,13 +47,13 @@ const TimelineList = (props: TimelineListProps) => {
 				<Match when={timeline.loading && !timeline.refetchParam}>
 					<div
 						class="flex h-13 items-center justify-center border-divider"
-						classList={{ 'border-b': !timeline.error && !!timeline() }}
+						classList={{ 'border-b': !!timeline() }}
 					>
 						<CircularProgress />
 					</div>
 				</Match>
 
-				<Match when={getLatestCid() !== getTimelineCid()}>
+				<Match when={isTimelineStale()}>
 					<button
 						onClick={onRefetch}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"

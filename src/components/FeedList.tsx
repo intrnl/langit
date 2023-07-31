@@ -36,7 +36,7 @@ const FeedList = (props: FeedListProps) => {
 	});
 
 	const list = () => {
-		const data = !feeds.error && feeds();
+		const data = feeds();
 		return data ? data.pages.flatMap((page) => page.feeds) : [];
 	};
 
@@ -133,7 +133,7 @@ const FeedList = (props: FeedListProps) => {
 					</div>
 				</Match>
 
-				<Match when={!feeds.error && getCollectionCursor(feeds(), 'cursor')}>
+				<Match when={getCollectionCursor(feeds(), 'cursor')}>
 					{(cursor) => (
 						<button
 							onClick={() => onLoadMore(cursor())}

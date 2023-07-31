@@ -63,7 +63,7 @@ const AuthenticatedPostPage = () => {
 
 	const focusRef = (node: HTMLDivElement) => {
 		requestAnimationFrame(() => {
-			const $thread = !thread.error && thread();
+			const $thread = thread();
 			const key = location.key;
 
 			if ($thread && key && !seen.has(key)) {
@@ -74,7 +74,7 @@ const AuthenticatedPostPage = () => {
 	};
 
 	const renderTitle = () => {
-		const $thread = !thread.error && thread();
+		const $thread = thread();
 
 		if ($thread) {
 			const post = $thread.post;
@@ -130,7 +130,7 @@ const AuthenticatedPostPage = () => {
 									return (
 										<div class="p-4">
 											<Switch>
-												<Match when={!profile.error && profile()} keyed>
+												<Match when={profile()} keyed>
 													{(profile) => {
 														return (
 															<Switch>

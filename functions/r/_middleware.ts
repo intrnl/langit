@@ -103,7 +103,7 @@ const renderPost = (
 
 		if (images) {
 			const tags = images.map((img) => {
-				const url = `${INSTANCE_URL}/xrpc/com.atproto.repo.getBlob?did=${repo.did}&cid=${img.image.ref.$link}`;
+				const url = `${INSTANCE_URL}/xrpc/com.atproto.sync.getBlob?did=${repo.did}&cid=${img.image.ref.$link}`;
 				return `<meta property="og:image" content="${escape(url, true)}" />`;
 			});
 

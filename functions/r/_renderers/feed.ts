@@ -11,19 +11,18 @@ export const renderFeed = async (actor: string, id: string) => {
 		resolveRecord(repo.did, 'app.bsky.feed.generator', id),
 	]);
 
-	const title = profile?.displayName ? `${profile.displayName} (@${repo.handle})` : `@${repo.handle}`;
 	const description = feed.description;
 	const avatar = feed.avatar;
 
 	let head = renderBase();
 	let text = '';
 
-	text += `by ${profile?.displayName ? `${profile.displayName} (@${repo.handle})` : `@${repo.handle}`}`;
+	text += `Feed by ${profile?.displayName ? `${profile.displayName} (@${repo.handle})` : `@${repo.handle}`}`;
 	if (description) {
 		text += `\n\n${description}`;
 	}
 
-	head += `<meta property="og:title" content="${escape(title, true)}" />`;
+	head += `<meta property="og:title" content="${escape(feed.displayName, true)}" />`;
 	head += `<meta property="og:description" content="${escape(text, true)}" />`;
 
 	if (avatar) {

@@ -7,11 +7,11 @@ const POST_MATCHER = new URLPattern({ pathname: '/r/profile/:actor/post/:post' }
 const appendHead = (response: Response, content: string) => {
 	const handler: HTMLRewriterElementContentHandlers = {
 		element: (element) => {
-			element.append(content, { html: true });
+			element.after(content, { html: true });
 		},
 	};
 
-	return new HTMLRewriter().on('head', handler).transform(response);
+	return new HTMLRewriter().on('meta[charset]', handler).transform(response);
 };
 
 export const onRequest: PagesFunction = async (context) => {

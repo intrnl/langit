@@ -1,6 +1,6 @@
 import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
-import { INSTANCE_URL, escape } from '../_global.ts';
+import { INSTANCE_URL, escape, getBlobUrl } from '../_global.ts';
 import { resolvePost, resolveProfile, resolveRepository } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
@@ -57,7 +57,8 @@ export const renderPost = async (actor: string, tid: string) => {
 
 		if (images) {
 			const img = images[0];
-			const url = `${INSTANCE_URL}/xrpc/com.atproto.sync.getBlob?did=${repo.did}&cid=${img.image.ref.$link}`;
+			const url = getBlobUrl(repo.did, img.image);
+
 			head += `<meta name="twitter:card" content="summary_large_image" />`;
 			head += `<meta property="og:image" content="${escape(url, true)}" />`;
 		}

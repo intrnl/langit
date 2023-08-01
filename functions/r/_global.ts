@@ -1,5 +1,5 @@
 import { XRPC } from '@intrnl/bluesky-client/xrpc';
-import type { Procedures, Queries } from '@intrnl/bluesky-client/atp-schema';
+import type { AtBlob, DID, Procedures, Queries } from '@intrnl/bluesky-client/atp-schema';
 
 export const INSTANCE_URL = `https://bsky.social`;
 
@@ -25,4 +25,8 @@ export const escape = (value: string, isAttribute: boolean) => {
 	}
 
 	return escaped + str.substring(last);
+};
+
+export const getBlobUrl = (did: DID, blob: AtBlob) => {
+	return `${INSTANCE_URL}/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${blob.ref.$link}`;
 };

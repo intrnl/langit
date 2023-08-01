@@ -1,5 +1,7 @@
 import { renderPost } from './_renderers/post.ts';
+import { renderProfile } from './_renderers/profile.ts';
 
+const PROFILE_MATCHER = new URLPattern({ pathname: '/r/profile/:actor' });
 const POST_MATCHER = new URLPattern({ pathname: '/r/profile/:actor/post/:post' });
 
 const appendHead = (response: Response, content: string) => {
@@ -18,11 +20,15 @@ export const onRequest: PagesFunction = async (context) => {
 	const response = await context.next();
 
 	try {
-		const url = request.url;
+		const url = new URL(request.url);
 
 		let match: URLPatternURLPatternResult | null;
 
-		if ((match = POST_MATCHER.exec(url))) {
+		if ((match = PROFILE_MATCHER.exec(url))) {
+			const { actor } = match.pathname.groups;
+
+			return appendHead(response, await renderProfile(actor));
+		} else if ((match = POST_MATCHER.exec(url))) {
 			const { actor, post } = match.pathname.groups;
 
 			return appendHead(response, await renderPost(actor, post));

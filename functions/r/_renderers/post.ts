@@ -1,6 +1,6 @@
 import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
-import { INSTANCE_URL, escape, getBlobUrl } from '../_global.ts';
+import { escape, getBlobUrl } from '../_global.ts';
 import { resolvePost, resolveProfile, resolveRepository } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';

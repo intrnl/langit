@@ -107,7 +107,7 @@ const renderPost = (
 				return `<meta property="og:image" content="${escape(url, true)}" />`;
 			});
 
-			image = tags.join('');
+			image = `<meta name="twitter:card" content="summary_large_image" />` + tags.join('');
 		}
 	}
 

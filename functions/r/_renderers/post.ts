@@ -1,4 +1,4 @@
-import { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { INSTANCE_URL, escape } from '../_global.ts';
 import { resolvePost, resolveProfile, resolveRepository } from '../_resolvers.ts';

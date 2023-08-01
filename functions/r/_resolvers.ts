@@ -14,38 +14,35 @@ export const resolveRepository = async (actor: string) => {
 	return data;
 };
 
-export const resolveProfile = async (did: DID) => {
-	try {
-		const response = await rpc.get('com.atproto.repo.getRecord', {
-			params: {
-				repo: did,
-				collection: 'app.bsky.actor.profile',
-				rkey: 'self',
-			},
-		});
-
-		const data = response.data;
-		return data.value as Records['app.bsky.actor.profile'];
-	} catch (err) {
-		if (err instanceof XRPCError) {
-			if (err.error === 'InvalidRequest') {
-				return null;
+export const resolveRecord = async <TCollection extends keyof Records, TCatch extends boolean = false>(
+	did: DID,
+	collection: TCollection,
+	rkey: string,
+	caught?: TCatch,
+): Promise<TCatch extends true ? Records[TCollection] | null : Records[TCollection]> => {
+	if (caught) {
+		try {
+			return await resolveRecord(did, collection, rkey, false);
+		} catch (err) {
+			if (err instanceof XRPCError) {
+				if (err.error === 'InvalidRequest') {
+					// @ts-expect-error
+					return null;
+				}
 			}
+
+			throw err;
 		}
-
-		throw err;
 	}
-};
 
-export const resolvePost = async (did: DID, post: string) => {
 	const response = await rpc.get('com.atproto.repo.getRecord', {
 		params: {
 			repo: did,
-			collection: 'app.bsky.feed.post',
-			rkey: post,
+			collection: collection,
+			rkey: rkey,
 		},
 	});
 
 	const data = response.data;
-	return data.value as Records['app.bsky.feed.post'];
+	return data.value as Records[TCollection];
 };

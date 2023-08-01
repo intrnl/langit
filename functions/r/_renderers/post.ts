@@ -1,14 +1,17 @@
 import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { escape, getBlobUrl } from '../_global.ts';
-import { resolvePost, resolveProfile, resolveRepository } from '../_resolvers.ts';
+import { resolveRecord, resolveRepository } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
 
 export const renderPost = async (actor: string, tid: string) => {
 	const repo = await resolveRepository(actor);
 
-	const [profile, post] = await Promise.all([resolveProfile(repo.did), resolvePost(repo.did, tid)]);
+	const [profile, post] = await Promise.all([
+		resolveRecord(repo.did, 'app.bsky.actor.profile', 'self', true),
+		resolveRecord(repo.did, 'app.bsky.feed.post', tid),
+	]);
 
 	const embed = post.embed;
 	const reply = post.reply;

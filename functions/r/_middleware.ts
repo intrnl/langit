@@ -1,8 +1,10 @@
+import { renderFeed } from './_renderers/feed.ts';
 import { renderPost } from './_renderers/post.ts';
 import { renderProfile } from './_renderers/profile.ts';
 
 const PROFILE_MATCHER = new URLPattern({ pathname: '/r/profile/:actor' });
 const POST_MATCHER = new URLPattern({ pathname: '/r/profile/:actor/post/:post' });
+const FEED_MATCHER = new URLPattern({ pathname: '/r/profile/:actor/feed/:feed' });
 
 const appendHead = (response: Response, content: string) => {
 	const handler: HTMLRewriterElementContentHandlers = {
@@ -23,15 +25,24 @@ export const onRequest: PagesFunction = async (context) => {
 		const url = new URL(request.url);
 
 		let match: URLPatternURLPatternResult | null;
+		let head: string | undefined;
 
 		if ((match = PROFILE_MATCHER.exec(url))) {
 			const { actor } = match.pathname.groups;
 
-			return appendHead(response, await renderProfile(actor));
+			head = await renderProfile(actor);
 		} else if ((match = POST_MATCHER.exec(url))) {
 			const { actor, post } = match.pathname.groups;
 
-			return appendHead(response, await renderPost(actor, post));
+			head = await renderPost(actor, post);
+		} else if ((match = FEED_MATCHER.exec(url))) {
+			const { actor, feed } = match.pathname.groups;
+
+			head = await renderFeed(actor, feed);
+		}
+
+		if (head) {
+			return appendHead(response, head);
 		}
 	} catch (err) {
 		console.log(`failed to render preview`);

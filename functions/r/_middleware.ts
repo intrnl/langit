@@ -1,4 +1,3 @@
-import { resolvePost, resolveProfile, resolveRepository } from './_resolvers.ts';
 import { renderPost } from './_renderers/post.ts';
 
 const POST_MATCHER = new URLPattern({ pathname: '/r/profile/:actor/post/:post' });
@@ -26,11 +25,7 @@ export const onRequest: PagesFunction = async (context) => {
 		if ((match = POST_MATCHER.exec(url))) {
 			const { actor, post } = match.pathname.groups;
 
-			const repo = await resolveRepository(actor);
-			const profile = await resolveProfile(repo.did);
-			const record = await resolvePost(repo.did, post);
-
-			return appendHead(response, renderPost(record, profile, repo));
+			return appendHead(response, await renderPost(actor, post));
 		}
 	} catch (err) {
 		console.log(`failed to render preview`);

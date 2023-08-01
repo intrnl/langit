@@ -11,12 +11,29 @@ export const renderPost = async (actor: string, tid: string) => {
 	const [profile, post] = await Promise.all([resolveProfile(repo.did), resolvePost(repo.did, tid)]);
 
 	const embed = post.embed;
+	const reply = post.reply;
+
 	const title = profile?.displayName ? `${profile.displayName} (@${repo.handle})` : `@${repo.handle}`;
 
 	let head = renderBase();
 
 	let header = '';
 	let text = post.text;
+
+	if (reply) {
+		const parentUri = reply.parent.uri;
+
+		try {
+			const repliedToRepo = await resolveRepository(getRepoId(parentUri));
+
+			header += `[replying to @${repliedToRepo.handle}] `;
+		} catch (err) {
+			console.log(`failed to resolve reply ${parentUri}`);
+			console.error(err);
+
+			header += `[reply: failed to resolve reply] `;
+		}
+	}
 
 	if (embed) {
 		const $type = embed.$type;

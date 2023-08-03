@@ -20,7 +20,7 @@ import {
 	getTimelineLatestKey,
 } from '~/api/queries/get-timeline.ts';
 
-import { preferences } from '~/globals/preferences.ts';
+import { getAccountPreferences } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
 
 import TimelineList from '~/components/TimelineList.tsx';
@@ -91,7 +91,7 @@ const AuthenticatedFeedPage = () => {
 	});
 
 	const toggleSave = () => {
-		const prefs = (preferences[uid()] ||= {});
+		const prefs = getAccountPreferences(uid());
 		const saved = prefs?.savedFeeds;
 
 		const uri = feedUri();

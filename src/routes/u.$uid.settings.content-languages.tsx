@@ -3,7 +3,7 @@ import { type ComponentProps, For, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
 import { systemLanguages } from '~/globals/platform.ts';
-import { preferences } from '~/globals/preferences.ts';
+import { getAccountPreferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 
@@ -33,7 +33,7 @@ const AuthenticatedLanguagesSettingsPage = () => {
 	const uid = () => params.uid as DID;
 
 	const prefs = createMemo(() => {
-		return (preferences[uid()] ||= {});
+		return getAccountPreferences(uid());
 	});
 
 	return (

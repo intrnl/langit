@@ -7,7 +7,7 @@ import { useNavigate } from '@solidjs/router';
 import type { FeedsPage } from '~/api/models/feeds.ts';
 import { type Collection, getCollectionCursor, getRepoId, getRecordId } from '~/api/utils.ts';
 
-import { preferences } from '~/globals/preferences.ts';
+import { getAccountPreferences } from '~/globals/preferences.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -32,7 +32,7 @@ const FeedList = (props: FeedListProps) => {
 	const uid = () => props.uid;
 
 	const prefs = createMemo(() => {
-		return (preferences[uid()] ||= {});
+		return getAccountPreferences(uid());
 	});
 
 	const list = () => {

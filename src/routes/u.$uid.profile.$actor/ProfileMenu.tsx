@@ -6,7 +6,7 @@ import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
-import { preferences } from '~/globals/preferences.ts';
+import { getAccountPreferences } from '~/globals/preferences.ts';
 
 import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog.tsx';
 import ReportDialog, { REPORT_PROFILE } from '~/components/dialogs/ReportDialog.tsx';
@@ -35,7 +35,7 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 	const profile = () => props.profile;
 
 	const prefs = createMemo(() => {
-		return (preferences[uid()] ||= {});
+		return getAccountPreferences(uid());
 	});
 
 	const isMuted = () => profile().viewer.muted.value;

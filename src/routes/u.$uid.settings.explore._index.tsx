@@ -19,7 +19,7 @@ import {
 	getInitialFeedGenerator,
 } from '~/api/queries/get-feed-generator.ts';
 
-import { preferences } from '~/globals/preferences.ts';
+import { getAccountPreferences } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
 import { ConstrainXDragAxis } from '~/utils/dnd.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
@@ -142,7 +142,7 @@ const AuthenticatedExploreSettingsPage = () => {
 	const isCoarse = useMediaQuery('(pointer: coarse)');
 
 	const prefs = createMemo(() => {
-		return (preferences[uid()] ||= {});
+		return getAccountPreferences(uid());
 	});
 
 	const pinnedFeeds = createMemo(() => {

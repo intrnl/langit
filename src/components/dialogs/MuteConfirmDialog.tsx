@@ -14,7 +14,7 @@ import { getList, getListKey } from '~/api/queries/get-list.ts';
 import type { FeedPage } from '~/api/queries/get-timeline.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
-import { preferences } from '~/globals/preferences';
+import { getAccountPreferences } from '~/globals/preferences.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import ListItem from '~/components/ListItem.tsx';
@@ -92,7 +92,7 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 			const date = Date.now() + parsedDuration;
 
 			batch(() => {
-				const accountPref = (preferences[uid()] ||= {});
+				const accountPref = getAccountPreferences(uid());
 				const tempMutes = (accountPref.pf_tempMutes ||= {});
 
 				tempMutes[$did] = date;

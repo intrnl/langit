@@ -1,4 +1,4 @@
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { detectFacets } from '../richtext/detection.ts';
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
@@ -70,15 +70,19 @@ const createSignalizedProfile = (
 	};
 };
 
-export const mergeSignalizedProfile = (profile: Profile | ProfileBasic | ProfileDetailed, key?: number) => {
-	let did = profile.did;
+export const mergeSignalizedProfile = (
+	uid: DID,
+	profile: Profile | ProfileBasic | ProfileDetailed,
+	key?: number,
+) => {
+	let id = uid + '|' + profile.did;
 
-	let ref: WeakRef<SignalizedProfile> | undefined = profiles[did];
+	let ref: WeakRef<SignalizedProfile> | undefined = profiles[id];
 	let val: SignalizedProfile;
 
 	if (!ref || !(val = ref.deref()!)) {
 		val = createSignalizedProfile(profile, key);
-		profiles[did] = new WeakRef(val);
+		profiles[id] = new WeakRef(val);
 	} else if (!key || val._key !== key) {
 		val._key = key;
 

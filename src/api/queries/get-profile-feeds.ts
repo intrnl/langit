@@ -33,7 +33,7 @@ export const getProfileFeeds: QueryFn<
 
 	const page: FeedsPage = {
 		cursor: feeds.length >= limit ? data.cursor : undefined,
-		feeds: feeds.map((feed) => mergeSignalizedFeedGenerator(feed)),
+		feeds: feeds.map((feed) => mergeSignalizedFeedGenerator(uid, feed)),
 	};
 
 	return pushCollection(collection, page, param);

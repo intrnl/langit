@@ -30,7 +30,7 @@ export const getSelfMutes: QueryFn<
 
 	const page: ProfilesListPage = {
 		cursor: mutes.length >= limit ? data.cursor : undefined,
-		profiles: mutes.map((profile) => mergeSignalizedProfile(profile)),
+		profiles: mutes.map((profile) => mergeSignalizedProfile(uid, profile)),
 	};
 
 	return pushCollection(collection, page, param);

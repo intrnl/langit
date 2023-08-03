@@ -53,7 +53,7 @@ export const getPost: QueryFn<SignalizedPost, ReturnType<typeof getPostKey>> = a
 
 	const post = await fetchPost([uid, resolvedUri]);
 
-	return mergeSignalizedPost(post);
+	return mergeSignalizedPost(uid, post);
 };
 
 export const getInitialPost: InitialDataFn<SignalizedPost, ReturnType<typeof getPostKey>> = (key) => {

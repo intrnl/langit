@@ -1,4 +1,4 @@
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { type SignalizedTimelinePost, createSignalizedTimelinePost } from '../cache/posts.ts';
 
@@ -38,7 +38,12 @@ export interface TimelinePage {
 export type SliceFilter = (slice: TimelineSlice, seen: Set<string>) => boolean;
 export type PostFilter = (post: FeedPost) => boolean;
 
-export const createTimelineSlices = (arr: FeedPost[], sliceFilter?: SliceFilter, postFilter?: PostFilter) => {
+export const createTimelineSlices = (
+	uid: DID,
+	arr: FeedPost[],
+	sliceFilter?: SliceFilter,
+	postFilter?: PostFilter,
+) => {
 	const key = Date.now();
 
 	const seen = new Set<string>();
@@ -62,7 +67,7 @@ export const createTimelineSlices = (arr: FeedPost[], sliceFilter?: SliceFilter,
 		}
 
 		// find a slice that matches
-		const signalized = createSignalizedTimelinePost(item, key);
+		const signalized = createSignalizedTimelinePost(uid, item, key);
 
 		// if we find a matching slice and it's currently not in front, then bump
 		// it to the front. this is so that new reply don't get buried away because

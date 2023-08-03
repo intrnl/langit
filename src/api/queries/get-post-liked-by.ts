@@ -36,7 +36,7 @@ export const getPostLikedBy: QueryFn<
 
 	const page: ProfilesListPage = {
 		cursor: likes.length >= limit ? data.cursor : undefined,
-		profiles: likes.map((record) => mergeSignalizedProfile(record.actor)),
+		profiles: likes.map((record) => mergeSignalizedProfile(uid, record.actor)),
 	};
 
 	return pushCollection(collection, page, param);

@@ -1,4 +1,4 @@
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
@@ -31,13 +31,17 @@ export interface SignalizedFeedGenerator {
 	$renderedDescription: ReturnType<typeof createFeedDescriptionRenderer>;
 }
 
-const createSignalizedFeedGenerator = (feed: FeedGenerator, key?: number): SignalizedFeedGenerator => {
+const createSignalizedFeedGenerator = (
+	uid: DID,
+	feed: FeedGenerator,
+	key?: number,
+): SignalizedFeedGenerator => {
 	return {
 		_key: key,
 		uri: feed.uri,
 		cid: signal(feed.cid),
 		did: signal(feed.did),
-		creator: mergeSignalizedProfile(feed.creator, key),
+		creator: mergeSignalizedProfile(uid, feed.creator, key),
 		displayName: signal(feed.displayName),
 		description: signal(feed.description),
 		descriptionFacets: signal(feed.descriptionFacets),
@@ -50,22 +54,26 @@ const createSignalizedFeedGenerator = (feed: FeedGenerator, key?: number): Signa
 	};
 };
 
-export const mergeSignalizedFeedGenerator = (feed: FeedGenerator, key?: number): SignalizedFeedGenerator => {
-	let uri = feed.uri;
+export const mergeSignalizedFeedGenerator = (
+	uid: DID,
+	feed: FeedGenerator,
+	key?: number,
+): SignalizedFeedGenerator => {
+	let id = uid + '|' + feed.uri;
 
-	let ref: WeakRef<SignalizedFeedGenerator> | undefined = feedGenerators[uri];
+	let ref: WeakRef<SignalizedFeedGenerator> | undefined = feedGenerators[id];
 	let val: SignalizedFeedGenerator;
 
 	if (!ref || !(val = ref.deref()!)) {
-		val = createSignalizedFeedGenerator(feed, key);
-		feedGenerators[uri] = new WeakRef(val);
+		val = createSignalizedFeedGenerator(uid, feed, key);
+		feedGenerators[id] = new WeakRef(val);
 	} else if (!key || val._key !== key) {
 		val._key = key;
 
 		val.cid.value = feed.cid;
 		val.did.value = feed.did;
 
-		val.creator = mergeSignalizedProfile(feed.creator, key);
+		val.creator = mergeSignalizedProfile(uid, feed.creator, key);
 
 		val.displayName.value = feed.displayName;
 		val.description.value = feed.description;

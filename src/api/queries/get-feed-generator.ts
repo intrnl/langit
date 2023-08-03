@@ -65,7 +65,7 @@ export const getFeedGenerator: QueryFn<
 
 	const feedGenerator = await fetchFeedGenerator([uid, resolvedUri]);
 
-	return mergeSignalizedFeedGenerator(feedGenerator);
+	return mergeSignalizedFeedGenerator(uid, feedGenerator);
 };
 
 export const getInitialFeedGenerator: InitialDataFn<
@@ -104,7 +104,7 @@ export const getPopularFeedGenerators: QueryFn<
 
 	const page: FeedsPage = {
 		cursor: feeds.length >= limit ? data.cursor : undefined,
-		feeds: feeds.map((feed) => mergeSignalizedFeedGenerator(feed)),
+		feeds: feeds.map((feed) => mergeSignalizedFeedGenerator(uid, feed)),
 	};
 
 	return pushCollection(collection, page, param);

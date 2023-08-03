@@ -1,4 +1,4 @@
-import type { Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
@@ -35,12 +35,12 @@ export interface SignalizedPost {
 	$renderedContent: ReturnType<typeof createPostRenderer>;
 }
 
-const createSignalizedPost = (post: Post, key?: number): SignalizedPost => {
+const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPost => {
 	return {
 		_key: key,
 		uri: post.uri,
 		cid: signal(post.cid),
-		author: mergeSignalizedProfile(post.author, key),
+		author: mergeSignalizedProfile(uid, post.author, key),
 		record: signal(post.record as PostRecord),
 		embed: signal(post.embed),
 		replyCount: signal(post.replyCount ?? 0),
@@ -56,20 +56,20 @@ const createSignalizedPost = (post: Post, key?: number): SignalizedPost => {
 	};
 };
 
-export const mergeSignalizedPost = (post: Post, key?: number) => {
-	let uri = post.uri;
+export const mergeSignalizedPost = (uid: DID, post: Post, key?: number) => {
+	let id = uid + '|' + post.uri;
 
-	let ref: WeakRef<SignalizedPost> | undefined = posts[uri];
+	let ref: WeakRef<SignalizedPost> | undefined = posts[id];
 	let val: SignalizedPost;
 
 	if (!ref || !(val = ref.deref()!)) {
-		val = createSignalizedPost(post, key);
-		posts[uri] = new WeakRef(val);
+		val = createSignalizedPost(uid, post, key);
+		posts[id] = new WeakRef(val);
 	} else if (!key || val._key !== key) {
 		val._key = key;
 
 		val.cid.value = post.cid;
-		val.author = mergeSignalizedProfile(post.author, key);
+		val.author = mergeSignalizedProfile(uid, post.author, key);
 
 		val.record.value = post.record as PostRecord;
 		val.embed.value = post.embed;
@@ -95,14 +95,18 @@ export interface SignalizedTimelinePost {
 	reason: FeedPost['reason'];
 }
 
-export const createSignalizedTimelinePost = (item: FeedPost, key?: number): SignalizedTimelinePost => {
+export const createSignalizedTimelinePost = (
+	uid: DID,
+	item: FeedPost,
+	key?: number,
+): SignalizedTimelinePost => {
 	const reply = item.reply;
 
 	return {
-		post: mergeSignalizedPost(item.post, key),
+		post: mergeSignalizedPost(uid, item.post, key),
 		reply: reply && {
-			root: mergeSignalizedPost(reply.root as Post, key),
-			parent: mergeSignalizedPost(reply.parent as Post, key),
+			root: mergeSignalizedPost(uid, reply.root as Post, key),
+			parent: mergeSignalizedPost(uid, reply.parent as Post, key),
 		},
 		reason: item.reason,
 	};

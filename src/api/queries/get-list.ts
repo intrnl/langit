@@ -38,8 +38,8 @@ export const getList: QueryFn<Collection<ListPage>, ReturnType<typeof getListKey
 
 	const page: ListPage = {
 		cursor: items.length >= limit ? data.cursor : undefined,
-		list: mergeSignalizedList(data.list),
-		items: items.map((item) => ({ subject: mergeSignalizedProfile(item.subject) })),
+		list: mergeSignalizedList(uid, data.list),
+		items: items.map((item) => ({ subject: mergeSignalizedProfile(uid, item.subject) })),
 	};
 
 	return pushCollection(collection, page, param);

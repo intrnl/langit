@@ -32,8 +32,8 @@ export const getProfileFollows: QueryFn<
 
 	const page: ProfilesListWithSubjectPage = {
 		cursor: follows.length >= limit ? data.cursor : undefined,
-		subject: mergeSignalizedProfile(data.subject),
-		profiles: follows.map((profile) => mergeSignalizedProfile(profile)),
+		subject: mergeSignalizedProfile(uid, data.subject),
+		profiles: follows.map((profile) => mergeSignalizedProfile(uid, profile)),
 	};
 
 	return pushCollection(collection, page, param);

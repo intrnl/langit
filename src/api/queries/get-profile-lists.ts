@@ -31,7 +31,7 @@ export const getProfileLists: QueryFn<
 
 	const page: ListsPage = {
 		cursor: data.lists.length >= limit ? data.cursor : undefined,
-		lists: data.lists.map((list) => mergeSignalizedList(list)),
+		lists: data.lists.map((list) => mergeSignalizedList(uid, list)),
 	};
 
 	return pushCollection(collection, page, param);

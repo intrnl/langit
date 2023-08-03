@@ -159,7 +159,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 		const timeline = await fetchPage(agent, params, limit, cursor, _did!);
 
 		const feed = timeline.feed;
-		const result = createTimelineSlices(feed, sliceFilter, postFilter);
+		const result = createTimelineSlices(uid, feed, sliceFilter, postFilter);
 
 		cursor = timeline.cursor;
 		empty = result.length > 0 ? 0 : empty + 1;

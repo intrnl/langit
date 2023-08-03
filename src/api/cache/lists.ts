@@ -1,4 +1,4 @@
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
@@ -29,11 +29,11 @@ export interface SignalizedList {
 	$renderedDescription: ReturnType<typeof createListRenderer>;
 }
 
-const createSignalizedList = (list: List, key?: number): SignalizedList => {
+const createSignalizedList = (uid: DID, list: List, key?: number): SignalizedList => {
 	return {
 		_key: key,
 		uri: list.uri,
-		creator: mergeSignalizedProfile(list.creator, key),
+		creator: mergeSignalizedProfile(uid, list.creator, key),
 		name: signal(list.name),
 		purpose: signal(list.purpose),
 		description: signal(list.description),
@@ -46,19 +46,19 @@ const createSignalizedList = (list: List, key?: number): SignalizedList => {
 	};
 };
 
-export const mergeSignalizedList = (list: List, key?: number) => {
-	let uri = list.uri;
+export const mergeSignalizedList = (uid: DID, list: List, key?: number) => {
+	let id = uid + '|' + list.uri;
 
-	let ref: WeakRef<SignalizedList> | undefined = lists[uri];
+	let ref: WeakRef<SignalizedList> | undefined = lists[id];
 	let val: SignalizedList;
 
 	if (!ref || !(val = ref.deref()!)) {
-		val = createSignalizedList(list, key);
-		lists[uri] = new WeakRef(val);
+		val = createSignalizedList(uid, list, key);
+		lists[id] = new WeakRef(val);
 	} else if (!key || val._key !== key) {
 		val._key = key;
 
-		val.creator = mergeSignalizedProfile(list.creator, key);
+		val.creator = mergeSignalizedProfile(uid, list.creator, key);
 
 		val.name.value = list.name;
 		val.purpose.value = list.purpose;

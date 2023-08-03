@@ -50,7 +50,7 @@ export const getSubscribedLists: QueryFn<
 
 		const arr = data.lists;
 		const filtered = others ? arr.filter((list) => list.creator.did !== uid) : arr;
-		const next = filtered.map((raw) => mergeSignalizedList(raw));
+		const next = filtered.map((raw) => mergeSignalizedList(uid, raw));
 
 		cursor = arr.length >= limit ? data.cursor : undefined;
 		empty = filtered.length > 0 ? 0 : empty + 1;

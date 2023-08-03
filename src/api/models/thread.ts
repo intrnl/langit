@@ -1,4 +1,4 @@
-import type { RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { type SignalizedPost, mergeSignalizedPost } from '../cache/posts.ts';
 
@@ -40,7 +40,7 @@ export interface ThreadPage {
 
 type ThreadStackNode = { thread: Thread; slice: ThreadSlice | undefined };
 
-export const createThreadPage = (data: Thread): ThreadPage => {
+export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 	const ancestors: (SignalizedPost | NotFoundPost | BlockedPost)[] = [];
 	const descendants: ThreadSlice[] = [];
 
@@ -58,7 +58,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 			break;
 		}
 
-		ancestors.push(mergeSignalizedPost(parent.post, key));
+		ancestors.push(mergeSignalizedPost(uid, parent.post, key));
 		parent = parent.parent;
 	}
 
@@ -96,7 +96,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 				const reply = replies[idx];
 
 				if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
-					const next: ThreadSlice = { items: [mergeSignalizedPost(reply.post, key)] };
+					const next: ThreadSlice = { items: [mergeSignalizedPost(uid, reply.post, key)] };
 
 					stack.push({ thread: reply, slice: next });
 					descendants.push(next);
@@ -108,7 +108,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 			const reply = replies[0];
 
 			if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
-				const post = mergeSignalizedPost(reply.post, key);
+				const post = mergeSignalizedPost(uid, reply.post, key);
 
 				slice.items.push(post);
 				stack.push({ thread: reply, slice: slice });
@@ -119,7 +119,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 	}
 
 	return {
-		post: mergeSignalizedPost(data.post, key),
+		post: mergeSignalizedPost(uid, data.post, key),
 		ancestors: ancestors.reverse() as any,
 		descendants: descendants,
 	};

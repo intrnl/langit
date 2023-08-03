@@ -18,7 +18,7 @@ export const getProfile: QueryFn<SignalizedProfile, ReturnType<typeof getProfile
 	});
 
 	const data = response.data;
-	const profile = mergeSignalizedProfile(data);
+	const profile = mergeSignalizedProfile(uid, data);
 
 	if (profile.did === uid) {
 		const $accounts = multiagent.store.accounts;

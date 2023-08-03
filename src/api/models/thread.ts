@@ -45,6 +45,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 	const descendants: ThreadSlice[] = [];
 
 	const stack = new Stack<ThreadStackNode>();
+	const key = Date.now();
 
 	let parent = data.parent;
 	let node: ThreadStackNode | undefined;
@@ -57,7 +58,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 			break;
 		}
 
-		ancestors.push(mergeSignalizedPost(parent.post));
+		ancestors.push(mergeSignalizedPost(parent.post, key));
 		parent = parent.parent;
 	}
 
@@ -95,7 +96,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 				const reply = replies[idx];
 
 				if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
-					const next: ThreadSlice = { items: [mergeSignalizedPost(reply.post)] };
+					const next: ThreadSlice = { items: [mergeSignalizedPost(reply.post, key)] };
 
 					stack.push({ thread: reply, slice: next });
 					descendants.push(next);
@@ -107,7 +108,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 			const reply = replies[0];
 
 			if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
-				const post = mergeSignalizedPost(reply.post);
+				const post = mergeSignalizedPost(reply.post, key);
 
 				slice.items.push(post);
 				stack.push({ thread: reply, slice: slice });
@@ -118,7 +119,7 @@ export const createThreadPage = (data: Thread): ThreadPage => {
 	}
 
 	return {
-		post: mergeSignalizedPost(data.post),
+		post: mergeSignalizedPost(data.post, key),
 		ancestors: ancestors.reverse() as any,
 		descendants: descendants,
 	};

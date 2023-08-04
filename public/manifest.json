@@ -4,6 +4,7 @@
 	"display": "standalone",
 	"id": "/?source=pwa",
 	"start_url": "/?source=pwa",
+	"background_color": "#000000",
 	"scope": "/",
 	"icons": [
 		{

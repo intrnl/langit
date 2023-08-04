@@ -40,10 +40,12 @@ export const getProfile: QueryFn<SignalizedProfile, ReturnType<typeof getProfile
 export const getInitialProfile: InitialDataFn<SignalizedProfile, ReturnType<typeof getProfileKey>> = (
 	key,
 ) => {
-	const [, , actor] = key;
+	const [, uid, actor] = key;
 
 	if (isDid(actor)) {
-		const ref = profiles[actor];
+		const id = uid + '|' + actor;
+
+		const ref = profiles[id];
 		const profile = ref?.deref();
 
 		return profile && { data: profile };

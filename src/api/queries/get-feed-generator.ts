@@ -72,9 +72,11 @@ export const getInitialFeedGenerator: InitialDataFn<
 	SignalizedFeedGenerator,
 	ReturnType<typeof getFeedGeneratorKey>
 > = (key) => {
-	const [, , uri] = key;
+	const [, uid, uri] = key;
 
-	const ref = feedGenerators[uri];
+	const id = uid + '|' + uri;
+
+	const ref = feedGenerators[id];
 	const feed = ref?.deref();
 
 	return feed && { data: feed };

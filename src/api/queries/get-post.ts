@@ -57,9 +57,11 @@ export const getPost: QueryFn<SignalizedPost, ReturnType<typeof getPostKey>> = a
 };
 
 export const getInitialPost: InitialDataFn<SignalizedPost, ReturnType<typeof getPostKey>> = (key) => {
-	const [, , uri] = key;
+	const [, uid, uri] = key;
 
-	const ref = posts[uri];
+	const id = uid + '|' + uri;
+
+	const ref = posts[id];
 	const post = ref?.deref();
 
 	return post && { data: post };

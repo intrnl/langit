@@ -248,7 +248,7 @@ const AuthenticatedPostPage = () => {
 									}}
 								</Show>
 
-								<div ref={focusRef} class="scroll-m-13 px-4 pt-3">
+								<div ref={focusRef} class="scroll-m-16 px-4 pt-3">
 									<div class="mb-1 flex items-center gap-3">
 										<A
 											href="/u/:uid/profile/:actor"

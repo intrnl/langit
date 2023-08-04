@@ -6,6 +6,7 @@ import { Router, useRoutes } from '@solidjs/router';
 import { type LocalSettings, preferences } from '~/globals/preferences.ts';
 import routes from '~/router-routes.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
+import '~/utils/service-worker.ts';
 
 import '~/styles/tailwind.css';
 

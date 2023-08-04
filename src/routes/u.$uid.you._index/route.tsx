@@ -7,6 +7,7 @@ import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { A, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
+import { isUpdateReady, updateSW } from '~/utils/service-worker.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import AddIcon from '~/icons/baseline-add.tsx';
@@ -148,6 +149,17 @@ const AuthenticatedYouPage = () => {
 				<BrightnessMediumIcon class="text-xl" />
 				<span>Application theme</span>
 			</button>
+
+			<Show when={isUpdateReady()}>
+				<button
+					onClick={() => {
+						updateSW();
+					}}
+					class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+				>
+					<span>Update application</span>
+				</button>
+			</Show>
 
 			<hr class="mt-4 border-divider" />
 

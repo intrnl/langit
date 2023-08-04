@@ -39,6 +39,6 @@ export const getPostThread: QueryFn<ThreadPage, ReturnType<typeof getPostThreadK
 		case 'app.bsky.feed.defs#notFoundPost':
 			throw new Error(`Post not found`);
 		case 'app.bsky.feed.defs#threadViewPost':
-			return createThreadPage(data.thread);
+			return createThreadPage(uid, data.thread);
 	}
 };

@@ -84,7 +84,7 @@ const AuthenticatedFeedPage = () => {
 	});
 
 	const isSaved = createMemo(() => {
-		const prefs = preferences[uid()];
+		const prefs = getAccountPreferences(uid());
 		const saved = prefs?.savedFeeds;
 
 		return !!saved && saved.includes(feedUri());

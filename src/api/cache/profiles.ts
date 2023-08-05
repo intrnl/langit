@@ -5,6 +5,7 @@ import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/re
 import { segmentRichText } from '../richtext/segmentize.ts';
 import { UnicodeString } from '../richtext/unicode.ts';
 
+import { EQUALS_DEQUAL } from '~/utils/misc.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
 
 type Profile = RefOf<'app.bsky.actor.defs#profileView'>;
@@ -56,7 +57,7 @@ const createSignalizedProfile = (
 		followersCount: signal((isDetailed && profile.followersCount) || 0),
 		followsCount: signal((isDetailed && profile.followsCount) || 0),
 		postsCount: signal((isDetailed && profile.postsCount) || 0),
-		labels: signal(profile.labels),
+		labels: signal(profile.labels, EQUALS_DEQUAL),
 		viewer: {
 			muted: signal(profile.viewer?.muted),
 			mutedByList: signal(profile.viewer?.mutedByList),

@@ -5,6 +5,7 @@ import { segmentRichText } from '../richtext/segmentize.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
 
+import { EQUALS_DEQUAL } from '~/utils/misc.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
 
 type Post = RefOf<'app.bsky.feed.defs#postView'>;
@@ -42,11 +43,11 @@ const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPos
 		cid: signal(post.cid),
 		author: mergeSignalizedProfile(uid, post.author, key),
 		record: signal(post.record as PostRecord),
-		embed: signal(post.embed),
+		embed: signal(post.embed, EQUALS_DEQUAL),
 		replyCount: signal(post.replyCount ?? 0),
 		repostCount: signal(post.repostCount ?? 0),
 		likeCount: signal(post.likeCount ?? 0),
-		labels: signal(post.labels),
+		labels: signal(post.labels, EQUALS_DEQUAL),
 		viewer: {
 			like: signal(post.viewer?.like),
 			repost: signal(post.viewer?.repost),

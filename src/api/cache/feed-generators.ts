@@ -50,7 +50,7 @@ const createSignalizedFeedGenerator = (
 		viewer: {
 			like: signal(feed.viewer?.like),
 		},
-		$renderedDescription: createFeedDescriptionRenderer(),
+		$renderedDescription: createFeedDescriptionRenderer(uid),
 	};
 };
 

@@ -178,7 +178,7 @@ const AuthenticatedProfileLayout = () => {
 
 									<Show when={profile().description.value}>
 										<div class="whitespace-pre-wrap break-words text-sm">
-											{profile().$renderedDescription(uid())}
+											{profile().$renderedDescription()}
 										</div>
 									</Show>
 

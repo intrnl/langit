@@ -295,7 +295,7 @@ const AuthenticatedPostPage = () => {
 
 									<Show when={record().text}>
 										<div class="mt-3 whitespace-pre-wrap break-words text-base">
-											{post.$renderedContent(uid())}
+											{post.$renderedContent()}
 										</div>
 									</Show>
 

@@ -1,6 +1,6 @@
 import type { DID, Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
-import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
+import { createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
@@ -53,7 +53,7 @@ const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPos
 			repost: signal(post.viewer?.repost),
 		},
 		$deleted: signal(false),
-		$renderedContent: createPostRenderer(),
+		$renderedContent: createPostRenderer(uid),
 	};
 };
 
@@ -113,18 +113,15 @@ export const createSignalizedTimelinePost = (
 	};
 };
 
-const createPostRenderer = () => {
+const createPostRenderer = (uid: DID) => {
 	let record: PostRecord | undefined;
-	let cuid: string | undefined;
-
 	let template: HTMLElement | undefined;
 
-	return function (this: SignalizedPost, uid: string) {
+	return function (this: SignalizedPost) {
 		const curr = this.record.value as PostRecord;
 
 		if (!record || record !== curr) {
 			record = curr;
-			cuid = uid;
 
 			if (record.facets) {
 				const segments = segmentRichText({ text: record.text, facets: record.facets });
@@ -137,11 +134,6 @@ const createPostRenderer = () => {
 		}
 
 		if (template) {
-			if (cuid !== uid) {
-				alterRenderedRichTextUid(template, uid);
-				cuid = uid;
-			}
-
 			return template.cloneNode(true);
 		} else {
 			return record.text;

@@ -115,7 +115,7 @@ const FeedList = (props: FeedListProps) => {
 
 								<Show when={feed.description.value}>
 									<div class="whitespace-pre-wrap break-words text-sm">
-										{feed.$renderedDescription(uid())}
+										{feed.$renderedDescription()}
 									</div>
 								</Show>
 

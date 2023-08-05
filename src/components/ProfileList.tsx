@@ -84,7 +84,7 @@ const ProfileList = (props: ProfileListProps) => {
 
 										<Show when={profile.description.value}>
 											<div class="line-clamp-3 break-words text-sm">
-												{profile.$renderedDescription(uid())}
+												{profile.$renderedDescription()}
 											</div>
 										</Show>
 									</div>

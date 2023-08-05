@@ -89,7 +89,7 @@ const AuthenticatedListPage = () => {
 
 								<Show when={list().description.value}>
 									<div class="whitespace-pre-wrap break-words text-sm">
-										{list().$renderedDescription(uid())}
+										{list().$renderedDescription()}
 									</div>
 								</Show>
 
@@ -154,7 +154,7 @@ const AuthenticatedListPage = () => {
 									</div>
 
 									<Show when={profile.description.value}>
-										<div class="line-clamp-3 break-words text-sm">{profile.$renderedDescription(uid())}</div>
+										<div class="line-clamp-3 break-words text-sm">{profile.$renderedDescription()}</div>
 									</Show>
 								</div>
 							</div>

@@ -1,7 +1,7 @@
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { detectFacets } from '../richtext/detection.ts';
-import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
+import { createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 import { UnicodeString } from '../richtext/unicode.ts';
 
@@ -40,6 +40,7 @@ export interface SignalizedProfile {
 }
 
 const createSignalizedProfile = (
+	uid: DID,
 	profile: Profile | ProfileBasic | ProfileDetailed,
 	key?: number,
 ): SignalizedProfile => {
@@ -67,7 +68,7 @@ const createSignalizedProfile = (
 			followedBy: signal(profile.viewer?.followedBy),
 		},
 
-		$renderedDescription: createProfileDescriptionRenderer(),
+		$renderedDescription: createProfileDescriptionRenderer(uid),
 	};
 };
 
@@ -82,7 +83,7 @@ export const mergeSignalizedProfile = (
 	let val: SignalizedProfile;
 
 	if (!ref || !(val = ref.deref()!)) {
-		val = createSignalizedProfile(profile, key);
+		val = createSignalizedProfile(uid, profile, key);
 		profiles[id] = new WeakRef(val);
 	} else if (!key || val._key !== key) {
 		val._key = key;
@@ -114,13 +115,11 @@ export const mergeSignalizedProfile = (
 	return val;
 };
 
-const createProfileDescriptionRenderer = () => {
+const createProfileDescriptionRenderer = (uid: DID) => {
 	let description: string;
-	let cuid: string;
-
 	let template: HTMLElement | undefined;
 
-	return function (this: SignalizedProfile, uid: string) {
+	return function (this: SignalizedProfile) {
 		const curr = this.description.value;
 
 		if (curr === undefined) {
@@ -130,7 +129,6 @@ const createProfileDescriptionRenderer = () => {
 			const facets = detectFacets(text);
 
 			description = curr;
-			cuid = uid;
 
 			if (facets) {
 				const segments = segmentRichText({ text: curr, facets: facets });
@@ -143,11 +141,6 @@ const createProfileDescriptionRenderer = () => {
 		}
 
 		if (template) {
-			if (cuid !== uid) {
-				alterRenderedRichTextUid(template, uid);
-				cuid = uid;
-			}
-
 			return template.cloneNode(true);
 		} else {
 			return description;

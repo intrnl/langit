@@ -41,7 +41,7 @@ const ListItem = (props: ListItemProps) => {
 				<p class="text-sm text-muted-fg">Mute list by @{list().creator.handle.value}</p>
 
 				<Show when={list().description.value}>
-					<div class="mt-1 whitespace-pre-wrap break-words text-sm">{list().$renderedDescription(uid())}</div>
+					<div class="mt-1 whitespace-pre-wrap break-words text-sm">{list().$renderedDescription()}</div>
 				</Show>
 			</div>
 		</A>

@@ -1,6 +1,6 @@
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
-import { alterRenderedRichTextUid, createRenderedRichText } from '../richtext/renderer.ts';
+import { createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
@@ -87,21 +87,19 @@ export const mergeSignalizedFeedGenerator = (
 	return val;
 };
 
-const createFeedDescriptionRenderer = () => {
+const createFeedDescriptionRenderer = (uid: DID) => {
 	let _description: string;
 	let _facets: Facet[] | undefined;
-	let _uid: string;
 
 	let template: HTMLElement | undefined;
 
-	return function (this: SignalizedFeedGenerator, uid: string) {
+	return function (this: SignalizedFeedGenerator) {
 		const description = this.description.value;
 		const facets = this.descriptionFacets.value;
 
 		if (_description !== description || _facets !== facets) {
 			_description = description || '';
 			_facets = facets;
-			_uid = uid;
 
 			if (_facets) {
 				const segments = segmentRichText({ text: _description, facets: _facets });
@@ -114,11 +112,6 @@ const createFeedDescriptionRenderer = () => {
 		}
 
 		if (template) {
-			if (_uid !== uid) {
-				_uid = uid;
-				alterRenderedRichTextUid(template, _uid);
-			}
-
 			return template.cloneNode(true);
 		} else {
 			return _description;

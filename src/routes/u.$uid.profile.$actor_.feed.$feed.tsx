@@ -174,7 +174,7 @@ const AuthenticatedFeedPage = () => {
 
 								<Show when={info().description.value}>
 									<div class="whitespace-pre-wrap break-words text-sm">
-										{info().$renderedDescription(uid())}
+										{info().$renderedDescription()}
 									</div>
 								</Show>
 

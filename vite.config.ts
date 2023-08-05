@@ -17,6 +17,22 @@ export default defineConfig({
 				globPatterns: ['**/*.{js,css,html,svg}'],
 				cleanupOutdatedCaches: true,
 			},
+			manifest: {
+				name: 'Langit',
+				description: 'Alternative client for Bluesky social media',
+				display: 'standalone',
+				id: '/?source=pwa',
+				start_url: '/?source=pwa',
+				background_color: '#000000',
+				scope: '/',
+				icons: [
+					{
+						src: 'favicon.svg',
+						type: 'image/svg+xml',
+						sizes: '150x150',
+					},
+				],
+			},
 		}),
 
 		router({

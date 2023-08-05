@@ -29,7 +29,6 @@
 		"@tiptap/pm": "^2.0.4",
 		"@tiptap/suggestion": "^2.0.4",
 		"class-variance-authority": "^0.7.0",
-		"dequal": "^2.0.3",
 		"immer": "^10.0.2",
 		"solid-js": "^1.7.9",
 		"solid-tiptap": "^0.6.0"

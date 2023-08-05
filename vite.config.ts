@@ -23,7 +23,7 @@ export default defineConfig({
 				display: 'standalone',
 				id: '/?source=pwa',
 				start_url: '/?source=pwa',
-				background_color: '#000000',
+				background_color: '#101010',
 				scope: '/',
 				icons: [
 					{

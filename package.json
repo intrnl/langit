@@ -13,7 +13,7 @@
 		"@intrnl/bluesky-client": "^0.1.4",
 		"@intrnl/sq": "^0.2.0",
 		"@intrnl/use-gesture-solid": "^0.1.0",
-		"@solid-primitives/deep": "^0.2.2",
+		"@solid-primitives/deep": "^0.2.3",
 		"@solidjs/meta": "^0.28.6",
 		"@solidjs/router": "file:vendor/solidjs-router-0.8.2",
 		"@thisbeyond/solid-dnd": "^0.7.4",
@@ -34,7 +34,7 @@
 		"solid-tiptap": "^0.6.0"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20230801.0",
+		"@cloudflare/workers-types": "^4.20230807.0",
 		"@tailwindcss/forms": "^0.5.4",
 		"@types/node": "^20.4.8",
 		"autoprefixer": "^10.4.14",
@@ -45,7 +45,7 @@
 		"tailwindcss": "^3.3.3",
 		"terser": "^5.19.2",
 		"typescript": "^5.1.6",
-		"vite": "^4.4.8",
+		"vite": "^4.4.9",
 		"vite-plugin-pwa": "^0.16.4",
 		"vite-plugin-solid": "^2.7.0"
 	}

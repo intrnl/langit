@@ -31,11 +31,18 @@ interface ReportOption {
 
 const options: ReportOption[] = [
 	{
-		label: REPORT_POST | REPORT_PROFILE,
-		value: 'com.atproto.moderation.defs#reasonSpam',
-		name: 'Spam',
-		desc: 'Excessive mentions or replies',
+		label: REPORT_PROFILE,
+		value: 'com.atproto.moderation.defs#reasonMisleading',
+		name: 'Misleading profile',
+		desc: 'False claims about identity or affiliation',
 	},
+	{
+		label: REPORT_PROFILE,
+		value: 'com.atproto.moderation.defs#reasonViolation',
+		name: 'Community standards violation',
+		desc: 'Profile uses terms that violate community standards',
+	},
+
 	{
 		label: REPORT_POST,
 		value: 'com.atproto.moderation.defs#reasonSexual',
@@ -60,11 +67,12 @@ const options: ReportOption[] = [
 		name: 'Other issues',
 		desc: 'Issues not covered by the options above',
 	},
+
 	{
-		label: REPORT_PROFILE,
-		value: 'com.atproto.moderation.defs#reasonMisleading',
-		name: 'Misleading profile',
-		desc: 'False claims about identity or affiliation',
+		label: REPORT_POST | REPORT_PROFILE,
+		value: 'com.atproto.moderation.defs#reasonSpam',
+		name: 'Spam',
+		desc: 'Excessive mentions or replies',
 	},
 ];
 

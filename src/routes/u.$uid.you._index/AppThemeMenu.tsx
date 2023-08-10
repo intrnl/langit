@@ -9,7 +9,8 @@ import CheckIcon from '~/icons/baseline-check.tsx';
 
 const AppThemeMenu = () => {
 	const prefs = createMemo(() => {
-		return (preferences.local ||= {});
+		preferences.local ||= {};
+		return preferences.local;
 	});
 
 	const theme = createMemo(() => {

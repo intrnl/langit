@@ -92,10 +92,10 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 			const date = Date.now() + parsedDuration;
 
 			batch(() => {
-				const accountPref = getAccountPreferences(uid());
-				const tempMutes = (accountPref.pf_tempMutes ||= {});
+				const $prefs = getAccountPreferences(uid());
 
-				tempMutes[$did] = date;
+				$prefs.pf_tempMutes ||= {};
+				$prefs.pf_tempMutes[$did] = date;
 			});
 		}
 

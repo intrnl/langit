@@ -48,7 +48,8 @@ export class Multiagent {
 	#agents: Record<DID, Promise<Agent>> = {};
 
 	constructor(name: string) {
-		this.store = createReactiveLocalStorage(name);
+		const $store = (this.store = createReactiveLocalStorage(name));
+		$store.accounts ||= {};
 	}
 
 	/**
@@ -82,7 +83,7 @@ export class Multiagent {
 
 			batch(() => {
 				const $store = this.store;
-				const $accounts = ($store.accounts ||= {});
+				const $accounts = $store.accounts!;
 
 				$store.active = did;
 				$accounts[did] = {
@@ -122,7 +123,7 @@ export class Multiagent {
 			this.active = nextActiveId;
 		}
 
-		const $accounts = (this.store.accounts ||= {});
+		const $accounts = this.store.accounts!;
 
 		delete $accounts[did];
 		delete this.#agents[did];
@@ -159,7 +160,7 @@ export class Multiagent {
 	}
 
 	#createAgent(serviceUri: string) {
-		const $accounts = (this.store.accounts ||= {});
+		const $accounts = this.store.accounts!;
 
 		const agent = new Agent({
 			serviceUri: serviceUri,

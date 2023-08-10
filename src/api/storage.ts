@@ -1,8 +1,6 @@
 import { createEffect, createRoot } from 'solid-js';
 import { type StoreNode, createMutable } from 'solid-js/store';
 
-import { trackStore } from '@solid-primitives/deep';
-
 export const createReactiveLocalStorage = <T extends StoreNode>(name: string, initialValue?: T) => {
 	try {
 		const persisted = JSON.parse('' + localStorage.getItem(name));
@@ -16,10 +14,10 @@ export const createReactiveLocalStorage = <T extends StoreNode>(name: string, in
 
 	createRoot(() => {
 		createEffect((changed: boolean) => {
-			trackStore(mutable);
+			const json = JSON.stringify(mutable);
 
 			if (changed) {
-				localStorage.setItem(name, JSON.stringify(mutable));
+				localStorage.setItem(name, json);
 			}
 
 			return true;

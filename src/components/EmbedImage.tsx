@@ -41,6 +41,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 					class="h-full w-full object-cover"
 					classList={{
 						'cursor-pointer': interactive,
+						'scale-110': blur(),
 						blur: blur() && !borderless,
 						'blur-lg': blur() && borderless,
 					}}

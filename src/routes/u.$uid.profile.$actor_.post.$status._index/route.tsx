@@ -10,7 +10,6 @@ import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
-import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { A, useParams } from '~/router.ts';
@@ -125,12 +124,6 @@ const AuthenticatedPostPage = () => {
 
 									return (
 										<Switch>
-											<Match when={viewer()?.blockedBy}>
-												<div class="p-3">
-													<EmbedRecordNotFound />
-												</div>
-											</Match>
-
 											<Match when={viewer()?.blocking}>
 												<div class="p-4">
 													<div class="mb-4 text-sm">
@@ -149,8 +142,8 @@ const AuthenticatedPostPage = () => {
 											</Match>
 
 											<Match when>
-												<div class="mb-4 text-sm">
-													<p>You are blocked from viewing this post</p>
+												<div class="p-3">
+													<EmbedRecordNotFound />
 												</div>
 											</Match>
 										</Switch>
@@ -210,6 +203,8 @@ const AuthenticatedPostPage = () => {
 																		record={{
 																			$type: 'app.bsky.embed.record#viewBlocked',
 																			uri: item.uri,
+																			blocked: item.blocked,
+																			author: item.author,
 																		}}
 																	/>
 																) : null}
@@ -382,6 +377,8 @@ const AuthenticatedPostPage = () => {
 																		record={{
 																			$type: 'app.bsky.embed.record#viewBlocked',
 																			uri: item.uri,
+																			blocked: item.blocked,
+																			author: item.author,
 																		}}
 																	/>
 																) : null}

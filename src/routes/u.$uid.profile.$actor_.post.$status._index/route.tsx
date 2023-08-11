@@ -1,13 +1,15 @@
-import { For, Match, Show, Switch } from 'solid-js';
+import { type Accessor, For, Match, Show, Switch, createSignal } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
 
+import type { ModerationDecision } from '~/api/moderation/internal/action.ts';
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
+import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
@@ -41,11 +43,13 @@ const seen = new Set<string>();
 const MAX_ANCESTORS = 10;
 const MAX_DESCENDANTS = 4;
 
+type PageSearchParams = { tl?: 'y' };
+
 const AuthenticatedPostPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/post/:status');
 	const location = useLocation();
 
-	const [searchParams, setSearchParams] = useSearchParams<{ tl?: 'y' }>();
+	const [searchParams, setSearchParams] = useSearchParams<PageSearchParams>();
 
 	const uid = () => params.uid as DID;
 	const actor = () => params.actor;
@@ -264,23 +268,7 @@ const AuthenticatedPostPage = () => {
 										</div>
 									</div>
 
-									<Show when={post.$deleted.value}>
-										<div class="mt-3 text-sm text-muted-fg">This post has been deleted.</div>
-									</Show>
-
-									<Show when={record().text}>
-										<div class="mt-3 whitespace-pre-wrap break-words text-base">
-											{post.$renderedContent()}
-										</div>
-									</Show>
-
-									<Show when={searchParams.tl === 'y'}>
-										<PostTranslation text={record().text} />
-									</Show>
-
-									<Show when={post.embed.value}>
-										{(embed) => <Embed uid={uid()} embed={embed()} large />}
-									</Show>
+									<PostContent uid={uid} post={post} searchParams={searchParams} />
 
 									<div class="my-3">
 										<span class="text-sm text-muted-fg">
@@ -442,3 +430,89 @@ const AuthenticatedPostPage = () => {
 };
 
 export default AuthenticatedPostPage;
+
+// <PostContent />
+interface PostContentProps {
+	uid: Accessor<DID>;
+	post: SignalizedPost;
+	searchParams: PageSearchParams;
+	force?: boolean;
+}
+
+const PostContent = ({ uid, post, searchParams, force }: PostContentProps) => {
+	const mod = post.$mod();
+
+	if (!force && mod?.b) {
+		const [show, setShow] = createSignal(false);
+
+		return (
+			<>
+				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
+					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.l.val}</p>
+
+					<button
+						onClick={() => setShow(!show())}
+						class="px-4 text-sm font-medium hover:bg-secondary hover:text-hinted-fg"
+					>
+						{show() ? 'Hide' : 'Show'}
+					</button>
+				</div>
+
+				<Show when={show()}>
+					<PostContent uid={uid} post={post} searchParams={searchParams} force />
+				</Show>
+			</>
+		);
+	}
+
+	return (
+		<>
+			<Show when={post.$deleted.value}>
+				<div class="mt-3 text-sm text-muted-fg">This post has been deleted.</div>
+			</Show>
+
+			<div class="mt-3 whitespace-pre-wrap break-words text-base empty:hidden">{post.$renderedContent()}</div>
+
+			<Show when={searchParams.tl === 'y'}>
+				<PostTranslation text={post.record.value.text} />
+			</Show>
+
+			<Show when={post.embed.value}>{(embed) => <PostEmbedContent uid={uid} embed={embed} mod={mod} />}</Show>
+		</>
+	);
+};
+
+// <PostEmbedContent />
+interface PostEmbedContentProps {
+	uid: Accessor<DID>;
+	mod?: ModerationDecision;
+	embed: Accessor<NonNullable<RefOf<'app.bsky.feed.defs#postView'>['embed']>>;
+	force?: boolean;
+}
+
+const PostEmbedContent = ({ uid, mod, embed, force }: PostEmbedContentProps) => {
+	if (!force && mod?.m) {
+		const [show, setShow] = createSignal(false);
+
+		return (
+			<>
+				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
+					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.l.val}</p>
+
+					<button
+						onClick={() => setShow(!show())}
+						class="px-4 text-sm font-medium hover:bg-secondary hover:text-hinted-fg"
+					>
+						{show() ? 'Hide' : 'Show'}
+					</button>
+				</div>
+
+				<Show when={show()}>
+					<PostEmbedContent uid={uid} embed={embed} force />
+				</Show>
+			</>
+		);
+	}
+
+	return <Embed uid={uid()} embed={embed()} large />;
+};

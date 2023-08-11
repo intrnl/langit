@@ -497,7 +497,7 @@ const PostEmbedContent = ({ uid, mod, embed, force }: PostEmbedContentProps) => 
 		return (
 			<>
 				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
-					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.l.val}</p>
+					<p class="m-3 text-sm text-muted-fg">Media warning: {mod.l.val}</p>
 
 					<button
 						onClick={() => setShow(!show())}

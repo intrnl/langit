@@ -10,10 +10,14 @@ type Thread = RefOf<'app.bsky.feed.defs#threadViewPost'>;
 type BlockedPost = UnionOf<'app.bsky.feed.defs#blockedPost'>;
 type NotFoundPost = UnionOf<'app.bsky.feed.defs#notFoundPost'>;
 
+const TypePost = 'app.bsky.feed.defs#threadViewPost';
+const TypeBlocked = 'app.bsky.feed.defs#blockedPost';
+const TypeNotFound = 'app.bsky.feed.defs#notFoundPost';
+
 const TypeSortOrder = {
-	'app.bsky.feed.defs#notFoundPost': 0,
-	'app.bsky.feed.defs#blockedPost': 1,
-	'app.bsky.feed.defs#threadViewPost': 2,
+	[TypeNotFound]: 0,
+	[TypeBlocked]: 1,
+	[TypePost]: 2,
 };
 
 const calculatePostScore = (post: Post, parent: Post) => {
@@ -53,7 +57,7 @@ export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 	stack.push({ thread: data, slice: undefined });
 
 	while (parent) {
-		if (parent.$type !== 'app.bsky.feed.defs#threadViewPost') {
+		if (parent.$type !== TypePost) {
 			ancestors.push(parent);
 			break;
 		}
@@ -77,7 +81,7 @@ export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 			const aType = a.$type;
 			const bType = b.$type;
 
-			if (aType === 'app.bsky.feed.defs#threadViewPost' && bType === 'app.bsky.feed.defs#threadViewPost') {
+			if (aType === TypePost && bType === TypePost) {
 				const aPost = a.post;
 				const bPost = b.post;
 
@@ -94,25 +98,27 @@ export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 			// we're in the root thread
 			for (let idx = 0, len = replies.length; idx < len; idx++) {
 				const reply = replies[idx];
+				const type = reply.$type;
 
-				if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
+				if (type === TypePost) {
 					const next: ThreadSlice = { items: [mergeSignalizedPost(uid, reply.post, key)] };
 
 					stack.push({ thread: reply, slice: next });
 					descendants.push(next);
-				} else {
+				} else if (type !== TypeBlocked || reply.author.viewer?.blocking) {
 					descendants.push({ items: [reply] });
 				}
 			}
 		} else if (replies.length > 0) {
 			const reply = replies[0];
+			const type = reply.$type;
 
-			if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
+			if (type === TypePost) {
 				const post = mergeSignalizedPost(uid, reply.post, key);
 
 				slice.items.push(post);
 				stack.push({ thread: reply, slice: slice });
-			} else {
+			} else if (type !== TypeBlocked || reply.author.viewer?.blocking) {
 				slice.items.push(reply);
 			}
 		}

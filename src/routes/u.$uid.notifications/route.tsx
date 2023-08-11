@@ -4,8 +4,9 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 
-import { getCollectionCursor } from '~/api/utils.ts';
+import { type Collection, getCollectionCursor } from '~/api/utils.ts';
 
+import type { NotificationsPage } from '~/api/models/notifications.ts';
 import { updateNotificationsSeen } from '~/api/mutations/update-notifications-seen.ts';
 import {
 	getNotifications,
@@ -65,11 +66,11 @@ const AuthenticatedNotificationsPage = () => {
 		onSuccess: () => refetch(true),
 	});
 
-	createEffect(() => {
-		const $notifications = notifications();
+	createEffect((prev: Collection<NotificationsPage> | undefined | 0) => {
+		const next = notifications();
 
-		if ($notifications) {
-			const pages = $notifications.pages;
+		if (prev === undefined && next) {
+			const pages = next.pages;
 
 			if (pages.length === 1) {
 				const page = pages[0];
@@ -78,7 +79,9 @@ const AuthenticatedNotificationsPage = () => {
 				mutate({ cid: page.cid, read: slice?.read ?? true });
 			}
 		}
-	});
+
+		return next;
+	}, 0 as const);
 
 	const getNotificationsCid = () => {
 		return notifications()?.pages[0].cid;

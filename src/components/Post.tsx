@@ -218,7 +218,7 @@ const Post = (props: PostProps) => {
 
 					<Show when={interactive()}>
 						<div class="mt-3 flex text-muted-fg">
-							<div class="flex grow items-end gap-0.5">
+							<div class="flex grow basis-0 items-end gap-0.5">
 								<UntypedAnchor
 									href={`/u/${uid()}/compose?reply=${encodeURIComponent(post().uri)}`}
 									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
@@ -229,7 +229,7 @@ const Post = (props: PostProps) => {
 							</div>
 
 							<div
-								class="flex grow items-end gap-0.5"
+								class="flex grow basis-0 items-end gap-0.5"
 								classList={{ 'text-green-600': !!post().viewer.repost.value }}
 							>
 								<button
@@ -248,7 +248,7 @@ const Post = (props: PostProps) => {
 							</div>
 
 							<div
-								class="group flex grow items-end gap-0.5"
+								class="group flex grow basis-0 items-end gap-0.5"
 								classList={{ 'is-active text-red-600': !!post().viewer.like.value }}
 							>
 								<button

@@ -66,6 +66,8 @@ const AuthenticatedNotificationsPage = () => {
 		onSuccess: () => refetch(true),
 	});
 
+	// We set the initial value of the effect to 0, this is so we can tell that
+	// we just mounted this effect.
 	createEffect((prev: Collection<NotificationsPage> | undefined | 0) => {
 		const next = notifications();
 

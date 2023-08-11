@@ -1,4 +1,4 @@
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
@@ -8,7 +8,7 @@ import { type ThreadPage, createThreadPage } from '../models/thread.ts';
 import _getDid from './_did.ts';
 
 export class BlockedThreadError extends Error {
-	constructor(public uri: string) {
+	constructor(public view: RefOf<'app.bsky.feed.defs#blockedPost'>) {
 		super();
 		this.name = 'BlockedThreadError';
 	}
@@ -35,7 +35,7 @@ export const getPostThread: QueryFn<ThreadPage, ReturnType<typeof getPostThreadK
 
 	switch (data.thread.$type) {
 		case 'app.bsky.feed.defs#blockedPost':
-			throw new BlockedThreadError(data.thread.uri);
+			throw new BlockedThreadError(data.thread);
 		case 'app.bsky.feed.defs#notFoundPost':
 			throw new Error(`Post not found`);
 		case 'app.bsky.feed.defs#threadViewPost':

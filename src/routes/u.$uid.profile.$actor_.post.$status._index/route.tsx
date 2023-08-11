@@ -121,59 +121,39 @@ const AuthenticatedPostPage = () => {
 
 							<Match when={error instanceof BlockedThreadError && error}>
 								{(err) => {
-									const [profile] = createQuery({
-										key: () => getProfileKey(uid(), getRepoId(err().uri)),
-										fetch: getProfile,
-										staleTime: Infinity,
-									});
+									const viewer = () => err().view.author.viewer;
 
 									return (
-										<div class="p-4">
-											<Switch>
-												<Match when={profile()} keyed>
-													{(profile) => {
-														return (
-															<Switch>
-																<Match when={profile.viewer.blockedBy.value}>
-																	<div class="mb-4 text-sm">
-																		<p>You are blocked from viewing this post</p>
-																	</div>
-																</Match>
+										<Switch>
+											<Match when={viewer()?.blockedBy}>
+												<div class="p-3">
+													<EmbedRecordNotFound />
+												</div>
+											</Match>
 
-																<Match when={profile.viewer.blocking.value}>
-																	<div class="mb-4 text-sm">
-																		<p class="font-bold">This post is from a user you blocked</p>
-																		<p class="text-muted-fg">
-																			You need to unblock the user to view the post.
-																		</p>
-																	</div>
-																</Match>
-															</Switch>
-														);
-													}}
-												</Match>
-
-												<Match when={profile.error}>
+											<Match when={viewer()?.blocking}>
+												<div class="p-4">
 													<div class="mb-4 text-sm">
-														<p>Something went wrong while retrieving profile status</p>
+														<p class="font-bold">This post is from a user you blocked</p>
+														<p class="text-muted-fg">You need to unblock the user to view the post.</p>
 													</div>
-												</Match>
 
-												<Match when>
-													<div class="mb-4 flex justify-center">
-														<CircularProgress />
-													</div>
-												</Match>
-											</Switch>
+													<A
+														href="/u/:uid/profile/:actor"
+														params={{ uid: uid(), actor: actor() }}
+														class={/* @once */ button({ color: 'primary' })}
+													>
+														View profile
+													</A>
+												</div>
+											</Match>
 
-											<A
-												href="/u/:uid/profile/:actor"
-												params={{ uid: uid(), actor: actor() }}
-												class={/* @once */ button({ color: 'primary' })}
-											>
-												View profile
-											</A>
-										</div>
+											<Match when>
+												<div class="mb-4 text-sm">
+													<p>You are blocked from viewing this post</p>
+												</div>
+											</Match>
+										</Switch>
 									);
 								}}
 							</Match>

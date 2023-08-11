@@ -8,148 +8,158 @@ import {
 } from './enums.ts';
 import type { LabelDefinitionMap } from './types.ts';
 
+const LabelSystem = 'system';
+const LabelLegal = 'legal';
+const LabelSexual = 'sexual';
+const LabelViolence = 'violence';
+const LabelIntolerance = 'intolerance';
+const LabelRude = 'rude';
+const LabelCuration = 'curation';
+const LabelSpam = 'spam';
+const LabelMisinfo = 'misinfo';
+
 export const LABELS: LabelDefinitionMap = {
 	'!hide': {
-		group: 'system',
-		enforce: PreferenceHide,
-		flags: FlagNoOverride,
-		action: ActionBlur,
+		g: LabelSystem,
+		e: PreferenceHide,
+		f: FlagNoOverride,
+		a: ActionBlur,
 	},
 	'!no-promote': {
-		group: 'system',
-		enforce: PreferenceHide,
-		flags: 0,
-		action: 0,
+		g: LabelSystem,
+		e: PreferenceHide,
+		f: 0,
+		a: 0,
 	},
 	'!warn': {
-		group: 'system',
-		enforce: PreferenceWarn,
-		flags: 0,
-		action: ActionBlur,
+		g: LabelSystem,
+		e: PreferenceWarn,
+		f: 0,
+		a: ActionBlur,
 	},
 
 	'dmca-violation': {
-		group: 'legal',
-		enforce: PreferenceHide,
-		flags: FlagNoOverride,
-		action: ActionBlur,
+		g: LabelLegal,
+		e: PreferenceHide,
+		f: FlagNoOverride,
+		a: ActionBlur,
 	},
 	doxxing: {
-		group: 'legal',
-		enforce: PreferenceHide,
-		flags: FlagNoOverride,
-		action: ActionBlur,
+		g: LabelLegal,
+		e: PreferenceHide,
+		f: FlagNoOverride,
+		a: ActionBlur,
 	},
 
 	porn: {
-		group: 'sexual',
-		flags: 0,
-		action: ActionBlurMedia,
+		g: LabelSexual,
+		f: 0,
+		a: ActionBlurMedia,
 	},
 	sexual: {
-		group: 'sexual',
-		flags: 0,
-		action: ActionBlurMedia,
+		g: LabelSexual,
+		f: 0,
+		a: ActionBlurMedia,
 	},
 	nudity: {
-		group: 'sexual',
-		flags: 0,
-		action: ActionBlurMedia,
+		g: LabelSexual,
+		f: 0,
+		a: ActionBlurMedia,
 	},
 
 	nsfl: {
-		group: 'violence',
-		flags: 0,
-		action: ActionBlurMedia,
+		g: LabelViolence,
+		f: 0,
+		a: ActionBlurMedia,
 	},
 	corpse: {
-		group: 'violence',
-		flags: 0,
-		action: ActionBlurMedia,
+		g: LabelViolence,
+		f: 0,
+		a: ActionBlurMedia,
 	},
 	gore: {
-		group: 'violence',
-		flags: 0,
-		action: ActionBlurMedia,
+		g: LabelViolence,
+		f: 0,
+		a: ActionBlurMedia,
 	},
 	torture: {
-		group: 'violence',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelViolence,
+		f: 0,
+		a: ActionBlur,
 	},
 	'self-harm': {
-		group: 'violence',
-		flags: 0,
-		action: ActionBlurMedia,
+		g: LabelViolence,
+		f: 0,
+		a: ActionBlurMedia,
 	},
 
 	intolerant: {
-		group: 'intolerance',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelIntolerance,
+		f: 0,
+		a: ActionBlur,
 	},
 	'intolerant-race': {
-		group: 'intolerance',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelIntolerance,
+		f: 0,
+		a: ActionBlur,
 	},
 	'intolerant-gender': {
-		group: 'intolerance',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelIntolerance,
+		f: 0,
+		a: ActionBlur,
 	},
 	'intolerant-sexual-orientation': {
-		group: 'intolerance',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelIntolerance,
+		f: 0,
+		a: ActionBlur,
 	},
 	'intolerant-religion': {
-		group: 'intolerance',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelIntolerance,
+		f: 0,
+		a: ActionBlur,
 	},
 	'icon-intolerant': {
-		group: 'intolerance',
-		flags: 0,
-		action: ActionBlurMedia,
+		g: LabelIntolerance,
+		f: 0,
+		a: ActionBlurMedia,
 	},
 
 	threat: {
-		group: 'rude',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelRude,
+		f: 0,
+		a: ActionBlur,
 	},
 
 	spoiler: {
-		group: 'curation',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelCuration,
+		f: 0,
+		a: ActionBlur,
 	},
 
 	spam: {
-		group: 'spam',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelSpam,
+		f: 0,
+		a: ActionBlur,
 	},
 
 	'account-security': {
-		group: 'misinfo',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelMisinfo,
+		f: 0,
+		a: ActionBlur,
 	},
 	'net-abuse': {
-		group: 'misinfo',
-		flags: 0,
-		action: ActionBlur,
+		g: LabelMisinfo,
+		f: 0,
+		a: ActionBlur,
 	},
 	impersonation: {
-		group: 'misinfo',
-		flags: 0,
-		action: ActionAlert,
+		g: LabelMisinfo,
+		f: 0,
+		a: ActionAlert,
 	},
 	scam: {
-		group: 'misinfo',
-		flags: 0,
-		action: ActionAlert,
+		g: LabelMisinfo,
+		f: 0,
+		a: ActionAlert,
 	},
 };

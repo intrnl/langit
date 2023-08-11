@@ -52,13 +52,13 @@ interface PostEmbedContentProps {
 }
 
 const PostEmbedContent = ({ uid, mod, embed, force }: PostEmbedContentProps) => {
-	if (!force && mod?.blurMedia) {
+	if (!force && mod?.m) {
 		const [show, setShow] = createSignal(false);
 
 		return (
 			<>
 				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
-					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.label.val}</p>
+					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.l.val}</p>
 
 					<button
 						onClick={() => setShow(!show())}
@@ -81,13 +81,13 @@ const PostEmbedContent = ({ uid, mod, embed, force }: PostEmbedContentProps) => 
 const PostContent = ({ uid, post, force }: PostContentProps) => {
 	const mod = post().$mod();
 
-	if (!force && mod?.blur) {
+	if (!force && mod?.b) {
 		const [show, setShow] = createSignal(false);
 
 		return (
 			<>
 				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
-					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.label.val}</p>
+					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.l.val}</p>
 
 					<button
 						onClick={() => setShow(!show())}

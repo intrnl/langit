@@ -4,13 +4,13 @@ export type Label = RefOf<'com.atproto.label.defs#label'>;
 
 export interface LabelDefinition {
 	/** The group ID that the label falls under */
-	group: string;
+	g: string;
 	/** Enforce a specific preference value, means that the user can't configure what to do with this label */
-	enforce?: number;
+	e?: number;
 	/** Additional flags for this label */
-	flags: number;
+	f: number;
 	/** Actions to take for this label */
-	action: number;
+	a: number;
 }
 
 export type LabelDefinitionMap = Record<string, LabelDefinition>;

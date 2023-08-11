@@ -13,24 +13,36 @@ import type { Label, LabelDefinition, ModerationOpts } from '../types.ts';
 import { LABELS } from '../labels.ts';
 
 export interface ModerationCause {
-	labeler: string;
-	label: Label;
-	labelDef: LabelDefinition;
-	setting: number;
-	priority: number;
+	/** Labeler DID */
+	s: string;
+	/** Label data */
+	l: Label;
+	/** Label definition */
+	d: LabelDefinition;
+	/** User's set preference for this cause */
+	v: number;
+	/** Priority of the cause */
+	p: number;
 }
 
 export interface ModerationDecision {
-	// causes: ModerationCause[];
+	// c: ModerationCause[];
 
-	labeler: string;
-	label: Label;
-	labelDef: LabelDefinition;
+	/** Labeler DID */
+	s: string;
+	/** Label data */
+	l: Label;
+	/** Label definition */
+	d: LabelDefinition;
 
-	filter: boolean;
-	alert: boolean;
-	blur: boolean;
-	blurMedia: boolean;
+	/** Whether content should be filtered out */
+	f: boolean;
+	/** Whether content should be shown an alert */
+	a: boolean;
+	/** Whether content should be blurred (shown a warning), this applies to the whole content */
+	b: boolean;
+	/** Whether content should be blurred (shown a warning), this applies only to images/videos */
+	m: boolean;
 }
 
 export const createModerationDecision = (
@@ -51,12 +63,12 @@ export const createModerationDecision = (
 			continue;
 		}
 
-		const groupId = labelDef.group;
+		const groupId = labelDef.g;
 
 		const labeler = label.src;
 		const isSelfLabeled = labeler === userDid;
 
-		let labelPref: number | undefined = labelDef.enforce;
+		let labelPref: number | undefined = labelDef.e;
 
 		if (labelPref === undefined) {
 			if (isSelfLabeled) {
@@ -101,44 +113,44 @@ export const createModerationDecision = (
 
 		// establish the priority of the label
 		let priority: 1 | 2 | 3 | 4 | 5;
-		if (labelDef.flags & FlagNoOverride) {
+		if (labelDef.f & FlagNoOverride) {
 			priority = 1;
 		} else if (labelPref === PreferenceHide) {
 			priority = 2;
-		} else if (labelDef.action === ActionBlur) {
+		} else if (labelDef.a === ActionBlur) {
 			priority = 3;
-		} else if (labelDef.action === ActionBlurMedia) {
+		} else if (labelDef.a === ActionBlurMedia) {
 			priority = 4;
 		} else {
 			priority = 5;
 		}
 
 		causes.push({
-			labeler: labeler,
-			label: label,
-			labelDef: labelDef,
-			setting: labelPref,
-			priority: priority,
+			s: labeler,
+			l: label,
+			d: labelDef,
+			v: labelPref,
+			p: priority,
 		});
 	}
 
 	if (causes.length > 0) {
-		const cause = causes.sort((a, b) => a.priority - b.priority)[0];
+		const cause = causes.sort((a, b) => a.p - b.p)[0];
 
-		const labelDef = cause.labelDef;
-		const action = labelDef.action;
+		const labelDef = cause.d;
+		const action = labelDef.a;
 
 		return {
-			// causes: causes,
+			// c: causes,
 
-			labeler: cause.labeler,
-			label: cause.label,
-			labelDef: labelDef,
+			s: cause.s,
+			l: cause.l,
+			d: labelDef,
 
-			filter: cause.setting === PreferenceHide,
-			alert: action === ActionAlert,
-			blur: action === ActionBlur,
-			blurMedia: action === ActionBlurMedia,
+			f: cause.v === PreferenceHide,
+			a: action === ActionAlert,
+			b: action === ActionBlur,
+			m: action === ActionBlurMedia,
 		};
 	}
 };

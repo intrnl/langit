@@ -8,6 +8,7 @@ import { createQuery } from '@intrnl/sq';
 import {
 	type FollowNotificationSlice,
 	type LikeNotificationSlice,
+	type MentionNotificationSlice,
 	type NotificationSlice,
 	type QuoteNotificationSlice,
 	type ReplyNotificationSlice,
@@ -50,11 +51,18 @@ const Notification = (props: NotificationProps) => {
 	const uid = () => props.uid;
 	const _data = () => props.data;
 
+	const isReply = () => {
+		const $data = _data();
+		const type = $data.type;
+
+		return type === 'reply' || type === 'quote' || type === 'mention'
+	}
+
 	return (
 		<Switch>
-			<Match when={_data().type === 'reply' || _data().type === 'quote'}>
+			<Match when={isReply()}>
 				{(_value) => {
-					const data = _data as any as Accessor<ReplyNotificationSlice | QuoteNotificationSlice>;
+					const data = _data as any as Accessor<ReplyNotificationSlice | QuoteNotificationSlice | MentionNotificationSlice>;
 
 					const replyObj = () => data().item;
 					const replyUri = () => replyObj().uri;

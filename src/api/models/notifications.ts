@@ -12,6 +12,7 @@ type RepostRecord = Records['app.bsky.feed.repost'];
 
 export type FollowNotification = Notification & { reason: 'follow'; record: FollowRecord };
 export type LikeNotification = Notification & { reason: 'like'; record: LikeRecord };
+export type MentionNotification = Notification & { reason: 'mention'; record: PostRecord }
 export type QuoteNotification = Notification & { reason: 'quote'; record: PostRecord };
 export type ReplyNotification = Notification & { reason: 'reply'; record: PostRecord };
 export type RepostNotification = Notification & { reason: 'repost'; record: RepostRecord };
@@ -31,11 +32,11 @@ export interface LikeNotificationSlice {
 	items: LikeNotification[];
 }
 
-export interface ReplyNotificationSlice {
-	type: 'reply';
+export interface MentionNotificationSlice {
+	type: 'mention';
 	read: boolean;
 	date: number;
-	item: ReplyNotification;
+	item: MentionNotification;
 }
 
 export interface QuoteNotificationSlice {
@@ -43,6 +44,13 @@ export interface QuoteNotificationSlice {
 	read: boolean;
 	date: number;
 	item: QuoteNotification;
+}
+
+export interface ReplyNotificationSlice {
+	type: 'reply';
+	read: boolean;
+	date: number;
+	item: ReplyNotification;
 }
 
 export interface RepostNotificationSlice {
@@ -56,6 +64,7 @@ export interface RepostNotificationSlice {
 export type NotificationSlice =
 	| FollowNotificationSlice
 	| LikeNotificationSlice
+	| MentionNotificationSlice
 	| QuoteNotificationSlice
 	| ReplyNotificationSlice
 	| RepostNotificationSlice;
@@ -165,7 +174,7 @@ export const createNotificationsPage = (data: NotificationsResponse): Notificati
 				// @ts-expect-error
 				items: [item],
 			});
-		} else if (reason === 'reply' || reason === 'quote') {
+		} else if (reason === 'reply' || reason === 'quote' || reason === 'mention') {
 			slen++;
 
 			slices.unshift({

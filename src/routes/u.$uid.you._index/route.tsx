@@ -167,10 +167,14 @@ const AuthenticatedYouPage = () => {
 				<p class="text-base font-bold">Moderation</p>
 			</div>
 
-			<div class="flex items-center gap-4 px-4 py-3 text-sm text-muted-fg">
+			<A
+				href="/u/:uid/you/moderation/content-filter"
+				params={params}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
 				<VisibilityIcon class="text-xl" />
-				<span>Content filtering (coming soon)</span>
-			</div>
+				<span>Content filtering</span>
+			</A>
 
 			<A
 				href="/u/:uid/you/moderation/mute-lists"

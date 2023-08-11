@@ -15,8 +15,20 @@ const routes: RouteDefinition[] = [
     component: lazy(() => import("./routes/u.$uid/route.tsx")),
     children: [
       {
+        path: "you/moderation/content-filter/labeler/:labeler",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.content-filter.labeler.$labeler/route.tsx")),
+      },
+      {
         path: "profile/:actor/post/:status/reposts",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status.reposts.tsx")),
+      },
+      {
+        path: "you/moderation/content-filter",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.content-filter._index/route.tsx")),
+      },
+      {
+        path: "you/moderation/content-filter/global",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.content-filter.global/route.tsx")),
       },
       {
         path: "profile/:actor/post/:status",

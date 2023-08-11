@@ -1,5 +1,6 @@
 import type { DID, Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
+import { createModerationLabeler } from '../moderation/labeler.ts';
 import { createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 
@@ -33,10 +34,14 @@ export interface SignalizedPost {
 	};
 
 	$deleted: Signal<boolean>;
+
 	$renderedContent: ReturnType<typeof createPostRenderer>;
+	$mod: ReturnType<typeof createModerationLabeler>;
 }
 
 const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPost => {
+	const labels = signal(post.labels, EQUALS_DEQUAL);
+
 	return {
 		_key: key,
 		uri: post.uri,
@@ -47,13 +52,16 @@ const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPos
 		replyCount: signal(post.replyCount ?? 0),
 		repostCount: signal(post.repostCount ?? 0),
 		likeCount: signal(post.likeCount ?? 0),
-		labels: signal(post.labels, EQUALS_DEQUAL),
+		labels: labels,
 		viewer: {
 			like: signal(post.viewer?.like),
 			repost: signal(post.viewer?.repost),
 		},
+
 		$deleted: signal(false),
+
 		$renderedContent: createPostRenderer(uid),
+		$mod: createModerationLabeler(uid, post.author.did, labels),
 	};
 };
 

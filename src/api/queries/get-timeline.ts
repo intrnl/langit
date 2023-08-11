@@ -367,7 +367,7 @@ const combine = <T>(filters: Array<undefined | FilterFn<T>>): FilterFn<T> | unde
 };
 
 const createLanguagePostFilter = (uid: DID): PostFilter | undefined => {
-	const $prefs = (preferences[uid] || {});
+	const $prefs = preferences[uid] || {};
 
 	const allowUnspecified = $prefs.cl_unspecified ?? true;
 	let languages = $prefs.cl_codes;

@@ -15,7 +15,10 @@ import {
 
 export type PathsWithParams = 
 	| "/u/:uid"
+	| "/u/:uid/you/moderation/content-filter/labeler/:labeler"
 	| "/u/:uid/profile/:actor/post/:status/reposts"
+	| "/u/:uid/you/moderation/content-filter"
+	| "/u/:uid/you/moderation/content-filter/global"
 	| "/u/:uid/profile/:actor/post/:status"
 	| "/u/:uid/profile/:actor/post/:status/likes"
 	| "/u/:uid/profile/:actor/feed/:feed"
@@ -49,7 +52,10 @@ export type Paths = PathsWithParams | PathsWithoutParams;
 
 export interface Params {
 	"/u/:uid": { "uid": string };
+	"/u/:uid/you/moderation/content-filter/labeler/:labeler": { "uid": string, "labeler": string };
 	"/u/:uid/profile/:actor/post/:status/reposts": { "uid": string, "actor": string, "status": string };
+	"/u/:uid/you/moderation/content-filter": { "uid": string };
+	"/u/:uid/you/moderation/content-filter/global": { "uid": string };
 	"/u/:uid/profile/:actor/post/:status": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/post/:status/likes": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/feed/:feed": { "uid": string, "actor": string, "feed": string };

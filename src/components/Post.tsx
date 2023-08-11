@@ -1,12 +1,13 @@
-import { Match, Show, Switch } from 'solid-js';
+import { type Accessor, Match, Show, Switch, createSignal } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { A as UntypedAnchor, useNavigate } from '@solidjs/router';
 
 import type { SignalizedPost, SignalizedTimelinePost } from '~/api/cache/posts.ts';
-import { getRecordId } from '~/api/utils.ts';
-
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
+
+import type { ModerationDecision } from '~/api/moderation/internal/action.ts';
+import { getRecordId } from '~/api/utils.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { A } from '~/router.ts';
@@ -36,6 +37,87 @@ interface PostProps {
 	interactive?: boolean;
 	highlight?: boolean;
 }
+
+interface PostContentProps {
+	uid: Accessor<DID>;
+	post: Accessor<SignalizedPost>;
+	force?: boolean;
+}
+
+interface PostEmbedContentProps {
+	uid: Accessor<DID>;
+	mod?: ModerationDecision;
+	embed: Accessor<NonNullable<RefOf<'app.bsky.feed.defs#postView'>['embed']>>;
+	force?: boolean;
+}
+
+const PostEmbedContent = ({ uid, mod, embed, force }: PostEmbedContentProps) => {
+	if (!force && mod?.blurMedia) {
+		const [show, setShow] = createSignal(false);
+
+		return (
+			<>
+				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
+					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.label.val}</p>
+
+					<button
+						onClick={() => setShow(!show())}
+						class="px-4 text-sm font-medium hover:bg-secondary hover:text-hinted-fg"
+					>
+						{show() ? 'Hide' : 'Show'}
+					</button>
+				</div>
+
+				<Show when={show()}>
+					<PostEmbedContent uid={uid} embed={embed} force />
+				</Show>
+			</>
+		);
+	}
+
+	return <Embed uid={uid()} embed={embed()} />;
+};
+
+const PostContent = ({ uid, post, force }: PostContentProps) => {
+	const mod = post().$mod();
+
+	if (!force && mod?.blur) {
+		const [show, setShow] = createSignal(false);
+
+		return (
+			<>
+				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
+					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.label.val}</p>
+
+					<button
+						onClick={() => setShow(!show())}
+						class="px-4 text-sm font-medium hover:bg-secondary hover:text-hinted-fg"
+					>
+						{show() ? 'Hide' : 'Show'}
+					</button>
+				</div>
+
+				<Show when={show()}>
+					<PostContent uid={uid} post={post} force />
+				</Show>
+			</>
+		);
+	}
+
+	return (
+		<>
+			<Show when={post().$deleted.value}>
+				<div class="text-sm text-muted-fg">This post has been deleted.</div>
+			</Show>
+
+			<div class="whitespace-pre-wrap break-words text-sm">{post().$renderedContent()}</div>
+
+			<Show when={post().embed.value}>
+				{(embed) => <PostEmbedContent uid={uid} mod={mod} embed={embed} />}
+			</Show>
+		</>
+	);
+};
 
 const Post = (props: PostProps) => {
 	const navigate = useNavigate();
@@ -206,15 +288,7 @@ const Post = (props: PostProps) => {
 						</Show>
 					</div>
 
-					<Show when={post().$deleted.value}>
-						<div class="text-sm text-muted-fg">This post has been deleted.</div>
-					</Show>
-
-					<Show when={record().text}>
-						<div class="whitespace-pre-wrap break-words text-sm">{post().$renderedContent()}</div>
-					</Show>
-
-					<Show when={post().embed.value}>{(embed) => <Embed uid={uid()} embed={embed()} />}</Show>
+					<PostContent uid={uid} post={post} />
 
 					<Show when={interactive()}>
 						<div class="mt-3 flex text-muted-fg">

@@ -42,7 +42,7 @@ export interface ThreadPage {
 	descendants: ThreadSlice[];
 }
 
-type ThreadStackNode = { thread: Thread; slice: ThreadSlice | undefined };
+type ThreadStackNode = [thread: Thread, slice: ThreadSlice | undefined];
 
 export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 	const ancestors: (SignalizedPost | NotFoundPost | BlockedPost)[] = [];
@@ -54,7 +54,7 @@ export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 	let parent = data.parent;
 	let node: ThreadStackNode | undefined;
 
-	stack.push({ thread: data, slice: undefined });
+	stack.push([data, undefined]);
 
 	while (parent) {
 		if (parent.$type !== TypePost) {
@@ -67,8 +67,8 @@ export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 	}
 
 	while ((node = stack.pop())) {
-		const thread = node.thread;
-		const slice = node.slice;
+		const thread = node[0];
+		const slice = node[1];
 
 		if (!thread.replies) {
 			continue;
@@ -103,7 +103,7 @@ export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 				if (type === TypePost) {
 					const next: ThreadSlice = { items: [mergeSignalizedPost(uid, reply.post, key)] };
 
-					stack.push({ thread: reply, slice: next });
+					stack.push([reply, next]);
 					descendants.push(next);
 				} else if (type !== TypeBlocked || reply.author.viewer?.blocking) {
 					descendants.push({ items: [reply] });
@@ -116,8 +116,8 @@ export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 			if (type === TypePost) {
 				const post = mergeSignalizedPost(uid, reply.post, key);
 
+				stack.push([reply, slice]);
 				slice.items.push(post);
-				stack.push({ thread: reply, slice: slice });
 			} else if (type !== TypeBlocked || reply.author.viewer?.blocking) {
 				slice.items.push(reply);
 			}

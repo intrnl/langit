@@ -11,6 +11,7 @@ type EmbeddedImage = RefOf<'app.bsky.embed.images#viewImage'>;
 export interface EmbedImageProps {
 	images: EmbeddedImage[];
 	borderless?: boolean;
+	blur?: boolean;
 	interactive?: boolean;
 }
 
@@ -18,30 +19,36 @@ const LazyImageViewerDialog = lazy(() => import('~/components/dialogs/ImageViewe
 
 const EmbedImage = (props: EmbedImageProps) => {
 	const images = () => props.images;
-	const interactive = () => props.interactive;
+
+	const interactive = props.interactive;
+	const borderless = props.borderless;
+	const blur = () => props.blur;
 
 	const render = (index: number, className?: string) => {
 		const image = images()[index];
 		const alt = image.alt;
 
 		return (
-			<div class={'relative ' + (className || 'min-h-0 grow basis-0')}>
+			<div class={'relative overflow-hidden ' + (className || 'min-h-0 grow basis-0')}>
 				<img
 					src={/* @once */ image.thumb}
 					alt={alt}
 					onClick={() => {
-						if (interactive()) {
+						if (interactive) {
 							openModal(() => <LazyImageViewerDialog images={images()} active={index} />);
 						}
 					}}
 					class="h-full w-full object-cover"
-					classList={{ 'cursor-pointer': interactive() }}
+					classList={{
+						'cursor-pointer': interactive,
+						blur: blur() && !borderless,
+						'blur-lg': blur() && borderless,
+					}}
 				/>
 
-				{interactive() && alt && (
+				{interactive && alt && (
 					<button
 						class="absolute bottom-0 left-0 m-2 h-5 rounded bg-black/70 px-1 text-xs font-medium"
-						classList={{ 'pointer-events-none': !interactive() }}
 						title="Show image description"
 						onClick={() => {
 							openModal(() => <ImageAltDialog alt={alt} />);
@@ -55,7 +62,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 	};
 
 	return (
-		<div classList={{ 'overflow-hidden rounded-md border border-divider': !props.borderless }}>
+		<div classList={{ 'overflow-hidden rounded-md border border-divider': !borderless }}>
 			<Switch>
 				<Match when={images().length >= 4}>
 					<div class="flex aspect-video gap-0.5">

@@ -1,20 +1,22 @@
 import { Show, createMemo } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
-import type { Records, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 import { A } from '@solidjs/router';
 
+import { createModerationDecision } from '~/api/moderation/internal/action.ts';
 import { getRecordId } from '~/api/utils.ts';
 
-import EmbedImage from '~/components/EmbedImage.tsx';
-
+import { getAccountModerationPreferences } from '~/globals/preferences.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
+
+import EmbedImage from '~/components/EmbedImage.tsx';
 
 type EmbeddedPostRecord = UnionOf<'app.bsky.embed.record#viewRecord'>;
 type PostRecord = Records['app.bsky.feed.post'];
 
 export interface EmbedRecordProps {
-	uid: string;
+	uid: DID;
 	record: EmbeddedPostRecord;
 	/** Whether it should show a large UI for image embeds */
 	large?: boolean;
@@ -22,6 +24,8 @@ export interface EmbedRecordProps {
 }
 
 const EmbedRecord = (props: EmbedRecordProps) => {
+	const uid = () => props.uid;
+
 	const record = () => props.record;
 	const large = () => props.large;
 	const interactive = () => props.interactive;
@@ -48,6 +52,27 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 		}
 	});
 
+	// TODO: figure out what else to do with the labels here, right now we're only
+	// using it for media embeds specifically
+	// TODO: should this be moved to a global cache somewhere?
+	const mod = createMemo(() => {
+		if (!images()) {
+			return;
+		}
+
+		const $record = record();
+		const $labels = $record.labels;
+
+		if (!$labels) {
+			return;
+		}
+
+		const prefs = getAccountModerationPreferences(uid());
+		const decision = createModerationDecision($labels, $record.author.did, prefs);
+
+		return decision;
+	});
+
 	return (
 		<Dynamic
 			component={interactive() ? A : 'div'}
@@ -72,7 +97,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 				<div class="flex items-start">
 					<Show when={!large() && images()}>
 						<div class="mb-3 ml-3 mt-2 grow basis-0">
-							<EmbedImage images={images()!} />
+							<EmbedImage images={images()!} blur={mod()?.m} />
 						</div>
 					</Show>
 
@@ -87,7 +112,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 					<div class="mt-3" />
 				</Show>
 
-				<EmbedImage images={images()!} borderless />
+				<EmbedImage images={images()!} blur={mod()?.m} borderless />
 			</Show>
 		</Dynamic>
 	);

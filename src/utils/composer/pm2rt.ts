@@ -109,6 +109,8 @@ export const pm2rt = (json: JSONContent) => {
 			length += handle.length;
 			text += handle;
 
+			leading = false;
+
 			facets.push({
 				index: {
 					byteStart: start,
@@ -131,6 +133,8 @@ export const pm2rt = (json: JSONContent) => {
 
 	text = trimmed;
 	length -= trailOffset;
+
+	console.log(text);
 
 	return {
 		length: ascii ? length : graphemeLen(text),

@@ -71,7 +71,7 @@ const AuthenticatedNotificationsPage = () => {
 	createEffect((prev: Collection<NotificationsPage> | undefined | 0) => {
 		const next = notifications();
 
-		if (prev === undefined && next) {
+		if (prev !== 0 && next) {
 			const pages = next.pages;
 
 			if (pages.length === 1) {

@@ -298,6 +298,7 @@ const fetchPage = async (
 					actor: params.actor,
 					cursor: cursor,
 					limit: limit,
+					filter: params.tab === 'media' ? 'posts_with_media' : 'posts_with_replies',
 				},
 			});
 

@@ -289,7 +289,10 @@ const PostContent = ({ uid, post, force }: PostContentProps) => {
 
 		return (
 			<>
-				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
+				<div
+					class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider"
+					classList={{ 'mb-3': show() }}
+				>
 					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.l.val}</p>
 
 					<button

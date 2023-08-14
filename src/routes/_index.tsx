@@ -62,7 +62,7 @@ const IndexPage = () => {
 						commit {GIT_BRANCH}/{GIT_COMMIT}
 					</a>
 					<span> • </span>
-					<a href={GIT_SOURCE} target="_blank">
+					<a href={GIT_SOURCE} target="_blank" class="hover:underline">
 						source code
 					</a>
 				</p>

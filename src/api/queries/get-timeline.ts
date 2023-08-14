@@ -4,7 +4,7 @@ import type { EnhancedResource, QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { systemLanguages } from '~/globals/platform.ts';
-import { preferences } from '~/globals/preferences.ts';
+import { getAccountModerationPreferences, preferences } from '~/globals/preferences.ts';
 import { assert } from '~/utils/misc.ts';
 
 import {
@@ -14,6 +14,7 @@ import {
 	createTimelineSlices,
 } from '../models/timeline.ts';
 
+import { createModerationDecision } from '../moderation/internal/action.ts';
 import { type Collection, pushCollection } from '../utils.ts';
 
 import _getDid from './_did.ts';
@@ -142,17 +143,31 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 
 	if (type === 'home') {
 		sliceFilter = createHomeSliceFilter(uid);
-		postFilter = combine([createTempMutePostFilter(uid), createHiddenRepostFilter(uid)]);
+		postFilter = combine([
+			createLabelPostFilter(uid),
+			createTempMutePostFilter(uid),
+			createHiddenRepostFilter(uid),
+		]);
 	} else if (type === 'custom') {
-		postFilter = combine([createTempMutePostFilter(uid), createLanguagePostFilter(uid)]);
+		postFilter = combine([
+			createLabelPostFilter(uid),
+			createTempMutePostFilter(uid),
+			createLanguagePostFilter(uid),
+		]);
 	} else if (type === 'profile') {
 		_did = await _getDid(agent, params.actor);
 
 		if (params.tab === 'media') {
-			postFilter = createMediaPostFilter();
-		} else if (params.tab !== 'likes') {
-			sliceFilter = createProfileSliceFilter(_did, params.tab === 'replies');
+			postFilter = combine([createLabelPostFilter(uid), createMediaPostFilter()]);
+		} else {
+			postFilter = createLabelPostFilter(uid);
+
+			if (params.tab !== 'likes') {
+				sliceFilter = createProfileSliceFilter(_did, params.tab === 'replies');
+			}
 		}
+	} else {
+		postFilter = createLabelPostFilter(uid);
 	}
 
 	while (count < limit) {
@@ -363,6 +378,23 @@ const combine = <T>(filters: Array<undefined | FilterFn<T>>): FilterFn<T> | unde
 		}
 
 		return true;
+	};
+};
+
+const createLabelPostFilter = (uid: DID): PostFilter | undefined => {
+	const prefs = getAccountModerationPreferences(uid);
+
+	return (item) => {
+		const post = item.post;
+		const labels = post.labels;
+
+		if (!labels || labels.length < 1) {
+			return true;
+		}
+
+		const decision = createModerationDecision(labels, post.author.did, prefs);
+
+		return !decision?.f;
 	};
 };
 

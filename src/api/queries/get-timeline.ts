@@ -510,10 +510,11 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 };
 
 const createMediaPostFilter = (): PostFilter => {
+	// `posts_with_media` server-side filter returns all the media from author's
+	// feed, but it doesn't filter out any reposts of other user's media, so we
+	// should filter that out while keeping reposts of author's own media.
 	return (item) => {
 		const post = item.post;
-		const embed = post.embed;
-
 		const reason = item.reason;
 
 		// skip reposts that aren't coming from original author
@@ -523,12 +524,7 @@ const createMediaPostFilter = (): PostFilter => {
 			}
 		}
 
-		return (
-			!!embed &&
-			(embed.$type === 'app.bsky.embed.images#view' ||
-				(embed.$type === 'app.bsky.embed.recordWithMedia#view' &&
-					embed.media.$type === 'app.bsky.embed.images#view'))
-		);
+		return true;
 	};
 };
 

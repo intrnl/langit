@@ -59,7 +59,7 @@ const IndexPage = () => {
 			{GIT_SOURCE && (
 				<p class="mt-4 text-center text-xs text-muted-fg">
 					<a href={`${GIT_SOURCE}/commit/${GIT_COMMIT}`} target="_blank" class="hover:underline">
-						commit {GIT_BRANCH}/{GIT_COMMIT.slice(0, 6)}
+						commit {GIT_BRANCH}/{GIT_COMMIT}
 					</a>
 					<span> • </span>
 					<a href={GIT_SOURCE} target="_blank">

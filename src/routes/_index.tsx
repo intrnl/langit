@@ -6,6 +6,12 @@ import { A, useNavigate } from '~/router.ts';
 import button from '~/styles/primitives/button.ts';
 
 const isSafari = navigator.vendor.includes('Apple');
+const INCOMPATIBLE_NOTE_URL = 'https://github.com/intrnl/langit/wiki/Safari-compatibility-issue';
+
+const GIT_SOURCE = import.meta.env.VITE_GIT_SOURCE;
+
+const GIT_BRANCH = import.meta.env.VITE_GIT_BRANCH;
+const GIT_COMMIT = import.meta.env.VITE_GIT_COMMIT;
 
 const IndexPage = () => {
 	const navigate = useNavigate();
@@ -27,43 +33,40 @@ const IndexPage = () => {
 	});
 
 	return (
-		<div class="mx-auto flex max-w-xl flex-col justify-center px-4 py-8">
-			<h1 class="text-lg font-bold">Langit</h1>
+		<div class="mx-auto flex min-h-screen min-w-0 max-w-2xl flex-col border-divider p-4 sm:border-x">
+			<div class="flex grow flex-col items-center justify-center">
+				<h1 class="text-center text-2xl font-bold">Langit</h1>
 
-			<p>Alternative Bluesky client</p>
+				<div class="mt-4 flex w-full max-w-md flex-col gap-2 sm:flex-row sm:justify-center">
+					<A href="/login" class={/* @once */ button({ color: 'primary', class: 'justify-center' })}>
+						Log in
+					</A>
+					<button disabled class={/* @once */ button({ color: 'outline', class: 'justify-center' })}>
+						Sign up
+					</button>
+				</div>
+			</div>
 
 			{isSafari && (
-				<div class="mt-4 rounded-md bg-secondary p-4 text-sm text-secondary-fg">
-					<p class="font-bold">Incompatible browser/OS detected</p>
-					<p>Looks like you're using an iOS device, or Safari on a macOS device.</p>
-
-					<p class="mt-2">
-						Unfortunately, with Safari being unavailable on other platforms like Windows or Linux, and me not
-						having an Apple device I can test things on, there's just no way for me to support Langit running
-						on an iOS device or Safari on a macOS device.
-					</p>
-
-					<p class="mt-2">
-						Personally, I cannot justify paying for an expensive device where I'd only be using it to test
-						websites, and while I could always rely on your aid to help me fix any issues that may happen,
-						it's going to be hard to support Safari that way.
-					</p>
-
-					<p class="mt-2">
-						Instead, I'd be much happy if the Safari monopoly goes away, and you can visit the{' '}
-						<a href="https://open-web-advocacy.org" target="_blank" class="underline">
-							Open Web Advocacy website
-						</a>{' '}
-						for details on that matter.
-					</p>
+				<div class="mt-4 flex justify-between gap-4 rounded-md bg-hinted px-4 py-3 text-sm text-secondary-fg">
+					<span>Incompatible browser/OS detected.</span>
+					<a href={INCOMPATIBLE_NOTE_URL} target="_blank" class="font-medium hover:underline">
+						Learn more
+					</a>
 				</div>
 			)}
 
-			<div class="mt-8 flex gap-4">
-				<A href="/login" class={/* @once */ button({ color: 'primary' })}>
-					Log in
-				</A>
-			</div>
+			{GIT_SOURCE && (
+				<p class="mt-4 text-center text-xs text-muted-fg">
+					<a href={`${GIT_SOURCE}/commit/${GIT_COMMIT}`} target="_blank" class="hover:underline">
+						commit {GIT_BRANCH}/{GIT_COMMIT.slice(0, 6)}
+					</a>
+					<span> • </span>
+					<a href={GIT_SOURCE} target="_blank">
+						source code
+					</a>
+				</p>
+			)}
 		</div>
 	);
 };

@@ -64,8 +64,10 @@ import CheckIcon from '~/icons/baseline-check.tsx';
 import CloseIcon from '~/icons/baseline-close.tsx';
 import ImageIcon from '~/icons/baseline-image.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
+import ShieldIcon from '~/icons/baseline-shield.tsx';
 
 import { type ComposedImage, type PendingImage } from './types.ts';
+import AddSelfLabelDialog from './AddSelfLabelDialog.tsx';
 import ComposeLanguageMenu from './ComposeLanguageMenu.tsx';
 import ImageAltEditDialog from './ImageAltEditDialog.tsx';
 import ImageUploadCompressDialog from './ImageUploadCompressDialog.tsx';
@@ -87,7 +89,7 @@ const enum PostState {
 	SENT,
 }
 
-const getLanguages = (uid: DID): Array<'none' | (string & {})> => {
+const getLanguages = (uid: DID): string[] => {
 	const lang = preferences[uid]?.cl_defaultLanguage ?? 'system';
 
 	if (lang === 'none') {
@@ -119,6 +121,7 @@ const AuthenticatedComposePage = () => {
 	const [imageProcessing, setImageProcessing] = createSignal(0);
 	const [images, setImages] = createSignal<ComposedImage[]>([]);
 
+	const [labels, setLabels] = createSignal<string[]>([]);
 	const [languages, setLanguages] = createSignal(getLanguages(uid()));
 
 	const [message, setMessage] = createSignal<string>();
@@ -220,6 +223,9 @@ const AuthenticatedComposePage = () => {
 		const $quote = quote() || feed();
 		const $link = link();
 		const $images = images();
+
+		const $languages = languages();
+		const $labels = labels();
 
 		let replyRecord: PostRecord['reply'];
 		let embedRecord: PostRecord['embed'];
@@ -327,7 +333,11 @@ const AuthenticatedComposePage = () => {
 			text: rt ? rt.text : '',
 			reply: replyRecord,
 			embed: embedRecord,
-			langs: languages(),
+			langs: $languages.length > 0 ? $languages : undefined,
+			labels:
+				$labels.length > 0
+					? { $type: 'com.atproto.label.defs#selfLabels', values: $labels.map((value) => ({ val: value })) }
+					: undefined,
 		};
 
 		try {
@@ -766,6 +776,19 @@ const AuthenticatedComposePage = () => {
 								class="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-hinted"
 							>
 								<ImageIcon />
+							</button>
+						</Show>
+
+						<Show when={images().length > 0}>
+							<button
+								title="Add content warning"
+								onClick={() => {
+									openModal(() => <AddSelfLabelDialog labels={labels()} onApply={setLabels} />);
+								}}
+								class="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-hinted"
+								classList={{ 'text-accent': labels().length > 0 }}
+							>
+								<ShieldIcon />
 							</button>
 						</Show>
 

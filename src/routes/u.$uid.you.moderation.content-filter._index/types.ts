@@ -13,4 +13,3 @@ export const LABELERS: Labeler[] = [
 		handle: 'moderation.bsky.social',
 	},
 ];
-

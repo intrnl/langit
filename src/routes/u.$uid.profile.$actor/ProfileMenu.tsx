@@ -6,7 +6,7 @@ import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getAccountPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
 
 import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog.tsx';
 import ReportDialog, { REPORT_PROFILE } from '~/components/dialogs/ReportDialog.tsx';
@@ -38,7 +38,8 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 		return getAccountPreferences(uid());
 	});
 
-	const isMuted = () => profile().viewer.muted.value;
+	const isMuted = () =>
+		profile().viewer.muted.value || isProfileTemporarilyMuted(uid(), profile().did) !== null;
 	const isBlocked = () => profile().viewer.blocking.value;
 
 	const isRepostHidden = () => {

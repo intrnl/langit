@@ -35,6 +35,18 @@ export const getAccountModerationPreferences = (uid: DID): ModerationOpts => {
 	return (moderationPreferencesCache[uid] ||= createAccountModerationPreferences(uid));
 };
 
+export const isProfileTemporarilyMuted = (uid: DID, actor: DID): number | null => {
+	const $prefs = getAccountPreferences(uid);
+	const mutes = $prefs.pf_tempMutes;
+
+	if (mutes) {
+		const date = mutes[actor];
+		return date !== undefined && Date.now() < date ? date : null;
+	}
+
+	return null;
+};
+
 export interface PreferencesStore {
 	local?: LocalSettings;
 	[account: DID]: AccountSettings | undefined;

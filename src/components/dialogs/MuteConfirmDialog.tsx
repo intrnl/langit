@@ -14,7 +14,7 @@ import { getList, getListKey } from '~/api/queries/get-list.ts';
 import type { FeedPage } from '~/api/queries/get-timeline.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getAccountPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import ListItem from '~/components/ListItem.tsx';
@@ -35,11 +35,28 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 	const [duration, setDuration] = createSignal('-1');
 	const mutate = useQueryMutation();
 
-	const isMuted = () => profile().viewer.muted.value;
+	const isTemporarilyMuted = () => isProfileTemporarilyMuted(uid(), profile().did);
+	const isMuted = () => profile().viewer.muted.value || isTemporarilyMuted();
 
 	const handleMute = () => {
 		const $uid = uid();
 		const $did = profile().did;
+
+		if (isMuted()) {
+			if (isTemporarilyMuted()) {
+				const $prefs = getAccountPreferences($uid);
+				const mutes = $prefs.pf_tempMutes;
+
+				if (mutes) {
+					delete mutes[$did];
+				}
+			} else {
+				muteProfile($uid, profile());
+			}
+
+			closeModal();
+			return;
+		}
 
 		const parsedDuration = parseInt(duration());
 

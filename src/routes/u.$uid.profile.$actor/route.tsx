@@ -13,8 +13,10 @@ import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-l
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { openModal } from '~/globals/modals.tsx';
+import { isProfileTemporarilyMuted } from '~/globals/preferences.ts';
 import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
+import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import FollowButton from '~/components/FollowButton.tsx';
@@ -230,6 +232,25 @@ const AuthenticatedProfileLayout = () => {
 													</button>
 												</p>
 											</div>
+										</Match>
+
+										<Match when={isProfileTemporarilyMuted(uid(), profile().did)}>
+											{(date) => (
+												<div class="text-sm text-muted-fg">
+													<p>
+														You have temporarily muted posts from this user until{' '}
+														<span class="font-bold">{relformat.formatAbsWithTime(date())}</span>.{' '}
+														<button
+															onClick={() => {
+																openModal(() => <LazyMuteConfirmDialog uid={uid()} profile={profile()} />);
+															}}
+															class="text-accent hover:underline"
+														>
+															Unmute
+														</button>
+													</p>
+												</div>
+											)}
 										</Match>
 									</Switch>
 								</div>

@@ -651,6 +651,12 @@ const AuthenticatedComposePage = () => {
 													next.splice(idx(), 1);
 
 													setImages(next);
+
+													// TODO: remove this when there are labels that can
+													// be applied for non-media content.
+													if (next.length === 0) {
+														setLabels([]);
+													}
 												}}
 												class="absolute right-0 top-0 m-1 flex h-7 w-7 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
 											>

@@ -446,13 +446,12 @@ const createHiddenRepostFilter = (uid: DID): PostFilter | undefined => {
 
 const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 	const $prefs = preferences[uid];
+	const now = Date.now();
 
 	let mutes = $prefs?.pf_tempMutes;
 
 	// check if there are any outdated mutes before proceeding
 	if (mutes) {
-		const now = Date.now();
-
 		let size = 0;
 		let outdated = false;
 
@@ -494,14 +493,14 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 		if (reason) {
 			const byDid = reason.by.did;
 
-			if (mutes![byDid] && Date.now() < mutes![byDid]!) {
+			if (mutes![byDid] && now < mutes![byDid]!) {
 				return false;
 			}
 		}
 
 		const did = item.post.author.did;
 
-		if (mutes![did] && Date.now() < mutes![did]!) {
+		if (mutes![did] && now < mutes![did]!) {
 			return false;
 		}
 

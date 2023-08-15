@@ -1,6 +1,6 @@
 import { Match, Show, Switch } from 'solid-js';
 
-import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records, ResponseOf } from '@intrnl/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
 
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
@@ -45,15 +45,21 @@ const AuthenticatedProfileSettingsPage = () => {
 			const $uid = uid();
 			const agent = await multiagent.connect($uid);
 
-			const existing = await agent.rpc.get('com.atproto.repo.getRecord', {
-				params: {
-					collection: 'app.bsky.actor.profile',
-					repo: $uid,
-					rkey: 'self',
-				},
-			});
+			let rec: ProfileRecord | undefined;
+			let resp: ResponseOf<'com.atproto.repo.getRecord'> | undefined;
 
-			const rec = existing.data.value as ProfileRecord;
+			try {
+				const existing = await agent.rpc.get('com.atproto.repo.getRecord', {
+					params: {
+						collection: 'app.bsky.actor.profile',
+						repo: $uid,
+						rkey: 'self',
+					},
+				});
+
+				resp = existing.data;
+				rec = resp.value as any;
+			} catch {}
 
 			const $avatar = avatar();
 			const $banner = banner();
@@ -80,7 +86,7 @@ const AuthenticatedProfileSettingsPage = () => {
 					collection: 'app.bsky.actor.profile',
 					repo: $uid,
 					rkey: 'self',
-					swapRecord: existing?.data.cid || undefined,
+					swapRecord: resp?.cid,
 					record: record,
 				},
 			});

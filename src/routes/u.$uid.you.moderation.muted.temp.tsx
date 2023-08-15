@@ -60,12 +60,14 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 
 	const users = createMemo(() => {
 		const $dict = mutedUsersDict();
+
+		const now = Date.now();
 		const arr: DID[] = [];
 
 		for (const did in $dict) {
 			const val = $dict[did as DID];
 
-			if (val != null) {
+			if (val != null && now < val) {
 				arr.push(did as DID);
 			}
 		}

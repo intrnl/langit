@@ -94,7 +94,7 @@ const ReportDialog = (props: ReportDialogProps) => {
 
 	const [step, setStep] = createSignal(ReportStep.CHOOSE);
 
-	const [type, setType] = createSignal<string>();
+	const [type, setType] = createSignal<ReportOption>();
 	const [reason, setReason] = createSignal('');
 
 	const reportMutation = createMutation({
@@ -125,8 +125,7 @@ const ReportDialog = (props: ReportDialogProps) => {
 
 			await agent.rpc.call('com.atproto.moderation.createReport', {
 				data: {
-					// @ts-expect-error
-					reasonType: $type,
+					reasonType: $type!.name,
 					subject: subject,
 					reason: $reason,
 				},
@@ -154,9 +153,9 @@ const ReportDialog = (props: ReportDialogProps) => {
 
 			nodes.push(
 				<button
-					onClick={() => setType(option.value)}
+					onClick={() => setType(option)}
 					class={/* @once */ menu.item()}
-					classList={{ 'group is-active': type() === option.value }}
+					classList={{ 'group is-active': type() === option }}
 				>
 					<div class="grow">
 						<p>{option.name}</p>
@@ -204,6 +203,10 @@ const ReportDialog = (props: ReportDialogProps) => {
 				</Match>
 
 				<Match when={step() === ReportStep.EXPLAIN}>
+					<p class="mt-4 text-sm">
+						You are reporting for <span class="font-bold">{type()?.name}</span>
+					</p>
+
 					<p class="mb-2 mt-4 text-sm text-muted-fg">Any additional details?</p>
 
 					<textarea

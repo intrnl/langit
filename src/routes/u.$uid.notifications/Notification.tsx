@@ -55,14 +55,16 @@ const Notification = (props: NotificationProps) => {
 		const $data = _data();
 		const type = $data.type;
 
-		return type === 'reply' || type === 'quote' || type === 'mention'
-	}
+		return type === 'reply' || type === 'quote' || type === 'mention';
+	};
 
 	return (
 		<Switch>
 			<Match when={isReply()}>
 				{(_value) => {
-					const data = _data as any as Accessor<ReplyNotificationSlice | QuoteNotificationSlice | MentionNotificationSlice>;
+					const data = _data as any as Accessor<
+						ReplyNotificationSlice | QuoteNotificationSlice | MentionNotificationSlice
+					>;
 
 					const replyObj = () => data().item;
 					const replyUri = () => replyObj().uri;
@@ -126,6 +128,11 @@ const Notification = (props: NotificationProps) => {
 											return (
 												<A
 													href="/u/:uid/profile/:actor"
+													title={
+														author.displayName
+															? `${author.displayName} (@${author.handle})`
+															: `@${author.handle}`
+													}
 													params={{ uid: uid(), actor: author.did }}
 													class="h-7.5 w-7.5 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 												>

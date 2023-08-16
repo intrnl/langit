@@ -29,7 +29,7 @@ const calculatePostScore = (uid: DID, post: Post, parent: Post) => {
 
 	return (
 		1 *
-		(!isMuted ? (post.replyCount ?? 0) * 0.5 + (post.repostCount ?? 0) * 1 + (post.likeCount ?? 0) * 1 : 0) *
+		(!isMuted ? (post.replyCount ?? 0) * 0.5 + (post.repostCount ?? 0) * 1 + (post.likeCount ?? 0) * 1 : 1) *
 		(isSameAuthor ? 1.5 : 1) *
 		(isFollowing ? 1.35 : 1)
 	);

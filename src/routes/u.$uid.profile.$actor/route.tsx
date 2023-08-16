@@ -25,6 +25,7 @@ import button from '~/styles/primitives/button.ts';
 
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
+import { ProfileContext } from './ProfileContext.tsx';
 import ProfileIdentifierDialog from './ProfileIdentifierDialog.tsx';
 import ProfileMenu from './ProfileMenu.tsx';
 
@@ -306,7 +307,9 @@ const AuthenticatedProfileLayout = () => {
 											</Show>
 										</div>
 
-										<Outlet />
+										<ProfileContext.Provider value={{ uid, profile }}>
+											<Outlet />
+										</ProfileContext.Provider>
 									</Match>
 								</Switch>
 							</>

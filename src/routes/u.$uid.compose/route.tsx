@@ -461,6 +461,7 @@ const AuthenticatedComposePage = () => {
 				protocols: ['http', 'https'],
 				autolink: true,
 				openOnClick: false,
+				linkOnPaste: false,
 			}),
 			Mention.configure({
 				suggestion: createMentionSuggestion(uid),

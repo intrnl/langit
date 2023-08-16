@@ -110,18 +110,20 @@ const AuthenticatedFeedPage = () => {
 		}
 	};
 
-	createEffect(() => {
-		const $timeline = timeline();
+	createEffect((prev: ReturnType<typeof timeline> | 0) => {
+		const next = timeline();
 
-		if ($timeline) {
-			const pages = $timeline.pages;
+		if (prev !== 0 && next) {
+			const pages = next.pages;
 			const length = pages.length;
 
 			if (length === 1) {
 				mutateLatest({ cid: pages[0].cid });
 			}
 		}
-	});
+
+		return next;
+	}, 0 as const);
 
 	return (
 		<div class="flex flex-col">
@@ -173,9 +175,7 @@ const AuthenticatedFeedPage = () => {
 								</div>
 
 								<Show when={info().description.value}>
-									<div class="whitespace-pre-wrap break-words text-sm">
-										{info().$renderedDescription()}
-									</div>
+									<div class="whitespace-pre-wrap break-words text-sm">{info().$renderedDescription()}</div>
 								</Show>
 
 								<p class="text-sm text-muted-fg">Liked by {info().likeCount.value} users</p>

@@ -68,7 +68,7 @@ const AuthenticatedNotificationsPage = () => {
 
 	// We set the initial value of the effect to 0, this is so we can tell that
 	// we just mounted this effect.
-	createEffect((prev: Collection<NotificationsPage> | undefined | 0) => {
+	createEffect((prev: ReturnType<typeof notifications> | 0) => {
 		const next = notifications();
 
 		if (prev !== 0 && next) {

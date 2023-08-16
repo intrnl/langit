@@ -45,18 +45,20 @@ const ProfileTimeline = ({ uid, profile, tab }: ProfileTimelineProps) => {
 		},
 	});
 
-	createEffect(() => {
-		const $timeline = timeline();
+	createEffect((prev: ReturnType<typeof timeline> | 0) => {
+		const next = timeline();
 
-		if ($timeline) {
-			const pages = $timeline.pages;
+		if (prev !== 0 && next) {
+			const pages = next.pages;
 			const length = pages.length;
 
 			if (length === 1) {
 				mutateLatest({ cid: pages[0].cid });
 			}
 		}
-	});
+
+		return next;
+	}, 0 as const);
 
 	return (
 		<TimelineList

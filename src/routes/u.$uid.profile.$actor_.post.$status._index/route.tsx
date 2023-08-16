@@ -6,7 +6,7 @@ import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
 
-import type { ModerationDecision } from '~/api/moderation/internal/action.ts';
+import { type ModerationDecision, CauseLabel } from '~/api/moderation/action.ts';
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import type { SignalizedPost } from '~/api/cache/posts.ts';
@@ -445,10 +445,13 @@ const PostContent = ({ uid, post, searchParams, force }: PostContentProps) => {
 	if (!force && mod?.b) {
 		const [show, setShow] = createSignal(false);
 
+		const source = mod.s;
+		const title = source.t === CauseLabel ? `Content warning: ${source.l.val}` : `You've muted this user`;
+
 		return (
 			<>
 				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
-					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.l.val}</p>
+					<p class="m-3 text-sm text-muted-fg">{title}</p>
 
 					<button
 						onClick={() => setShow(!show())}
@@ -494,10 +497,13 @@ const PostEmbedContent = ({ uid, mod, embed, force }: PostEmbedContentProps) => 
 	if (!force && mod?.m) {
 		const [show, setShow] = createSignal(false);
 
+		const source = mod.s;
+		const title = `Media warning${source.t === CauseLabel ? `: ${source.l.val}` : ''}`;
+
 		return (
 			<>
 				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
-					<p class="m-3 text-sm text-muted-fg">Media warning: {mod.l.val}</p>
+					<p class="m-3 text-sm text-muted-fg">{title}</p>
 
 					<button
 						onClick={() => setShow(!show())}

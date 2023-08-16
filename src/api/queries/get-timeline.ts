@@ -14,7 +14,7 @@ import {
 	createTimelineSlices,
 } from '../models/timeline.ts';
 
-import { createModerationDecision } from '../moderation/internal/action.ts';
+import { decideLabelModeration, finalizeModeration } from '../moderation/action.ts';
 import { type Collection, pushCollection } from '../utils.ts';
 
 import _getDid from './_did.ts';
@@ -392,7 +392,8 @@ const createLabelPostFilter = (uid: DID): PostFilter | undefined => {
 			return true;
 		}
 
-		const decision = createModerationDecision(labels, post.author.did, prefs);
+		const accu = decideLabelModeration([], labels, post.author.did, prefs);
+		const decision = finalizeModeration(accu);
 
 		return !decision?.f;
 	};

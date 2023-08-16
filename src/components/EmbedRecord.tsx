@@ -1,13 +1,20 @@
-import { Show, createMemo } from 'solid-js';
+import { Show, createMemo, createSignal } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
 import type { DID, Records, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 import { A } from '@solidjs/router';
 
-import { createModerationDecision } from '~/api/moderation/internal/action.ts';
+import {
+	type ModerationCause,
+	CauseLabel,
+	decideLabelModeration,
+	decideMutedPermanentModeration,
+	decideMutedTemporaryModeration,
+	finalizeModeration,
+} from '~/api/moderation/action.ts';
 import { getRecordId } from '~/api/utils.ts';
 
-import { getAccountModerationPreferences } from '~/globals/preferences.ts';
+import { getAccountModerationPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
 import EmbedImage from '~/components/EmbedImage.tsx';
@@ -33,6 +40,8 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 	const author = () => record().author;
 	const val = () => record().value;
 
+	const [force, setForce] = createSignal(false);
+
 	// we only show image embeds
 	const images = createMemo(() => {
 		const embeds = record().embeds;
@@ -56,65 +65,85 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 	// using it for media embeds specifically
 	// TODO: should this be moved to a global cache somewhere?
 	const mod = createMemo(() => {
-		if (!images()) {
-			return;
-		}
-
+		const $uid = uid();
 		const $record = record();
-		const $labels = $record.labels;
 
-		if (!$labels) {
-			return;
-		}
+		const authorDid = $record.author.did;
+		const prefs = getAccountModerationPreferences($uid);
 
-		const prefs = getAccountModerationPreferences(uid());
-		const decision = createModerationDecision($labels, $record.author.did, prefs);
+		const accu: ModerationCause[] = [];
+		decideLabelModeration(accu, $record.labels, authorDid, prefs);
+		decideMutedPermanentModeration(accu, $record.author.viewer?.muted);
+		decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted($uid, authorDid));
 
-		return decision;
+		return finalizeModeration(accu);
 	});
 
 	return (
-		<Dynamic
-			component={interactive() ? A : 'div'}
-			href={`/u/${props.uid}/profile/${author().did}/post/${getRecordId(record().uri)}`}
-			class="overflow-hidden rounded-md border border-divider"
-			classList={{ 'cursor-pointer hover:bg-secondary': interactive() }}
+		<Show
+			when={!mod()?.b || force()}
+			fallback={
+				<div class="flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
+					<p class="m-3 text-sm text-muted-fg">
+						{(() => {
+							const $mod = mod()!;
+
+							const source = $mod.s;
+							return source.t === CauseLabel ? `Quote warning: ${source.l.val}` : `Quote from a user you've muted`;
+						})()}
+					</p>
+
+					<button
+						onClick={() => setForce(true)}
+						class="px-4 text-sm font-medium hover:bg-secondary hover:text-hinted-fg"
+					>
+						Show
+					</button>
+				</div>
+			}
 		>
-			<div class="mx-3 mt-3 flex text-sm text-muted-fg">
-				<div class="mr-1 h-5 w-5 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-					<Show when={author().avatar}>{(avatar) => <img src={avatar()} class="h-full w-full" />}</Show>
-				</div>
-
-				<span class="line-clamp-1 break-all font-bold text-primary group-hover:underline">
-					{author().displayName}
-				</span>
-				<span class="ml-1 line-clamp-1 break-all">@{author().handle}</span>
-				<span class="px-1">·</span>
-				<span class="whitespace-nowrap">{relformat.format((val() as PostRecord).createdAt)}</span>
-			</div>
-
-			<Show when={(val() as PostRecord).text}>
-				<div class="flex items-start">
-					<Show when={!large() && images()}>
-						<div class="mb-3 ml-3 mt-2 grow basis-0">
-							<EmbedImage images={images()!} blur={mod()?.m} />
-						</div>
-					</Show>
-
-					<div class="mx-3 mb-3 mt-1 min-w-0 grow-4 basis-0 whitespace-pre-wrap break-words text-sm empty:hidden">
-						{(val() as PostRecord).text}
+			<Dynamic
+				component={interactive() ? A : 'div'}
+				href={`/u/${props.uid}/profile/${author().did}/post/${getRecordId(record().uri)}`}
+				class="overflow-hidden rounded-md border border-divider"
+				classList={{ 'cursor-pointer hover:bg-secondary': interactive() }}
+			>
+				<div class="mx-3 mt-3 flex text-sm text-muted-fg">
+					<div class="mr-1 h-5 w-5 shrink-0 overflow-hidden rounded-full bg-muted-fg">
+						<Show when={author().avatar}>{(avatar) => <img src={avatar()} class="h-full w-full" />}</Show>
 					</div>
-				</div>
-			</Show>
 
-			<Show when={(large() || !(val() as PostRecord).text) && images()}>
-				<Show when={!(val() as PostRecord).text}>
-					<div class="mt-3" />
+					<span class="line-clamp-1 break-all font-bold text-primary group-hover:underline">
+						{author().displayName}
+					</span>
+					<span class="ml-1 line-clamp-1 break-all">@{author().handle}</span>
+					<span class="px-1">·</span>
+					<span class="whitespace-nowrap">{relformat.format((val() as PostRecord).createdAt)}</span>
+				</div>
+
+				<Show when={(val() as PostRecord).text}>
+					<div class="flex items-start">
+						<Show when={!large() && images()}>
+							<div class="mb-3 ml-3 mt-2 grow basis-0">
+								<EmbedImage images={images()!} blur={mod()?.m} />
+							</div>
+						</Show>
+
+						<div class="mx-3 mb-3 mt-1 min-w-0 grow-4 basis-0 whitespace-pre-wrap break-words text-sm empty:hidden">
+							{(val() as PostRecord).text}
+						</div>
+					</div>
 				</Show>
 
-				<EmbedImage images={images()!} blur={mod()?.m} borderless />
-			</Show>
-		</Dynamic>
+				<Show when={(large() || !(val() as PostRecord).text) && images()}>
+					<Show when={!(val() as PostRecord).text}>
+						<div class="mt-3" />
+					</Show>
+
+					<EmbedImage images={images()!} blur={mod()?.m} borderless />
+				</Show>
+			</Dynamic>
+		</Show>
 	);
 };
 

@@ -1,11 +1,22 @@
+import { createRoot, type Accessor } from 'solid-js';
+
 import type { DID, Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
-import { createModerationLabeler } from '../moderation/labeler.ts';
+import {
+	type ModerationCause,
+	type ModerationDecision,
+	decideLabelModeration,
+	decideMutedPermanentModeration,
+	decideMutedTemporaryModeration,
+	finalizeModeration,
+} from '../moderation/action.ts';
 import { createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
 
+import { getAccountModerationPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
+import { createLazyMemo } from '~/utils/hooks.ts';
 import { EQUALS_DEQUAL } from '~/utils/misc.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
 
@@ -36,12 +47,10 @@ export interface SignalizedPost {
 	$deleted: Signal<boolean>;
 
 	$renderedContent: ReturnType<typeof createPostRenderer>;
-	$mod: ReturnType<typeof createModerationLabeler>;
+	$mod: ReturnType<typeof createPostModerationDecision>;
 }
 
 const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPost => {
-	const labels = signal(post.labels, EQUALS_DEQUAL);
-
 	return {
 		_key: key,
 		uri: post.uri,
@@ -52,7 +61,7 @@ const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPos
 		replyCount: signal(post.replyCount ?? 0),
 		repostCount: signal(post.repostCount ?? 0),
 		likeCount: signal(post.likeCount ?? 0),
-		labels: labels,
+		labels: signal(post.labels, EQUALS_DEQUAL),
 		viewer: {
 			like: signal(post.viewer?.like),
 			repost: signal(post.viewer?.repost),
@@ -61,7 +70,7 @@ const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPos
 		$deleted: signal(false),
 
 		$renderedContent: createPostRenderer(uid),
-		$mod: createModerationLabeler(uid, post.author.did, labels),
+		$mod: createPostModerationDecision(uid),
 	};
 };
 
@@ -78,7 +87,7 @@ export const mergeSignalizedPost = (uid: DID, post: Post, key?: number) => {
 		val._key = key;
 
 		val.cid.value = post.cid;
-		val.author = mergeSignalizedProfile(uid, post.author, key);
+		mergeSignalizedProfile(uid, post.author, key);
 
 		val.record.value = post.record as PostRecord;
 		val.embed.value = post.embed;
@@ -118,6 +127,34 @@ export const createSignalizedTimelinePost = (
 			parent: mergeSignalizedPost(uid, reply.parent as Post, key),
 		},
 		reason: item.reason,
+	};
+};
+
+export const createPostModerationDecision = (uid: DID) => {
+	let accessor: Accessor<ModerationDecision | undefined>;
+
+	return function (this: SignalizedPost) {
+		if (!accessor) {
+			const prefs = getAccountModerationPreferences(uid);
+
+			const labels = this.labels;
+			const muted = this.author.viewer.muted;
+			const authorDid = this.author.did;
+
+			accessor = createRoot(() => {
+				return createLazyMemo(() => {
+					const accu: ModerationCause[] = [];
+
+					decideLabelModeration(accu, labels.value, authorDid, prefs);
+					decideMutedPermanentModeration(accu, muted.value);
+					decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted(uid, authorDid));
+
+					return finalizeModeration(accu);
+				});
+			});
+		}
+
+		return accessor();
 	};
 };
 

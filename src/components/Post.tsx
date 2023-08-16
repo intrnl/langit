@@ -6,7 +6,7 @@ import { A as UntypedAnchor, useNavigate } from '@solidjs/router';
 import type { SignalizedPost, SignalizedTimelinePost } from '~/api/cache/posts.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 
-import type { ModerationDecision } from '~/api/moderation/internal/action.ts';
+import { type ModerationDecision, CauseLabel } from '~/api/moderation/action.ts';
 import { getRecordId } from '~/api/utils.ts';
 
 import { openModal } from '~/globals/modals.tsx';
@@ -287,13 +287,16 @@ const PostContent = ({ uid, post, force }: PostContentProps) => {
 	if (!force && mod?.b) {
 		const [show, setShow] = createSignal(false);
 
+		const source = mod.s;
+		const title = source.t === CauseLabel ? `Content warning: ${source.l.val}` : `You've muted this user`;
+
 		return (
 			<>
 				<div
 					class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider"
 					classList={{ 'mb-3': show() }}
 				>
-					<p class="m-3 text-sm text-muted-fg">Content warning: {mod.l.val}</p>
+					<p class="m-3 text-sm text-muted-fg">{title}</p>
 
 					<button
 						onClick={() => setShow(!show())}
@@ -337,10 +340,13 @@ const PostEmbedContent = ({ uid, mod, embed, force }: PostEmbedContentProps) => 
 	if (!force && mod?.m) {
 		const [show, setShow] = createSignal(false);
 
+		const source = mod.s;
+		const title = `Media warning${source.t === CauseLabel ? `: ${source.l.val}` : ''}`;
+
 		return (
 			<>
 				<div class="mt-3 flex items-stretch justify-between gap-3 overflow-hidden rounded-md border border-divider">
-					<p class="m-3 text-sm text-muted-fg">Media warning: {mod.l.val}</p>
+					<p class="m-3 text-sm text-muted-fg">{title}</p>
 
 					<button
 						onClick={() => setShow(!show())}

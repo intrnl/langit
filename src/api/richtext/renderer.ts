@@ -72,6 +72,7 @@ export const alterRenderedRichTextUid = (template: HTMLElement, uid: string) => 
 };
 
 const TRIM_HOST_RE = /^www\./;
+const PATH_MAX_LENGTH = 18;
 
 export const toShortUrl = (uri: string): string => {
 	try {
@@ -79,17 +80,16 @@ export const toShortUrl = (uri: string): string => {
 		const protocol = url.protocol;
 
 		const host = url.host.replace(TRIM_HOST_RE, '');
-		const path = url.pathname + url.search + url.hash;
-		const short = host + (path === '/' ? '' : path);
+		const pathname = url.pathname;
+
+		const path = (pathname === '/' ? '' : pathname) + url.search + url.hash;
 
 		if (protocol === 'http:' || protocol === 'https:') {
-			if (short.length > 30) {
-				return short.slice(0, 27) + '...';
+			if (path.length > PATH_MAX_LENGTH) {
+				return host + path.slice(0, PATH_MAX_LENGTH - 1) + '…';
 			}
 
-			if (short.length > 0) {
-				return short;
-			}
+			return host + path;
 		}
 	} catch {}
 

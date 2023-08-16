@@ -79,7 +79,8 @@ export const toShortUrl = (uri: string): string => {
 		const protocol = url.protocol;
 
 		const host = url.host.replace(TRIM_HOST_RE, '');
-		const short = host + (url.pathname === '/' ? '' : url.pathname) + url.search + url.hash;
+		const path = url.pathname + url.search + url.hash;
+		const short = host + (path === '/' ? '' : path);
 
 		if (protocol === 'http:' || protocol === 'https:') {
 			if (short.length > 30) {

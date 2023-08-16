@@ -2,6 +2,7 @@ import type { DID, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { type SignalizedPost, mergeSignalizedPost } from '../cache/posts.ts';
 
+import { isProfileTemporarilyMuted } from '~/globals/preferences.ts';
 import { Stack } from '~/utils/stack.ts';
 
 type Post = RefOf<'app.bsky.feed.defs#postView'>;
@@ -20,9 +21,13 @@ const TypeSortOrder = {
 	[TypePost]: 2,
 };
 
-const calculatePostScore = (post: Post, parent: Post) => {
+const calculatePostScore = (uid: DID, post: Post, parent: Post) => {
 	const isSameAuthor = parent.author.did === post.author.did;
 	const isFollowing = !!post.author.viewer?.following;
+
+	if (post.author.viewer?.muted || isProfileTemporarilyMuted(uid, post.author.did)) {
+		return 0;
+	}
 
 	return (
 		1 *
@@ -85,8 +90,8 @@ export const createThreadPage = (uid: DID, data: Thread): ThreadPage => {
 				const aPost = a.post;
 				const bPost = b.post;
 
-				const aScore = (scores[aPost.cid] ??= calculatePostScore(aPost, post));
-				const bScore = (scores[bPost.cid] ??= calculatePostScore(bPost, post));
+				const aScore = (scores[aPost.cid] ??= calculatePostScore(uid, aPost, post));
+				const bScore = (scores[bPost.cid] ??= calculatePostScore(uid, bPost, post));
 
 				return bScore - aScore;
 			}

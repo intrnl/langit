@@ -25,13 +25,11 @@ const calculatePostScore = (uid: DID, post: Post, parent: Post) => {
 	const isSameAuthor = parent.author.did === post.author.did;
 	const isFollowing = !!post.author.viewer?.following;
 
-	if (post.author.viewer?.muted || isProfileTemporarilyMuted(uid, post.author.did)) {
-		return 0;
-	}
+	const isMuted = !!post.author.viewer?.muted || isProfileTemporarilyMuted(uid, post.author.did) != null;
 
 	return (
 		1 *
-		((post.replyCount ?? 0) * 0.5 + (post.repostCount ?? 0) * 1 + (post.likeCount ?? 0) * 1) *
+		(!isMuted ? (post.replyCount ?? 0) * 0.5 + (post.repostCount ?? 0) * 1 + (post.likeCount ?? 0) * 1 : 0) *
 		(isSameAuthor ? 1.5 : 1) *
 		(isFollowing ? 1.35 : 1)
 	);

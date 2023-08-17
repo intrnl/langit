@@ -45,64 +45,60 @@ const AuthenticatedContentFilterModerationPage = () => {
 
 			<hr class="border-divider" />
 
-			{/* <div class="flex flex-col">
-				<p class="p-4 text-base font-bold leading-5">Self-labeled content</p>
+			{/* <p class="p-4 text-base font-bold leading-5">Self-labeled content</p>
 
-				<p class="px-4 pb-3 text-[0.8125rem] text-muted-fg">
-					Adds filter overrides for posts that have been labeled by the author themselves.
-				</p>
+			<p class="px-4 pb-3 text-[0.8125rem] text-muted-fg">
+				Adds filter overrides for posts that have been labeled by the author themselves.
+			</p>
 
-				<button class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted">
-					<AddIcon class="text-2xl" />
-					<span>Add user override</span>
-				</button>
-			</div>
+			<button class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted">
+				<AddIcon class="text-2xl" />
+				<span>Add user override</span>
+			</button>
 
 			<hr class="mt-2 border-divider" /> */}
 
-			<div class="flex flex-col">
-				<p class="p-4 text-base font-bold leading-5">Label providers</p>
+			<p class="p-4 text-base font-bold leading-5">Label providers</p>
 
-				<p class="px-4 pb-3 text-[0.8125rem] text-muted-fg">
-					Label providers are communities or instances aiming to provide a better social experience by
-					labeling the content that you see in Bluesky.
-				</p>
+			<p class="px-4 pb-3 text-[0.8125rem] text-muted-fg">
+				Label providers are communities or instances aiming to provide a better social experience by labeling
+				the content that you see in Bluesky.
+			</p>
 
-				<button
-					onClick={() => {
-						openModal(() => (
-							<AddLabelerDialog
-								uid={uid()}
-								onPick={(labeler) => {
-									const $prefs = prefs();
-									$prefs.labelers[labeler.did] = { groups: {}, labels: {} };
-								}}
-							/>
-						));
-					}}
-					class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
-				>
-					<AddIcon class="text-2xl" />
-					<span>Add label provider</span>
-				</button>
+			<button
+				onClick={() => {
+					openModal(() => (
+						<AddLabelerDialog
+							uid={uid()}
+							onPick={(labeler) => {
+								const $prefs = prefs();
+								$prefs.labelers[labeler.did] = { groups: {}, labels: {} };
+							}}
+						/>
+					));
+				}}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
+				<AddIcon class="text-2xl" />
+				<span>Add label provider</span>
+			</button>
 
-				<For each={enabledLabelers()}>
-					{(labeler) => (
-						<A
-							href="/u/:uid/you/moderation/content-filter/labeler/:labeler"
-							params={{ uid: uid(), labeler: labeler.did }}
-							class="flex items-center gap-3 px-4 py-3 text-left hover:bg-hinted"
-						>
-							<div class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg"></div>
+			<For each={enabledLabelers()}>
+				{(labeler) => (
+					<A
+						href="/u/:uid/you/moderation/content-filter/labeler/:labeler"
+						params={{ uid: uid(), labeler: labeler.did }}
+						class="flex items-center gap-3 px-4 py-3 text-left hover:bg-hinted"
+					>
+						<div class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg"></div>
 
-							<div class="min-w-0 grow">
-								<p class="break-words text-sm font-bold">{labeler.name}</p>
-								<p class="text-sm text-muted-fg">@{labeler.handle}</p>
-							</div>
-						</A>
-					)}
-				</For>
-			</div>
+						<div class="min-w-0 grow">
+							<p class="break-words text-sm font-bold">{labeler.name}</p>
+							<p class="text-sm text-muted-fg">@{labeler.handle}</p>
+						</div>
+					</A>
+				)}
+			</For>
 		</div>
 	);
 };

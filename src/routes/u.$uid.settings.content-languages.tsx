@@ -55,9 +55,14 @@ const AuthenticatedLanguagesSettingsPage = () => {
 						<button
 							title="Remove language"
 							onClick={() => {
-								const arr = prefs().cl_codes!;
+								const $prefs = prefs();
+								const arr = $prefs.cl_codes!;
 
 								arr.splice(idx(), 1);
+
+								if (arr.length === 0) {
+									$prefs.cl_codes = undefined;
+								}
 							}}
 							class="-my-1 -mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-xl text-muted-fg hover:bg-hinted"
 						>
@@ -69,13 +74,18 @@ const AuthenticatedLanguagesSettingsPage = () => {
 
 			<button
 				onClick={() => {
-					const codes = (prefs().cl_codes ||= []);
+					const $prefs = prefs();
+					const codes = $prefs.cl_codes;
 
 					openModal(() => (
 						<LanguagePicker
-							exclude={codes}
+							exclude={codes || []}
 							onPick={(next) => {
-								codes.push(next);
+								if (codes) {
+									codes.push(next);
+								} else {
+									$prefs.cl_codes = [next];
+								}
 							}}
 						/>
 					));

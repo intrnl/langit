@@ -84,29 +84,31 @@ const AuthenticatedFeedPage = () => {
 	});
 
 	const isSaved = createMemo(() => {
-		const prefs = getAccountPreferences(uid());
-		const saved = prefs?.savedFeeds;
+		const $prefs = getAccountPreferences(uid());
+		const saved = $prefs?.savedFeeds;
 
 		return !!saved && saved.includes(feedUri());
 	});
 
 	const toggleSave = () => {
-		const prefs = getAccountPreferences(uid());
-		const saved = prefs?.savedFeeds;
+		const $prefs = getAccountPreferences(uid());
+		const saved = $prefs.savedFeeds;
 
 		const uri = feedUri();
 
 		if (isSaved()) {
-			const idx = saved!.indexOf(uri);
-			const next = saved!.slice();
+			if (saved) {
+				const idx = saved.indexOf(uri);
+				saved.splice(idx, 1);
 
-			next.splice(idx, 1);
-
-			prefs.savedFeeds = next;
+				if (saved.length === 0) {
+					$prefs.savedFeeds = undefined;
+				}
+			}
+		} else if (saved) {
+			saved.push(uri);
 		} else {
-			const next = saved ? saved.concat(uri) : [uri];
-
-			prefs.savedFeeds = next;
+			$prefs.savedFeeds = [uri];
 		}
 	};
 

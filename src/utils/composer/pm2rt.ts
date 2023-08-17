@@ -1,6 +1,7 @@
 import type { JSONContent } from '@tiptap/core';
 
 import { graphemeLen } from '~/api/richtext/intl.ts';
+import { toShortUrl } from '~/api/richtext/renderer.ts';
 import type { Facet, LinkFacet } from '~/api/richtext/types.ts';
 
 const encoder = new TextEncoder();
@@ -78,6 +79,14 @@ export const pm2rt = (json: JSONContent) => {
 				leading = false;
 			}
 
+			if (feature && feature.$type === 'app.bsky.richtext.facet#link') {
+				const uri = feature.uri;
+				const shortened = toShortUrl(uri);
+
+				links.push(uri);
+				value = shortened;
+			}
+
 			text += value;
 
 			if (isAscii(value)) {
@@ -88,10 +97,6 @@ export const pm2rt = (json: JSONContent) => {
 			}
 
 			if (feature) {
-				if (feature.$type === 'app.bsky.richtext.facet#link') {
-					links.push(feature.uri);
-				}
-
 				facets.push({
 					index: {
 						byteStart: start,

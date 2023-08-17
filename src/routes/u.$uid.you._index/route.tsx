@@ -132,12 +132,12 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/settings/content-languages"
+				href="/u/:uid/settings/languages"
 				params={params}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<LanguageIcon class="text-xl" />
-				<span>Content languages</span>
+				<span>Languages</span>
 			</A>
 
 			<button

@@ -51,10 +51,6 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.list.$list/route.tsx")),
       },
       {
-        path: "settings/content-languages",
-        component: lazy(() => import("./routes/u.$uid.settings.content-languages.tsx")),
-      },
-      {
         path: "profile/:actor/followers",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.followers.tsx")),
       },
@@ -81,6 +77,10 @@ const routes: RouteDefinition[] = [
       {
         path: "settings/explore/add",
         component: lazy(() => import("./routes/u.$uid.settings.explore.add.tsx")),
+      },
+      {
+        path: "settings/languages",
+        component: lazy(() => import("./routes/u.$uid.settings.languages.tsx")),
       },
       {
         path: "settings/profile",

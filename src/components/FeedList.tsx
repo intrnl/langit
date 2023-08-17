@@ -53,16 +53,23 @@ const FeedList = (props: FeedListProps) => {
 
 					const toggleSave = () => {
 						const $prefs = prefs();
-						const saved = ($prefs.savedFeeds ||= []);
-
 						const uri = feed.uri;
 
-						if (isSaved()) {
-							const idx = saved.indexOf(uri);
+						const saved = $prefs.savedFeeds;
 
-							saved.splice(idx, 1);
-						} else {
+						if (isSaved()) {
+							if (saved) {
+								const idx = saved.indexOf(uri);
+								saved.splice(idx, 1);
+
+								if (saved.length === 0) {
+									$prefs.savedFeeds = undefined;
+								}
+							}
+						} else if (saved) {
 							saved.push(uri);
+						} else {
+							$prefs.savedFeeds = [uri];
 						}
 					};
 
@@ -114,9 +121,7 @@ const FeedList = (props: FeedListProps) => {
 								</div>
 
 								<Show when={feed.description.value}>
-									<div class="whitespace-pre-wrap break-words text-sm">
-										{feed.$renderedDescription()}
-									</div>
+									<div class="whitespace-pre-wrap break-words text-sm">{feed.$renderedDescription()}</div>
 								</Show>
 
 								<p class="text-muted-fg">Liked by {feed.likeCount.value} users</p>

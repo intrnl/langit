@@ -1,4 +1,5 @@
-import { type Accessor, For, Match, Show, Switch, createSignal } from 'solid-js';
+import { type Accessor, For, Match, Show, Switch, createSignal, createMemo } from 'solid-js';
+import { unwrap } from 'solid-js/store';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
@@ -14,6 +15,8 @@ import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { openModal } from '~/globals/modals.tsx';
+import { getAccountPreferences } from '~/globals/preferences.ts';
+import { systemLanguages } from '~/globals/platform.ts';
 import { A, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
@@ -268,7 +271,12 @@ const AuthenticatedPostPage = () => {
 										</div>
 									</div>
 
-									<PostContent uid={uid} post={post} searchParams={searchParams} />
+									<PostContent
+										uid={uid}
+										post={post}
+										searchParams={searchParams}
+										onTranslate={() => setSearchParams({ tl: 'y' }, { replace: true })}
+									/>
 
 									<div class="my-3">
 										<span class="text-sm text-muted-fg">
@@ -436,10 +444,11 @@ interface PostContentProps {
 	uid: Accessor<DID>;
 	post: SignalizedPost;
 	searchParams: PageSearchParams;
+	onTranslate?: () => void;
 	force?: boolean;
 }
 
-const PostContent = ({ uid, post, searchParams, force }: PostContentProps) => {
+const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostContentProps) => {
 	const mod = post.$mod();
 
 	if (!force && mod?.b) {
@@ -462,11 +471,36 @@ const PostContent = ({ uid, post, searchParams, force }: PostContentProps) => {
 				</div>
 
 				<Show when={show()}>
-					<PostContent uid={uid} post={post} searchParams={searchParams} force />
+					<PostContent uid={uid} post={post} searchParams={searchParams} onTranslate={onTranslate} force />
 				</Show>
 			</>
 		);
 	}
+
+	const needTranslation = createMemo(() => {
+		const $record = post.record.value;
+		const langs = $record.langs;
+
+		if (!langs || langs.length < 1) {
+			return false;
+		}
+
+		const $prefs = getAccountPreferences(uid());
+		const preferred = $prefs.ct_language ?? 'system';
+
+		if (preferred === 'none') {
+			return false;
+		}
+
+		const preferredLang = preferred === 'system' ? systemLanguages[0] : preferred;
+		const exclusions = unwrap($prefs.ct_exclusions);
+
+		const unknowns = langs.filter(
+			(code) => code !== preferredLang && (!exclusions || !exclusions.includes(code)),
+		);
+
+		return unknowns.length > 0;
+	});
 
 	return (
 		<>
@@ -476,9 +510,17 @@ const PostContent = ({ uid, post, searchParams, force }: PostContentProps) => {
 
 			<div class="mt-3 whitespace-pre-wrap break-words text-base empty:hidden">{post.$renderedContent()}</div>
 
-			<Show when={searchParams.tl === 'y'}>
-				<PostTranslation text={post.record.value.text} />
-			</Show>
+			<Switch>
+				<Match when={searchParams.tl === 'y'}>
+					<PostTranslation text={post.record.value.text} />
+				</Match>
+
+				<Match when={needTranslation()}>
+					<button onClick={onTranslate} class="mt-3 text-sm text-accent hover:underline">
+						Translate this post
+					</button>
+				</Match>
+			</Switch>
 
 			<Show when={post.embed.value}>{(embed) => <PostEmbedContent uid={uid} embed={embed} mod={mod} />}</Show>
 		</>

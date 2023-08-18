@@ -66,6 +66,10 @@ export interface AccountSettings {
 	cl_unspecified?: boolean;
 	cl_codes?: string[];
 
+	// content translations
+	ct_language?: 'none' | 'system' | (string & {});
+	ct_exclusions?: string[];
+
 	// content filters
 	cf_globals?: ModerationOpts['globals'];
 	cf_users?: ModerationOpts['users'];

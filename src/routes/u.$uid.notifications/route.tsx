@@ -4,9 +4,8 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 
-import { type Collection, getCollectionCursor } from '~/api/utils.ts';
+import { getCollectionCursor } from '~/api/utils.ts';
 
-import type { NotificationsPage } from '~/api/models/notifications.ts';
 import { updateNotificationsSeen } from '~/api/mutations/update-notifications-seen.ts';
 import {
 	getNotifications,

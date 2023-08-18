@@ -213,7 +213,7 @@ const AuthenticatedLanguagesSettingsPage = () => {
 						const pref = prefs().ct_language ?? 'system';
 
 						if (pref === 'none') {
-							return `Disabled`;
+							return `Disabled (None)`;
 						} else if (pref === 'system') {
 							return `Primary system language (${languageNames.of(systemLanguages[0])})`;
 						} else {

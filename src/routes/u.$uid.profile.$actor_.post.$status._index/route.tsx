@@ -247,7 +247,7 @@ const AuthenticatedPostPage = () => {
 											params={{ uid: uid(), actor: author.did }}
 											class="flex flex-col text-sm"
 										>
-											<span class="line-clamp-1 break-all font-bold hover:underline">
+											<span dir="auto" class="line-clamp-1 break-all font-bold hover:underline">
 												{author.displayName.value || author.handle.value}
 											</span>
 											<span class="line-clamp-1 break-all text-muted-fg">@{author.handle.value}</span>

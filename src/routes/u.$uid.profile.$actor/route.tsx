@@ -77,7 +77,7 @@ const AuthenticatedProfileLayout = () => {
 									/ Langit
 								</Title>
 
-								<p class="line-clamp-1 break-all text-base font-bold leading-5">
+								<p dir="auto" class="line-clamp-1 break-all text-base font-bold leading-5">
 									{profile().displayName.value || profile().handle.value}
 								</p>
 								<p class="text-xs text-muted-fg">{comformat.format(profile().postsCount.value)} posts</p>
@@ -158,7 +158,7 @@ const AuthenticatedProfileLayout = () => {
 									</div>
 
 									<div>
-										<p class="line-clamp-1 break-all text-xl font-bold">
+										<p dir="auto" class="line-clamp-1 break-all text-xl font-bold">
 											{profile().displayName.value || profile().handle.value}
 										</p>
 										<p class="flex items-center text-sm text-muted-fg">

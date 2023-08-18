@@ -242,6 +242,7 @@ const renderText = (
 
 		nodes.push(
 			<A
+				dir="auto"
 				href="/u/:uid/profile/:actor"
 				params={{ uid: uid, actor: author.did }}
 				class="font-bold hover:underline"

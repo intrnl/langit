@@ -95,7 +95,9 @@ const Post = (props: PostProps) => {
 								params={{ uid: uid(), actor: reason()!.by.did }}
 								class="flex font-medium hover:underline"
 							>
-								<span class="line-clamp-1 break-all">{reason()!.by.displayName || reason()!.by.handle}</span>
+								<span dir="auto" class="line-clamp-1 break-all">
+									{reason()!.by.displayName || reason()!.by.handle}
+								</span>
 								<span class="whitespace-pre"> Reposted</span>
 							</A>
 						</div>
@@ -115,7 +117,7 @@ const Post = (props: PostProps) => {
 									class="flex font-medium hover:underline"
 								>
 									<span class="whitespace-pre">Replying to </span>
-									<span class="line-clamp-1">
+									<span dir="auto" class="line-clamp-1">
 										{parent()!.author.displayName.value || parent()!.author.handle.value}
 									</span>
 								</A>
@@ -168,7 +170,7 @@ const Post = (props: PostProps) => {
 									params={{ uid: uid(), actor: author().did }}
 									class="group flex gap-1"
 								>
-									<span class="line-clamp-1 break-all font-bold group-hover:underline">
+									<span dir="auto" class="line-clamp-1 break-all font-bold group-hover:underline">
 										{author().displayName.value || author().handle.value}
 									</span>
 									<span class="line-clamp-1 break-all text-muted-fg">@{author().handle.value}</span>

@@ -83,9 +83,7 @@ const ProfileList = (props: ProfileListProps) => {
 										</div>
 
 										<Show when={profile.description.value}>
-											<div class="line-clamp-3 break-words text-sm">
-												{profile.$renderedDescription()}
-											</div>
+											<div class="line-clamp-3 break-words text-sm">{profile.$renderedDescription()}</div>
 										</Show>
 									</div>
 								</div>

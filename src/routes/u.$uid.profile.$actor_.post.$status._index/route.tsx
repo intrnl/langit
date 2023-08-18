@@ -502,6 +502,14 @@ const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostConten
 		return unknowns.length > 0;
 	});
 
+	const preferredLanguage = () => {
+		const $prefs = getAccountPreferences(uid());
+		const preferred = $prefs.ct_language ?? 'system';
+
+		const preferredLang = preferred === 'system' || preferred === 'none' ? systemLanguages[0] : preferred;
+		return preferredLang;
+	};
+
 	return (
 		<>
 			<Show when={post.$deleted.value}>
@@ -512,7 +520,7 @@ const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostConten
 
 			<Switch>
 				<Match when={searchParams.tl === 'y'}>
-					<PostTranslation text={post.record.value.text} />
+					<PostTranslation text={post.record.value.text} target={preferredLanguage()} />
 				</Match>
 
 				<Match when={needTranslation()}>

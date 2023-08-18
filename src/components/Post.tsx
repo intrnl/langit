@@ -6,7 +6,7 @@ import { A as UntypedAnchor, useNavigate } from '@solidjs/router';
 import type { SignalizedPost, SignalizedTimelinePost } from '~/api/cache/posts.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 
-import { type ModerationDecision, CauseLabel } from '~/api/moderation/action.ts';
+import { type ModerationDecision, CauseLabel, CauseMutedKeyword } from '~/api/moderation/action.ts';
 import { getRecordId } from '~/api/utils.ts';
 
 import { openModal } from '~/globals/modals.tsx';
@@ -36,6 +36,7 @@ interface PostProps {
 	next?: boolean;
 	interactive?: boolean;
 	highlight?: boolean;
+	timelineDid?: DID;
 }
 
 const Post = (props: PostProps) => {
@@ -207,7 +208,7 @@ const Post = (props: PostProps) => {
 						</Show>
 					</div>
 
-					<PostContent uid={uid} post={post} />
+					<PostContent uid={uid} post={post} timelineDid={props.timelineDid} />
 
 					<Show when={interactive()}>
 						<div class="mt-3 flex text-muted-fg">
@@ -278,13 +279,21 @@ export default Post;
 interface PostContentProps {
 	uid: Accessor<DID>;
 	post: Accessor<SignalizedPost>;
+	timelineDid?: DID;
 	force?: boolean;
 }
 
-const PostContent = ({ uid, post, force }: PostContentProps) => {
+const PostContent = ({ uid, post, force, timelineDid }: PostContentProps) => {
 	const mod = post().$mod();
 
-	if (!force && mod?.b) {
+	if (
+		!force &&
+		mod?.b &&
+		(!timelineDid ||
+			mod.s.t === CauseLabel ||
+			mod.s.t === CauseMutedKeyword ||
+			timelineDid !== post().author.did)
+	) {
 		const [show, setShow] = createSignal(false);
 
 		const source = mod.s;

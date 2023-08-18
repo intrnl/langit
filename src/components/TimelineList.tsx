@@ -15,6 +15,7 @@ export interface TimelineListProps {
 	uid: DID;
 	timeline: FeedResource;
 	latest?: FeedLatestResource;
+	timelineDid?: DID;
 	onRefetch: () => void;
 	onLoadMore: (cursor: string) => void;
 }
@@ -86,6 +87,7 @@ const TimelineList = (props: TimelineListProps) => {
 									reason={/* @once */ item.reason}
 									prev={idx !== 0}
 									next={idx !== len - 1}
+									timelineDid={props.timelineDid}
 								/>
 							</VirtualContainer>
 						));

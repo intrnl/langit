@@ -65,6 +65,7 @@ const ProfileTimeline = ({ uid, profile, tab }: ProfileTimelineProps) => {
 			uid={uid()}
 			timeline={timeline}
 			latest={latest}
+			timelineDid={profile().did}
 			onLoadMore={(cursor) => refetch(true, cursor)}
 			onRefetch={() => refetch(true)}
 		/>

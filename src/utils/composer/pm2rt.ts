@@ -139,8 +139,6 @@ export const pm2rt = (json: JSONContent) => {
 	text = trimmed;
 	length -= trailOffset;
 
-	console.log(text);
-
 	return {
 		length: ascii ? length : graphemeLen(text),
 		text,

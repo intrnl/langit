@@ -19,11 +19,12 @@ export default defineConfig({
 			},
 			manifest: {
 				name: 'Langit',
+				short_name: 'Langit',
 				description: 'Alternative client for Bluesky social media',
 				display: 'standalone',
 				id: '/?source=pwa',
 				start_url: '/?source=pwa',
-				background_color: '#101010',
+				background_color: '#000000',
 				scope: '/',
 				icons: [
 					{

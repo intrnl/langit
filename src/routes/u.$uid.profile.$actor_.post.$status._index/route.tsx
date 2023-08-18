@@ -7,7 +7,7 @@ import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
 
-import { type ModerationDecision, CauseLabel } from '~/api/moderation/action.ts';
+import { type ModerationDecision, CauseLabel, CauseMutedKeyword } from '~/api/moderation/action.ts';
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import type { SignalizedPost } from '~/api/cache/posts.ts';
@@ -451,7 +451,7 @@ interface PostContentProps {
 const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostContentProps) => {
 	const mod = post.$mod();
 
-	if (!force && mod?.b) {
+	if (!force && mod?.b && (mod.s.t === CauseLabel || mod.s.t === CauseMutedKeyword)) {
 		const [show, setShow] = createSignal(false);
 
 		const source = mod.s;

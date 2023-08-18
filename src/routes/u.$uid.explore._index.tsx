@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createMemo } from 'solid-js';
+import { For, Match, Show, Switch, createMemo, createSignal, onCleanup } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
@@ -22,6 +22,7 @@ import Post from '~/components/Post.tsx';
 import SearchInput from '~/components/SearchInput.tsx';
 import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
 
+import RefreshIcon from '~/icons/baseline-refresh.tsx';
 import SettingsIcon from '~/icons/baseline-settings.tsx';
 
 const MAX_POSTS = 5;
@@ -33,8 +34,29 @@ const AuthenticatedExplorePage = () => {
 	const uid = () => params.uid as DID;
 
 	const savedFeeds = createMemo(() => {
-		return preferences[uid()]?.savedFeeds || [];
+		return preferences[uid()]?.savedFeeds;
 	});
+
+	const [refetching, setRefetching] = createSignal(false);
+	const refetches: (() => void | Promise<void>)[] = [];
+
+	const refetchAll = () => {
+		const promises: Promise<void>[] = [];
+
+		for (let idx = 0, len = refetches.length; idx < len; idx++) {
+			const refetch = refetches[idx];
+			const promise = refetch();
+
+			if (promise) {
+				promises.push(promise);
+			}
+		}
+
+		if (promises.length > 0) {
+			setRefetching(true);
+			Promise.all(promises).then(() => setRefetching(false));
+		}
+	};
 
 	return (
 		<div class="flex flex-col pb-4">
@@ -48,6 +70,16 @@ const AuthenticatedExplorePage = () => {
 						}
 					}}
 				/>
+
+				<Show when={savedFeeds()}>
+					<button
+						disabled={refetching()}
+						onClick={refetchAll}
+						class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary disabled:pointer-events-none disabled:opacity-50"
+					>
+						<RefreshIcon />
+					</button>
+				</Show>
 
 				<A
 					href="/u/:uid/settings/explore"
@@ -66,17 +98,30 @@ const AuthenticatedExplorePage = () => {
 				}
 			>
 				{(feedUri) => {
-					const [feed] = createQuery({
+					const [feed, { refetch: refetchFeed }] = createQuery({
 						key: () => getFeedGeneratorKey(uid(), feedUri),
 						fetch: getFeedGenerator,
 						staleTime: 120_000,
 						initialData: getInitialFeedGenerator,
 					});
 
-					const [timeline] = createQuery({
+					const [timeline, { refetch: refetchTimeline }] = createQuery({
 						key: () => getTimelineKey(uid(), { type: 'custom', uri: feedUri }, MAX_POSTS),
 						fetch: getTimeline,
-						staleTime: 60_000,
+						staleTime: 5_000,
+						refetchOnMount: false,
+						refetchOnWindowFocus: false,
+					});
+
+					const refetch = () => {
+						refetchFeed();
+						return refetchTimeline();
+					};
+
+					refetches.push(refetch);
+					onCleanup(() => {
+						const idx = refetches.indexOf(refetch);
+						refetches.splice(idx, 1);
 					});
 
 					return (

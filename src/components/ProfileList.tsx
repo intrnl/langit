@@ -69,7 +69,7 @@ const ProfileList = (props: ProfileListProps) => {
 									<div class="flex min-w-0 grow flex-col gap-1">
 										<div class="flex items-center justify-between gap-3">
 											<div class="flex flex-col text-sm">
-												<span class="line-clamp-1 break-all font-bold">
+												<span dir="auto" class="line-clamp-1 break-all font-bold">
 													{profile.displayName.value || profile.handle.value}
 												</span>
 												<span class="line-clamp-1 break-all text-muted-fg">@{profile.handle.value}</span>

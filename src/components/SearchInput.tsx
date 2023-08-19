@@ -8,7 +8,7 @@ export interface SearchInputProps {
 
 const SearchInput = (props: SearchInputProps) => {
 	return (
-		<div class="flex h-8 flex-grow rounded-full bg-hinted outline-2 -outline-offset-1 outline-accent outline-none focus-within:outline dark:bg-[#202327]">
+		<div class="flex h-8 grow rounded-full bg-hinted outline-2 -outline-offset-1 outline-accent outline-none focus-within:outline dark:bg-[#202327]">
 			<input
 				type="text"
 				value={props.value ?? ''}
@@ -20,7 +20,7 @@ const SearchInput = (props: SearchInputProps) => {
 						props.onEnter(value);
 					}
 				}}
-				class="peer flex-grow bg-transparent pl-4 text-sm text-primary outline-none placeholder:text-muted-fg"
+				class="peer grow bg-transparent pl-4 text-sm text-primary outline-none placeholder:text-muted-fg"
 			/>
 
 			<button

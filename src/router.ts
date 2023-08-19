@@ -16,11 +16,14 @@ import {
 export type PathsWithParams = 
 	| "/u/:uid"
 	| "/u/:uid/you/moderation/content-filter/labeler/:labeler"
+	| "/u/:uid/you/moderation/keyword-filter/:fid/edit"
 	| "/u/:uid/profile/:actor/post/:status/reposts"
 	| "/u/:uid/you/moderation/content-filter"
 	| "/u/:uid/you/moderation/content-filter/global"
+	| "/u/:uid/you/moderation/keyword-filter"
 	| "/u/:uid/profile/:actor/post/:status"
 	| "/u/:uid/profile/:actor/post/:status/likes"
+	| "/u/:uid/you/moderation/keyword-filter/add"
 	| "/u/:uid/you/moderation/muted"
 	| "/u/:uid/profile/:actor/feed/:feed"
 	| "/u/:uid/profile/:actor/list/:list"
@@ -54,11 +57,14 @@ export type Paths = PathsWithParams | PathsWithoutParams;
 export interface Params {
 	"/u/:uid": { "uid": string };
 	"/u/:uid/you/moderation/content-filter/labeler/:labeler": { "uid": string, "labeler": string };
+	"/u/:uid/you/moderation/keyword-filter/:fid/edit": { "uid": string, "fid": string };
 	"/u/:uid/profile/:actor/post/:status/reposts": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/you/moderation/content-filter": { "uid": string };
 	"/u/:uid/you/moderation/content-filter/global": { "uid": string };
+	"/u/:uid/you/moderation/keyword-filter": { "uid": string };
 	"/u/:uid/profile/:actor/post/:status": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/post/:status/likes": { "uid": string, "actor": string, "status": string };
+	"/u/:uid/you/moderation/keyword-filter/add": { "uid": string };
 	"/u/:uid/you/moderation/muted": { "uid": string };
 	"/u/:uid/profile/:actor/feed/:feed": { "uid": string, "actor": string, "feed": string };
 	"/u/:uid/profile/:actor/list/:list": { "uid": string, "actor": string, "list": string };

@@ -1,4 +1,4 @@
-import { type Accessor, type Setter, createRenderEffect } from 'solid-js';
+import { type Accessor, createRenderEffect } from 'solid-js';
 
 export const EMPTY_ARRAY: unknown[] = [];
 
@@ -62,7 +62,7 @@ export const isElementAltClicked = (ev: MouseEvent | KeyboardEvent) => {
 	return ev.type === 'auxclick' || ev.ctrlKey;
 };
 
-export const model = (getter: Accessor<string>, setter: Setter<string>) => {
+export const model = (getter: Accessor<string>, setter: (next: string) => void) => {
 	return (node: HTMLInputElement | HTMLTextAreaElement) => {
 		createRenderEffect(() => {
 			node.value = getter();
@@ -70,6 +70,18 @@ export const model = (getter: Accessor<string>, setter: Setter<string>) => {
 
 		node.addEventListener('input', () => {
 			setter(node.value);
+		});
+	};
+};
+
+export const modelChecked = (getter: Accessor<boolean>, setter: (next: boolean) => void) => {
+	return (node: HTMLInputElement) => {
+		createRenderEffect(() => {
+			node.checked = getter();
+		});
+
+		node.addEventListener('input', () => {
+			setter(node.checked);
 		});
 	};
 };

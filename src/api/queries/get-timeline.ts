@@ -14,7 +14,13 @@ import {
 	createTimelineSlices,
 } from '../models/timeline.ts';
 
-import { decideLabelModeration, finalizeModeration } from '../moderation/action.ts';
+import {
+	type ModerationCause,
+	decideLabelModeration,
+	decideMutedKeywordModeration,
+	finalizeModeration,
+} from '../moderation/action.ts';
+import { PreferenceHide } from '../moderation/enums.ts';
 import { type Collection, pushCollection } from '../utils.ts';
 
 import _getDid from './_did.ts';
@@ -388,11 +394,10 @@ const createLabelPostFilter = (uid: DID): PostFilter | undefined => {
 		const post = item.post;
 		const labels = post.labels;
 
-		if (!labels || labels.length < 1) {
-			return true;
-		}
+		const accu: ModerationCause[] = [];
+		decideLabelModeration(accu, labels, post.author.did, prefs);
+		decideMutedKeywordModeration(accu, (post.record as PostRecord).text, PreferenceHide, prefs);
 
-		const accu = decideLabelModeration([], labels, post.author.did, prefs);
 		const decision = finalizeModeration(accu);
 
 		return !decision?.f;

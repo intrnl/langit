@@ -7,11 +7,14 @@ import { A } from '@solidjs/router';
 import {
 	type ModerationCause,
 	CauseLabel,
+	CauseMutedKeyword,
 	decideLabelModeration,
+	decideMutedKeywordModeration,
 	decideMutedPermanentModeration,
 	decideMutedTemporaryModeration,
 	finalizeModeration,
 } from '~/api/moderation/action.ts';
+import { PreferenceWarn } from '~/api/moderation/enums.ts';
 import { getRecordId } from '~/api/utils.ts';
 
 import { getAccountModerationPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
@@ -75,6 +78,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 		decideLabelModeration(accu, $record.labels, authorDid, prefs);
 		decideMutedPermanentModeration(accu, $record.author.viewer?.muted);
 		decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted($uid, authorDid));
+		decideMutedKeywordModeration(accu, ($record.value as PostRecord).text, PreferenceWarn, prefs);
 
 		return finalizeModeration(accu);
 	});
@@ -89,7 +93,11 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 							const $mod = mod()!;
 
 							const source = $mod.s;
-							return source.t === CauseLabel ? `Quote warning: ${source.l.val}` : `Quote from a user you've muted`;
+							return source.t === CauseLabel
+								? `Quote warning: ${source.l.val}`
+								: source.t === CauseMutedKeyword
+								? `Filtered: ${source.n}`
+								: `Quote from a user you've muted`;
 						})()}
 					</p>
 

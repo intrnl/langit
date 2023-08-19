@@ -21,12 +21,14 @@ const createAccountModerationPreferences = (uid: DID): ModerationOpts => {
 		$prefs.cf_globals ||= { groups: {}, labels: {} };
 		$prefs.cf_users ||= {};
 		$prefs.cf_labelers ||= {};
+		$prefs.cf_keywords ||= [];
 
 		return {
 			userDid: uid,
 			globals: $prefs.cf_globals,
 			labelers: $prefs.cf_labelers,
 			users: $prefs.cf_users,
+			filters: $prefs.cf_keywords,
 		};
 	});
 };
@@ -74,6 +76,7 @@ export interface AccountSettings {
 	cf_globals?: ModerationOpts['globals'];
 	cf_users?: ModerationOpts['users'];
 	cf_labelers?: ModerationOpts['labelers'];
+	cf_keywords?: ModerationOpts['filters'];
 
 	// post filters
 	pf_hideReposts?: DID[];

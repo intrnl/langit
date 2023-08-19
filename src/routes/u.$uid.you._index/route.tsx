@@ -14,6 +14,7 @@ import AddIcon from '~/icons/baseline-add.tsx';
 import BlockIcon from '~/icons/baseline-block.tsx';
 import BrightnessMediumIcon from '~/icons/baseline-brightness-medium.tsx';
 import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
+import FilterAltIcon from '~/icons/baseline-filter-alt.tsx';
 import GroupOffIcon from '~/icons/baseline-group-off.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
@@ -173,7 +174,16 @@ const AuthenticatedYouPage = () => {
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<VisibilityIcon class="text-xl" />
-				<span>Content filtering</span>
+				<span>Content filters</span>
+			</A>
+
+			<A
+				href="/u/:uid/you/moderation/keyword-filter"
+				params={params}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
+				<FilterAltIcon class="text-xl" />
+				<span>Keyword filters</span>
 			</A>
 
 			<A

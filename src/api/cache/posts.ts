@@ -6,10 +6,12 @@ import {
 	type ModerationCause,
 	type ModerationDecision,
 	decideLabelModeration,
+	decideMutedKeywordModeration,
 	decideMutedPermanentModeration,
 	decideMutedTemporaryModeration,
 	finalizeModeration,
 } from '../moderation/action.ts';
+import { PreferenceWarn } from '../moderation/enums.ts';
 import { createRenderedRichText } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 
@@ -138,6 +140,7 @@ export const createPostModerationDecision = (uid: DID) => {
 			const prefs = getAccountModerationPreferences(uid);
 
 			const labels = this.labels;
+			const record = this.record;
 			const muted = this.author.viewer.muted;
 			const authorDid = this.author.did;
 
@@ -148,6 +151,7 @@ export const createPostModerationDecision = (uid: DID) => {
 					decideLabelModeration(accu, labels.value, authorDid, prefs);
 					decideMutedPermanentModeration(accu, muted.value);
 					decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted(uid, authorDid));
+					decideMutedKeywordModeration(accu, record.value.text, PreferenceWarn, prefs);
 
 					return finalizeModeration(accu);
 				});

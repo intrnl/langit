@@ -3,6 +3,7 @@ export const PreferenceWarn = 2;
 export const PreferenceHide = 3;
 
 export type LabelPreference = 1 | 2 | 3;
+export type KeywordPreference = 1 | 2 | 3;
 
 export const ActionBlur = 1;
 export const ActionBlurMedia = 2;

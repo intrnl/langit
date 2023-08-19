@@ -19,6 +19,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.you.moderation.content-filter.labeler.$labeler/route.tsx")),
       },
       {
+        path: "you/moderation/keyword-filter/:fid/edit",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.keyword-filter.$fid.edit/route.tsx")),
+      },
+      {
         path: "profile/:actor/post/:status/reposts",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status.reposts.tsx")),
       },
@@ -31,12 +35,20 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.you.moderation.content-filter.global/route.tsx")),
       },
       {
+        path: "you/moderation/keyword-filter",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.keyword-filter._index/route.tsx")),
+      },
+      {
         path: "profile/:actor/post/:status",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status._index/route.tsx")),
       },
       {
         path: "profile/:actor/post/:status/likes",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.post.$status.likes.tsx")),
+      },
+      {
+        path: "you/moderation/keyword-filter/add",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.keyword-filter.add/route.tsx")),
       },
       {
         path: "you/moderation/muted",

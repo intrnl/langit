@@ -2,6 +2,8 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
 import type { Label, LabelDefinition, ModerationOpts } from './types.js';
 import {
+	type KeywordPreference,
+	type LabelPreference,
 	ActionAlert,
 	ActionBlur,
 	ActionBlurMedia,
@@ -36,7 +38,7 @@ export interface LabelModerationCause extends BaseModerationCause {
 	/** Label definition */
 	d: LabelDefinition;
 	/** User's set preference for this cause */
-	v: number;
+	v: LabelPreference;
 }
 
 export interface MutedPermanentModerationCause extends BaseModerationCause {
@@ -58,6 +60,8 @@ export interface MutedKeywordModerationCause extends BaseModerationCause {
 
 	/** Name of keyword muting in effect */
 	n: string;
+	/** User's set preference for this cause */
+	v: KeywordPreference;
 }
 
 export type ModerationCause =
@@ -67,8 +71,6 @@ export type ModerationCause =
 	| MutedKeywordModerationCause;
 
 export interface ModerationDecision {
-	// c: ModerationCause[];
-
 	/** Moderation cause responsible for this decision */
 	s: ModerationCause;
 
@@ -200,6 +202,53 @@ export const decideMutedTemporaryModeration = (accu: ModerationCause[], duration
 	return accu;
 };
 
+export const decideMutedKeywordModeration = (
+	accu: ModerationCause[],
+	text: string,
+	pref: KeywordPreference,
+	opts: ModerationOpts,
+) => {
+	const filters = opts.filters;
+
+	let cache = opts._filtersCache;
+	let init = true;
+
+	for (let idx = 0, len = filters.length; idx < len; idx++) {
+		const filter = filters[idx];
+
+		if (filter.pref !== pref) {
+			continue;
+		}
+
+		if (init) {
+			if (cache) {
+				cache.length = len;
+			} else {
+				cache = opts._filtersCache = new Array(len);
+			}
+
+			init = !init;
+		}
+
+		let match = filter.match;
+
+		let matcher: RegExp;
+		let cachedMatcher = cache![idx];
+
+		if (!cachedMatcher || cachedMatcher[0] !== match) {
+			cache![idx] = [match, (matcher = new RegExp(match))];
+		} else {
+			matcher = cachedMatcher[1];
+		}
+
+		if (matcher.test(text)) {
+			accu.push({ t: CauseMutedKeyword, p: 6, n: filter.name, v: pref });
+		}
+	}
+
+	return accu;
+};
+
 export const finalizeModeration = (accu: ModerationCause[]): ModerationDecision | undefined => {
 	if (accu.length > 0) {
 		const cause = accu.sort((a, b) => a.p - b.p)[0];
@@ -211,7 +260,7 @@ export const finalizeModeration = (accu: ModerationCause[]): ModerationDecision 
 		return {
 			s: cause,
 
-			f: isLabelCause && cause.v === PreferenceHide,
+			f: (isLabelCause || cause.t === CauseMutedKeyword) && cause.v === PreferenceHide,
 			a: action === ActionAlert,
 			b: action === ActionBlur,
 			m: action === ActionBlurMedia,

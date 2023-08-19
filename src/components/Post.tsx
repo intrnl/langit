@@ -299,7 +299,12 @@ const PostContent = ({ uid, post, force, timelineDid }: PostContentProps) => {
 		const [show, setShow] = createSignal(false);
 
 		const source = mod.s;
-		const title = source.t === CauseLabel ? `Content warning: ${source.l.val}` : `You've muted this user`;
+		const title =
+			source.t === CauseLabel
+				? `Content warning: ${source.l.val}`
+				: source.t === CauseMutedKeyword
+				? `Filtered: ${source.n}`
+				: `You've muted this user`;
 
 		return (
 			<>

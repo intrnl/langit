@@ -28,10 +28,10 @@ const AuthenticatedContentFilterModerationPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Content filtering / Langit</Title>
+			<Title>Content filters / Langit</Title>
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
-				<p class="text-base font-bold">Content filtering</p>
+				<p class="text-base font-bold">Content filters</p>
 			</div>
 
 			<A

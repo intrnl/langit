@@ -27,11 +27,11 @@ const EXCLUDED_TAGS = ['a', 'button', 'img', 'video', 'dialog'];
 export const INTERACTION_TAGS = ['a', 'button'];
 
 export const isElementClicked = (ev: Event, excludedTags: string[] = EXCLUDED_TAGS) => {
-	const node = ev.currentTarget as HTMLElement;
+	const target = ev.currentTarget as HTMLElement;
 	const path = ev.composedPath() as HTMLElement[];
 
 	if (
-		!path.includes(node) ||
+		!path.includes(target) ||
 		(ev.type === 'keydown' && (ev as KeyboardEvent).key !== 'Enter') ||
 		(ev.type === 'auxclick' && (ev as MouseEvent).button !== 1)
 	) {
@@ -42,7 +42,7 @@ export const isElementClicked = (ev: Event, excludedTags: string[] = EXCLUDED_TA
 		const node = path[idx];
 		const tag = node.localName;
 
-		if (node == ev.currentTarget) {
+		if (node == target) {
 			break;
 		}
 

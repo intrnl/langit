@@ -347,7 +347,7 @@ const PostContent = ({ uid, post, force, timelineDid }: PostContentProps) => {
 // <PostEmbedContent />
 interface PostEmbedContentProps {
 	uid: Accessor<DID>;
-	mod?: ModerationDecision;
+	mod?: ModerationDecision | null;
 	embed: Accessor<NonNullable<RefOf<'app.bsky.feed.defs#postView'>['embed']>>;
 	force?: boolean;
 }

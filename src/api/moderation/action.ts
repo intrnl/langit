@@ -249,7 +249,7 @@ export const decideMutedKeywordModeration = (
 	return accu;
 };
 
-export const finalizeModeration = (accu: ModerationCause[]): ModerationDecision | undefined => {
+export const finalizeModeration = (accu: ModerationCause[]): ModerationDecision | null => {
 	if (accu.length > 0) {
 		const cause = accu.sort((a, b) => a.p - b.p)[0];
 
@@ -266,4 +266,6 @@ export const finalizeModeration = (accu: ModerationCause[]): ModerationDecision 
 			m: action === ActionBlurMedia,
 		};
 	}
+
+	return null
 };

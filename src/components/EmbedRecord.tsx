@@ -1,4 +1,4 @@
-import { Show, createMemo, createSignal } from 'solid-js';
+import { type Accessor, Show, createMemo, createSignal, createRoot } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
 import type { DID, Records, UnionOf } from '@intrnl/bluesky-client/atp-schema';
@@ -6,6 +6,7 @@ import { A } from '@solidjs/router';
 
 import {
 	type ModerationCause,
+	type ModerationDecision,
 	CauseLabel,
 	CauseMutedKeyword,
 	decideLabelModeration,
@@ -18,6 +19,7 @@ import { PreferenceWarn } from '~/api/moderation/enums.ts';
 import { getRecordId } from '~/api/utils.ts';
 
 import { getAccountModerationPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
+import { createLazyMemo } from '~/utils/hooks.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
 import EmbedImage from '~/components/EmbedImage.tsx';
@@ -32,6 +34,8 @@ export interface EmbedRecordProps {
 	large?: boolean;
 	interactive?: boolean;
 }
+
+const moderationCache = new WeakMap<EmbeddedPostRecord, Accessor<ModerationDecision | null>>();
 
 const EmbedRecord = (props: EmbedRecordProps) => {
 	const uid = () => props.uid;
@@ -64,23 +68,32 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 		}
 	});
 
-	// TODO: figure out what else to do with the labels here, right now we're only
-	// using it for media embeds specifically
-	// TODO: should this be moved to a global cache somewhere?
 	const mod = createMemo(() => {
-		const $uid = uid();
 		const $record = record();
+		let decision = moderationCache.get($record);
 
-		const authorDid = $record.author.did;
-		const prefs = getAccountModerationPreferences($uid);
+		if (!decision) {
+			const $uid = uid();
 
-		const accu: ModerationCause[] = [];
-		decideLabelModeration(accu, $record.labels, authorDid, prefs);
-		decideMutedPermanentModeration(accu, $record.author.viewer?.muted);
-		decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted($uid, authorDid));
-		decideMutedKeywordModeration(accu, ($record.value as PostRecord).text, PreferenceWarn, prefs);
+			const authorDid = $record.author.did;
+			const prefs = getAccountModerationPreferences($uid);
 
-		return finalizeModeration(accu);
+			decision = createRoot(() => {
+				return createLazyMemo(() => {
+					const accu: ModerationCause[] = [];
+					decideLabelModeration(accu, $record.labels, authorDid, prefs);
+					decideMutedPermanentModeration(accu, $record.author.viewer?.muted);
+					decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted($uid, authorDid));
+					decideMutedKeywordModeration(accu, ($record.value as PostRecord).text, PreferenceWarn, prefs);
+
+					return finalizeModeration(accu);
+				});
+			});
+
+			moderationCache.set($record, decision);
+		}
+
+		return decision();
 	});
 
 	return (

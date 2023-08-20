@@ -133,7 +133,7 @@ export const createSignalizedTimelinePost = (
 };
 
 export const createPostModerationDecision = (uid: DID) => {
-	let accessor: Accessor<ModerationDecision | undefined>;
+	let accessor: Accessor<ModerationDecision | null>;
 
 	return function (this: SignalizedPost) {
 		if (!accessor) {

@@ -41,6 +41,8 @@ const LogoutConfirmDialog = (props: LogoutConfirmDialogProps) => {
 
 						if (uid() === did) {
 							navigate('/');
+						} else {
+							closeModal();
 						}
 					}}
 					class={/* @once */ button({ color: 'primary' })}

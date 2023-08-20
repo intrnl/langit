@@ -76,15 +76,18 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 			const $uid = uid();
 
 			const authorDid = $record.author.did;
+			const isPermanentlyMuted = $record.author.viewer?.muted;
+			const recordText = ($record.value as PostRecord).text;
+
 			const prefs = getAccountModerationPreferences($uid);
 
 			decision = createRoot(() => {
 				return createLazyMemo(() => {
 					const accu: ModerationCause[] = [];
 					decideLabelModeration(accu, $record.labels, authorDid, prefs);
-					decideMutedPermanentModeration(accu, $record.author.viewer?.muted);
+					decideMutedPermanentModeration(accu, isPermanentlyMuted);
 					decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted($uid, authorDid));
-					decideMutedKeywordModeration(accu, ($record.value as PostRecord).text, PreferenceWarn, prefs);
+					decideMutedKeywordModeration(accu, recordText, PreferenceWarn, prefs);
 
 					return finalizeModeration(accu);
 				});

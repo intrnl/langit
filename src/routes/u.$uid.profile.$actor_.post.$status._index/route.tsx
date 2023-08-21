@@ -481,7 +481,7 @@ const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostConten
 		const $record = post.record.value;
 		const langs = $record.langs;
 
-		if (!langs || langs.length < 1) {
+		if (!langs || !$record.text || langs.length < 1) {
 			return false;
 		}
 

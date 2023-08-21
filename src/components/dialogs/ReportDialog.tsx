@@ -125,7 +125,7 @@ const ReportDialog = (props: ReportDialogProps) => {
 
 			await agent.rpc.call('com.atproto.moderation.createReport', {
 				data: {
-					reasonType: $type!.name,
+					reasonType: $type!.value,
 					subject: subject,
 					reason: $reason,
 				},

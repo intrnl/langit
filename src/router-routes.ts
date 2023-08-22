@@ -51,16 +51,16 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.you.moderation.keyword-filter.add/route.tsx")),
       },
       {
+        path: "profile/:actor/lists/:list",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.lists.$list/route.tsx")),
+      },
+      {
         path: "you/moderation/muted",
         component: lazy(() => import("./routes/u.$uid.you.moderation.muted._index.tsx")),
       },
       {
         path: "profile/:actor/feed/:feed",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.feed.$feed.tsx")),
-      },
-      {
-        path: "profile/:actor/list/:list",
-        component: lazy(() => import("./routes/u.$uid.profile.$actor_.list.$list/route.tsx")),
       },
       {
         path: "profile/:actor/followers",
@@ -111,16 +111,16 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$actor/route.tsx")),
         children: [
           {
+            path: "lists",
+            component: lazy(() => import("./routes/u.$uid.profile.$actor.lists._index.tsx")),
+          },
+          {
             path: "with_replies",
             component: lazy(() => import("./routes/u.$uid.profile.$actor.with_replies.tsx")),
           },
           {
             path: "feed",
             component: lazy(() => import("./routes/u.$uid.profile.$actor.feed._index.tsx")),
-          },
-          {
-            path: "list",
-            component: lazy(() => import("./routes/u.$uid.profile.$actor.list._index.tsx")),
           },
           {
             path: "/",

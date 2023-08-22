@@ -8,7 +8,7 @@ import { useParams } from '~/router.ts';
 import ListList from '~/components/ListList';
 
 const AuthenticatedProfileListsPage = () => {
-	const params = useParams('/u/:uid/profile/:actor/list');
+	const params = useParams('/u/:uid/profile/:actor/lists');
 
 	const uid = () => params.uid as DID;
 

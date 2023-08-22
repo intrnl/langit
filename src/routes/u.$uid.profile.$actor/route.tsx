@@ -204,7 +204,7 @@ const AuthenticatedProfileLayout = () => {
 													<p>
 														This user is muted by{' '}
 														<A
-															href="/u/:uid/profile/:actor/list/:list"
+															href="/u/:uid/profile/:actor/lists/:list"
 															params={{
 																uid: uid(),
 																actor: getRepoId(list().uri),
@@ -295,7 +295,7 @@ const AuthenticatedProfileLayout = () => {
 											</TabLink>
 
 											<Show when={!!lists()?.pages[0]?.lists.length}>
-												<TabLink href="/u/:uid/profile/:actor/list" params={params} replace>
+												<TabLink href="/u/:uid/profile/:actor/lists" params={params} replace>
 													Lists
 												</TabLink>
 											</Show>

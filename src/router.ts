@@ -24,9 +24,9 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/post/:status"
 	| "/u/:uid/profile/:actor/post/:status/likes"
 	| "/u/:uid/you/moderation/keyword-filter/add"
+	| "/u/:uid/profile/:actor/lists/:list"
 	| "/u/:uid/you/moderation/muted"
 	| "/u/:uid/profile/:actor/feed/:feed"
-	| "/u/:uid/profile/:actor/list/:list"
 	| "/u/:uid/profile/:actor/followers"
 	| "/u/:uid/you/moderation/mute-lists"
 	| "/u/:uid/you/moderation/muted/temp"
@@ -39,9 +39,9 @@ export type PathsWithParams =
 	| "/u/:uid/explore"
 	| "/u/:uid/explore/search"
 	| "/u/:uid/profile/:actor"
+	| "/u/:uid/profile/:actor/lists"
 	| "/u/:uid/profile/:actor/with_replies"
 	| "/u/:uid/profile/:actor/feed"
-	| "/u/:uid/profile/:actor/list"
 	| "/u/:uid/profile/:actor/likes"
 	| "/u/:uid/profile/:actor/media"
 	| "/u/:uid/notifications"
@@ -65,9 +65,9 @@ export interface Params {
 	"/u/:uid/profile/:actor/post/:status": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/post/:status/likes": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/you/moderation/keyword-filter/add": { "uid": string };
+	"/u/:uid/profile/:actor/lists/:list": { "uid": string, "actor": string, "list": string };
 	"/u/:uid/you/moderation/muted": { "uid": string };
 	"/u/:uid/profile/:actor/feed/:feed": { "uid": string, "actor": string, "feed": string };
-	"/u/:uid/profile/:actor/list/:list": { "uid": string, "actor": string, "list": string };
 	"/u/:uid/profile/:actor/followers": { "uid": string, "actor": string };
 	"/u/:uid/you/moderation/mute-lists": { "uid": string };
 	"/u/:uid/you/moderation/muted/temp": { "uid": string };
@@ -80,9 +80,9 @@ export interface Params {
 	"/u/:uid/explore": { "uid": string };
 	"/u/:uid/explore/search": { "uid": string };
 	"/u/:uid/profile/:actor": { "uid": string, "actor": string };
+	"/u/:uid/profile/:actor/lists": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/with_replies": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/feed": { "uid": string, "actor": string };
-	"/u/:uid/profile/:actor/list": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/likes": { "uid": string, "actor": string };
 	"/u/:uid/profile/:actor/media": { "uid": string, "actor": string };
 	"/u/:uid/notifications": { "uid": string };

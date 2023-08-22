@@ -21,7 +21,7 @@ const ListItem = (props: ListItemProps) => {
 
 	return (
 		<A
-			href="/u/:uid/profile/:actor/list/:list"
+			href="/u/:uid/profile/:actor/lists/:list"
 			params={{ uid: uid(), actor: getRepoId(list().uri), list: getRecordId(list().uri) }}
 			onClick={props.onClick}
 			class="flex gap-3 px-4 py-3 hover:bg-hinted"

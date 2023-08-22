@@ -21,7 +21,7 @@ import SubscribeListConfirmDialog from './SubscribeListConfirmDialog.tsx';
 const PAGE_SIZE = 30;
 
 const AuthenticatedListPage = () => {
-	const params = useParams('/u/:uid/profile/:actor/list/:list');
+	const params = useParams('/u/:uid/profile/:actor/lists/:list');
 	const navigate = useNavigate();
 
 	const uid = () => params.uid as DID;

@@ -72,7 +72,6 @@ type TimelineResponse = ResponseOf<'app.bsky.feed.getTimeline'>;
 type Post = RefOf<'app.bsky.feed.defs#postView'>;
 
 type PostRecord = Records['app.bsky.feed.post'];
-type LikeRecord = Records['app.bsky.feed.like'];
 
 //// Feed query
 // How many attempts it should try looking for more items before it gives up on empty pages.
@@ -162,22 +161,17 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 		]);
 	} else if (type === 'profile') {
 		_did = await _getDid(agent, params.actor);
+		postFilter = createLabelPostFilter(uid);
 
-		if (params.tab === 'media') {
-			postFilter = combine([createLabelPostFilter(uid), createMediaPostFilter()]);
-		} else {
-			postFilter = createLabelPostFilter(uid);
-
-			if (params.tab !== 'likes') {
-				sliceFilter = createProfileSliceFilter(_did, params.tab === 'replies');
-			}
+		if (params.tab !== 'likes' && params.tab !== 'media') {
+			sliceFilter = createProfileSliceFilter(_did, params.tab === 'replies');
 		}
 	} else {
 		postFilter = createLabelPostFilter(uid);
 	}
 
 	while (count < limit) {
-		const timeline = await fetchPage(agent, params, limit, cursor, _did!);
+		const timeline = await fetchPage(agent, params, limit, cursor);
 
 		const feed = timeline.feed;
 		const result = createTimelineSlices(uid, feed, sliceFilter, postFilter);
@@ -188,7 +182,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 
 		count += countPosts(result);
 
-		cid ||= timeline.cid || (feed.length > 0 ? feed[0].post.cid : undefined);
+		cid ||= feed.length > 0 ? feed[0].post.cid : undefined;
 
 		if (!cursor || empty >= MAX_EMPTY) {
 			break;
@@ -219,26 +213,10 @@ export const getTimelineLatest: QueryFn<FeedLatestResult, ReturnType<typeof getT
 
 	const agent = await multiagent.connect(uid);
 
-	if (params.type === 'profile' && params.tab === 'likes') {
-		const did = await _getDid(agent, params.actor);
+	const timeline = await fetchPage(agent, params, 1, undefined);
+	const feed = timeline.feed;
 
-		const response = await agent.rpc.get('com.atproto.repo.listRecords', {
-			params: {
-				collection: 'app.bsky.feed.like',
-				repo: did,
-				limit: 1,
-			},
-		});
-
-		const records = response.data.records;
-
-		return { cid: records.length > 0 ? records[0].cid : undefined };
-	} else {
-		const timeline = await fetchPage(agent, params, 1, undefined, undefined);
-		const feed = timeline.feed;
-
-		return { cid: feed.length > 0 ? feed[0].post.cid : undefined };
-	}
+	return { cid: feed.length > 0 ? feed[0].post.cid : undefined };
 };
 
 //// Raw fetch
@@ -263,8 +241,7 @@ const fetchPage = async (
 	params: FeedParams,
 	limit: number,
 	cursor: string | undefined,
-	_did: DID | undefined,
-): Promise<TimelineResponse & { cid?: string }> => {
+): Promise<TimelineResponse> => {
 	const type = params.type;
 
 	if (type === 'home') {
@@ -289,30 +266,15 @@ const fetchPage = async (
 		return response.data;
 	} else if (type === 'profile') {
 		if (params.tab === 'likes') {
-			const response = await agent.rpc.get('com.atproto.repo.listRecords', {
+			const response = await agent.rpc.get('app.bsky.feed.getActorLikes', {
 				params: {
-					collection: 'app.bsky.feed.like',
-					repo: _did!,
-					cursor,
-					limit,
+					actor: params.actor,
+					cursor: cursor,
+					limit: limit,
 				},
 			});
 
-			const data = response.data;
-			const records = data.records;
-
-			const postUris = records.map((record) => (record.value as LikeRecord).subject.uri);
-
-			const uid = agent.session!.did;
-			const queries = await Promise.allSettled(postUris.map((uri) => fetchPost([uid, uri])));
-
-			return {
-				cid: records.length > 0 ? records[0].cid : undefined,
-				cursor: data.cursor,
-				feed: queries
-					.filter((result): result is PromiseFulfilledResult<Post> => result.status === 'fulfilled')
-					.map((result) => ({ post: result.value })),
-			};
+			return response.data;
 		} else {
 			const response = await agent.rpc.get('app.bsky.feed.getAuthorFeed', {
 				params: {
@@ -508,25 +470,6 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 
 		if (mutes![did] && now < mutes![did]!) {
 			return false;
-		}
-
-		return true;
-	};
-};
-
-const createMediaPostFilter = (): PostFilter => {
-	// `posts_with_media` server-side filter returns all the media from author's
-	// feed, but it doesn't filter out any reposts of other user's media, so we
-	// should filter that out while keeping reposts of author's own media.
-	return (item) => {
-		const post = item.post;
-		const reason = item.reason;
-
-		// skip reposts that aren't coming from original author
-		if (reason) {
-			if (reason.$type === 'app.bsky.feed.defs#reasonRepost' && reason.by.did !== post.author.did) {
-				return false;
-			}
 		}
 
 		return true;

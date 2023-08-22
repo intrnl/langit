@@ -1,4 +1,4 @@
-import { Show, createSignal } from 'solid-js';
+import { Match, Show, Switch, createSignal } from 'solid-js';
 
 import { Agent } from '@intrnl/bluesky-client/agent';
 import { createMutation, createQuery, useQueryMutation } from '@intrnl/sq';
@@ -130,25 +130,48 @@ const AuthLoginPage = () => {
 					)}
 				</Show>
 
-				<Show when={description()}>
-					{(data) => (
-						<p class="text-sm leading-6 text-muted-fg">
-							By continuing, you agree to the service's{' '}
-							<a href={data().links?.termsOfService} class="text-primary hover:underline">
-								Terms of Service
-							</a>{' '}
-							and{' '}
-							<a href={data().links?.privacyPolicy} class="text-primary hover:underline">
-								Privacy Policy
-							</a>
-							.
-						</p>
-					)}
-				</Show>
+				<Switch>
+					<Match when={description.error}>
+						{(error: any) => (
+							<p class="text-sm text-red-600">
+								Failed to retrieve server information, try again later.
+								<br />
+								{error.cause ? error.cause.message : error.message || '' + error}
+							</p>
+						)}
+					</Match>
+
+					<Match
+						when={(() => {
+							const $description = description();
+							if ($description && $description.links?.termsOfService && $description.links.privacyPolicy) {
+								return $description;
+							}
+						})()}
+					>
+						{(data) => (
+							<p class="text-sm text-muted-fg">
+								By continuing, you agree to the service's{' '}
+								<a href={data().links!.termsOfService} class="text-primary hover:underline">
+									Terms of Service
+								</a>{' '}
+								and{' '}
+								<a href={data().links!.privacyPolicy} class="text-primary hover:underline">
+									Privacy Policy
+								</a>
+								.
+							</p>
+						)}
+					</Match>
+
+					<Match when={!description()}>
+						<p class="text-sm text-muted-fg">Retrieving server information</p>
+					</Match>
+				</Switch>
 
 				<div>
 					<button
-						disabled={loginMutation.isLoading || description.loading}
+						disabled={loginMutation.isLoading || !description()}
 						type="submit"
 						class={/* @once */ button({ color: 'primary' })}
 					>

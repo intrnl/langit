@@ -1,4 +1,10 @@
-import { BSKY_FEED_URL_RE, BSKY_POST_URL_RE, BSKY_PROFILE_URL_RE, isAppUrl } from '~/utils/link.ts';
+import {
+	BSKY_FEED_URL_RE,
+	BSKY_LIST_URL_RE,
+	BSKY_POST_URL_RE,
+	BSKY_PROFILE_URL_RE,
+	isAppUrl,
+} from '~/utils/link.ts';
 
 import type { RichTextSegment } from './types.ts';
 
@@ -33,13 +39,12 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			if (isAppUrl(uri)) {
 				if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
 					anchor.href = `/u/${uid}/profile/${match[1]}`;
-					anchor.toggleAttribute('link', true);
 				} else if ((match = BSKY_POST_URL_RE.exec(uri))) {
 					anchor.href = `/u/${uid}/profile/${match[1]}/post/${match[2]}`;
-					anchor.toggleAttribute('link', true);
 				} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
 					anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
-					anchor.toggleAttribute('link', true);
+				} else if ((match = BSKY_LIST_URL_RE.exec(uri))) {
+					anchor.href = `/u/${uid}/profile/${match[1]}/lists/${match[2]}`;
 				}
 			}
 
@@ -47,6 +52,8 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 				anchor.href = uri;
 				anchor.rel = 'noopener noreferrer nofollow';
 				anchor.target = '_blank';
+			} else {
+				anchor.toggleAttribute('link', true);
 			}
 
 			div.appendChild(anchor);

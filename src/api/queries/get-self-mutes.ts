@@ -36,7 +36,7 @@ export const getSelfMutes: QueryFn<
 	return pushCollection(collection, page, param);
 };
 
-export const getSelfMutesLatestKey = (uid: DID) => ['getSelfMutes', uid] as const;
+export const getSelfMutesLatestKey = (uid: DID) => ['getSelfMutesLatest', uid] as const;
 export const getSelfMutesLatest: QueryFn<
 	{ did: DID | undefined },
 	ReturnType<typeof getSelfMutesLatestKey>

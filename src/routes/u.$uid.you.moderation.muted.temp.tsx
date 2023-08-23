@@ -141,6 +141,14 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 						);
 					}}
 				</For>
+
+				<Show when={users().length > 0}>
+					<Suspense>
+						<div class="flex h-13 items-center justify-center">
+							<p class="text-sm text-muted-fg">End of list</p>
+						</div>
+					</Suspense>
+				</Show>
 			</SuspenseList>
 		</div>
 	);

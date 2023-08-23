@@ -20,6 +20,7 @@ import GroupOffIcon from '~/icons/baseline-group-off.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import PersonOffIcon from '~/icons/baseline-person-off.tsx';
+import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import VisibilityIcon from '~/icons/baseline-visibility.tsx';
 
 import AccountActionMenu from './AccountActionMenu.tsx';
@@ -185,6 +186,15 @@ const AuthenticatedYouPage = () => {
 			>
 				<FilterAltIcon class="text-xl" />
 				<span>Keyword filters</span>
+			</A>
+
+			<A
+				href="/u/:uid/you/moderation/repost-filter"
+				params={params}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
+				<RepeatIcon class="text-xl" />
+				<span>Hidden reposts</span>
 			</A>
 
 			<A

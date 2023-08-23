@@ -51,6 +51,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.you.moderation.keyword-filter.add/route.tsx")),
       },
       {
+        path: "you/moderation/repost-filter",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.repost-filter.tsx")),
+      },
+      {
         path: "profile/:actor/lists/:list",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.lists.$list/route.tsx")),
       },

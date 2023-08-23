@@ -1,48 +1,21 @@
 import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
 
 import { mergeSignalizedProfile, type SignalizedProfile } from '~/api/cache/profiles.ts';
 import { getInitialProfile, getProfileKey } from '~/api/queries/get-profile.ts';
+import { fetchProfileBatched } from '~/api/queries/get-profile-batched.ts';
 
-import { multiagent } from '~/globals/agent.ts';
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
-import { createBatchedFetch } from '~/utils/batch-fetch.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
-
-type ProfileData = RefOf<'app.bsky.actor.defs#profileViewDetailed'>;
-type Query = [uid: DID, actor: DID];
-
-const fetchProfile = createBatchedFetch<Query, string, ProfileData>({
-	limit: 25,
-	timeout: 0,
-	key: (query) => query[0],
-	idFromQuery: (query) => query[1],
-	idFromData: (data) => data.did,
-	fetch: async (queries) => {
-		const uid = queries[0][0];
-		const actors = queries.map((query) => query[1]);
-
-		const agent = await multiagent.connect(uid);
-
-		const response = await agent.rpc.get('app.bsky.actor.getProfiles', {
-			params: {
-				actors,
-			},
-		});
-
-		const profiles = response.data.profiles;
-		return profiles;
-	},
-});
 
 const AuthenticatedTempMutedUsersModerationPage = () => {
 	const params = useParams('/u/:uid/you/moderation/muted/temp');
@@ -94,7 +67,7 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 						const [profile] = createQuery<SignalizedProfile, ReturnType<typeof getProfileKey>>({
 							key: () => getProfileKey(uid(), actor),
 							fetch: async ([, uid, actor]) => {
-								const response = await fetchProfile([uid, actor as DID]);
+								const response = await fetchProfileBatched([uid, actor as DID]);
 								const profile = mergeSignalizedProfile(uid, response);
 
 								return profile;

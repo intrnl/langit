@@ -30,16 +30,16 @@ const AuthenticatedRepostFilterModerationPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Temporarily muted users / Langit</Title>
+			<Title>Hidden reposts / Langit</Title>
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
-				<p class="text-base font-bold">Temporarily muted users</p>
+				<p class="text-base font-bold">Hidden reposts</p>
 			</div>
 
 			<SuspenseList revealOrder="forwards" tail="collapsed">
 				<For
 					each={users()}
-					fallback={<div class="p-4 text-sm text-muted-fg">You don't have any temporarily muted users</div>}
+					fallback={<div class="p-4 text-sm text-muted-fg">You don't have any users with reposts hidden from timeline</div>}
 				>
 					{(actor) => {
 						const [profile] = createQuery<SignalizedProfile, ReturnType<typeof getProfileKey>>({

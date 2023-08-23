@@ -32,3 +32,24 @@ export const getSelfBlocks: QueryFn<
 
 	return pushCollection(collection, page, param);
 };
+
+export const getSelfBlocksLatestKey = (uid: DID) => ['getSelfBlocksLatest', uid] as const;
+export const getSelfBlocksLatest: QueryFn<
+	{ did: DID | undefined },
+	ReturnType<typeof getSelfBlocksLatestKey>
+> = async (key) => {
+	const [, uid] = key;
+
+	const agent = await multiagent.connect(uid);
+
+	const response = await agent.rpc.get('app.bsky.graph.getBlocks', {
+		params: {
+			limit: 1,
+		},
+	});
+
+	const data = response.data;
+	const blocks = data.blocks;
+
+	return { did: blocks.length > 0 ? blocks[0].did : undefined };
+};

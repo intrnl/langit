@@ -11,6 +11,7 @@ import { isUpdateReady, updateSW } from '~/utils/service-worker.ts';
 
 import AccountCircleIcon from '~/icons/baseline-account-circle.tsx';
 import AddIcon from '~/icons/baseline-add.tsx';
+import AvTimerIcon from '~/icons/baseline-av-timer.tsx';
 import BlockIcon from '~/icons/baseline-block.tsx';
 import BrightnessMediumIcon from '~/icons/baseline-brightness-medium.tsx';
 import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
@@ -202,6 +203,15 @@ const AuthenticatedYouPage = () => {
 			>
 				<PersonOffIcon class="text-xl" />
 				<span>Muted users</span>
+			</A>
+
+			<A
+				href="/u/:uid/you/moderation/muted/temp"
+				params={params}
+				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+			>
+				<AvTimerIcon class="text-xl" />
+				<span>Temporarily muted users</span>
 			</A>
 
 			<A

@@ -35,3 +35,24 @@ export const getSelfMutes: QueryFn<
 
 	return pushCollection(collection, page, param);
 };
+
+export const getSelfMutesLatestKey = (uid: DID) => ['getSelfMutes', uid] as const;
+export const getSelfMutesLatest: QueryFn<
+	{ did: DID | undefined },
+	ReturnType<typeof getSelfMutesLatestKey>
+> = async (key) => {
+	const [, uid] = key;
+
+	const agent = await multiagent.connect(uid);
+
+	const response = await agent.rpc.get('app.bsky.graph.getMutes', {
+		params: {
+			limit: 1,
+		},
+	});
+
+	const data = response.data;
+	const mutes = data.mutes;
+
+	return { did: mutes.length > 0 ? mutes[0].did : undefined };
+};

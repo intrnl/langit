@@ -106,3 +106,22 @@ export const createTimelineSlices = (
 
 	return slices;
 };
+
+export const createUnjoinedSlices = (uid: DID, arr: FeedPost[], postFilter?: PostFilter): TimelineSlice[] => {
+	const slices: TimelineSlice[] = [];
+	const key = Date.now();
+
+	for (let idx = 0, len = arr.length; idx < len; idx++) {
+		const item = arr[idx];
+
+		if (postFilter && !postFilter(item)) {
+			continue;
+		}
+
+		const signalized = createSignalizedTimelinePost(uid, item, key);
+
+		slices.push({ items: [signalized] });
+	}
+
+	return slices;
+};

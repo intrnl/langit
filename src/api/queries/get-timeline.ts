@@ -12,6 +12,7 @@ import {
 	type SliceFilter,
 	type TimelineSlice,
 	createTimelineSlices,
+	createUnjoinedSlices,
 } from '../models/timeline.ts';
 
 import {
@@ -133,7 +134,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 	let slices: TimelineSlice[];
 	let count = 0;
 
-	let sliceFilter: SliceFilter | undefined;
+	let sliceFilter: SliceFilter | undefined | null;
 	let postFilter: PostFilter | undefined;
 
 	if (cursor && prevData) {
@@ -165,6 +166,8 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 
 		if (params.tab !== 'likes' && params.tab !== 'media') {
 			sliceFilter = createProfileSliceFilter(_did, params.tab === 'replies');
+		} else {
+			sliceFilter = null;
 		}
 	} else {
 		postFilter = createLabelPostFilter(uid);
@@ -174,7 +177,10 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 		const timeline = await fetchPage(agent, params, limit, cursor);
 
 		const feed = timeline.feed;
-		const result = createTimelineSlices(uid, feed, sliceFilter, postFilter);
+		const result =
+			sliceFilter !== null
+				? createTimelineSlices(uid, feed, sliceFilter, postFilter)
+				: createUnjoinedSlices(uid, feed, postFilter);
 
 		cursor = timeline.cursor;
 		empty = result.length > 0 ? 0 : empty + 1;

@@ -24,7 +24,6 @@ import {
 import { PreferenceHide } from '../moderation/enums.ts';
 import { type Collection, pushCollection } from '../utils.ts';
 
-import _getDid from './_did.ts';
 import { fetchPost } from './get-post.ts';
 
 export interface HomeTimelineParams {
@@ -125,9 +124,6 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 
 	const agent = await multiagent.connect(uid);
 
-	// used for profiles
-	let _did: DID;
-
 	let cursor = prevCursor;
 	let empty = 0;
 	let cid: string | undefined;
@@ -162,11 +158,10 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 			createLanguagePostFilter(uid),
 		]);
 	} else if (type === 'profile') {
-		_did = await _getDid(agent, params.actor);
 		postFilter = createLabelPostFilter(uid);
 
 		if (params.tab !== 'likes' && params.tab !== 'media') {
-			sliceFilter = createProfileSliceFilter(_did, params.tab === 'replies');
+			sliceFilter = createProfileSliceFilter(params.actor, params.tab === 'replies');
 		} else {
 			sliceFilter = null;
 		}

@@ -3,7 +3,7 @@ import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 
 import { rpc } from './_global.ts';
 
-export const resolveRepository = async (actor: string) => {
+export const resolveRepo = async (actor: string) => {
 	const response = await rpc.get('com.atproto.repo.describeRepo', {
 		params: {
 			repo: actor,
@@ -14,27 +14,11 @@ export const resolveRepository = async (actor: string) => {
 	return data;
 };
 
-export const resolveRecord = async <TCollection extends keyof Records, TCatch extends boolean = false>(
+export const resolveRecord = async <TCollection extends keyof Records>(
 	did: DID,
 	collection: TCollection,
 	rkey: string,
-	caught?: TCatch,
-): Promise<TCatch extends true ? Records[TCollection] | null : Records[TCollection]> => {
-	if (caught) {
-		try {
-			return await resolveRecord(did, collection, rkey, false);
-		} catch (err) {
-			if (err instanceof XRPCError) {
-				if (err.error === 'InvalidRequest') {
-					// @ts-expect-error
-					return null;
-				}
-			}
-
-			throw err;
-		}
-	}
-
+): Promise<Records[TCollection]> => {
 	const response = await rpc.get('com.atproto.repo.getRecord', {
 		params: {
 			repo: did,
@@ -45,4 +29,22 @@ export const resolveRecord = async <TCollection extends keyof Records, TCatch ex
 
 	const data = response.data;
 	return data.value as Records[TCollection];
+};
+
+export const tryResolveRecord = async <TCollection extends keyof Records>(
+	did: DID,
+	collection: TCollection,
+	rkey: string,
+): Promise<Records[TCollection] | null> => {
+	try {
+		return await resolveRecord(did, collection, rkey);
+	} catch (err) {
+		if (err instanceof XRPCError) {
+			if (err.error === 'InvalidRequest') {
+				return null;
+			}
+		}
+
+		throw err;
+	}
 };

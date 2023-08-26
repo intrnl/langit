@@ -1,11 +1,11 @@
 import { escape, getBlobUrl } from '../_global.ts';
-import { resolveRecord, resolveRepository } from '../_resolvers.ts';
+import { resolveRepo, tryResolveRecord } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
 
 export const renderProfile = async (actor: string) => {
-	const repo = await resolveRepository(actor);
-	const profile = await resolveRecord(repo.did, 'app.bsky.actor.profile', 'self', true);
+	const repo = await resolveRepo(actor);
+	const profile = await tryResolveRecord(repo.did, 'app.bsky.actor.profile', 'self');
 
 	const title = profile?.displayName ? `${profile.displayName} (@${repo.handle})` : `@${repo.handle}`;
 

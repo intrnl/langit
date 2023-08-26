@@ -1,15 +1,15 @@
 import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { escape, getBlobUrl } from '../_global.ts';
-import { resolveRecord, resolveRepository } from '../_resolvers.ts';
+import { resolveRecord, resolveRepo, tryResolveRecord } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
 
 export const renderPost = async (actor: string, tid: string) => {
-	const repo = await resolveRepository(actor);
+	const repo = await resolveRepo(actor);
 
 	const [profile, post] = await Promise.all([
-		resolveRecord(repo.did, 'app.bsky.actor.profile', 'self', true),
+		tryResolveRecord(repo.did, 'app.bsky.actor.profile', 'self'),
 		resolveRecord(repo.did, 'app.bsky.feed.post', tid),
 	]);
 
@@ -27,14 +27,14 @@ export const renderPost = async (actor: string, tid: string) => {
 		const parentUri = reply.parent.uri;
 
 		try {
-			const repliedToRepo = await resolveRepository(getRepoId(parentUri));
+			const repliedToRepo = await resolveRepo(getRepoId(parentUri));
 
 			header += `[replying to @${repliedToRepo.handle}] `;
 		} catch (err) {
 			console.log(`failed to resolve reply ${parentUri}`);
 			console.error(err);
 
-			header += `[reply: failed to resolve reply] `;
+			header += `[reply: not found] `;
 		}
 	}
 
@@ -68,14 +68,14 @@ export const renderPost = async (actor: string, tid: string) => {
 
 		if (record && getCollectionId(record) === 'app.bsky.feed.post') {
 			try {
-				const quotedRepo = await resolveRepository(getRepoId(record));
+				const quotedRepo = await resolveRepo(getRepoId(record));
 
 				header += `[quoting @${quotedRepo.handle}] `;
 			} catch (err) {
 				console.log(`failed to resolve quote ${record}`);
 				console.error(err);
 
-				header += `[quote: failed to resolve quote] `;
+				header += `[quote: not found] `;
 			}
 		}
 	}

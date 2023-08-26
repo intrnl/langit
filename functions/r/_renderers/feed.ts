@@ -1,13 +1,13 @@
 import { escape, getBlobUrl } from '../_global.ts';
-import { resolveRecord, resolveRepository } from '../_resolvers.ts';
+import { resolveRecord, resolveRepo, tryResolveRecord } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
 
 export const renderFeed = async (actor: string, id: string) => {
-	const repo = await resolveRepository(actor);
+	const repo = await resolveRepo(actor);
 
 	const [profile, feed] = await Promise.all([
-		resolveRecord(repo.did, 'app.bsky.actor.profile', 'self', true),
+		tryResolveRecord(repo.did, 'app.bsky.actor.profile', 'self'),
 		resolveRecord(repo.did, 'app.bsky.feed.generator', id),
 	]);
 

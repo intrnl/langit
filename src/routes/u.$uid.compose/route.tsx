@@ -446,6 +446,7 @@ const AuthenticatedComposePage = () => {
 
 	const editor = createTiptapEditor(() => ({
 		element: editorRef!,
+		autofocus: true,
 		extensions: [
 			Document,
 			Paragraph,

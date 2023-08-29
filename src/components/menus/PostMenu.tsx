@@ -8,6 +8,7 @@ import type { SignalizedPost } from '~/api/cache/posts.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
+import { generatePath } from '~/router.ts';
 
 import DeletePostConfirmDialog from '~/components/dialogs/DeletePostConfirmDialog.tsx';
 import ReportDialog, { REPORT_POST } from '~/components/dialogs/ReportDialog.tsx';
@@ -58,7 +59,13 @@ const PostMenu = (props: PostMenuProps) => {
 						openModal(() => (
 							<SwitchAccountMenu
 								uid={uid()}
-								redirect={(uid) => `/u/${uid}/profile/${author().did}/post/${getRecordId(post().uri)}`}
+								redirect={(uid) =>
+									generatePath('/u/:uid/profile/:actor/post/:status', {
+										uid: uid,
+										actor: author().did,
+										status: getRecordId(post().uri),
+									})
+								}
 							/>
 						));
 					}}

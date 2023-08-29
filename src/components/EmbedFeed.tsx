@@ -1,10 +1,11 @@
 import { Show } from 'solid-js';
 
 import type { DID, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import { A } from '@solidjs/router';
 
 import { getRecordId } from '~/api/utils.ts';
 
-import { A } from '~/router.ts';
+import { generatePath } from '~/router.ts';
 
 type EmbeddedGeneratorRecord = UnionOf<'app.bsky.feed.defs#generatorView'>;
 
@@ -19,8 +20,11 @@ const EmbedFeed = (props: EmbedFeedProps) => {
 
 	return (
 		<A
-			href="/u/:uid/profile/:actor/feed/:feed"
-			params={{ uid: uid(), actor: feed().creator.did, feed: getRecordId(feed().uri) }}
+			href={generatePath('/u/:uid/profile/:actor/feed/:feed', {
+				uid: uid(),
+				actor: feed().creator.did,
+				feed: getRecordId(feed().uri),
+			})}
 			class="flex flex-col gap-2 rounded-md border border-divider p-3 text-sm hover:bg-secondary"
 		>
 			<div class="flex items-center gap-3">

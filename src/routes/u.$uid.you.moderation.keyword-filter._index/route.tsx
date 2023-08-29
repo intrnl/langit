@@ -2,6 +2,7 @@ import { For, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { Title } from '@solidjs/meta';
+import { A } from '@solidjs/router';
 
 import {
 	type KeywordPreference,
@@ -11,7 +12,7 @@ import {
 } from '~/api/moderation/enums.ts';
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 
 import AddIcon from '~/icons/baseline-add.tsx';
 
@@ -46,8 +47,7 @@ const AuthenticatedAddFilterModerationPage = () => {
 
 				<A
 					title="Add new filter"
-					href="/u/:uid/you/moderation/keyword-filter/add"
-					params={params}
+					href={generatePath('/u/:uid/you/moderation/keyword-filter/add', params)}
 					class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary"
 				>
 					<AddIcon />
@@ -60,8 +60,10 @@ const AuthenticatedAddFilterModerationPage = () => {
 			>
 				{(filter) => (
 					<A
-						href="/u/:uid/you/moderation/keyword-filter/:fid/edit"
-						params={{ uid: uid(), fid: '' + filter.id }}
+						href={generatePath('/u/:uid/you/moderation/keyword-filter/:fid/edit', {
+							uid: uid(),
+							fid: '' + filter.id,
+						})}
 						class="px-4 py-3 hover:bg-hinted"
 					>
 						<div class="text-sm">

@@ -1,12 +1,13 @@
 import { Show } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import { A } from '@solidjs/router';
 
 import { type SignalizedList } from '~/api/cache/lists.ts';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
-import { A } from '~/router.ts';
+import { generatePath } from '~/router.ts';
 
 export interface ListItemProps {
 	uid: DID;
@@ -21,8 +22,11 @@ const ListItem = (props: ListItemProps) => {
 
 	return (
 		<A
-			href="/u/:uid/profile/:actor/lists/:list"
-			params={{ uid: uid(), actor: getRepoId(list().uri), list: getRecordId(list().uri) }}
+			href={generatePath('/u/:uid/profile/:actor/lists/:list', {
+				uid: uid(),
+				actor: getRepoId(list().uri),
+				list: getRecordId(list().uri),
+			})}
 			onClick={props.onClick}
 			class="flex gap-3 px-4 py-3 hover:bg-hinted"
 		>

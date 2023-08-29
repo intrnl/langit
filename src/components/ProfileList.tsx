@@ -7,6 +7,7 @@ import { useNavigate } from '@solidjs/router';
 import type { ProfilesListPage } from '~/api/models/profiles-list.ts';
 import { type Collection, getCollectionCursor } from '~/api/utils.ts';
 
+import { generatePath } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -41,7 +42,10 @@ const ProfileList = (props: ProfileListProps) => {
 								return;
 							}
 
-							const path = `/u/${uid()}/profile/${profile.did}`;
+							const path = generatePath('/u/:uid/profile/:actor', {
+								uid: uid(),
+								actor: profile.did,
+							});
 
 							if (isElementAltClicked(ev)) {
 								open(path, '_blank');

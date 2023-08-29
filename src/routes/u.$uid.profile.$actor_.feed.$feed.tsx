@@ -3,6 +3,7 @@ import { Match, Show, Switch, createEffect, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
+import { A } from '@solidjs/router';
 
 import { favoriteFeed } from '~/api/mutations/favorite-feed.ts';
 import {
@@ -21,7 +22,7 @@ import {
 } from '~/api/queries/get-timeline.ts';
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 
 import TimelineList from '~/components/TimelineList.tsx';
 import button from '~/styles/primitives/button.ts';
@@ -160,8 +161,7 @@ const AuthenticatedFeedPage = () => {
 										<p class="text-sm text-muted-fg">
 											<span>by </span>
 											<A
-												href="/u/:uid/profile/:actor"
-												params={{ uid: uid(), actor: creator().did }}
+												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator().did })}
 												class="hover:underline"
 											>
 												@{creator().handle.value}

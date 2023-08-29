@@ -1,11 +1,11 @@
 import { For, Show, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { useNavigate } from '@solidjs/router';
+import { A, useNavigate } from '@solidjs/router';
 
 import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 import { isUpdateReady, updateSW } from '~/utils/service-worker.ts';
 
@@ -55,7 +55,7 @@ const AuthenticatedYouPage = () => {
 							return;
 						}
 
-						const path = `/u/${did}`;
+						const path = generatePath('/u/:uid', { uid: did });
 
 						if (isElementAltClicked(ev)) {
 							window.open(path, '_blank');
@@ -117,8 +117,7 @@ const AuthenticatedYouPage = () => {
 			<hr class="my-4 border-divider" />
 
 			<A
-				href="/u/:uid/profile/:actor"
-				params={{ uid: uid(), actor: uid() }}
+				href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: uid() })}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<AccountCircleIcon class="text-xl" />
@@ -126,8 +125,7 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/you/invites"
-				params={params}
+				href={generatePath('/u/:uid/you/invites', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<ConfirmationNumberIcon class="text-xl" />
@@ -135,8 +133,7 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/settings/languages"
-				params={params}
+				href={generatePath('/u/:uid/settings/languages', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<LanguageIcon class="text-xl" />
@@ -171,8 +168,7 @@ const AuthenticatedYouPage = () => {
 			</div>
 
 			<A
-				href="/u/:uid/you/moderation/content-filter"
-				params={params}
+				href={generatePath('/u/:uid/you/moderation/content-filter', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<VisibilityIcon class="text-xl" />
@@ -180,8 +176,7 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/you/moderation/keyword-filter"
-				params={params}
+				href={generatePath('/u/:uid/you/moderation/keyword-filter', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<FilterAltIcon class="text-xl" />
@@ -189,8 +184,7 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/you/moderation/repost-filter"
-				params={params}
+				href={generatePath('/u/:uid/you/moderation/repost-filter', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<RepeatIcon class="text-xl" />
@@ -198,8 +192,7 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/you/moderation/mute-lists"
-				params={params}
+				href={generatePath('/u/:uid/you/moderation/mute-lists', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<GroupOffIcon class="text-xl" />
@@ -207,8 +200,7 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/you/moderation/muted"
-				params={params}
+				href={generatePath('/u/:uid/you/moderation/muted', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<PersonOffIcon class="text-xl" />
@@ -216,8 +208,7 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/you/moderation/muted/temp"
-				params={params}
+				href={generatePath('/u/:uid/you/moderation/muted/temp', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<AvTimerIcon class="text-xl" />
@@ -225,8 +216,7 @@ const AuthenticatedYouPage = () => {
 			</A>
 
 			<A
-				href="/u/:uid/you/moderation/blocked"
-				params={params}
+				href={generatePath('/u/:uid/you/moderation/blocked', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<BlockIcon class="text-xl" />

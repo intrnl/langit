@@ -4,6 +4,7 @@ import { Dynamic } from 'solid-js/web';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
+import { A } from '@solidjs/router';
 
 import {
 	type FollowNotificationSlice,
@@ -17,7 +18,7 @@ import {
 
 import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 
-import { A } from '~/router.ts';
+import { generatePath } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
@@ -127,13 +128,12 @@ const Notification = (props: NotificationProps) => {
 
 											return (
 												<A
-													href="/u/:uid/profile/:actor"
+													href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author.did })}
 													title={
 														author.displayName
 															? `${author.displayName} (@${author.handle})`
 															: `@${author.handle}`
 													}
-													params={{ uid: uid(), actor: author.did }}
 													class="h-7.5 w-7.5 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 												>
 													<Show when={author.avatar}>
@@ -243,8 +243,7 @@ const renderText = (
 		nodes.push(
 			<A
 				dir="auto"
-				href="/u/:uid/profile/:actor"
-				params={{ uid: uid, actor: author.did }}
+				href={generatePath('/u/:uid/profile/:actor', { uid: uid, actor: author.did })}
 				class="font-bold hover:underline"
 			>
 				{author.displayName || `@${author.handle}`}

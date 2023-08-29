@@ -8,6 +8,7 @@ import type { FeedsPage } from '~/api/models/feeds.ts';
 import { type Collection, getCollectionCursor, getRepoId, getRecordId } from '~/api/utils.ts';
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
+import { generatePath } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -79,7 +80,11 @@ const FeedList = (props: FeedListProps) => {
 						}
 
 						const uri = feed.uri;
-						const path = `/u/${uid()}/profile/${getRepoId(uri)}/feed/${getRecordId(uri)}`;
+						const path = generatePath('/u/:uid/profile/:actor/feed/:feed', {
+							uid: uid(),
+							actor: getRepoId(uri),
+							feed: getRecordId(uri),
+						});
 
 						if (isElementAltClicked(ev)) {
 							open(path, '_blank');

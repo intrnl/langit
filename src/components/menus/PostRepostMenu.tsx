@@ -5,6 +5,7 @@ import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { repostPost } from '~/api/mutations/repost-post.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
+import { generatePath } from '~/router.ts';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
@@ -39,8 +40,11 @@ const PostRepostMenu = (props: PostRepostMenuProps) => {
 
 			<button
 				onClick={() => {
+					const path =
+						generatePath('/u/:uid/compose', { uid: uid() }) + `?quote=${encodeURIComponent(post().uri)}`;
+
 					closeModal();
-					navigate(`/u/${uid()}/compose?quote=${encodeURIComponent(post().uri)}`);
+					navigate(path);
 				}}
 				class={/* @once */ menu.item()}
 			>

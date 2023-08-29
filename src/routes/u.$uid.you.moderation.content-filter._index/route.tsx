@@ -1,8 +1,9 @@
 import { For, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { Title } from '@solidjs/meta';
+import { A } from '@solidjs/router';
 
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { getAccountModerationPreferences } from '~/globals/preferences.ts';
 
@@ -35,8 +36,7 @@ const AuthenticatedContentFilterModerationPage = () => {
 			</div>
 
 			<A
-				href="/u/:uid/you/moderation/content-filter/global"
-				params={{ uid: uid() }}
+				href={generatePath('/u/:uid/you/moderation/content-filter/global', params)}
 				class="my-2 flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<VisibilityIcon class="text-2xl" />
@@ -86,8 +86,10 @@ const AuthenticatedContentFilterModerationPage = () => {
 			<For each={enabledLabelers()}>
 				{(labeler) => (
 					<A
-						href="/u/:uid/you/moderation/content-filter/labeler/:labeler"
-						params={{ uid: uid(), labeler: labeler.did }}
+						href={generatePath('/u/:uid/you/moderation/content-filter/labeler/:labeler', {
+							uid: uid(),
+							labeler: labeler.did,
+						})}
 						class="flex items-center gap-3 px-4 py-3 text-left hover:bg-hinted"
 					>
 						<div class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg"></div>

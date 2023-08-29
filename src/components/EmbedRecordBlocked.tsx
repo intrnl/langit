@@ -1,9 +1,11 @@
 import { Match, Switch } from 'solid-js';
+
 import type { DID, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import { A } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
-import { A } from '~/router.ts';
+import { generatePath } from '~/router.ts';
 
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 
@@ -25,8 +27,11 @@ const EmbedRecordBlocked = (props: EmbedRecordBlockedProps) => {
 					<p class="m-3 text-sm text-muted-fg">Blocked post</p>
 
 					<A
-						href="/u/:uid/profile/:actor/post/:status"
-						params={{ uid: uid(), actor: getRepoId(record().uri), status: getRecordId(record().uri) }}
+						href={generatePath('/u/:uid/profile/:actor/post/:status', {
+							uid: uid(),
+							actor: getRepoId(record().uri),
+							status: getRecordId(record().uri),
+						})}
 						class="flex items-center whitespace-nowrap px-4 text-sm font-medium hover:bg-secondary hover:text-hinted-fg"
 					>
 						View

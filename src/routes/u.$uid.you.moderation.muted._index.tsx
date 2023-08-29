@@ -17,7 +17,7 @@ import {
 import { openModal } from '~/globals/modals.tsx';
 import { getCollectionCursor } from '~/api/utils.ts';
 
-import { useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
@@ -121,7 +121,10 @@ const AuthenticatedMutedUsersModerationPage = () => {
 								return;
 							}
 
-							const path = `/u/${uid()}/profile/${profile.did}`;
+							const path = generatePath('/u/:uid/profile/:actor', {
+								uid: uid(),
+								actor: profile.did,
+							});
 
 							if (isElementAltClicked(ev)) {
 								open(path, '_blank');

@@ -3,14 +3,14 @@ import { For, Match, Show, Switch, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { useNavigate } from '@solidjs/router';
+import { A, useNavigate } from '@solidjs/router';
 
 import { getCollectionCursor } from '~/api/utils.ts';
 
 import { getList, getListKey } from '~/api/queries/get-list.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -71,8 +71,7 @@ const AuthenticatedListPage = () => {
 										<p class="text-sm text-muted-fg">
 											<span>by </span>
 											<A
-												href="/u/:uid/profile/:actor"
-												params={{ uid: uid(), actor: creator().did }}
+												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator().did })}
 												class="hover:underline"
 											>
 												@{creator().handle.value}
@@ -117,7 +116,7 @@ const AuthenticatedListPage = () => {
 								return;
 							}
 
-							const path = `/u/${uid()}/profile/${profile.did}`;
+							const path = generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: profile.did });
 
 							if (isElementAltClicked(ev)) {
 								open(path, '_blank');

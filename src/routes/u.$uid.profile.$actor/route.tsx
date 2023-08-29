@@ -4,7 +4,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import type { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { Outlet } from '@solidjs/router';
+import { A, Outlet } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -14,7 +14,7 @@ import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-
 
 import { openModal } from '~/globals/modals.tsx';
 import { isProfileTemporarilyMuted } from '~/globals/preferences.ts';
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
@@ -131,8 +131,7 @@ const AuthenticatedProfileLayout = () => {
 										<Switch>
 											<Match when={profile().did === uid()}>
 												<A
-													href="/u/:uid/settings/profile"
-													params={params}
+													href={generatePath('/u/:uid/settings/profile', params)}
 													class={/* @once */ button({ color: 'primary' })}
 												>
 													Edit profile
@@ -186,12 +185,15 @@ const AuthenticatedProfileLayout = () => {
 									</Show>
 
 									<div class="flex flex-wrap gap-4 text-sm">
-										<A href="/u/:uid/profile/:actor/follows" params={params} class="hover:underline">
+										<A href={generatePath('/u/:uid/profile/:actor/follows', params)} class="hover:underline">
 											<span class="font-bold">{comformat.format(profile().followsCount.value)}</span>{' '}
 											<span class="text-muted-fg">Follows</span>
 										</A>
 
-										<A href="/u/:uid/profile/:actor/followers" params={params} class="hover:underline">
+										<A
+											href={generatePath('/u/:uid/profile/:actor/followers', params)}
+											class="hover:underline"
+										>
 											<span class="font-bold">{comformat.format(profile().followersCount.value)}</span>{' '}
 											<span class="text-muted-fg">Followers</span>
 										</A>
@@ -204,12 +206,11 @@ const AuthenticatedProfileLayout = () => {
 													<p>
 														This user is muted by{' '}
 														<A
-															href="/u/:uid/profile/:actor/lists/:list"
-															params={{
+															href={generatePath('/u/:uid/profile/:actor/lists/:list', {
 																uid: uid(),
 																actor: getRepoId(list().uri),
 																list: getRecordId(list().uri),
-															}}
+															})}
 															class="text-accent hover:underline"
 														>
 															{list().name}
@@ -281,27 +282,27 @@ const AuthenticatedProfileLayout = () => {
 
 									<Match when>
 										<div class="flex h-13 overflow-x-auto border-b border-divider">
-											<TabLink href="/u/:uid/profile/:actor" params={params} replace end>
+											<TabLink href={generatePath('/u/:uid/profile/:actor', params)} replace end>
 												Posts
 											</TabLink>
-											<TabLink href="/u/:uid/profile/:actor/with_replies" params={params} replace>
+											<TabLink href={generatePath('/u/:uid/profile/:actor/with_replies', params)} replace>
 												Replies
 											</TabLink>
-											<TabLink href="/u/:uid/profile/:actor/media" params={params} replace>
+											<TabLink href={generatePath('/u/:uid/profile/:actor/media', params)} replace>
 												Media
 											</TabLink>
-											<TabLink href="/u/:uid/profile/:actor/likes" params={params} replace>
+											<TabLink href={generatePath('/u/:uid/profile/:actor/likes', params)} replace>
 												Likes
 											</TabLink>
 
 											<Show when={!!lists()?.pages[0]?.lists.length}>
-												<TabLink href="/u/:uid/profile/:actor/lists" params={params} replace>
+												<TabLink href={generatePath('/u/:uid/profile/:actor/lists', params)} replace>
 													Lists
 												</TabLink>
 											</Show>
 
 											<Show when={!!feeds()?.pages[0]?.feeds.length}>
-												<TabLink href="/u/:uid/profile/:actor/feed" params={params} replace>
+												<TabLink href={generatePath('/u/:uid/profile/:actor/feed', params)} replace>
 													Feeds
 												</TabLink>
 											</Show>

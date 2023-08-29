@@ -8,6 +8,7 @@ import { DEFAULT_DATA_SERVERS } from '~/api/defaults.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
+import { generatePath } from '~/router.ts';
 import { model } from '~/utils/misc.ts';
 
 import button from '~/styles/primitives/button.ts';
@@ -54,7 +55,7 @@ const AuthLoginPage = () => {
 			if (to) {
 				navigate(to.replace(`@uid/`, `/u/${uid}/`));
 			} else {
-				navigate(`/u/${uid}`);
+				navigate(generatePath('/u/:uid', { uid: uid }));
 			}
 		},
 	});

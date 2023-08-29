@@ -2,7 +2,7 @@ import { For, Show, Suspense, SuspenseList, batch, createMemo, createSignal } fr
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { useNavigate } from '@solidjs/router';
+import { A, useNavigate } from '@solidjs/router';
 import {
 	DragDropProvider,
 	DragDropSensors,
@@ -20,7 +20,7 @@ import {
 } from '~/api/queries/get-feed-generator.ts';
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import { ConstrainXDragAxis } from '~/utils/dnd.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
@@ -66,7 +66,12 @@ const FeedItem = (props: FeedItemProps) => {
 		}
 
 		const uri = feedUri();
-		const path = `/u/${props.uid}/profile/${getRepoId(uri)}/feed/${getRecordId(uri)}`;
+
+		const path = generatePath('/u/:uid/profile/:actor/feed/:feed', {
+			uid: props.uid,
+			actor: getRepoId(uri),
+			feed: getRecordId(uri),
+		});
 
 		if (isElementAltClicked(ev)) {
 			open(path, '_blank');
@@ -267,8 +272,7 @@ const AuthenticatedExploreSettingsPage = () => {
 			</DragDropProvider>
 
 			<A
-				href="/u/:uid/settings/explore/add"
-				params={params}
+				href={generatePath('/u/:uid/settings/explore/add', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<AddIcon class="text-2xl" />

@@ -10,7 +10,7 @@ import { getInitialProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { fetchProfileBatched } from '~/api/queries/get-profile-batched.ts';
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
-import { useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
@@ -83,7 +83,10 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 								return;
 							}
 
-							const path = `/u/${uid()}/profile/${profile()!.did}`;
+							const path = generatePath('/u/:uid/profile/:actor', {
+								uid: uid(),
+								actor: profile()!.did,
+							});
 
 							if (isElementAltClicked(ev)) {
 								open(path, '_blank');

@@ -1,10 +1,10 @@
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { useNavigate } from '@solidjs/router';
 
 import type { MultiagentAccountData } from '~/api/multiagent.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal } from '~/globals/modals.tsx';
+import { useNavigate } from '~/router.ts';
 
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';

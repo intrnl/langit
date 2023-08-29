@@ -5,7 +5,7 @@ import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { A as UntypedAnchor, useLocation, useSearchParams } from '@solidjs/router';
+import { A, useLocation, useSearchParams } from '@solidjs/router';
 
 import { type ModerationDecision, CauseLabel } from '~/api/moderation/action.ts';
 import { getRecordId, getRepoId } from '~/api/utils.ts';
@@ -17,7 +17,7 @@ import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queri
 import { openModal } from '~/globals/modals.tsx';
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { systemLanguages } from '~/globals/platform.ts';
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
@@ -139,8 +139,7 @@ const AuthenticatedPostPage = () => {
 													</div>
 
 													<A
-														href="/u/:uid/profile/:actor"
-														params={{ uid: uid(), actor: actor() }}
+														href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: actor() })}
 														class={/* @once */ button({ color: 'primary' })}
 													>
 														View profile
@@ -183,12 +182,11 @@ const AuthenticatedPostPage = () => {
 											<>
 												{overflowing && (
 													<A
-														href="/u/:uid/profile/:actor/post/:status"
-														params={{
+														href={generatePath('/u/:uid/profile/:actor/post/:status', {
 															uid: uid(),
 															actor: getRepoId(items[0].uri),
 															status: getRecordId(items[0].uri),
-														}}
+														})}
 														class="flex h-10 items-center gap-3 px-4 hover:bg-hinted"
 													>
 														<div class="flex h-full w-10 justify-center">
@@ -233,8 +231,7 @@ const AuthenticatedPostPage = () => {
 								<div ref={focusRef} class="scroll-m-16 px-4 pt-3">
 									<div class="mb-1 flex items-center gap-3">
 										<A
-											href="/u/:uid/profile/:actor"
-											params={{ uid: uid(), actor: author.did }}
+											href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author.did })}
 											class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 										>
 											<Show when={author.avatar.value}>
@@ -243,8 +240,7 @@ const AuthenticatedPostPage = () => {
 										</A>
 
 										<A
-											href="/u/:uid/profile/:actor"
-											params={{ uid: uid(), actor: author.did }}
+											href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author.did })}
 											class="flex flex-col text-sm"
 										>
 											<span dir="auto" class="line-clamp-1 break-all font-bold hover:underline">
@@ -288,16 +284,14 @@ const AuthenticatedPostPage = () => {
 
 									<div class="flex flex-wrap gap-4 py-4 text-sm">
 										<A
-											href="/u/:uid/profile/:actor/post/:status/reposts"
-											params={params}
+											href={generatePath('/u/:uid/profile/:actor/post/:status/reposts', params)}
 											class="hover:underline"
 										>
 											<span class="font-bold">{comformat.format(post.repostCount.value)}</span>{' '}
 											<span class="text-muted-fg">Reposts</span>
 										</A>
 										<A
-											href="/u/:uid/profile/:actor/post/:status/likes"
-											params={params}
+											href={generatePath('/u/:uid/profile/:actor/post/:status/likes', params)}
 											class="hover:underline"
 										>
 											<span class="font-bold">{comformat.format(post.likeCount.value)}</span>{' '}
@@ -308,12 +302,12 @@ const AuthenticatedPostPage = () => {
 									<hr class="border-divider" />
 
 									<div class="flex h-13 items-center justify-around text-muted-fg">
-										<UntypedAnchor
+										<A
 											href={`/u/${uid()}/compose?reply=${encodeURIComponent(post.uri)}`}
 											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 										>
 											<ChatBubbleOutlinedIcon />
-										</UntypedAnchor>
+										</A>
 
 										<button
 											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
@@ -400,12 +394,11 @@ const AuthenticatedPostPage = () => {
 
 												{overflowing && (
 													<A
-														href="/u/:uid/profile/:actor/post/:status"
-														params={{
+														href={generatePath('/u/:uid/profile/:actor/post/:status', {
 															uid: uid(),
 															actor: getRepoId(items[len - 1].uri),
 															status: getRecordId(items[len - 1].uri),
-														}}
+														})}
 														class="flex h-10 items-center gap-3 border-b border-divider px-4 hover:bg-hinted"
 													>
 														<div class="flex h-full w-10 justify-center">

@@ -3,7 +3,7 @@ import { For, Match, Show, Switch, createMemo, createSignal, onCleanup } from 's
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { useNavigate } from '@solidjs/router';
+import { A, useNavigate } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -15,7 +15,7 @@ import {
 import { getTimeline, getTimelineKey } from '~/api/queries/get-timeline';
 
 import { preferences } from '~/globals/preferences.ts';
-import { A, useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post from '~/components/Post.tsx';
@@ -66,7 +66,11 @@ const AuthenticatedExplorePage = () => {
 				<SearchInput
 					onEnter={(next) => {
 						if (next.trim()) {
-							navigate(`/u/${uid()}/explore/search?t=user&q=${encodeURIComponent(next)}`);
+							const path =
+								generatePath('/u/:uid/explore/search', { uid: uid() }) +
+								`?t=user&q=${encodeURIComponent(next)}`;
+
+							navigate(path);
 						}
 					}}
 				/>
@@ -82,8 +86,7 @@ const AuthenticatedExplorePage = () => {
 				</Show>
 
 				<A
-					href="/u/:uid/settings/explore"
-					params={params}
+					href={generatePath('/u/:uid/settings/explore', params)}
 					class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary"
 				>
 					<SettingsIcon />
@@ -179,8 +182,11 @@ const AuthenticatedExplorePage = () => {
 
 											<Show when={timeline()?.pages[0].cid}>
 												<A
-													href="/u/:uid/profile/:actor/feed/:feed"
-													params={{ uid: uid(), actor: getRepoId(feedUri), feed: getRecordId(feedUri) }}
+													href={generatePath('/u/:uid/profile/:actor/feed/:feed', {
+														uid: uid(),
+														actor: getRepoId(feedUri),
+														feed: getRecordId(feedUri),
+													})}
 													class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
 												>
 													Show more

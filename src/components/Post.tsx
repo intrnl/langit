@@ -1,7 +1,7 @@
 import { type Accessor, Match, Show, Switch, createSignal } from 'solid-js';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
-import { A as UntypedAnchor, useNavigate } from '@solidjs/router';
+import { A, useNavigate } from '@solidjs/router';
 
 import type { SignalizedPost, SignalizedTimelinePost } from '~/api/cache/posts.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
@@ -10,7 +10,7 @@ import { type ModerationDecision, CauseLabel, CauseMutedKeyword } from '~/api/mo
 import { getRecordId } from '~/api/utils.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import { A } from '~/router.ts';
+import { generatePath } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 import { isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
@@ -57,7 +57,11 @@ const Post = (props: PostProps) => {
 			return;
 		}
 
-		let path = `/u/${uid()}/profile/${author().did}/post/${getRecordId(post().uri)}`;
+		let path = generatePath('/u/:uid/profile/:actor/post/:status', {
+			uid: uid(),
+			actor: author().did,
+			status: getRecordId(post().uri),
+		});
 
 		if (translate) {
 			path += '?tl=y';
@@ -91,8 +95,7 @@ const Post = (props: PostProps) => {
 						</div>
 						<div class="min-w-0">
 							<A
-								href="/u/:uid/profile/:actor"
-								params={{ uid: uid(), actor: reason()!.by.did }}
+								href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: reason()!.by.did })}
 								class="flex font-medium hover:underline"
 							>
 								<span dir="auto" class="line-clamp-1 break-all">
@@ -112,8 +115,11 @@ const Post = (props: PostProps) => {
 							</div>
 							<div class="min-w-0">
 								<A
-									href="/u/:uid/profile/:actor/post/:status"
-									params={{ uid: uid(), actor: parent()!.author.did, status: getRecordId(parent()!.uri) }}
+									href={generatePath('/u/:uid/profile/:actor/post/:status', {
+										uid: uid(),
+										actor: parent()!.author.did,
+										status: getRecordId(parent()!.uri),
+									})}
 									class="flex font-medium hover:underline"
 								>
 									<span class="whitespace-pre">Replying to </span>
@@ -132,8 +138,11 @@ const Post = (props: PostProps) => {
 							</div>
 							<div class="min-w-0">
 								<A
-									href="/u/:uid/profile/:actor/post/:status"
-									params={{ uid: uid(), actor: post().author.did, status: getRecordId(post()!.uri) }}
+									href={generatePath('/u/:uid/profile/:actor/post/:status', {
+										uid: uid(),
+										actor: post().author.did,
+										status: getRecordId(post()!.uri),
+									})}
 									class="flex font-medium hover:underline"
 								>
 									Show full thread
@@ -147,8 +156,7 @@ const Post = (props: PostProps) => {
 			<div class="flex gap-3">
 				<div class="flex shrink-0 flex-col items-center">
 					<A
-						href="/u/:uid/profile/:actor"
-						params={{ uid: uid(), actor: author().did }}
+						href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author().did })}
 						class="h-10 w-10 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 					>
 						<Show when={author().avatar.value}>
@@ -165,8 +173,7 @@ const Post = (props: PostProps) => {
 					<div class="mb-0.5 flex items-center justify-between gap-4">
 						<div class="flex items-center text-sm">
 							<A
-								href="/u/:uid/profile/:actor"
-								params={{ uid: uid(), actor: author().did }}
+								href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author().did })}
 								class="group flex gap-1"
 							>
 								<span dir="auto" class="line-clamp-1 break-all font-bold group-hover:underline">
@@ -179,12 +186,11 @@ const Post = (props: PostProps) => {
 								<span class="px-1">·</span>
 								<A
 									title={relformat.formatAbsWithTime(record().createdAt)}
-									href="/u/:uid/profile/:actor/post/:status"
-									params={{
+									href={generatePath('/u/:uid/profile/:actor/post/:status', {
 										uid: uid(),
 										actor: author().did,
 										status: getRecordId(post().uri),
-									}}
+									})}
 									class="whitespace-nowrap hover:underline"
 								>
 									{relformat.format(record().createdAt)}
@@ -213,12 +219,15 @@ const Post = (props: PostProps) => {
 					<Show when={interactive()}>
 						<div class="mt-3 flex text-muted-fg">
 							<div class="flex grow basis-0 items-end gap-0.5">
-								<UntypedAnchor
-									href={`/u/${uid()}/compose?reply=${encodeURIComponent(post().uri)}`}
+								<A
+									href={
+										generatePath('/u/:uid/compose', { uid: uid() }) +
+										`?reply=${encodeURIComponent(post().uri)}`
+									}
 									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
 								>
 									<ChatBubbleOutlinedIcon />
-								</UntypedAnchor>
+								</A>
 								<span class="text-[0.8125rem]">{comformat.format(post().replyCount.value)}</span>
 							</div>
 

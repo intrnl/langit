@@ -10,7 +10,7 @@ import { getInitialProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { fetchProfileBatched } from '~/api/queries/get-profile-batched.ts';
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
-import { useParams } from '~/router.ts';
+import { generatePath, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -39,7 +39,11 @@ const AuthenticatedRepostFilterModerationPage = () => {
 			<SuspenseList revealOrder="forwards" tail="collapsed">
 				<For
 					each={users()}
-					fallback={<div class="p-4 text-sm text-muted-fg">You don't have any users with reposts hidden from timeline</div>}
+					fallback={
+						<div class="p-4 text-sm text-muted-fg">
+							You don't have any users with reposts hidden from timeline
+						</div>
+					}
 				>
 					{(actor) => {
 						const [profile] = createQuery<SignalizedProfile, ReturnType<typeof getProfileKey>>({
@@ -61,7 +65,10 @@ const AuthenticatedRepostFilterModerationPage = () => {
 								return;
 							}
 
-							const path = `/u/${uid()}/profile/${profile()!.did}`;
+							const path = generatePath('/u/:uid/profile/:actor', {
+								uid: uid(),
+								actor: profile()!.did,
+							});
 
 							if (isElementAltClicked(ev)) {
 								open(path, '_blank');

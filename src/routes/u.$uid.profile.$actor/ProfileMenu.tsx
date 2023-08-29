@@ -7,6 +7,7 @@ import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 import { getAccountPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
+import { generatePath } from '~/router.ts';
 
 import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog.tsx';
 import ReportDialog, { REPORT_PROFILE } from '~/components/dialogs/ReportDialog.tsx';
@@ -66,7 +67,10 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 						closeModal();
 
 						openModal(() => (
-							<SwitchAccountMenu uid={uid()} redirect={(uid) => `/u/${uid}/profile/${profile().did}`} />
+							<SwitchAccountMenu
+								uid={uid()}
+								redirect={(uid) => generatePath('/u/:uid/profile/:actor', { uid: uid, actor: profile().did })}
+							/>
 						));
 					}}
 					class={/* @once */ menu.item()}

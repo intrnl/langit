@@ -5,7 +5,6 @@ export interface BlobImageProps extends Omit<ComponentProps<'img'>, 'src'> {
 }
 
 interface BlobObject {
-	blob: Blob;
 	url: string;
 	uses: number;
 }
@@ -17,13 +16,13 @@ const BlobImage = (props: BlobImageProps) => {
 		const src = props.src;
 
 		if (typeof src === 'string') {
-			return { url: src };
+			return src;
 		}
 
 		let obj = map.get(src);
 
 		if (!obj) {
-			map.set(src, (obj = { blob: src, url: URL.createObjectURL(src), uses: 0 }));
+			map.set(src, (obj = { url: URL.createObjectURL(src), uses: 0 }));
 		}
 
 		obj.uses++;
@@ -35,10 +34,10 @@ const BlobImage = (props: BlobImageProps) => {
 			}
 		});
 
-		return obj;
+		return obj.url;
 	};
 
-	return <img {...props} src={blob().url} />;
+	return <img {...props} src={blob()} />;
 };
 
 export default BlobImage;

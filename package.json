@@ -1,56 +1,56 @@
 {
-  "private": true,
-  "type": "module",
-  "name": "langit",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "fmt": "prettier --cache --write ."
-  },
-  "dependencies": {
-    "@floating-ui/dom": "^1.5.1",
-    "@intrnl/bluesky-client": "^0.1.7",
-    "@intrnl/sq": "^0.2.0",
-    "@intrnl/use-gesture-solid": "^0.1.0",
-    "@solid-primitives/deep": "^0.2.3",
-    "@solidjs/meta": "^0.28.6",
-    "@solidjs/router": "^0.8.3",
-    "@thisbeyond/solid-dnd": "^0.7.4",
-    "@tiptap/core": "^2.1.6",
-    "@tiptap/extension-document": "^2.1.6",
-    "@tiptap/extension-hard-break": "^2.1.6",
-    "@tiptap/extension-history": "^2.1.6",
-    "@tiptap/extension-link": "^2.1.6",
-    "@tiptap/extension-mention": "^2.1.6",
-    "@tiptap/extension-paragraph": "^2.1.6",
-    "@tiptap/extension-placeholder": "^2.1.6",
-    "@tiptap/extension-text": "^2.1.6",
-    "@tiptap/pm": "^2.1.6",
-    "@tiptap/suggestion": "^2.1.6",
-    "class-variance-authority": "^0.7.0",
-    "immer": "^10.0.2",
-    "solid-js": "^1.7.11",
-    "solid-tiptap": "^0.6.0"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230814.0",
-    "@tailwindcss/forms": "^0.5.4",
-    "@types/node": "^20.5.1",
-    "autoprefixer": "^10.4.15",
-    "glob-to-regexp": "^0.4.1",
-    "postcss": "^8.4.28",
-    "prettier": "^3.0.2",
-    "prettier-plugin-tailwindcss": "^0.5.3",
-    "tailwindcss": "^3.3.3",
-    "terser": "^5.19.2",
-    "typescript": "^5.1.6",
-    "vite": "^4.4.9",
-    "vite-plugin-pwa": "^0.16.4",
-    "vite-plugin-solid": "^2.7.0"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@solidjs/router@0.8.3": "patches/@solidjs__router@0.8.3.patch"
-    }
-  }
+	"private": true,
+	"type": "module",
+	"name": "langit",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"fmt": "prettier --cache --write ."
+	},
+	"dependencies": {
+		"@floating-ui/dom": "^1.5.1",
+		"@intrnl/bluesky-client": "^0.1.7",
+		"@intrnl/sq": "^0.2.0",
+		"@intrnl/use-gesture-solid": "^0.1.0",
+		"@solid-primitives/deep": "^0.2.3",
+		"@solidjs/meta": "^0.28.6",
+		"@solidjs/router": "^0.8.3",
+		"@thisbeyond/solid-dnd": "^0.7.4",
+		"@tiptap/core": "^2.1.6",
+		"@tiptap/extension-document": "^2.1.6",
+		"@tiptap/extension-hard-break": "^2.1.6",
+		"@tiptap/extension-history": "^2.1.6",
+		"@tiptap/extension-link": "^2.1.6",
+		"@tiptap/extension-mention": "^2.1.6",
+		"@tiptap/extension-paragraph": "^2.1.6",
+		"@tiptap/extension-placeholder": "^2.1.6",
+		"@tiptap/extension-text": "^2.1.6",
+		"@tiptap/pm": "^2.1.6",
+		"@tiptap/suggestion": "^2.1.6",
+		"class-variance-authority": "^0.7.0",
+		"immer": "^10.0.2",
+		"solid-js": "^1.7.11",
+		"solid-tiptap": "^0.6.0"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20230814.0",
+		"@tailwindcss/forms": "^0.5.4",
+		"@types/node": "^20.5.1",
+		"autoprefixer": "^10.4.15",
+		"glob-to-regexp": "^0.4.1",
+		"postcss": "^8.4.28",
+		"prettier": "^3.0.2",
+		"prettier-plugin-tailwindcss": "^0.5.3",
+		"tailwindcss": "^3.3.3",
+		"terser": "^5.19.2",
+		"typescript": "^5.1.6",
+		"vite": "^4.4.9",
+		"vite-plugin-pwa": "^0.16.4",
+		"vite-plugin-solid": "^2.7.0"
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"@solidjs/router@0.8.3": "patches/@solidjs__router@0.8.3.patch"
+		}
+	}
 }

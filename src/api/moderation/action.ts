@@ -267,5 +267,5 @@ export const finalizeModeration = (accu: ModerationCause[]): ModerationDecision 
 		};
 	}
 
-	return null
+	return null;
 };

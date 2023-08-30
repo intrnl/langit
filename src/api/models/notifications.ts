@@ -12,7 +12,7 @@ type RepostRecord = Records['app.bsky.feed.repost'];
 
 export type FollowNotification = Notification & { reason: 'follow'; record: FollowRecord };
 export type LikeNotification = Notification & { reason: 'like'; record: LikeRecord };
-export type MentionNotification = Notification & { reason: 'mention'; record: PostRecord }
+export type MentionNotification = Notification & { reason: 'mention'; record: PostRecord };
 export type QuoteNotification = Notification & { reason: 'quote'; record: PostRecord };
 export type ReplyNotification = Notification & { reason: 'reply'; record: PostRecord };
 export type RepostNotification = Notification & { reason: 'repost'; record: RepostRecord };

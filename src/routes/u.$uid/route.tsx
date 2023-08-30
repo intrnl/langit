@@ -135,7 +135,7 @@ const AuthenticatedLayout = () => {
 				<div class="sticky top-0 flex h-screen flex-col items-end xl:basis-1/4">
 					<div class="flex grow flex-col gap-2 p-2 lg:p-4 xl:w-64">
 						<A
-							href={generatePath("/u/:uid", { uid: uid() })}
+							href={generatePath('/u/:uid', { uid: uid() })}
 							title="Home"
 							class="group flex items-center rounded-md hover:bg-hinted"
 							activeClass="is-active"
@@ -150,7 +150,7 @@ const AuthenticatedLayout = () => {
 						</A>
 
 						<A
-							href={generatePath("/u/:uid/explore", { uid: uid() })}
+							href={generatePath('/u/:uid/explore', { uid: uid() })}
 							title="Search"
 							class="group flex items-center rounded-md hover:bg-hinted"
 							activeClass="is-active"
@@ -164,7 +164,7 @@ const AuthenticatedLayout = () => {
 						</A>
 
 						<A
-							href={generatePath("/u/:uid/notifications", { uid: uid() })}
+							href={generatePath('/u/:uid/notifications', { uid: uid() })}
 							title="Notifications"
 							class="group flex items-center rounded-md hover:bg-hinted"
 							activeClass="is-active"
@@ -184,7 +184,7 @@ const AuthenticatedLayout = () => {
 						<div class="grow" />
 
 						<A
-							href={generatePath("/u/:uid/compose", { uid: uid() })}
+							href={generatePath('/u/:uid/compose', { uid: uid() })}
 							title="Compose"
 							class="group flex items-center rounded-md hover:bg-hinted"
 							activeClass="is-active"
@@ -198,7 +198,7 @@ const AuthenticatedLayout = () => {
 						</A>
 
 						<A
-							href={generatePath("/u/:uid/you", { uid: uid() })}
+							href={generatePath('/u/:uid/you', { uid: uid() })}
 							title="You"
 							class="group flex items-center rounded-md hover:bg-hinted"
 							activeClass="is-active"
@@ -232,7 +232,7 @@ const AuthenticatedLayout = () => {
 			<Show when={!isDesktop()}>
 				<div class="sticky bottom-0 z-30 flex h-13 border-t border-divider bg-background text-primary">
 					<A
-						href={generatePath("/u/:uid", { uid: uid() })}
+						href={generatePath('/u/:uid', { uid: uid() })}
 						title="Home"
 						class="group flex grow basis-0 items-center justify-center text-2xl"
 						activeClass="is-active"
@@ -242,7 +242,7 @@ const AuthenticatedLayout = () => {
 						<HomeIcon class="hidden group-[.is-active]:block" />
 					</A>
 					<A
-						href={generatePath("/u/:uid/explore", { uid: uid() })}
+						href={generatePath('/u/:uid/explore', { uid: uid() })}
 						title="Explore"
 						class="group flex grow basis-0 items-center justify-center text-2xl"
 						activeClass="is-active"
@@ -251,7 +251,7 @@ const AuthenticatedLayout = () => {
 						<ExploreIcon class="hidden group-[.is-active]:block" />
 					</A>
 					<A
-						href={generatePath("/u/:uid/compose", { uid: uid() })}
+						href={generatePath('/u/:uid/compose', { uid: uid() })}
 						title="Compose"
 						class="group flex grow basis-0 items-center justify-center text-2xl"
 						activeClass="is-active"
@@ -260,7 +260,7 @@ const AuthenticatedLayout = () => {
 						<AddBoxIcon class="hidden group-[.is-active]:block" />
 					</A>
 					<A
-						href={generatePath("/u/:uid/notifications", { uid: uid() })}
+						href={generatePath('/u/:uid/notifications', { uid: uid() })}
 						title="Notifications"
 						class="group flex grow basis-0 items-center justify-center text-2xl"
 						activeClass="is-active"
@@ -275,7 +275,7 @@ const AuthenticatedLayout = () => {
 						</div>
 					</A>
 					<A
-						href={generatePath("/u/:uid/you", { uid: uid() })}
+						href={generatePath('/u/:uid/you', { uid: uid() })}
 						title="You"
 						class="group flex grow basis-0 items-center justify-center text-2xl"
 						activeClass="is-active"

@@ -1,7 +1,7 @@
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import type { InitialDataFn, QueryFn } from '@intrnl/sq';
 
-import { multiagent } from '~/globals/agent.ts';
+import { getAccountData, multiagent } from '~/globals/agent.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile, profiles } from '../cache/profiles.ts';
 import { isDid } from '../utils.ts';
@@ -21,8 +21,7 @@ export const getProfile: QueryFn<SignalizedProfile, ReturnType<typeof getProfile
 	const profile = mergeSignalizedProfile(uid, data);
 
 	if (profile.did === uid) {
-		const $accounts = multiagent.store.accounts;
-		const $account = $accounts[uid];
+		const $account = getAccountData(uid)!;
 
 		if (!$account.profile || $account.profile.indexedAt !== data.indexedAt) {
 			$account.profile = {

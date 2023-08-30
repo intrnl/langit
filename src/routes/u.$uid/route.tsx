@@ -5,12 +5,12 @@ import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { A, Navigate, Outlet, useLocation } from '@solidjs/router';
 
-import { MultiagentError } from '~/api/multiagent.ts';
+import { type MultiagentProfileData, MultiagentError } from '~/api/multiagent.ts';
 
 import { getNotificationsLatest, getNotificationsLatestKey } from '~/api/queries/get-notifications.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { multiagent } from '~/globals/agent.ts';
+import { getAccountData, multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { generatePath, useParams } from '~/router.ts';
 import { parseStackTrace } from '~/utils/errorstacks.ts';
@@ -105,6 +105,23 @@ const AuthenticatedLayout = () => {
 		fetch: getNotificationsLatest,
 		staleTime: 10_000,
 	});
+
+	const basicProfile = (): MultiagentProfileData | undefined => {
+		const remote = profile();
+
+		if (remote) {
+			return {
+				avatar: remote.avatar.value,
+				handle: remote.handle.value,
+				displayName: remote.displayName.value,
+			};
+		}
+
+		const local = getAccountData(uid())!.profile;
+		if (local) {
+			return local;
+		}
+	};
 
 	createEffect(() => {
 		let error = profile.error;
@@ -205,15 +222,15 @@ const AuthenticatedLayout = () => {
 						>
 							<div class="p-2">
 								<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg outline-2 outline-primary group-[.is-active]:outline">
-									<Show when={profile()?.avatar.value}>
+									<Show when={basicProfile()?.avatar}>
 										{(avatar) => <img src={avatar()} class="h-full w-full object-cover" />}
 									</Show>
 								</div>
 							</div>
 
 							<span class="hidden overflow-hidden text-ellipsis text-base group-[.is-active]:font-medium xl:inline">
-								<Show when={profile()} fallback="You">
-									{(profile) => <>{profile().displayName.value || '@' + profile().handle.value}</>}
+								<Show when={basicProfile()} fallback="You">
+									{(profile) => <>{profile().displayName || '@' + profile().handle}</>}
 								</Show>
 							</span>
 						</A>
@@ -281,7 +298,7 @@ const AuthenticatedLayout = () => {
 						activeClass="is-active"
 					>
 						<div class="h-6 w-6 overflow-hidden rounded-full bg-muted-fg outline-2 outline-primary group-[.is-active]:outline">
-							<Show when={profile()?.avatar.value}>
+							<Show when={basicProfile()?.avatar}>
 								{(avatar) => <img src={avatar()} class="h-full w-full object-cover" />}
 							</Show>
 						</div>

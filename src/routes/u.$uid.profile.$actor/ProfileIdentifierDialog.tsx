@@ -1,3 +1,5 @@
+import { createSignal } from 'solid-js';
+
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
@@ -55,6 +57,8 @@ const chunked = (str: string, size: number): string[] => {
 const ProfileIdentifierDialog = (props: ProfileIdentifierDialogProps) => {
 	const profile = () => props.profile;
 
+	const [copied, setCopied] = createSignal(false);
+
 	return (
 		<div class={/* @once */ dialog.content()}>
 			<h1 class={/* @once */ dialog.title()}>User identifier for @{profile().handle.value}</h1>
@@ -81,12 +85,16 @@ const ProfileIdentifierDialog = (props: ProfileIdentifierDialogProps) => {
 
 			<div class={/* @once */ dialog.actions()}>
 				<button
+					disabled={copied()}
 					onClick={() => {
-						navigator.clipboard.writeText(profile().did);
+						navigator.clipboard.writeText(profile().did).then(() => {
+							setCopied(true);
+							setTimeout(() => setCopied(false), 1000);
+						});
 					}}
 					class={/* @once */ button({ color: 'outline' })}
 				>
-					Copy DID
+					{!copied() ? 'Copy DID' : 'Copied!'}
 				</button>
 
 				<button onClick={closeModal} class={/* @once */ button({ color: 'primary' })}>

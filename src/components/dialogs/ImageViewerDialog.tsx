@@ -11,6 +11,7 @@ import CloseIcon from '~/icons/baseline-close.tsx';
 
 export interface EmbeddedImage {
 	fullsize: string;
+	alt?: string;
 }
 
 export interface ImageViewerDialogProps {

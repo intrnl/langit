@@ -117,7 +117,7 @@ const AuthenticatedLayout = () => {
 			};
 		}
 
-		const local = getAccountData(uid())!.profile;
+		const local = getAccountData(uid())?.profile;
 		if (local) {
 			return local;
 		}

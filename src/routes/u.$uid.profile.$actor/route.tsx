@@ -132,11 +132,24 @@ const AuthenticatedProfileLayout = () => {
 
 								<div class="z-10 flex flex-col gap-3 p-4">
 									<div class="flex gap-2">
-										<div class="-mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted-fg outline-2 outline-background outline">
-											<Show when={profile().avatar.value}>
-												{(avatar) => <img src={avatar()} class="h-full w-full" />}
-											</Show>
-										</div>
+										<Show
+											when={profile().avatar.value}
+											keyed
+											fallback={
+												<div class="-mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted-fg outline-2 outline-background outline"></div>
+											}
+										>
+											{(avatar) => (
+												<button
+													onClick={() => {
+														openModal(() => <LazyImageViewerDialog images={[{ fullsize: avatar }]} />);
+													}}
+													class="group -mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-background outline-2 outline-background outline focus-visible:outline-primary"
+												>
+													<img src={avatar} class="h-full w-full group-hover:opacity-75" />
+												</button>
+											)}
+										</Show>
 
 										<div class="grow" />
 

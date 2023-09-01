@@ -62,7 +62,14 @@ const AuthenticatedNotificationsPage = () => {
 
 			await updateNotificationsSeen(uid(), new Date(date));
 		},
-		onSuccess: () => refetch(true),
+		onSuccess: () => {
+			const $latest = latest();
+			if ($latest) {
+				mutate({ ...$latest, read: true });
+			}
+
+			refetch(true);
+		},
 	});
 
 	// We set the initial value of the effect to 0, this is so we can tell that

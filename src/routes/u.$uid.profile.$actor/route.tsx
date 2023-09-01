@@ -31,6 +31,7 @@ import ProfileMenu from './ProfileMenu.tsx';
 
 const ERROR_NAMES = ['InvalidRequest', 'AccountTakedown'];
 
+const LazyImageViewerDialog = lazy(() => import('~/components/dialogs/ImageViewerDialog.tsx'));
 const LazyMuteConfirmDialog = lazy(() => import('~/components/dialogs/MuteConfirmDialog.tsx'));
 
 const AuthenticatedProfileLayout = () => {
@@ -65,7 +66,7 @@ const AuthenticatedProfileLayout = () => {
 
 	return (
 		<div class="flex grow flex-col">
-			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
+			<div class="sticky top-0 z-20 flex h-13 items-center border-b border-divider bg-background px-4">
 				<Switch>
 					<Match when={profile()}>
 						{(profile) => (
@@ -112,13 +113,24 @@ const AuthenticatedProfileLayout = () => {
 					{(profile) => {
 						return (
 							<>
-								<div class="aspect-banner bg-muted-fg">
-									<Show when={profile().banner.value}>
-										{(banner) => <img src={banner()} class="h-full w-full" />}
-									</Show>
-								</div>
+								<Show
+									when={profile().banner.value}
+									keyed
+									fallback={<div class="aspect-banner bg-muted-fg"></div>}
+								>
+									{(banner) => (
+										<button
+											onClick={() => {
+												openModal(() => <LazyImageViewerDialog images={[{ fullsize: banner }]} />);
+											}}
+											class="group aspect-banner bg-background"
+										>
+											<img src={banner} class="h-full w-full object-cover group-hover:opacity-75" />
+										</button>
+									)}
+								</Show>
 
-								<div class="flex flex-col gap-3 p-4">
+								<div class="z-10 flex flex-col gap-3 p-4">
 									<div class="flex gap-2">
 										<div class="-mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted-fg outline-2 outline-background outline">
 											<Show when={profile().avatar.value}>

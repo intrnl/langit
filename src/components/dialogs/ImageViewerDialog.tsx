@@ -1,6 +1,5 @@
 import { For, Show, batch, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { type Vector2, createGesture } from '@intrnl/use-gesture-solid';
 
 import { closeModal } from '~/globals/modals.tsx';
@@ -10,7 +9,9 @@ import { useMediaQuery } from '~/utils/media-query.ts';
 import ArrowLeftIcon from '~/icons/baseline-arrow-left.tsx';
 import CloseIcon from '~/icons/baseline-close.tsx';
 
-type EmbeddedImage = RefOf<'app.bsky.embed.images#viewImage'>;
+export interface EmbeddedImage {
+	fullsize: string;
+}
 
 export interface ImageViewerDialogProps {
 	active?: number;

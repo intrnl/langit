@@ -24,7 +24,7 @@
 		--divider: 209 213 219; /* gray-300 */
 	}
 
-	.dark {
+	.is-dark {
 		color-scheme: dark;
 
 		--background: 0 0 0; /* black */

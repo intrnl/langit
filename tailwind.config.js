@@ -77,7 +77,7 @@ export default {
 	plugins: [
 		plugin(({ addVariant, addUtilities }) => {
 			addVariant('modal', '&:modal');
-			addVariant('dark', '.dark:where(&)');
+			addVariant('dark', '.is-dark:where(&)');
 
 			addUtilities({
 				'.scrollbar-hide': {

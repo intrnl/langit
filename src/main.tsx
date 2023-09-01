@@ -41,10 +41,10 @@ createRoot(() => {
 			const isDark = useMediaQuery('(prefers-color-scheme: dark)');
 
 			createRenderEffect(() => {
-				cl.toggle('dark', isDark());
+				cl.toggle('is-dark', isDark());
 			});
 		} else {
-			cl.toggle('dark', theme === 'dark');
+			cl.toggle('is-dark', theme === 'dark');
 		}
 
 		return theme;

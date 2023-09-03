@@ -147,17 +147,17 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 	if (type === 'home') {
 		sliceFilter = createHomeSliceFilter(uid);
 		postFilter = combine([
+			createHiddenRepostFilter(uid),
 			createDuplicatePostFilter(),
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
-			createHiddenRepostFilter(uid),
 		]);
 	} else if (type === 'custom') {
 		postFilter = combine([
 			createDuplicatePostFilter(),
+			createLanguagePostFilter(uid),
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
-			createLanguagePostFilter(uid),
 		]);
 	} else if (type === 'profile') {
 		postFilter = createLabelPostFilter(uid);

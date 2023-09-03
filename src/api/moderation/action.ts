@@ -236,7 +236,7 @@ export const decideMutedKeywordModeration = (
 		let cachedMatcher = cache![idx];
 
 		if (!cachedMatcher || cachedMatcher[0] !== match) {
-			cache![idx] = [match, (matcher = new RegExp(match))];
+			cache![idx] = [match, (matcher = new RegExp(match, 'i'))];
 		} else {
 			matcher = cachedMatcher[1];
 		}

@@ -237,9 +237,6 @@ const Post = (props: PostProps) => {
 							>
 								<button
 									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
-									classList={{
-										'text-green-600': !!post().viewer.repost.value,
-									}}
 									onClick={() => {
 										openModal(() => <PostRepostMenu uid={uid()} post={post()} />);
 									}}

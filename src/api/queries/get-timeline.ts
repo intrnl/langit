@@ -148,13 +148,13 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 		sliceFilter = createHomeSliceFilter(uid);
 		postFilter = combine([
 			createHiddenRepostFilter(uid),
-			createDuplicatePostFilter(),
+			createDuplicatePostFilter(slices),
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
 		]);
 	} else if (type === 'custom') {
 		postFilter = combine([
-			createDuplicatePostFilter(),
+			createDuplicatePostFilter(slices),
 			createLanguagePostFilter(uid),
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
@@ -368,8 +368,20 @@ const combine = <T>(filters: Array<undefined | FilterFn<T>>): FilterFn<T> | unde
 	};
 };
 
-const createDuplicatePostFilter = (): PostFilter => {
+const createDuplicatePostFilter = (slices: TimelineSlice[]): PostFilter => {
 	const seen = new Set<string>();
+
+	for (let i = 0, il = slices.length; i < il; i++) {
+		const slice = slices[i];
+		const items = slice.items;
+
+		for (let j = 0, jl = items.length; j < jl; j++) {
+			const item = items[j];
+			const uri = item.post.uri;
+
+			seen.add(uri);
+		}
+	}
 
 	return (item) => {
 		const uri = item.post.uri;

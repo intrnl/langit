@@ -35,7 +35,7 @@ export interface TimelinePage {
 	slices: TimelineSlice[];
 }
 
-export type SliceFilter = (slice: TimelineSlice, seen: Set<string>) => boolean;
+export type SliceFilter = (slice: TimelineSlice) => boolean;
 export type PostFilter = (post: FeedPost) => boolean;
 
 export const createTimelineSlices = (
@@ -46,21 +46,12 @@ export const createTimelineSlices = (
 ) => {
 	const key = Date.now();
 
-	const seen = new Set<string>();
 	let slices: TimelineSlice[] = [];
 	let jlen = 0;
 
 	// arrange the posts into connected slices
 	loop: for (let i = arr.length - 1; i >= 0; i--) {
 		const item = arr[i];
-		const cid = item.post.cid;
-
-		// skip any posts that have been seen already
-		if (seen.has(cid)) {
-			continue;
-		}
-
-		seen.add(cid);
 
 		if (postFilter && !postFilter(item)) {
 			continue;
@@ -101,7 +92,7 @@ export const createTimelineSlices = (
 	}
 
 	if (sliceFilter && jlen > 0) {
-		slices = slices.filter((slice) => sliceFilter(slice, seen));
+		slices = slices.filter((slice) => sliceFilter(slice));
 	}
 
 	return slices;

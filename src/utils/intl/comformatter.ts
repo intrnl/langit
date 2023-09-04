@@ -1,11 +1,14 @@
-const formatter = new Intl.NumberFormat('en-US', {
-	notation: 'compact',
-});
+const long = new Intl.NumberFormat('en-US');
+const compact = new Intl.NumberFormat('en-US', { notation: 'compact' });
 
 export const format = (value: number) => {
 	if (value < 1_000) {
 		return '' + value;
 	}
 
-	return formatter.format(value);
+	if (value < 100_000) {
+		return long.format(value);
+	}
+
+	return compact.format(value);
 };

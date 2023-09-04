@@ -1,6 +1,6 @@
 import type { QueryFn } from '@intrnl/sq';
 
-import { compress } from '~/utils/image.ts';
+import { compressPostImage } from '~/utils/image.ts';
 
 const LINK_PROXY_ENDPOINT = 'https://cardyb.bsky.app/v1/extract';
 
@@ -51,7 +51,7 @@ export const getLinkMeta: QueryFn<LinkMeta, ReturnType<typeof getLinkMetaKey>> =
 			}
 
 			const blob = await response.blob();
-			const result = await compress(blob);
+			const result = await compressPostImage(blob);
 
 			thumb = result.blob;
 		} catch {}

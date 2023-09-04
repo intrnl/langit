@@ -45,7 +45,7 @@ import { useNavigate, useParams } from '~/router.ts';
 
 import { pm2rt } from '~/utils/composer/pm2rt.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
-import { compress } from '~/utils/image.ts';
+import { compressPostImage } from '~/utils/image.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
 import { Locker } from '~/utils/lock.ts';
@@ -398,7 +398,7 @@ const AuthenticatedComposePage = () => {
 			}
 
 			try {
-				const compressed = await compress(file);
+				const compressed = await compressPostImage(file);
 
 				const blob = compressed.blob;
 				const before = compressed.before;

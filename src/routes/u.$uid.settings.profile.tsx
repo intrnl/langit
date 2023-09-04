@@ -1,25 +1,110 @@
-import { Match, Show, Switch } from 'solid-js';
+import { Match, Show, Switch, createSignal } from 'solid-js';
 
 import type { DID, Records, ResponseOf } from '@intrnl/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
 
+import { uploadBlob } from '~/api/mutations/upload-blob.ts';
 import { getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { multiagent } from '~/globals/agent.ts';
+import { openModal } from '~/globals/modals.tsx';
 import { useParams } from '~/router.ts';
+import { compressProfileImage } from '~/utils/image.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
 import { createId, model } from '~/utils/misc.ts';
 
-import { uploadBlob } from '~/api/mutations/upload-blob';
+import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input';
 import textarea from '~/styles/primitives/textarea.ts';
 
+import AddPhotoAlternateIcon from '~/icons/baseline-add-photo-alternate.tsx';
+
+import ImageUploadCompressDialog from './u.$uid.compose/ImageUploadCompressDialog.tsx';
+
 const MAX_NAME_LENGTH = 64;
 const MAX_BIO_LENGTH = 256;
 
 type ProfileRecord = Records['app.bsky.actor.profile'];
+
+interface AddPhotoButtonProps {
+	title: string;
+	aspectRatio: number;
+	maxWidth: number;
+	maxHeight: number;
+	onPick: (blob: Blob) => void;
+}
+
+const AddPhotoButton = (props: AddPhotoButtonProps) => {
+	let input: HTMLInputElement | undefined;
+
+	const [loading, setLoading] = createSignal(false);
+
+	const processBlob = async (file: File) => {
+		if (loading()) {
+			return;
+		}
+
+		setLoading(true);
+
+		try {
+			const { aspectRatio, maxWidth, maxHeight } = props;
+			const result = await compressProfileImage(file, aspectRatio, maxWidth, maxHeight);
+
+			if (result.before !== result.after) {
+				openModal(() => (
+					<ImageUploadCompressDialog
+						images={[{ ...result, name: file.name }]}
+						onSubmit={() => props.onPick(result.blob)}
+					/>
+				));
+			} else {
+				props.onPick(file);
+			}
+		} catch {}
+
+		setLoading(false);
+	};
+
+	const handleClick = () => {
+		input!.click();
+	};
+
+	const handleFileInput = (ev: Event & { currentTarget: HTMLInputElement }) => {
+		const target = ev.currentTarget;
+		const files = Array.from(target.files!);
+
+		target.value = '';
+
+		if (files.length > 0) {
+			processBlob(files[0]);
+		}
+	};
+
+	return (
+		<>
+			<Show
+				when={!loading()}
+				fallback={
+					<div class="absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/75">
+						<CircularProgress />
+					</div>
+				}
+			>
+				<button
+					title={props.title}
+					onClick={handleClick}
+					class="absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 outline-2 outline-primary hover:bg-secondary focus-visible:outline"
+				>
+					<AddPhotoAlternateIcon class="text-xl" />
+				</button>
+			</Show>
+
+			<input ref={input} type="file" class="hidden" accept="image/*" onChange={handleFileInput} />
+		</>
+	);
+};
 
 const AuthenticatedProfileSettingsPage = () => {
 	const params = useParams('/u/:uid/settings/profile');
@@ -37,8 +122,8 @@ const AuthenticatedProfileSettingsPage = () => {
 
 	const [name, setName] = createDerivedSignal(() => profile()?.displayName.value || '');
 	const [bio, setBio] = createDerivedSignal(() => profile()?.description.value || '');
-	const [avatar, _setAvatar] = createDerivedSignal<Blob | string | undefined>(() => profile()?.avatar.value);
-	const [banner, _setBanner] = createDerivedSignal<Blob | string | undefined>(() => profile()?.banner.value);
+	const [avatar, setAvatar] = createDerivedSignal<Blob | string | undefined>(() => profile()?.avatar.value);
+	const [banner, setBanner] = createDerivedSignal<Blob | string | undefined>(() => profile()?.banner.value);
 
 	const mutation = createMutation({
 		mutate: async () => {
@@ -118,19 +203,35 @@ const AuthenticatedProfileSettingsPage = () => {
 
 			<Switch>
 				<Match when={profile()}>
-					{(profile) => (
+					{(_profile) => (
 						<fieldset disabled={mutation.isLoading} class="contents">
-							<div class="aspect-banner bg-muted-fg">
-								<Show when={profile().banner.value}>
-									{(banner) => <img src={banner()} class="h-full w-full" />}
+							<div class="relative aspect-banner bg-muted-fg">
+								<Show when={banner()} keyed>
+									{(banner) => <BlobImage src={banner} class="h-full w-full" />}
 								</Show>
+
+								<AddPhotoButton
+									title="Add banner image"
+									aspectRatio={3 / 1}
+									maxWidth={3000}
+									maxHeight={1000}
+									onPick={setBanner}
+								/>
 							</div>
 
-							<div class="flex flex-col gap-4 p-4">
-								<div class="-mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted-fg outline-2 outline-background outline">
-									<Show when={profile().avatar.value}>
-										{(avatar) => <img src={avatar()} class="h-full w-full" />}
+							<div class="z-10 flex flex-col gap-4 p-4">
+								<div class="relative -mt-11 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-muted-fg outline-2 outline-background outline">
+									<Show when={avatar()} keyed>
+										{(avatar) => <BlobImage src={avatar} class="h-full w-full" />}
 									</Show>
+
+									<AddPhotoButton
+										title="Add profile image"
+										aspectRatio={1 / 1}
+										maxWidth={1000}
+										maxHeight={1000}
+										onPick={setAvatar}
+									/>
 								</div>
 
 								<div class="flex flex-col gap-2">

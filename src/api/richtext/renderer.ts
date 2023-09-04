@@ -34,7 +34,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			let match: RegExpExecArray | null | undefined;
 
 			anchor.className = 'text-accent hover:underline';
-			anchor.textContent = toShortUrl(segment.text);
+			anchor.textContent = segment.text;
 
 			if (isAppUrl(uri)) {
 				if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {

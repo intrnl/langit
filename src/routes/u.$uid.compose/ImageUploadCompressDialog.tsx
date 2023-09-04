@@ -32,7 +32,11 @@ const ImageUploadCompressDialog = (props: ImageUploadCompressDialogProps) => {
 
 						return (
 							<div class="flex items-center gap-3">
-								<BlobImage src={image.blob} class="h-20 w-20 shrink-0 rounded-md object-cover" />
+								<BlobImage
+									src={image.blob}
+									class="w-20 shrink-0 rounded-md object-contain"
+									style={{ 'aspect-ratio': `${after.width}/${after.height}`, 'max-height': '80px' }}
+								/>
 
 								<div class="flex min-w-0 flex-col gap-0.5 text-sm">
 									<p class="line-clamp-1 break-words font-bold">{image.name}</p>

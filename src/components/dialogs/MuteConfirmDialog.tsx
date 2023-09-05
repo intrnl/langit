@@ -20,6 +20,7 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import ListItem from '~/components/ListItem.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
+import select from '~/styles/primitives/select.ts';
 
 export interface MuteConfirmDialogProps {
 	uid: DID;
@@ -201,7 +202,7 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 									<select
 										value={duration()}
 										onChange={(el) => setDuration(el.currentTarget.value)}
-										class="rounded-md border border-input bg-background px-3 py-2 text-primary outline-2 -outline-offset-1 outline-accent outline-none focus:outline disabled:opacity-50"
+										class={/* @once */ select()}
 									>
 										<option value={-1}>Indefinite</option>
 										<option value={1 * 60 * 60 * 1_000}>1 hour</option>

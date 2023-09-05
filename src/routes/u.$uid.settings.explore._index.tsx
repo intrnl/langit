@@ -87,7 +87,7 @@ const FeedItem = (props: FeedItemProps) => {
 			onClick={click}
 			onAuxClick={click}
 			onKeyDown={click}
-			class="flex flex-col gap-3 px-4 py-3 text-sm"
+			class="flex flex-col gap-3 px-4 py-3 text-sm outline-2 -outline-offset-2 outline-primary focus-visible:outline"
 			classList={{
 				'bg-hinted z-10 touch-none': sortable.isActiveDraggable,
 				'cursor-pointer hover:bg-hinted': !editing(),
@@ -273,7 +273,7 @@ const AuthenticatedExploreSettingsPage = () => {
 
 			<A
 				href={generatePath('/u/:uid/settings/explore/add', params)}
-				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+				class="flex items-center gap-4 px-4 py-3 text-sm outline-2  -outline-offset-2 outline-primary hover:bg-hinted focus-visible:outline"
 			>
 				<AddIcon class="text-2xl" />
 				<span>Add new feed</span>

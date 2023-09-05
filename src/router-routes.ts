@@ -100,7 +100,7 @@ const routes: RouteDefinition[] = [
       },
       {
         path: "settings/profile",
-        component: lazy(() => import("./routes/u.$uid.settings.profile.tsx")),
+        component: lazy(() => import("./routes/u.$uid.settings.profile/route.tsx")),
       },
       {
         path: "explore",

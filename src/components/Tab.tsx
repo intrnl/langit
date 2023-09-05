@@ -13,7 +13,7 @@ export const Tab = <C extends ValidComponent>(
 		// @ts-expect-error
 		<Dynamic
 			{...b}
-			class="group flex h-full min-w-14 shrink-0 grow justify-center whitespace-nowrap px-4 text-sm font-bold text-muted-fg hover:bg-hinted"
+			class="group flex h-full min-w-14 shrink-0 grow justify-center whitespace-nowrap px-4 text-sm font-bold text-muted-fg outline-2 -outline-offset-2 outline-primary hover:bg-hinted focus-visible:outline"
 			classList={{ 'text-primary is-active': a.active }}
 		>
 			<div class="relative flex h-full w-max items-center">
@@ -28,7 +28,7 @@ export const TabLink = (props: AnchorProps) => {
 	return (
 		<A
 			{...props}
-			class="group flex h-full min-w-14 shrink-0 grow justify-center whitespace-nowrap px-4 text-sm font-bold text-muted-fg hover:bg-hinted"
+			class="group flex h-full min-w-14 shrink-0 grow justify-center whitespace-nowrap px-4 text-sm font-bold text-muted-fg outline-2 -outline-offset-2 outline-primary hover:bg-hinted focus-visible:outline"
 			activeClass="text-primary is-active"
 		>
 			<div class="relative flex h-full w-max items-center">

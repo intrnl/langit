@@ -80,7 +80,7 @@ const Post = (props: PostProps) => {
 			onClick={handleClick}
 			onAuxClick={handleClick}
 			onKeyDown={handleClick}
-			class="relative border-divider px-4"
+			class="relative border-divider px-4 outline-2 -outline-offset-2 outline-primary focus-visible:outline"
 			classList={{
 				'border-b': !props.next,
 				'hover:bg-hinted': interactive(),

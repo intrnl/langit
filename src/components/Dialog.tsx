@@ -1,4 +1,4 @@
-import { type ComponentProps, Show, createEffect } from 'solid-js';
+import { type ComponentProps, Show, createEffect, onCleanup } from 'solid-js';
 
 export interface DialogProps extends Pick<ComponentProps<'svg'>, 'children'> {
 	centered?: boolean;
@@ -10,6 +10,7 @@ let checked = false;
 
 const Dialog = (props: DialogProps) => {
 	let dialog: HTMLDialogElement | undefined;
+	let focused: Element | null | undefined;
 
 	createEffect(() => {
 		const open = props.open;
@@ -48,10 +49,23 @@ const Dialog = (props: DialogProps) => {
 				document.documentElement.style.setProperty('--sb-width', `${scrollbarSize}px`);
 			}
 
+			focused = document.activeElement;
 			dialog.returnValue = '';
 			dialog.showModal();
 		} else if (dialog.open) {
 			dialog.close();
+
+			if (focused && document.contains(focused)) {
+				(focused as any).focus();
+			}
+
+			focused = null;
+		}
+	});
+
+	onCleanup(() => {
+		if (focused && document.contains(focused)) {
+			setTimeout(() => (focused as any).focus(), 0);
 		}
 	});
 

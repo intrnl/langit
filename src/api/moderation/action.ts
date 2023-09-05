@@ -202,6 +202,17 @@ export const decideMutedTemporaryModeration = (accu: ModerationCause[], duration
 	return accu;
 };
 
+const shouldAllowKeywordFilter = (filterPref: KeywordPreference, pref: KeywordPreference) => {
+	switch (pref) {
+		case PreferenceWarn:
+			return filterPref === pref || filterPref === PreferenceHide;
+		case PreferenceHide:
+			return filterPref === pref;
+	}
+
+	return false;
+};
+
 export const decideMutedKeywordModeration = (
 	accu: ModerationCause[],
 	text: string,
@@ -216,7 +227,7 @@ export const decideMutedKeywordModeration = (
 	for (let idx = 0, len = filters.length; idx < len; idx++) {
 		const filter = filters[idx];
 
-		if (filter.pref !== pref) {
+		if (!shouldAllowKeywordFilter(filter.pref, pref)) {
 			continue;
 		}
 

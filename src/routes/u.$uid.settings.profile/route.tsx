@@ -129,6 +129,7 @@ const AuthenticatedProfileSettingsPage = () => {
 								</Show>
 
 								<AddPhotoButton
+									exists={!!banner()}
 									title="Add banner image"
 									aspectRatio={3 / 1}
 									maxWidth={3000}
@@ -144,6 +145,7 @@ const AuthenticatedProfileSettingsPage = () => {
 									</Show>
 
 									<AddPhotoButton
+										exists={!!avatar()}
 										title="Add profile image"
 										aspectRatio={1 / 1}
 										maxWidth={1000}

@@ -9,7 +9,10 @@ import AddPhotoAlternateIcon from '~/icons/baseline-add-photo-alternate.tsx';
 
 import ImageUploadCompressDialog from '../u.$uid.compose/ImageUploadCompressDialog.tsx';
 
+import PhotoPickerMenu from './PhotoPickerMenu.tsx';
+
 export interface AddPhotoButtonProps {
+	exists: boolean;
 	title: string;
 	aspectRatio: number;
 	maxWidth: number;
@@ -48,8 +51,20 @@ const AddPhotoButton = (props: AddPhotoButtonProps) => {
 		setLoading(false);
 	};
 
-	const handleClick = () => {
+	const clearPhoto = () => {
+		props.onPick(undefined);
+	};
+
+	const openFileInput = () => {
 		input!.click();
+	};
+
+	const handleClick = () => {
+		if (props.exists) {
+			openModal(() => <PhotoPickerMenu onChoose={openFileInput} onClear={clearPhoto} />);
+		} else {
+			openFileInput();
+		}
 	};
 
 	const handleFileInput = (ev: Event & { currentTarget: HTMLInputElement }) => {

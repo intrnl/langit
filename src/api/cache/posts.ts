@@ -23,8 +23,6 @@ import { EQUALS_DEQUAL } from '~/utils/misc.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
 
 type Post = RefOf<'app.bsky.feed.defs#postView'>;
-type FeedPost = RefOf<'app.bsky.feed.defs#feedViewPost'>;
-
 type PostRecord = Records['app.bsky.feed.post'];
 
 export const posts: Record<string, WeakRef<SignalizedPost>> = {};
@@ -103,33 +101,6 @@ export const mergeSignalizedPost = (uid: DID, post: Post, key?: number) => {
 	}
 
 	return val;
-};
-
-/** @see BskyTimelinePost */
-export interface SignalizedTimelinePost {
-	post: SignalizedPost;
-	reply?: {
-		root: SignalizedPost;
-		parent: SignalizedPost;
-	};
-	reason: FeedPost['reason'];
-}
-
-export const createSignalizedTimelinePost = (
-	uid: DID,
-	item: FeedPost,
-	key?: number,
-): SignalizedTimelinePost => {
-	const reply = item.reply;
-
-	return {
-		post: mergeSignalizedPost(uid, item.post, key),
-		reply: reply && {
-			root: mergeSignalizedPost(uid, reply.root as Post, key),
-			parent: mergeSignalizedPost(uid, reply.parent as Post, key),
-		},
-		reason: item.reason,
-	};
 };
 
 export const createPostModerationDecision = (uid: DID) => {

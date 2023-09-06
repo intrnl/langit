@@ -9,6 +9,7 @@ import { assert } from '~/utils/misc.ts';
 
 import {
 	type PostFilter,
+	type SignalizedTimelineItem,
 	type SliceFilter,
 	type TimelineSlice,
 	createTimelineSlices,
@@ -369,7 +370,7 @@ const combine = <T>(filters: Array<undefined | FilterFn<T>>): FilterFn<T> | unde
 };
 
 const createDuplicatePostFilter = (slices: TimelineSlice[]): PostFilter => {
-	const seen = new Set<string>();
+	const map: Record<string, boolean> = {};
 
 	for (let i = 0, il = slices.length; i < il; i++) {
 		const slice = slices[i];
@@ -379,19 +380,18 @@ const createDuplicatePostFilter = (slices: TimelineSlice[]): PostFilter => {
 			const item = items[j];
 			const uri = item.post.uri;
 
-			seen.add(uri);
+			map[uri] = true;
 		}
 	}
 
 	return (item) => {
 		const uri = item.post.uri;
 
-		if (seen.has(uri)) {
+		if (map[uri]) {
 			return false;
 		}
 
-		seen.add(uri);
-		return true;
+		return (map[uri] = true);
 	};
 };
 
@@ -536,10 +536,10 @@ const createHomeSliceFilter = (uid: DID): SliceFilter | undefined => {
 				(root.author.did !== uid && !root.author.viewer.following.peek()) ||
 				(parent.author.did !== uid && !parent.author.viewer.following.peek())
 			) {
-				return false;
+				return yankReposts(items);
 			}
 		} else if (first.post.record.peek().reply) {
-			return false;
+			return yankReposts(items);
 		}
 
 		return true;
@@ -558,12 +558,36 @@ const createProfileSliceFilter = (did: DID, replies: boolean): SliceFilter | und
 				const root = reply.root;
 				const parent = reply.parent;
 
-				return root.author.did === did && parent.author.did === did;
+				if (root.author.did !== did || parent.author.did !== did) {
+					return yankReposts(items);
+				}
 			} else if (first.post.record.peek().reply) {
-				return false;
+				return yankReposts(items);
 			}
 		}
 
 		return true;
 	};
+};
+
+// Get the reposts out of the gutter
+const yankReposts = (items: SignalizedTimelineItem[]): TimelineSlice[] | false => {
+	let slices: TimelineSlice[] | false = false;
+	let last: SignalizedTimelineItem[] | undefined;
+
+	for (let idx = 0, len = items.length; idx < len; idx++) {
+		const item = items[idx];
+
+		if (item.reason && item.reason.$type === 'app.bsky.feed.defs#reasonRepost') {
+			if (last) {
+				last.push(item);
+			} else {
+				(slices ||= []).push({ items: (last = [item]) });
+			}
+		} else {
+			last = undefined;
+		}
+	}
+
+	return slices;
 };

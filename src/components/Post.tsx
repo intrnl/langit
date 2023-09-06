@@ -3,8 +3,9 @@ import { type Accessor, Match, Show, Switch, createSignal } from 'solid-js';
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { A, useNavigate } from '@solidjs/router';
 
-import type { SignalizedPost, SignalizedTimelinePost } from '~/api/cache/posts.ts';
+import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
+import type { SignalizedTimelineItem } from '~/api/models/timeline.ts';
 
 import { type ModerationDecision, CauseLabel, CauseMutedKeyword } from '~/api/moderation/action.ts';
 import { getRecordId } from '~/api/utils.ts';
@@ -31,7 +32,7 @@ interface PostProps {
 	uid: DID;
 	post: SignalizedPost;
 	parent?: SignalizedPost;
-	reason?: SignalizedTimelinePost['reason'];
+	reason?: SignalizedTimelineItem['reason'];
 	prev?: boolean;
 	next?: boolean;
 	interactive?: boolean;

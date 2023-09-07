@@ -9,6 +9,10 @@ export interface PendingImage extends CompressResult {
 
 export interface ComposedImage {
 	blob: Blob;
+	ratio: {
+		width: number;
+		height: number;
+	};
 	alt: Signal<string>;
 	record?: AtBlob | undefined;
 }

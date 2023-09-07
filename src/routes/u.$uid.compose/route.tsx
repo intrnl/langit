@@ -275,6 +275,7 @@ const AuthenticatedComposePage = () => {
 				images: $images.map((img) => ({
 					alt: img.alt.value,
 					image: img.record! as AtBlob<`image/${string}`>,
+					aspectRatio: img.ratio,
 				})),
 			};
 		} else if ($link) {
@@ -360,14 +361,15 @@ const AuthenticatedComposePage = () => {
 		}
 	};
 
-	const addImagesUncompressed = (files: (Blob | File)[]) => {
+	const addImagesRaw = (imgs: Array<{ blob: Blob; ratio: { width: number; height: number } }>) => {
 		const next: ComposedImage[] = [];
 
-		for (let idx = 0, len = files.length; idx < len; idx++) {
-			const file = files[idx];
+		for (let idx = 0, len = imgs.length; idx < len; idx++) {
+			const img = imgs[idx];
 
 			next.push({
-				blob: file,
+				blob: img.blob,
+				ratio: img.ratio,
 				alt: signal(''),
 				record: undefined,
 			});
@@ -384,7 +386,7 @@ const AuthenticatedComposePage = () => {
 		}
 
 		const pending: PendingImage[] = [];
-		const next: (Blob | File)[] = [];
+		const next: Array<{ blob: Blob; ratio: { width: number; height: number } }> = [];
 		let errored = false;
 
 		setMessage('');
@@ -407,7 +409,7 @@ const AuthenticatedComposePage = () => {
 				if (after.size !== before.size) {
 					pending.push({ ...compressed, name: file.name });
 				} else {
-					next.push(blob);
+					next.push({ blob: blob, ratio: { width: after.width, height: after.height } });
 				}
 			} catch (err) {
 				console.error(`Failed to compress image`, err);
@@ -417,13 +419,23 @@ const AuthenticatedComposePage = () => {
 
 		batch(() => {
 			setImageProcessing(imageProcessing() - 1);
-			addImagesUncompressed(next);
+			addImagesRaw(next);
 
 			if (pending.length > 0) {
 				openModal(() => (
 					<ImageUploadCompressDialog
 						images={pending}
-						onSubmit={() => addImagesUncompressed(pending.map((img) => img.blob))}
+						onSubmit={() =>
+							addImagesRaw(
+								pending.map((img) => ({
+									blob: img.blob,
+									ratio: {
+										width: img.after.width,
+										height: img.after.height,
+									},
+								})),
+							)
+						}
 					/>
 				));
 			}

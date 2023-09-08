@@ -135,7 +135,7 @@ const AuthenticatedNotificationsPage = () => {
 			</div>
 
 			<Switch>
-				<Match when={notifications.loading && !notifications.refetchParam}>
+				<Match when={read.isLoading || (notifications.loading && !notifications.refetchParam)}>
 					<div
 						class="flex h-13 items-center justify-center border-divider"
 						classList={{ 'border-b': !!notifications() }}

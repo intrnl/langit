@@ -4,7 +4,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import type { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { A, Outlet } from '@solidjs/router';
+import { Outlet } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -155,12 +155,13 @@ const AuthenticatedProfileLayout = () => {
 
 										<Switch>
 											<Match when={profile().did === uid()}>
-												<A
+												<a
+													link
 													href={generatePath('/u/:uid/settings/profile', params)}
 													class={/* @once */ button({ color: 'primary' })}
 												>
 													Edit profile
-												</A>
+												</a>
 											</Match>
 
 											<Match when>
@@ -210,18 +211,23 @@ const AuthenticatedProfileLayout = () => {
 									</Show>
 
 									<div class="flex flex-wrap gap-4 text-sm">
-										<A href={generatePath('/u/:uid/profile/:actor/follows', params)} class="hover:underline">
+										<a
+											link
+											href={generatePath('/u/:uid/profile/:actor/follows', params)}
+											class="hover:underline"
+										>
 											<span class="font-bold">{comformat.format(profile().followsCount.value)}</span>{' '}
 											<span class="text-muted-fg">Follows</span>
-										</A>
+										</a>
 
-										<A
+										<a
+											link
 											href={generatePath('/u/:uid/profile/:actor/followers', params)}
 											class="hover:underline"
 										>
 											<span class="font-bold">{comformat.format(profile().followersCount.value)}</span>{' '}
 											<span class="text-muted-fg">Followers</span>
-										</A>
+										</a>
 									</div>
 
 									<Switch>
@@ -230,7 +236,8 @@ const AuthenticatedProfileLayout = () => {
 												<div class="text-sm text-muted-fg">
 													<p>
 														This user is muted by{' '}
-														<A
+														<a
+															link
 															href={generatePath('/u/:uid/profile/:actor/lists/:list', {
 																uid: uid(),
 																actor: getRepoId(list().uri),
@@ -239,7 +246,7 @@ const AuthenticatedProfileLayout = () => {
 															class="text-accent hover:underline"
 														>
 															{list().name}
-														</A>
+														</a>
 													</p>
 												</div>
 											)}

@@ -1,7 +1,7 @@
 import { type Accessor, Match, Show, Switch, createSignal } from 'solid-js';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
-import { A, useNavigate } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
 
 import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
@@ -95,7 +95,8 @@ const Post = (props: PostProps) => {
 							<RepeatIcon />
 						</div>
 						<div class="min-w-0">
-							<A
+							<a
+								link
 								href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: reason()!.by.did })}
 								class="flex font-medium hover:underline"
 							>
@@ -103,7 +104,7 @@ const Post = (props: PostProps) => {
 									{reason()!.by.displayName || reason()!.by.handle}
 								</span>
 								<span class="whitespace-pre"> Reposted</span>
-							</A>
+							</a>
 						</div>
 					</div>
 				</Show>
@@ -115,7 +116,8 @@ const Post = (props: PostProps) => {
 								<ChatBubbleOutlinedIcon />
 							</div>
 							<div class="min-w-0">
-								<A
+								<a
+									link
 									href={generatePath('/u/:uid/profile/:actor/post/:status', {
 										uid: uid(),
 										actor: parent()!.author.did,
@@ -127,7 +129,7 @@ const Post = (props: PostProps) => {
 									<span dir="auto" class="line-clamp-1">
 										{parent()!.author.displayName.value || parent()!.author.handle.value}
 									</span>
-								</A>
+								</a>
 							</div>
 						</div>
 					</Match>
@@ -138,7 +140,8 @@ const Post = (props: PostProps) => {
 								<ChatBubbleOutlinedIcon />
 							</div>
 							<div class="min-w-0">
-								<A
+								<a
+									link
 									href={generatePath('/u/:uid/profile/:actor/post/:status', {
 										uid: uid(),
 										actor: post().author.did,
@@ -147,7 +150,7 @@ const Post = (props: PostProps) => {
 									class="flex font-medium hover:underline"
 								>
 									Show full thread
-								</A>
+								</a>
 							</div>
 						</div>
 					</Match>
@@ -156,14 +159,15 @@ const Post = (props: PostProps) => {
 
 			<div class="flex gap-3">
 				<div class="flex shrink-0 flex-col items-center">
-					<A
+					<a
+						link
 						href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author().did })}
 						class="h-10 w-10 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 					>
 						<Show when={author().avatar.value}>
 							{(avatar) => <img src={avatar()} class="h-full w-full" />}
 						</Show>
-					</A>
+					</a>
 
 					<Show when={props.next}>
 						<div class="mt-3 grow border-l-2 border-divider" />
@@ -173,7 +177,8 @@ const Post = (props: PostProps) => {
 				<div class="min-w-0 grow pb-3">
 					<div class="mb-0.5 flex items-center justify-between gap-4">
 						<div class="flex items-center text-sm">
-							<A
+							<a
+								link
 								href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author().did })}
 								class="group flex gap-1"
 							>
@@ -181,11 +186,12 @@ const Post = (props: PostProps) => {
 									{author().displayName.value || author().handle.value}
 								</span>
 								<span class="line-clamp-1 break-all text-muted-fg">@{author().handle.value}</span>
-							</A>
+							</a>
 
 							<span class="text-muted-fg">
 								<span class="px-1">·</span>
-								<A
+								<a
+									link
 									title={relformat.formatAbsWithTime(record().createdAt)}
 									href={generatePath('/u/:uid/profile/:actor/post/:status', {
 										uid: uid(),
@@ -195,7 +201,7 @@ const Post = (props: PostProps) => {
 									class="whitespace-nowrap hover:underline"
 								>
 									{relformat.format(record().createdAt)}
-								</A>
+								</a>
 							</span>
 						</div>
 
@@ -220,7 +226,8 @@ const Post = (props: PostProps) => {
 					<Show when={interactive()}>
 						<div class="mt-3 flex text-muted-fg">
 							<div class="flex grow basis-0 items-end gap-0.5">
-								<A
+								<a
+									link
 									href={
 										generatePath('/u/:uid/compose', { uid: uid() }) +
 										`?reply=${encodeURIComponent(post().uri)}`
@@ -228,7 +235,7 @@ const Post = (props: PostProps) => {
 									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
 								>
 									<ChatBubbleOutlinedIcon />
-								</A>
+								</a>
 								<span class="text-[0.8125rem]">{comformat.format(post().replyCount.value)}</span>
 							</div>
 

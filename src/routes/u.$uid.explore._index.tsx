@@ -3,7 +3,7 @@ import { For, Match, Show, Switch, createMemo, createSignal, onCleanup } from 's
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { A, useNavigate } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -85,12 +85,13 @@ const AuthenticatedExplorePage = () => {
 					</button>
 				</Show>
 
-				<A
+				<a
+					link
 					href={generatePath('/u/:uid/settings/explore', params)}
 					class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary"
 				>
 					<SettingsIcon />
-				</A>
+				</a>
 			</div>
 			<For
 				each={savedFeeds()}
@@ -181,7 +182,8 @@ const AuthenticatedExplorePage = () => {
 											</For>
 
 											<Show when={timeline()?.pages[0].cid}>
-												<A
+												<a
+													link
 													href={generatePath('/u/:uid/profile/:actor/feed/:feed', {
 														uid: uid(),
 														actor: getRepoId(feedUri),
@@ -190,7 +192,7 @@ const AuthenticatedExplorePage = () => {
 													class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
 												>
 													Show more
-												</A>
+												</a>
 											</Show>
 										</Match>
 

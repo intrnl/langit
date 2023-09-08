@@ -1,7 +1,5 @@
 import { createEffect } from 'solid-js';
 
-import { A } from '@solidjs/router';
-
 import { multiagent } from '~/globals/agent.ts';
 import { generatePath, useNavigate } from '~/router.ts';
 
@@ -40,12 +38,13 @@ const IndexPage = () => {
 				<h1 class="text-center text-2xl font-bold">Langit</h1>
 
 				<div class="mt-4 flex w-full max-w-md flex-col gap-2 sm:flex-row sm:justify-center">
-					<A
+					<a
+						link
 						href={generatePath('/login')}
 						class={/* @once */ button({ color: 'primary', class: 'justify-center' })}
 					>
 						Log in
-					</A>
+					</a>
 					<button disabled class={/* @once */ button({ color: 'outline', class: 'justify-center' })}>
 						Sign up
 					</button>

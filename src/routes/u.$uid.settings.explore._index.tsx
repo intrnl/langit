@@ -2,7 +2,7 @@ import { For, Show, Suspense, SuspenseList, batch, createMemo, createSignal } fr
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { A, useNavigate } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
 import {
 	DragDropProvider,
 	DragDropSensors,
@@ -271,13 +271,14 @@ const AuthenticatedExploreSettingsPage = () => {
 				</SortableProvider>
 			</DragDropProvider>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/settings/explore/add', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm outline-2  -outline-offset-2 outline-primary hover:bg-hinted focus-visible:outline"
 			>
 				<AddIcon class="text-2xl" />
 				<span>Add new feed</span>
-			</A>
+			</a>
 		</div>
 	);
 };

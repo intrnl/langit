@@ -4,7 +4,6 @@ import { Dynamic } from 'solid-js/web';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { A } from '@solidjs/router';
 
 import {
 	type FollowNotificationSlice,
@@ -127,7 +126,8 @@ const Notification = (props: NotificationProps) => {
 											const author = item.author;
 
 											return (
-												<A
+												<a
+													link
 													href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author.did })}
 													title={
 														author.displayName
@@ -139,7 +139,7 @@ const Notification = (props: NotificationProps) => {
 													<Show when={author.avatar}>
 														{(avatar) => <img src={avatar()} class="h-full w-full" />}
 													</Show>
-												</A>
+												</a>
 											);
 										}}
 									</For>
@@ -241,13 +241,14 @@ const renderText = (
 		}
 
 		nodes.push(
-			<A
+			<a
+				link
 				dir="auto"
 				href={generatePath('/u/:uid/profile/:actor', { uid: uid, actor: author.did })}
 				class="font-bold hover:underline"
 			>
 				{author.displayName || `@${author.handle}`}
-			</A>,
+			</a>,
 		);
 	}
 

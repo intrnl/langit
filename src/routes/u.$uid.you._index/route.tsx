@@ -1,7 +1,7 @@
 import { For, Show, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { A, useNavigate } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
 
 import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
@@ -109,36 +109,39 @@ const AuthenticatedYouPage = () => {
 				}}
 			</For>
 
-			<A href="/login" class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted">
+			<a link href={generatePath('/login')} class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted">
 				<AddIcon class="text-xl" />
 				<span>Add new account</span>
-			</A>
+			</a>
 
 			<hr class="my-4 border-divider" />
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: uid() })}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<AccountCircleIcon class="text-xl" />
 				<span>Profile</span>
-			</A>
+			</a>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/you/invites', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<ConfirmationNumberIcon class="text-xl" />
 				<span>Invite codes</span>
-			</A>
+			</a>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/settings/languages', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<LanguageIcon class="text-xl" />
 				<span>Languages</span>
-			</A>
+			</a>
 
 			<button
 				onClick={() => {
@@ -167,61 +170,68 @@ const AuthenticatedYouPage = () => {
 				<p class="text-base font-bold">Moderation</p>
 			</div>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/you/moderation/content-filter', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<VisibilityIcon class="text-xl" />
 				<span>Content filters</span>
-			</A>
+			</a>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/you/moderation/keyword-filter', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<FilterAltIcon class="text-xl" />
 				<span>Keyword filters</span>
-			</A>
+			</a>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/you/moderation/repost-filter', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<RepeatIcon class="text-xl" />
 				<span>Hidden reposts</span>
-			</A>
+			</a>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/you/moderation/mute-lists', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<GroupOffIcon class="text-xl" />
 				<span>Mute lists</span>
-			</A>
+			</a>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/you/moderation/muted', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<PersonOffIcon class="text-xl" />
 				<span>Muted users</span>
-			</A>
+			</a>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/you/moderation/muted/temp', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<AvTimerIcon class="text-xl" />
 				<span>Temporarily muted users</span>
-			</A>
+			</a>
 
-			<A
+			<a
+				link
 				href={generatePath('/u/:uid/you/moderation/blocked', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<BlockIcon class="text-xl" />
 				<span>Blocked users</span>
-			</A>
+			</a>
 		</div>
 	);
 };

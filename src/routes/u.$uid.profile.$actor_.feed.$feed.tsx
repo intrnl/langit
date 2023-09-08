@@ -3,7 +3,6 @@ import { Match, Show, Switch, createEffect, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { A } from '@solidjs/router';
 
 import { favoriteFeed } from '~/api/mutations/favorite-feed.ts';
 import {
@@ -160,12 +159,13 @@ const AuthenticatedFeedPage = () => {
 										<p class="break-words text-lg font-bold">{info().displayName.value}</p>
 										<p class="text-sm text-muted-fg">
 											<span>by </span>
-											<A
+											<a
+												link
 												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator().did })}
 												class="hover:underline"
 											>
 												@{creator().handle.value}
-											</A>
+											</a>
 										</p>
 									</div>
 

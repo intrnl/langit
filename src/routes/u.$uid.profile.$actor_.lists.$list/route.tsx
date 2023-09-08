@@ -3,7 +3,7 @@ import { For, Match, Show, Switch, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { A, useNavigate } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
 
 import { getCollectionCursor } from '~/api/utils.ts';
 
@@ -70,12 +70,13 @@ const AuthenticatedListPage = () => {
 										<p class="break-words text-lg font-bold">{list().name.value}</p>
 										<p class="text-sm text-muted-fg">
 											<span>by </span>
-											<A
+											<a
+												link
 												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator().did })}
 												class="hover:underline"
 											>
 												@{creator().handle.value}
-											</A>
+											</a>
 										</p>
 									</div>
 

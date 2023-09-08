@@ -1,7 +1,6 @@
 import { Show } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { A } from '@solidjs/router';
 
 import { type SignalizedList } from '~/api/cache/lists.ts';
 
@@ -21,7 +20,8 @@ const ListItem = (props: ListItemProps) => {
 	const list = () => props.list;
 
 	return (
-		<A
+		<a
+			link
 			href={generatePath('/u/:uid/profile/:actor/lists/:list', {
 				uid: uid(),
 				actor: getRepoId(list().uri),
@@ -48,7 +48,7 @@ const ListItem = (props: ListItemProps) => {
 					<div class="mt-1 whitespace-pre-wrap break-words text-sm">{list().$renderedDescription()}</div>
 				</Show>
 			</div>
-		</A>
+		</a>
 	);
 };
 

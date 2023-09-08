@@ -2,7 +2,6 @@ import { For, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { Title } from '@solidjs/meta';
-import { A } from '@solidjs/router';
 
 import {
 	type KeywordPreference,
@@ -45,13 +44,14 @@ const AuthenticatedAddFilterModerationPage = () => {
 
 				<div class="grow" />
 
-				<A
+				<a
+					link
 					title="Add new filter"
 					href={generatePath('/u/:uid/you/moderation/keyword-filter/add', params)}
 					class="-mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg hover:bg-secondary"
 				>
 					<AddIcon />
-				</A>
+				</a>
 			</div>
 
 			<For
@@ -59,7 +59,8 @@ const AuthenticatedAddFilterModerationPage = () => {
 				fallback={<p class="p-4 text-sm text-muted-fg">You don't have any keyword filters set up yet.</p>}
 			>
 				{(filter) => (
-					<A
+					<a
+						link
 						href={generatePath('/u/:uid/you/moderation/keyword-filter/:fid/edit', {
 							uid: uid(),
 							fid: '' + filter.id,
@@ -72,7 +73,7 @@ const AuthenticatedAddFilterModerationPage = () => {
 								{filter.matchers.length} keywords muted · {renderPrefName(filter.pref)}
 							</p>
 						</div>
-					</A>
+					</a>
 				)}
 			</For>
 		</div>

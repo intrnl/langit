@@ -1,7 +1,6 @@
 import { Show } from 'solid-js';
 
 import type { DID, UnionOf } from '@intrnl/bluesky-client/atp-schema';
-import { A } from '@solidjs/router';
 
 import { getRecordId } from '~/api/utils.ts';
 
@@ -19,7 +18,8 @@ const EmbedFeed = (props: EmbedFeedProps) => {
 	const feed = () => props.feed;
 
 	return (
-		<A
+		<a
+			link
 			href={generatePath('/u/:uid/profile/:actor/feed/:feed', {
 				uid: uid(),
 				actor: feed().creator.did,
@@ -39,7 +39,7 @@ const EmbedFeed = (props: EmbedFeedProps) => {
 			</div>
 
 			<p class="text-muted-fg">Liked by {feed().likeCount || 0} users</p>
-		</A>
+		</a>
 	);
 };
 

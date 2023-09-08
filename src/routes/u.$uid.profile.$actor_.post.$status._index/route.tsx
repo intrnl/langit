@@ -5,7 +5,7 @@ import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
-import { A, useLocation, useSearchParams } from '@solidjs/router';
+import { useLocation, useSearchParams } from '@solidjs/router';
 
 import { type ModerationDecision, CauseLabel } from '~/api/moderation/action.ts';
 import { getRecordId, getRepoId } from '~/api/utils.ts';
@@ -138,12 +138,13 @@ const AuthenticatedPostPage = () => {
 														<p class="text-muted-fg">You need to unblock the user to view the post.</p>
 													</div>
 
-													<A
+													<a
+														link
 														href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: actor() })}
 														class={/* @once */ button({ color: 'primary' })}
 													>
 														View profile
-													</A>
+													</a>
 												</div>
 											</Match>
 
@@ -181,7 +182,8 @@ const AuthenticatedPostPage = () => {
 										return (
 											<>
 												{overflowing && (
-													<A
+													<a
+														link
 														href={generatePath('/u/:uid/profile/:actor/post/:status', {
 															uid: uid(),
 															actor: getRepoId(items[0].uri),
@@ -193,7 +195,7 @@ const AuthenticatedPostPage = () => {
 															<div class="mt-3 border-l-2 border-dashed border-divider" />
 														</div>
 														<span class="text-sm text-accent">Show parent post</span>
-													</A>
+													</a>
 												)}
 
 												{items.map((item) => {
@@ -230,16 +232,18 @@ const AuthenticatedPostPage = () => {
 
 								<div ref={focusRef} class="scroll-m-16 px-4 pt-3">
 									<div class="mb-1 flex items-center gap-3">
-										<A
+										<a
+											link
 											href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author.did })}
 											class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
 										>
 											<Show when={author.avatar.value}>
 												{(avatar) => <img src={avatar()} class="h-full w-full" />}
 											</Show>
-										</A>
+										</a>
 
-										<A
+										<a
+											link
 											href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author.did })}
 											class="flex flex-col text-sm"
 										>
@@ -247,7 +251,7 @@ const AuthenticatedPostPage = () => {
 												{author.displayName.value || author.handle.value}
 											</span>
 											<span class="line-clamp-1 break-all text-muted-fg">@{author.handle.value}</span>
-										</A>
+										</a>
 
 										<div class="flex shrink-0 grow justify-end">
 											<button
@@ -283,31 +287,34 @@ const AuthenticatedPostPage = () => {
 									<hr class="border-divider" />
 
 									<div class="flex flex-wrap gap-4 py-4 text-sm">
-										<A
+										<a
+											link
 											href={generatePath('/u/:uid/profile/:actor/post/:status/reposts', params)}
 											class="hover:underline"
 										>
 											<span class="font-bold">{comformat.format(post.repostCount.value)}</span>{' '}
 											<span class="text-muted-fg">Reposts</span>
-										</A>
-										<A
+										</a>
+										<a
+											link
 											href={generatePath('/u/:uid/profile/:actor/post/:status/likes', params)}
 											class="hover:underline"
 										>
 											<span class="font-bold">{comformat.format(post.likeCount.value)}</span>{' '}
 											<span class="text-muted-fg">Likes</span>
-										</A>
+										</a>
 									</div>
 
 									<hr class="border-divider" />
 
 									<div class="flex h-13 items-center justify-around text-muted-fg">
-										<A
+										<a
+											link
 											href={`/u/${uid()}/compose?reply=${encodeURIComponent(post.uri)}`}
 											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 										>
 											<ChatBubbleOutlinedIcon />
-										</A>
+										</a>
 
 										<button
 											class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
@@ -393,7 +400,8 @@ const AuthenticatedPostPage = () => {
 												})}
 
 												{overflowing && (
-													<A
+													<a
+														link
 														href={generatePath('/u/:uid/profile/:actor/post/:status', {
 															uid: uid(),
 															actor: getRepoId(items[len - 1].uri),
@@ -405,7 +413,7 @@ const AuthenticatedPostPage = () => {
 															<div class="mb-3 border-l-2 border-dashed border-divider" />
 														</div>
 														<span class="text-sm text-accent">Continue thread</span>
-													</A>
+													</a>
 												)}
 											</>
 										);

@@ -24,6 +24,10 @@ import Notification from './Notification.tsx';
 
 const PAGE_SIZE = 30;
 
+const sleep = (ms: number) => {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 const AuthenticatedNotificationsPage = () => {
 	const params = useParams('/u/:uid/notifications');
 
@@ -60,7 +64,21 @@ const AuthenticatedNotificationsPage = () => {
 				return;
 			}
 
+			// there's something weird with notifications, it seems that updating the
+			// seen field and refetching the list afterwards wouldn't properly mark
+			// the unread notifications as being read.
+
+			// from the random encounters that I've had with it so far, it happens
+			// when this mutation here completes relatively quickly, like perhaps
+			// 150-400ms? no idea, yolo.
+			const start = performance.now();
 			await updateNotificationsSeen(uid(), new Date(date));
+			const end = performance.now();
+
+			const delay = 750 - (end - start);
+			if (delay > 0) {
+				await sleep(delay);
+			}
 		},
 		onSuccess: () => {
 			const $latest = latest();

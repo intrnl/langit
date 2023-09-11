@@ -70,13 +70,14 @@ export const pm2rt = (json: JSONContent) => {
 			let value = node.text!;
 
 			if (leading) {
-				value = value.trimStart();
-
-				if (value.length === 0) {
-					return;
-				}
-
+				value = end ? value.trim() : value.trimStart();
 				leading = false;
+			} else if (end) {
+				value = value.trimEnd();
+			}
+
+			if (value.length === 0) {
+				return;
 			}
 
 			if (feature && feature.$type === 'app.bsky.richtext.facet#link') {
@@ -132,12 +133,6 @@ export const pm2rt = (json: JSONContent) => {
 	};
 
 	delve(json, true);
-
-	const trimmed = text.trimEnd();
-	const trailOffset = length - trimmed.length;
-
-	text = trimmed;
-	length -= trailOffset;
 
 	return {
 		length: ascii ? length : graphemeLen(text),

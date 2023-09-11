@@ -75,7 +75,7 @@ const AuthenticatedNotificationsPage = () => {
 			await updateNotificationsSeen(uid(), new Date(date));
 			const end = performance.now();
 
-			const delay = 750 - (end - start);
+			const delay = 1000 - (end - start);
 			if (delay > 0) {
 				await sleep(delay);
 			}

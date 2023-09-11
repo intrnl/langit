@@ -532,9 +532,15 @@ const createHomeSliceFilter = (uid: DID): SliceFilter | undefined => {
 			const root = first.reply.root;
 			const parent = first.reply.parent;
 
+			const rAuthor = root.author;
+			const pAuthor = parent.author;
+
+			const rViewer = rAuthor.viewer;
+			const pViewer = pAuthor.viewer;
+
 			if (
-				(root.author.did !== uid && !root.author.viewer.following.peek()) ||
-				(parent.author.did !== uid && !parent.author.viewer.following.peek())
+				(rAuthor.did !== uid && (!rViewer.following.peek() || rViewer.muted.peek())) ||
+				(pAuthor.did !== uid && (!pViewer.following.peek() || pViewer.muted.peek()))
 			) {
 				return yankReposts(items);
 			}

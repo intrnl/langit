@@ -83,7 +83,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 
 		setIntersecting(intersect);
 
-		if (intersect || cachedHeight() !== undefined) {
+		if (intersect || cachedHeight() === undefined) {
 			scheduleIdleTask(calculateHeight);
 		}
 	}, 150);

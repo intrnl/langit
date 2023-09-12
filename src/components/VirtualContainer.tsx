@@ -2,16 +2,20 @@
 
 import type { JSX } from 'solid-js/jsx-runtime';
 
-import { Show, createSignal } from 'solid-js';
+import { Show, batch, createSignal } from 'solid-js';
 
-import { createMutable, modifyMutable, reconcile } from 'solid-js/store';
+import { createMutable } from 'solid-js/store';
 
 import { scheduleIdleTask } from '~/utils/idle.ts';
 import { scrollObserver } from '~/utils/intersection-observer.ts';
 import { debounce } from '~/utils/misc.ts';
 
 const mutable = createMutable<Record<string, number>>({});
-const makeEmpty = reconcile({});
+const makeEmpty = () => {
+	for (const key in mutable) {
+		delete mutable[key];
+	}
+};
 
 let cachedWidth: number | undefined = undefined;
 
@@ -20,7 +24,7 @@ const resizeListener = () => {
 
 	if (cachedWidth !== next) {
 		cachedWidth = next;
-		modifyMutable(mutable, makeEmpty);
+		batch(makeEmpty);
 	}
 };
 

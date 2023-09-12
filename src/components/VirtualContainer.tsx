@@ -2,7 +2,7 @@
 
 import type { JSX } from 'solid-js/jsx-runtime';
 
-import { Show, batch, createSignal } from 'solid-js';
+import { Show, createSignal } from 'solid-js';
 
 import { createMutable, modifyMutable, reconcile } from 'solid-js/store';
 
@@ -76,7 +76,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		}
 	};
 
-	const listener = debounce((next: IntersectionObserverEntry) => {
+	const listener = (next: IntersectionObserverEntry) => {
 		const intersect = next.isIntersecting;
 
 		entry = next;
@@ -86,7 +86,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		if (intersect || (estimateHeight === undefined && cachedHeight() === undefined)) {
 			scheduleIdleTask(calculateHeight);
 		}
-	}, 150);
+	};
 
 	const observer = () => props.observer || scrollObserver;
 	const measure = (node: HTMLElement) => observer().observe(node);

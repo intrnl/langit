@@ -19,14 +19,15 @@ import { scheduleIdleTask } from '~/utils/idle.ts';
 import { scrollObserver } from '~/utils/intersection-observer.ts';
 import { debounce } from '~/utils/misc.ts';
 
+let cachedWidth: number | undefined;
+let hasBoundingRectBug: boolean | undefined;
+
 const mutable = createMutable<Record<string, number>>({});
 const makeEmpty = () => {
 	for (const key in mutable) {
 		delete mutable[key];
 	}
 };
-
-let cachedWidth: number | undefined = undefined;
 
 const resizeListener = () => {
 	const next = window.innerWidth;
@@ -38,8 +39,6 @@ const resizeListener = () => {
 };
 
 window.addEventListener('resize', debounce(resizeListener, 500, true));
-
-let hasBoundingRectBug: boolean | undefined;
 
 const getRectFromEntry = (entry: IntersectionObserverEntry) => {
 	if (typeof hasBoundingRectBug !== 'boolean') {

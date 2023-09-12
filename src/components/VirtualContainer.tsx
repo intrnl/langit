@@ -81,11 +81,12 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 
 		entry = next;
 
-		setIntersecting(intersect);
-
-		if (intersect || (estimateHeight === undefined && cachedHeight() === undefined)) {
+		if (intersecting() && !intersect) {
+			// we're no longer intersecting, so let's calculate the height
 			scheduleIdleTask(calculateHeight);
 		}
+
+		setIntersecting(intersect);
 	}, 150);
 
 	const observer = () => props.observer || scrollObserver;

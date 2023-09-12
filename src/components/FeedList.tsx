@@ -94,7 +94,7 @@ const FeedList = (props: FeedListProps) => {
 					};
 
 					return (
-						<VirtualContainer key="feed" id={`${feed.did}`}>
+						<VirtualContainer key="feed" id={`${feed.did}`} estimateHeight={128}>
 							<div
 								tabindex={0}
 								onClick={click}

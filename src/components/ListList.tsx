@@ -30,7 +30,7 @@ const ListList = (props: ListListProps) => {
 			<For each={list()?.pages}>
 				{(page) => {
 					return page.lists.map((list) => (
-						<VirtualContainer key="list" id={list.uri}>
+						<VirtualContainer key="list" id={list.uri} estimateHeight={88}>
 							<ListItem uid={props.uid} list={list} hideSubscribedBadge={props.hideSubscribedBadge} />
 						</VirtualContainer>
 					));

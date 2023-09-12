@@ -103,7 +103,7 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 									</div>
 								}
 							>
-								<VirtualContainer key="profile" id={`${profile()?.did}/f`}>
+								<VirtualContainer key="profile" id={`${profile()?.did}/f`} estimateHeight={88}>
 									<div
 										onClick={handleClick}
 										onAuxClick={handleClick}

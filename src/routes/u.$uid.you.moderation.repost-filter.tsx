@@ -85,7 +85,7 @@ const AuthenticatedRepostFilterModerationPage = () => {
 									</div>
 								}
 							>
-								<VirtualContainer key="profile" id={`${profile()?.did}/r`}>
+								<VirtualContainer key="profile" id={`${profile()?.did}/r`} estimateHeight={88}>
 									<div
 										onClick={handleClick}
 										onAuxClick={handleClick}

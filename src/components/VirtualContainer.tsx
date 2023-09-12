@@ -20,7 +20,7 @@ import { scrollObserver } from '~/utils/intersection-observer.ts';
 
 let hasBoundingRectBug: boolean | undefined;
 
-const mutable = createMutable<Record<string, number>>({});
+const cachedHeights = createMutable<Record<string, number>>({});
 
 const getRectFromEntry = (entry: IntersectionObserverEntry) => {
 	if (typeof hasBoundingRectBug !== 'boolean') {
@@ -56,18 +56,16 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const [intersecting, setIntersecting] = createSignal(false);
 	const estimateHeight = props.estimateHeight;
 
-	const cachedHeight = () => mutable[props.id] ?? estimateHeight;
-
 	const calculateHeight = () => {
 		const next = getRectFromEntry(entry!).height;
 
 		if (next !== height) {
 			height = next;
-			mutable[props.id] = height;
+			cachedHeights[props.id] = height;
 		}
 	};
 
-	const listener = (next: IntersectionObserverEntry) => {
+	const handleIntersect = (next: IntersectionObserverEntry) => {
 		const intersect = next.isIntersecting;
 
 		entry = next;
@@ -80,13 +78,15 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	};
 
 	const measure = (node: HTMLElement) => scrollObserver.observe(node);
+
+	const cachedHeight = () => cachedHeights[props.id] ?? estimateHeight;
 	const shouldHide = () => !intersecting() && cachedHeight();
 
 	return (
 		<article
 			ref={measure}
 			style={{ height: shouldHide() ? `${height || cachedHeight()}px` : undefined }}
-			prop:$onintersect={listener}
+			prop:$onintersect={handleIntersect}
 		>
 			<Show when={!shouldHide()}>{props.children}</Show>
 		</article>

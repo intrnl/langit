@@ -26,6 +26,11 @@ import VisibilityIcon from '~/icons/baseline-visibility.tsx';
 import AccountActionMenu from './AccountActionMenu.tsx';
 import AppThemeMenu from './AppThemeMenu.tsx';
 
+const GIT_SOURCE = import.meta.env.VITE_GIT_SOURCE;
+
+const GIT_BRANCH = import.meta.env.VITE_GIT_BRANCH;
+const GIT_COMMIT = import.meta.env.VITE_GIT_COMMIT;
+
 const AuthenticatedYouPage = () => {
 	const params = useParams('/u/:uid');
 	const navigate = useNavigate();
@@ -232,6 +237,18 @@ const AuthenticatedYouPage = () => {
 				<BlockIcon class="text-xl" />
 				<span>Blocked users</span>
 			</a>
+
+			{GIT_SOURCE && (
+				<p class="mt-4 border-t border-divider pt-4 text-center text-xs text-muted-fg">
+					<a href={`${GIT_SOURCE}/commit/${GIT_COMMIT}`} target="_blank" class="hover:underline">
+						commit {GIT_BRANCH}/{GIT_COMMIT}
+					</a>
+					<span> • </span>
+					<a href={GIT_SOURCE} target="_blank" class="hover:underline">
+						source code
+					</a>
+				</p>
+			)}
 		</div>
 	);
 };

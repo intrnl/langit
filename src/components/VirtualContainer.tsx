@@ -6,8 +6,8 @@
 
 // This default approach is fine for lists that starts out small and expands
 // over time, but not for scenarios where you know you'd be rendering a large
-// list with more than 250 items, in which case an `estimateHeight` can be used
-// as a baseline it can use
+// list with more than 250 items, in which case an `estimateHeight` can be
+// provided as a baseline it can use
 
 import type { JSX } from 'solid-js/jsx-runtime';
 

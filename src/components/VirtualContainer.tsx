@@ -38,7 +38,7 @@ const resizeListener = () => {
 	}
 };
 
-window.addEventListener('resize', debounce(resizeListener, 500, true));
+window.addEventListener('resize', debounce(resizeListener, 500));
 
 const getRectFromEntry = (entry: IntersectionObserverEntry) => {
 	if (typeof hasBoundingRectBug !== 'boolean') {

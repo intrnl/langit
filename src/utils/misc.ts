@@ -10,14 +10,10 @@ export const createId = (prefix = '_') => {
 
 export type VoidFunction = (...args: any[]) => void;
 
-export const debounce = <F extends VoidFunction>(fn: F, delay: number, leading = false) => {
+export const debounce = <F extends VoidFunction>(fn: F, delay: number) => {
 	let timeout: any;
 
 	return (...args: Parameters<F>) => {
-		if (leading && !timeout) {
-			fn(...args);
-		}
-
 		clearTimeout(timeout);
 		timeout = setTimeout(() => fn(...args), delay);
 	};

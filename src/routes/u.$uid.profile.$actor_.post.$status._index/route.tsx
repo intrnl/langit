@@ -28,8 +28,8 @@ import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
 import PostMenu from '~/components/menus/PostMenu.tsx';
 import PostRepostMenu from '~/components/menus/PostRepostMenu.tsx';
 import PostShareMenu from '~/components/menus/PostShareMenu.tsx';
-import Post from '~/components/Post.tsx';
-import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
+import Post, { createPostKey } from '~/components/Post.tsx';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import FavoriteIcon from '~/icons/baseline-favorite.tsx';

@@ -45,10 +45,6 @@ export interface VirtualContainerProps {
 	children?: JSX.Element;
 }
 
-export const createPostKey = (cid: string, parent: boolean, next: boolean) => {
-	return `posts/${cid}:${+parent}${+next}`;
-};
-
 const VirtualContainer = (props: VirtualContainerProps) => {
 	let height: number | undefined;
 	let entry: IntersectionObserverEntry | undefined;

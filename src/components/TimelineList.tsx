@@ -7,8 +7,8 @@ import type { FeedLatestResource, FeedResource } from '~/api/queries/get-timelin
 import { getCollectionCursor } from '~/api/utils.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
-import Post from '~/components/Post.tsx';
-import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
+import Post, { createPostKey } from '~/components/Post.tsx';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 export interface TimelineListProps {

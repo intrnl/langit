@@ -40,6 +40,10 @@ interface PostProps {
 	timelineDid?: DID;
 }
 
+export const createPostKey = (cid: string, parent: boolean, next: boolean) => {
+	return `posts/${cid}:${+parent}${+next}`;
+};
+
 const Post = (props: PostProps) => {
 	const navigate = useNavigate();
 

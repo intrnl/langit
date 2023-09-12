@@ -18,9 +18,9 @@ import { preferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
-import Post from '~/components/Post.tsx';
+import Post, { createPostKey } from '~/components/Post.tsx';
 import SearchInput from '~/components/SearchInput.tsx';
-import VirtualContainer, { createPostKey } from '~/components/VirtualContainer.tsx';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
 
 import RefreshIcon from '~/icons/baseline-refresh.tsx';
 import SettingsIcon from '~/icons/baseline-settings.tsx';

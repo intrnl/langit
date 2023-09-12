@@ -11,34 +11,16 @@
 
 import type { JSX } from 'solid-js/jsx-runtime';
 
-import { Show, batch, createSignal } from 'solid-js';
+import { Show, createSignal } from 'solid-js';
 
 import { createMutable } from 'solid-js/store';
 
 import { scheduleIdleTask } from '~/utils/idle.ts';
 import { scrollObserver } from '~/utils/intersection-observer.ts';
-import { debounce } from '~/utils/misc.ts';
 
-let cachedWidth: number | undefined;
 let hasBoundingRectBug: boolean | undefined;
 
 const mutable = createMutable<Record<string, number>>({});
-const makeEmpty = () => {
-	for (const key in mutable) {
-		delete mutable[key];
-	}
-};
-
-const resizeListener = () => {
-	const next = window.innerWidth;
-
-	if (cachedWidth !== next) {
-		cachedWidth = next;
-		batch(makeEmpty);
-	}
-};
-
-window.addEventListener('resize', debounce(resizeListener, 500));
 
 const getRectFromEntry = (entry: IntersectionObserverEntry) => {
 	if (typeof hasBoundingRectBug !== 'boolean') {

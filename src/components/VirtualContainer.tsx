@@ -1,4 +1,13 @@
-// This isn't a full-blown virtual list solution, but it's close to being one.
+// This is a general use-case implementation for rendering children components
+// only when it's visible on viewport
+
+// By default, it will render the children, measure the height of the container,
+// persists them and unmounts the render if it is outside of the viewport
+
+// This default approach is fine for lists that starts out small and expands
+// over time, but not for scenarios where you know you'd be rendering a large
+// list with more than 250 items, in which case an `estimateHeight` can be used
+// as a baseline it can use
 
 import type { JSX } from 'solid-js/jsx-runtime';
 
@@ -53,7 +62,6 @@ export interface VirtualContainerProps {
 	key: string;
 	id: string;
 	estimateHeight?: number;
-	observer?: IntersectionObserver;
 	children?: JSX.Element;
 }
 
@@ -62,14 +70,14 @@ export const createPostKey = (cid: string, parent: boolean, next: boolean) => {
 };
 
 const VirtualContainer = (props: VirtualContainerProps) => {
+	let height: number | undefined;
+	let entry: IntersectionObserverEntry | undefined;
+
 	const [intersecting, setIntersecting] = createSignal(false);
 	const estimateHeight = props.estimateHeight;
 
 	const id = () => props.key + '//' + props.id;
 	const cachedHeight = () => mutable[id()] ?? estimateHeight;
-
-	let height: number | undefined;
-	let entry: IntersectionObserverEntry | undefined;
 
 	const calculateHeight = () => {
 		const next = getRectFromEntry(entry!).height;
@@ -92,9 +100,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		setIntersecting(intersect);
 	};
 
-	const observer = () => props.observer || scrollObserver;
-	const measure = (node: HTMLElement) => observer().observe(node);
-
+	const measure = (node: HTMLElement) => scrollObserver.observe(node);
 	const shouldHide = () => !intersecting() && cachedHeight();
 
 	return (

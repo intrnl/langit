@@ -55,10 +55,7 @@ const ProfileList = (props: ProfileListProps) => {
 						};
 
 						return (
-							<VirtualContainer
-								id={`profile/${profile.did}/${+showFollowButton()}`}
-								estimateHeight={112}
-							>
+							<VirtualContainer id={`profile/${profile.did}/${+showFollowButton()}`} estimateHeight={112}>
 								<div
 									onClick={handleClick}
 									onAuxClick={handleClick}

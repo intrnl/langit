@@ -59,10 +59,10 @@ export const createPostKey = (cid: string, parent: boolean, next: boolean) => {
 
 const VirtualContainer = (props: VirtualContainerProps) => {
 	const [intersecting, setIntersecting] = createSignal(false);
-	const [hidden, setHidden] = createSignal(false);
+	const estimateHeight = props.estimateHeight;
 
 	const id = () => props.key + '//' + props.id;
-	const cachedHeight = () => mutable[id()] ?? props.estimateHeight;
+	const cachedHeight = () => mutable[id()] ?? estimateHeight;
 
 	let height: number | undefined;
 	let entry: IntersectionObserverEntry | undefined;
@@ -76,29 +76,22 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		}
 	};
 
-	const hideElement = () => {
-		setHidden(!intersecting());
-	};
-
 	const listener = debounce((next: IntersectionObserverEntry) => {
+		const intersect = next.isIntersecting;
+
 		entry = next;
 
-		batch(() => {
-			setIntersecting(next.isIntersecting);
-			setHidden(false);
-		});
+		setIntersecting(intersect);
 
-		scheduleIdleTask(calculateHeight);
-
-		if (intersecting() && !next.isIntersecting) {
-			scheduleIdleTask(hideElement);
+		if (intersect || cachedHeight() !== undefined) {
+			scheduleIdleTask(calculateHeight);
 		}
 	}, 150);
 
 	const observer = () => props.observer || scrollObserver;
 	const measure = (node: HTMLElement) => observer().observe(node);
 
-	const shouldHide = () => !intersecting() && (hidden() || cachedHeight());
+	const shouldHide = () => !intersecting() && cachedHeight();
 
 	return (
 		<article

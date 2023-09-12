@@ -16,28 +16,9 @@ import { Show, createSignal } from 'solid-js';
 import { createMutable } from 'solid-js/store';
 
 import { scheduleIdleTask } from '~/utils/idle.ts';
-import { scrollObserver } from '~/utils/intersection-observer.ts';
-
-let hasBoundingRectBug: boolean | undefined;
+import { getRectFromEntry, scrollObserver } from '~/utils/intersection-observer.ts';
 
 const cachedHeights = createMutable<Record<string, number>>({});
-
-const getRectFromEntry = (entry: IntersectionObserverEntry) => {
-	if (typeof hasBoundingRectBug !== 'boolean') {
-		const boundingRect = entry.target.getBoundingClientRect();
-		const observerRect = entry.boundingClientRect;
-
-		hasBoundingRectBug =
-			boundingRect.height !== observerRect.height ||
-			boundingRect.top !== observerRect.top ||
-			boundingRect.width !== observerRect.width ||
-			boundingRect.bottom !== observerRect.bottom ||
-			boundingRect.left !== observerRect.left ||
-			boundingRect.right !== observerRect.right;
-	}
-
-	return hasBoundingRectBug ? entry.target.getBoundingClientRect() : entry.boundingClientRect;
-};
 
 export interface VirtualContainerProps {
 	id: string;

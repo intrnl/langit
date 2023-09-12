@@ -1,6 +1,6 @@
 import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
 
-import { escape, getBlobUrl } from '../_global.ts';
+import { escape, getImageUrl } from '../_global.ts';
 import { resolveRecord, resolveRepo, tryResolveRecord } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
@@ -60,7 +60,7 @@ export const renderPost = async (actor: string, tid: string) => {
 
 		if (images) {
 			const img = images[0];
-			const url = getBlobUrl(repo.did, img.image);
+			const url = getImageUrl(repo.did, img.image, 'feed_fullsize');
 
 			head += `<meta name="twitter:card" content="summary_large_image" />`;
 			head += `<meta property="og:image" content="${escape(url, true)}" />`;

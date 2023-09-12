@@ -1,4 +1,4 @@
-import { escape, getBlobUrl } from '../_global.ts';
+import { escape, getImageUrl } from '../_global.ts';
 import { resolveRecord, resolveRepo, tryResolveRecord } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
@@ -26,7 +26,7 @@ export const renderFeed = async (actor: string, id: string) => {
 	head += `<meta property="og:description" content="${escape(text, true)}" />`;
 
 	if (avatar) {
-		const url = getBlobUrl(repo.did, avatar);
+		const url = getImageUrl(repo.did, avatar, 'avatar');
 
 		head += `<meta property="og:image" content="${escape(url, true)}" />`;
 	}

@@ -30,3 +30,9 @@ export const escape = (value: string, isAttribute: boolean) => {
 export const getBlobUrl = (did: DID, blob: AtBlob) => {
 	return `${INSTANCE_URL}/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${blob.ref.$link}`;
 };
+
+export type ImageType = 'avatar' | 'banner' | 'feed_thumbnail' | 'feed_fullsize';
+
+export const getImageUrl = (did: DID, blob: AtBlob, type: ImageType) => {
+	return `https://av-cdn.bsky.app/img/${type}/plain/${did}/${blob.ref.$link}@jpeg`;
+};

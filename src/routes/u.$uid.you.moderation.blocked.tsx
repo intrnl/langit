@@ -131,7 +131,7 @@ const AuthenticatedBlockedUsersModerationPage = () => {
 						};
 
 						return (
-							<VirtualContainer key="profile" id={`${profile.did}/m`} estimateHeight={88}>
+							<VirtualContainer id={/* @once */ `profile/${profile.did}/b`} estimateHeight={88}>
 								<div
 									onClick={handleClick}
 									onAuxClick={handleClick}

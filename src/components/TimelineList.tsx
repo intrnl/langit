@@ -72,7 +72,6 @@ const TimelineList = (props: TimelineListProps) => {
 
 						return items.map((item, idx) => (
 							<VirtualContainer
-								key="posts"
 								estimateHeight={98.8}
 								id={createPostKey(
 									item.post.cid.value,

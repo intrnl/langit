@@ -220,7 +220,7 @@ const AuthenticatedPostPage = () => {
 													}
 
 													return (
-														<VirtualContainer key="posts" id={createPostKey(item.cid.value, false, true)}>
+														<VirtualContainer id={createPostKey(item.cid.value, false, true)}>
 															<Post interactive uid={uid()} post={item} prev next />
 														</VirtualContainer>
 													);

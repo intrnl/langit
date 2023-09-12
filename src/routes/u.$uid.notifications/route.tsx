@@ -159,7 +159,7 @@ const AuthenticatedNotificationsPage = () => {
 					{(page) =>
 						page.slices.map((slice) => {
 							return (
-								<VirtualContainer key="notifs" id={/* @once */ '' + slice.date} estimateHeight={168.4}>
+								<VirtualContainer id={/* @once */ `notifs/${slice.date}`} estimateHeight={168.4}>
 									<Notification uid={uid()} data={slice} />
 								</VirtualContainer>
 							);

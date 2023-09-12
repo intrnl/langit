@@ -59,14 +59,13 @@ const getRectFromEntry = (entry: IntersectionObserverEntry) => {
 };
 
 export interface VirtualContainerProps {
-	key: string;
 	id: string;
 	estimateHeight?: number;
 	children?: JSX.Element;
 }
 
 export const createPostKey = (cid: string, parent: boolean, next: boolean) => {
-	return `${cid}:${+parent}${+next}`;
+	return `posts/${cid}:${+parent}${+next}`;
 };
 
 const VirtualContainer = (props: VirtualContainerProps) => {
@@ -76,15 +75,14 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const [intersecting, setIntersecting] = createSignal(false);
 	const estimateHeight = props.estimateHeight;
 
-	const id = () => props.key + '//' + props.id;
-	const cachedHeight = () => mutable[id()] ?? estimateHeight;
+	const cachedHeight = () => mutable[props.id] ?? estimateHeight;
 
 	const calculateHeight = () => {
 		const next = getRectFromEntry(entry!).height;
 
 		if (next !== height) {
 			height = next;
-			mutable[id()] = height;
+			mutable[props.id] = height;
 		}
 	};
 

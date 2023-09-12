@@ -85,7 +85,8 @@ const AuthenticatedRepostFilterModerationPage = () => {
 									</div>
 								}
 							>
-								<VirtualContainer key="profile" id={`${profile()?.did}/r`} estimateHeight={88}>
+								{/* `0` here is because it follows ProfileList with the follow button hidden */}
+								<VirtualContainer id={/* @once */ `profile/${profile()?.did}/0`} estimateHeight={88}>
 									<div
 										onClick={handleClick}
 										onAuxClick={handleClick}

@@ -48,6 +48,7 @@ const getRectFromEntry = (entry: IntersectionObserverEntry) => {
 export interface VirtualContainerProps {
 	key: string;
 	id: string;
+	estimateHeight?: number;
 	observer?: IntersectionObserver;
 	children?: JSX.Element;
 }
@@ -61,7 +62,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const [hidden, setHidden] = createSignal(false);
 
 	const id = () => props.key + '//' + props.id;
-	const cachedHeight = () => mutable[id()];
+	const cachedHeight = () => mutable[id()] ?? props.estimateHeight;
 
 	let height: number | undefined;
 	let entry: IntersectionObserverEntry | undefined;
@@ -95,13 +96,13 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	}, 150);
 
 	const observer = () => props.observer || scrollObserver;
-	const setRef = (node: HTMLElement) => observer().observe(node);
+	const measure = (node: HTMLElement) => observer().observe(node);
 
 	const shouldHide = () => !intersecting() && (hidden() || cachedHeight());
 
 	return (
 		<article
-			ref={setRef}
+			ref={measure}
 			style={{ height: shouldHide() ? `${height || cachedHeight()}px` : undefined }}
 			prop:$onintersect={listener}
 		>

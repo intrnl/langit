@@ -5,12 +5,13 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { getRecordId } from '~/api/utils.ts';
 
 import type { SignalizedPost } from '~/api/cache/posts.ts';
+import { deletePost } from '~/api/mutations/delete-post.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 import { generatePath } from '~/router.ts';
 
-import DeletePostConfirmDialog from '~/components/dialogs/DeletePostConfirmDialog.tsx';
+import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
 import ReportDialog, { REPORT_POST } from '~/components/dialogs/ReportDialog.tsx';
 import SwitchAccountMenu from '~/components/menus/SwitchAccountMenu.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
@@ -122,7 +123,15 @@ const PostMenu = (props: PostMenuProps) => {
 				<button
 					onClick={() => {
 						closeModal();
-						openModal(() => <DeletePostConfirmDialog uid={uid()} post={post()} />);
+
+						openModal(() => (
+							<ConfirmDialog
+								title={`Delete post?`}
+								body={`This can't be undone, the post will be deleted from your profile, the timeline of any users that follow you, and from search results.`}
+								confirmation={`Delete`}
+								onConfirm={() => deletePost(uid(), post())}
+							/>
+						));
 					}}
 					class={/* @once */ menu.item()}
 				>

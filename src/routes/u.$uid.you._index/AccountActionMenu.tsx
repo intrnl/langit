@@ -6,9 +6,8 @@ import { multiagent } from '~/globals/agent.ts';
 import { closeModal, openModal } from '~/globals/modals.tsx';
 import { useNavigate } from '~/router.ts';
 
+import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
-
-import LogoutConfirmDialog from './LogoutConfirmDialog.tsx';
 
 export interface AccountActionMenuProps {
 	uid: DID;
@@ -41,7 +40,23 @@ const AccountActionMenu = (props: AccountActionMenuProps) => {
 			<button
 				onClick={() => {
 					closeModal();
-					openModal(() => <LogoutConfirmDialog uid={uid()} account={account()} />);
+					openModal(() => (
+						<ConfirmDialog
+							title={`Sign out?`}
+							body={`This will sign you out of ${
+								profile() ? `@${profile()!.handle}` : did()
+							}, and you'll still be signed in to other accounts.`}
+							confirmation={`Sign out`}
+							onConfirm={() => {
+								const $did = did();
+								multiagent.logout($did);
+
+								if (uid() === $did) {
+									navigate('/');
+								}
+							}}
+						/>
+					));
 				}}
 				class={/* @once */ menu.item()}
 			>

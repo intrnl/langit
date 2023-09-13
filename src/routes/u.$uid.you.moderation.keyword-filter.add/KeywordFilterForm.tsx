@@ -1,15 +1,17 @@
-import { type Accessor, type Signal, For, createSignal, createRenderEffect } from 'solid-js';
+import { type Accessor, type Signal, For, createSignal, createRenderEffect, Show } from 'solid-js';
 
 import { type KeywordPreference } from '~/api/moderation/enums.ts';
 import type { ModerationFiltersOpts } from '~/api/moderation/types.ts';
 
+import { openModal } from '~/globals/modals.tsx';
 import { createId, model, modelChecked } from '~/utils/misc.ts';
 
+import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input.ts';
 
 import DeleteIcon from '~/icons/baseline-delete.tsx';
-import AddIcon from '~/icons/baseline-add';
+import AddIcon from '~/icons/baseline-add.tsx';
 
 interface PartialFilterOpts {
 	name: ModerationFiltersOpts['name'];
@@ -19,7 +21,8 @@ interface PartialFilterOpts {
 
 export interface KeywordFilterFormProps {
 	initialData?: ModerationFiltersOpts;
-	onSubmit?: (next: PartialFilterOpts) => void;
+	onSubmit: (next: PartialFilterOpts) => void;
+	onDelete?: () => void;
 }
 
 type KeywordState = [keyword: Signal<string>, whole: Signal<boolean>];
@@ -193,7 +196,34 @@ const KeywordFilterForm = (props: KeywordFilterFormProps) => {
 			<hr class="border-divider" />
 
 			<div class="flex justify-end">
-				<button class={/* @once */ button({ color: 'primary' })}>Save</button>
+				<Show when={initialData && props.onDelete} keyed>
+					{(onDelete) => (
+						<button
+							type="button"
+							onClick={() => {
+								openModal(() => (
+									<ConfirmDialog
+										title={`Delete keyword filter?`}
+										body={`Are you sure you want to delete "${
+											initialData!.name
+										}"? This will affect posts that were previously hidden by this keyword filter.`}
+										confirmation={`Delete`}
+										onConfirm={onDelete}
+									/>
+								));
+							}}
+							class={/* @once */ button({ color: 'ghost' })}
+						>
+							<DeleteIcon class="text-lg" />
+						</button>
+					)}
+				</Show>
+
+				<div class="grow" />
+
+				<button type="submit" class={/* @once */ button({ color: 'primary' })}>
+					Save
+				</button>
 			</div>
 		</form>
 	);

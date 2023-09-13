@@ -33,6 +33,14 @@ const AuthenticatedEditFilterModerationPage = () => {
 		return `Edit keyword filter / Langit`;
 	};
 
+	const navigateBack = () => {
+		if (history.state) {
+			navigate(-1);
+		} else {
+			navigate('/u/:uid/you/moderation/keyword-filter', { params });
+		}
+	};
+
 	return (
 		<div class="flex grow flex-col">
 			<Title>{renderTitle()}</Title>
@@ -47,6 +55,8 @@ const AuthenticatedEditFilterModerationPage = () => {
 						<KeywordFilterForm
 							initialData={$filter}
 							onSubmit={(fields) => {
+								navigateBack();
+
 								batch(() => {
 									$filter.name = fields.name;
 									$filter.pref = fields.pref;
@@ -54,11 +64,15 @@ const AuthenticatedEditFilterModerationPage = () => {
 
 									$filter.matchers = fields.matchers;
 								});
+							}}
+							onDelete={() => {
+								const prefs = getAccountModerationPreferences(uid());
+								const index = prefs.filters.indexOf($filter);
 
-								if (history.state) {
-									navigate(-1);
-								} else {
-									navigate('/u/:uid/you/moderation/keyword-filter', { params });
+								navigateBack();
+
+								if (index !== -1) {
+									prefs.filters.splice(index, 1);
 								}
 							}}
 						/>

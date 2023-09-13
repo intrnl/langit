@@ -385,7 +385,6 @@ const AuthenticatedPostPage = () => {
 
 													return (
 														<VirtualContainer
-															key="posts"
 															estimateHeight={98.8}
 															id={createPostKey(item.cid.value, false, overflowing || idx !== len - 1)}
 														>

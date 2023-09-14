@@ -5,7 +5,7 @@ import { followProfile } from '~/api/mutations/follow-profile.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 
-import UnfollowConfirmDialog from '~/components/dialogs/UnfollowConfirmDialog.tsx';
+import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
 import button from '~/styles/primitives/button.ts';
 
 export interface FollowButtonProps {
@@ -33,7 +33,14 @@ const FollowButton = (props: FollowButtonProps) => {
 				}
 
 				if (isFollowing()) {
-					openModal(() => <UnfollowConfirmDialog uid={uid()} profile={profile()} />);
+					openModal(() => (
+						<ConfirmDialog
+							title={`Unfollow ${profile().handle.value}?`}
+							body={`Their posts will no longer show up in your home timeline.`}
+							confirmation={`Unfollow`}
+							onConfirm={() => followProfile(uid(), profile())}
+						/>
+					));
 				} else {
 					followProfile(uid(), profile());
 				}

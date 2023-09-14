@@ -8,15 +8,15 @@ import { useNavigate } from '@solidjs/router';
 import { getCollectionCursor } from '~/api/utils.ts';
 
 import { getList, getListKey } from '~/api/queries/get-list.ts';
+import { subscribeMuteList } from '~/api/mutations/subscribe-mute-list.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { generatePath, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
+import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
-
-import SubscribeListConfirmDialog from './SubscribeListConfirmDialog.tsx';
 
 const PAGE_SIZE = 30;
 
@@ -94,7 +94,22 @@ const AuthenticatedListPage = () => {
 								<div class="flex gap-2">
 									<button
 										onClick={() => {
-											openModal(() => <SubscribeListConfirmDialog uid={uid()} list={list()} />);
+											openModal(() => (
+												<ConfirmDialog
+													title={`${isSubscribed() ? 'Unsubscribe from' : 'Subscribe to'} "${
+														list().name.value
+													}"?`}
+													body={
+														isSubscribed()
+															? `Posts from users added to this list will be allowed to show in your home timeline.`
+															: `Any users in this list, present or future, will be muted. Their posts will no longer show up in your home timeline, but it will still allow them to see your posts and follow you.`
+													}
+													confirmation={isSubscribed() ? `Unmute` : `Mute`}
+													onConfirm={() => {
+														subscribeMuteList(uid(), list());
+													}}
+												/>
+											));
 										}}
 										class={button({ color: isSubscribed() ? 'outline' : 'primary' })}
 									>

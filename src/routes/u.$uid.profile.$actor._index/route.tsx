@@ -1,7 +1,7 @@
 import { useContext } from 'solid-js';
 
-import { ProfileContext } from './u.$uid.profile.$actor/ProfileContext.tsx';
-import ProfileTimeline from './u.$uid.profile.$actor/ProfileTimeline.tsx';
+import { ProfileContext } from '../u.$uid.profile.$actor/ProfileContext.tsx';
+import ProfileTimeline from '../u.$uid.profile.$actor/ProfileTimeline.tsx';
 
 const AuthenticatedProfileTimelinePage = () => {
 	const { uid, profile } = useContext(ProfileContext)!;

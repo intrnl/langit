@@ -1,6 +1,6 @@
 import { Show } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { type SignalizedList } from '~/api/cache/lists.ts';
 
@@ -15,9 +15,21 @@ export interface ListItemProps {
 	hideSubscribedBadge?: boolean;
 }
 
+type ListPurpose = RefOf<'app.bsky.graph.defs#listPurpose'>;
+
+const ListPurposeLabels: Record<ListPurpose, string> = {
+	'app.bsky.graph.defs#modlist': 'Moderation list',
+	'app.bsky.graph.defs#curatelist': 'Curation list',
+};
+
 const ListItem = (props: ListItemProps) => {
 	const uid = () => props.uid;
 	const list = () => props.list;
+
+	const purpose = () => {
+		const raw = list().purpose.value;
+		return raw in ListPurposeLabels ? ListPurposeLabels[raw] : `Unknown list`;
+	};
 
 	return (
 		<a
@@ -42,7 +54,9 @@ const ListItem = (props: ListItemProps) => {
 						<span class="ml-2 rounded bg-muted px-1 py-px align-[1px] text-xs font-medium">Subscribed</span>
 					</Show>
 				</div>
-				<p class="text-sm text-muted-fg">Mute list by @{list().creator.handle.value}</p>
+				<p class="text-sm text-muted-fg">
+					{purpose()} by @{list().creator.handle.value}
+				</p>
 
 				<Show when={list().description.value}>
 					<div class="mt-1 whitespace-pre-wrap break-words text-sm">{list().$renderedDescription()}</div>

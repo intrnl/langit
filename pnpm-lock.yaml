@@ -14,8 +14,8 @@ dependencies:
     specifier: ^1.5.1
     version: 1.5.1
   '@intrnl/bluesky-client':
-    specifier: ^0.2.1
-    version: 0.2.1
+    specifier: ^0.2.2
+    version: 0.2.2
   '@intrnl/sq':
     specifier: ^0.2.0
     version: 0.2.1(solid-js@1.7.11)
@@ -1578,8 +1578,8 @@ packages:
     resolution: {integrity: sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==}
     dev: false
 
-  /@intrnl/bluesky-client@0.2.1:
-    resolution: {integrity: sha512-sqeklXcbsQgML46qO0n28baC3up4FoKoqozF9u3dpGqh1Fbg64vlUvnfyPmyU1NPy0/4cC0gVJLaqGOFZ54vbw==}
+  /@intrnl/bluesky-client@0.2.2:
+    resolution: {integrity: sha512-ULjOaHy1nkmsYg7B/6/02bRLUPDu3nznYhQTmqQbQfYhq5OkNVLLzPN15G9rnh24vWd68DeJTGCfmFbqcDKwfQ==}
     dev: false
 
   /@intrnl/sq@0.2.1(solid-js@1.7.11):

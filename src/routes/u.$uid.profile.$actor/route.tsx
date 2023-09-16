@@ -26,6 +26,8 @@ import button from '~/styles/primitives/button.ts';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
 import { ProfileContext } from './ProfileContext.tsx';
+
+import { BlockedByList, isBlockedByList } from './BlockedByList.tsx';
 import ProfileIdentifierDialog from './ProfileIdentifierDialog.tsx';
 import ProfileMenu from './ProfileMenu.tsx';
 
@@ -231,6 +233,10 @@ const AuthenticatedProfileLayout = () => {
 									</div>
 
 									<Switch>
+										<Match when={isBlockedByList(profile())}>
+											{(uri) => <BlockedByList uid={uid()} uri={uri()} />}
+										</Match>
+
 										<Match when={profile().viewer.mutedByList.value}>
 											{(list) => (
 												<div class="text-sm text-muted-fg">

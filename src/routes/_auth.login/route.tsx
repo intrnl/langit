@@ -22,6 +22,28 @@ const AuthLoginPage = () => {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams<{ to?: string }>();
 
+	// if the user has a redirect going, then it's likely that they didn't intend
+	// to login a new user with it, it'd have to come from users with no logged-in
+	// accounts, so let's check if we have a logged-in account thanks to the user
+	// opening the client in two different tabs
+	if (searchParams.to) {
+		const to = searchParams.to;
+
+		let activeId = multiagent.active;
+
+		if (!activeId) {
+			// Nothing is registered as active, grab the first account that comes up
+			for (activeId in multiagent.accounts) {
+				break;
+			}
+		}
+
+		if (activeId) {
+			navigate(to.replace(`@uid/`, `/u/${activeId}/`));
+			return null;
+		}
+	}
+
 	const [service, _setService] = createSignal(DEFAULT_DATA_SERVERS[0]);
 
 	const [identifier, setIdentifier] = createSignal('');

@@ -2,6 +2,7 @@ import { Match, Show, Switch, createSignal } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 
 import type { AtUri, DID, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import { createMutation } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, useModalState } from '~/globals/modals.tsx';
@@ -13,7 +14,6 @@ import * as dialog from '~/styles/primitives/dialog.ts';
 import * as menu from '~/styles/primitives/menu.ts';
 
 import CheckIcon from '~/icons/baseline-check';
-import { createMutation } from '@intrnl/sq';
 
 export const REPORT_POST = 1; // 1 << 0
 export const REPORT_PROFILE = 2; // 1 << 1

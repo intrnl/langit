@@ -42,6 +42,8 @@ const AuthenticatedListPage = () => {
 		key: () => getListKey(uid(), params.actor, params.list, PAGE_SIZE),
 		fetch: getList,
 		refetchOnMount: false,
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
 	});
 
 	const list = createMemo(() => {

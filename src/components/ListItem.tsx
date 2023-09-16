@@ -31,6 +31,10 @@ const ListItem = (props: ListItemProps) => {
 		return raw in ListPurposeLabels ? ListPurposeLabels[raw] : `Unknown list`;
 	};
 
+	const isSubscribed = () => {
+		return list().viewer.muted.value || !!list().viewer.blocked.value;
+	};
+
 	return (
 		<a
 			link
@@ -50,7 +54,7 @@ const ListItem = (props: ListItemProps) => {
 				<div class="text-sm">
 					<span class="font-bold">{list().name.value}</span>
 
-					<Show when={list().viewer.muted.value && !props.hideSubscribedBadge}>
+					<Show when={isSubscribed() && !props.hideSubscribedBadge}>
 						<span class="ml-2 rounded bg-muted px-1 py-px align-[1px] text-xs font-medium">Subscribed</span>
 					</Show>
 				</div>

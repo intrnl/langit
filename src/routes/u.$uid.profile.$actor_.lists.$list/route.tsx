@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
@@ -8,15 +8,27 @@ import { useNavigate } from '@solidjs/router';
 import { getCollectionCursor } from '~/api/utils.ts';
 
 import { getList, getListKey } from '~/api/queries/get-list.ts';
-import { subscribeMuteList } from '~/api/mutations/subscribe-mute-list.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { generatePath, useParams } from '~/router.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
-import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
+
+import SubscribeListDialog from './SubscribeListDialog.tsx';
+
+const enum Subscription {
+	MUTED = 1,
+	BLOCKED,
+}
+
+type ListPurpose = RefOf<'app.bsky.graph.defs#listPurpose'>;
+
+const ListPurposeLabels: Record<ListPurpose, string> = {
+	'app.bsky.graph.defs#modlist': 'Moderation list',
+	'app.bsky.graph.defs#curatelist': 'Curation list',
+};
 
 const PAGE_SIZE = 30;
 
@@ -36,7 +48,26 @@ const AuthenticatedListPage = () => {
 		return listing()?.pages[0].list;
 	});
 
-	const isSubscribed = () => list()?.viewer.muted.value;
+	const subscription = createMemo(() => {
+		const $list = list();
+
+		if ($list) {
+			const $viewer = $list.viewer;
+
+			if ($viewer.blocked.value) {
+				return Subscription.BLOCKED;
+			} else if ($viewer.muted.value) {
+				return Subscription.MUTED;
+			}
+		}
+
+		return undefined;
+	});
+
+	const purpose = () => {
+		const raw = list()?.purpose.value;
+		return raw && raw in ListPurposeLabels ? ListPurposeLabels[raw] : `Unknown list`;
+	};
 
 	return (
 		<div class="flex flex-col">
@@ -45,14 +76,14 @@ const AuthenticatedListPage = () => {
 					<Match when={list()}>
 						{(info) => (
 							<>
-								<Title>Feed ({info().name.value}) / Langit</Title>
+								<Title>List ({info().name.value}) / Langit</Title>
 								<p class="text-base font-bold">{info().name.value}</p>
 							</>
 						)}
 					</Match>
 
 					<Match when>
-						<Title>Feed ({params.list})</Title>
+						<Title>List ({params.list}) / Langit</Title>
 						<p class="text-base font-bold">List</p>
 					</Match>
 				</Switch>
@@ -69,7 +100,7 @@ const AuthenticatedListPage = () => {
 									<div class="mt-2 grow">
 										<p class="break-words text-lg font-bold">{list().name.value}</p>
 										<p class="text-sm text-muted-fg">
-											<span>by </span>
+											<span>{purpose()} by </span>
 											<a
 												link
 												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator().did })}
@@ -94,26 +125,11 @@ const AuthenticatedListPage = () => {
 								<div class="flex gap-2">
 									<button
 										onClick={() => {
-											openModal(() => (
-												<ConfirmDialog
-													title={`${isSubscribed() ? 'Unsubscribe from' : 'Subscribe to'} "${
-														list().name.value
-													}"?`}
-													body={
-														isSubscribed()
-															? `Posts from users added to this list will be allowed to show in your home timeline.`
-															: `Any users in this list, present or future, will be muted. Their posts will no longer show up in your home timeline, but it will still allow them to see your posts and follow you.`
-													}
-													confirmation={isSubscribed() ? `Unmute` : `Mute`}
-													onConfirm={() => {
-														subscribeMuteList(uid(), list());
-													}}
-												/>
-											));
+											openModal(() => <SubscribeListDialog uid={uid()} list={list()} />);
 										}}
-										class={button({ color: isSubscribed() ? 'outline' : 'primary' })}
+										class={button({ color: subscription() ? 'outline' : 'primary' })}
 									>
-										{isSubscribed() ? 'Unsubscribe list' : 'Subscribe list'}
+										{subscription() ? 'Unsubscribe list' : 'Subscribe list'}
 									</button>
 								</div>
 							</div>

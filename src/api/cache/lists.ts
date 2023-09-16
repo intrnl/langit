@@ -24,6 +24,7 @@ export interface SignalizedList {
 	avatar: Signal<List['avatar']>;
 	viewer: {
 		muted: Signal<NonNullable<List['viewer']>['muted']>;
+		blocked: Signal<NonNullable<List['viewer']>['blocked']>;
 	};
 
 	$renderedDescription: ReturnType<typeof createListRenderer>;
@@ -41,6 +42,7 @@ const createSignalizedList = (uid: DID, list: List, key?: number): SignalizedLis
 		avatar: signal(list.avatar),
 		viewer: {
 			muted: signal(list.viewer?.muted),
+			blocked: signal(list.viewer?.blocked),
 		},
 		$renderedDescription: createListRenderer(uid),
 	};
@@ -67,6 +69,7 @@ export const mergeSignalizedList = (uid: DID, list: List, key?: number) => {
 		val.avatar.value = list.avatar;
 
 		val.viewer.muted.value = list.viewer?.muted;
+		val.viewer.blocked.value = list.viewer?.blocked;
 	}
 
 	return val;

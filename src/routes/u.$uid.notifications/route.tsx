@@ -48,7 +48,7 @@ const AuthenticatedNotificationsPage = () => {
 		enabled: () => {
 			const $notifications = notifications();
 
-			if (!$notifications || $notifications.pages.length < 1 || !$notifications.pages[0].cid) {
+			if (!$notifications || !$notifications.pages[0].cid) {
 				return false;
 			}
 

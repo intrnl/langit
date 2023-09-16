@@ -68,14 +68,10 @@ const AuthenticatedFeedPage = () => {
 		staleTime: 10_000,
 		refetchInterval: 30_000,
 		enabled: () => {
-			if (
-				did.error ||
-				timeline.error ||
-				!did() ||
-				!timeline() ||
-				timeline()!.pages.length < 1 ||
-				!timeline()!.pages[0].cid
-			) {
+			const $did = did();
+			const $timeline = timeline();
+
+			if (!$did || !$timeline || !$timeline.pages[0].cid) {
 				return false;
 			}
 

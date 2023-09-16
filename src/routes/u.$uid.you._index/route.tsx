@@ -204,7 +204,7 @@ const AuthenticatedYouPage = () => {
 
 			<a
 				link
-				href={generatePath('/u/:uid/you/moderation/mute-lists', params)}
+				href={generatePath('/u/:uid/you/moderation/lists', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
 				<GroupOffIcon class="text-xl" />

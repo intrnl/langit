@@ -140,22 +140,18 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 
 						return (
 							<>
-								<h1 class={/* @once */ dialog.title()}>Cannot unmute @{profile().handle.value}</h1>
+								<h1 class={/* @once */ dialog.title()}>Cannot unmute this user</h1>
 
-								<p class="mt-3 text-sm">To unmute this user, you have to unsubscribe from this mute list.</p>
+								<p class="mt-3 text-sm">
+									We can't unmute <strong>@{profile().handle.value}</strong> because you've chosen to mute
+									users on this list:
+								</p>
 
 								<div class="mt-3 rounded-md border border-divider">
 									<Switch>
 										<Match when={list()?.pages[0]}>
 											{(data) => (
-												<ListItem
-													uid={uid()}
-													list={data().list}
-													hideSubscribedBadge
-													onClick={() => {
-														closeModal();
-													}}
-												/>
+												<ListItem uid={uid()} list={data().list} hideSubscribedBadge onClick={closeModal} />
 											)}
 										</Match>
 
@@ -168,12 +164,7 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 								</div>
 
 								<div class={/* @once */ dialog.actions()}>
-									<button
-										onClick={() => {
-											closeModal();
-										}}
-										class={/* @once */ button({ color: 'primary' })}
-									>
+									<button onClick={closeModal} class={/* @once */ button({ color: 'primary' })}>
 										Ok
 									</button>
 								</div>

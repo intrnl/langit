@@ -19,15 +19,18 @@ export type PathsWithParams =
 	| "/u/:uid/you/moderation/keyword-filter/add"
 	| "/u/:uid/you/moderation/repost-filter"
 	| "/u/:uid/profile/:actor/lists/:list"
+	| "/u/:uid/you/moderation/lists"
 	| "/u/:uid/you/moderation/muted"
 	| "/u/:uid/profile/:actor/feed/:feed"
+	| "/u/:uid/you/moderation/lists/block"
 	| "/u/:uid/profile/:actor/followers"
+	| "/u/:uid/you/moderation/lists/mute"
+	| "/u/:uid/you/moderation/lists/self"
 	| "/u/:uid/you/moderation/muted/temp"
 	| "/u/:uid/profile/:actor/follows"
 	| "/u/:uid/settings/explore"
 	| "/u/:uid/you/moderation/blocked"
 	| "/u/:uid/settings/explore/add"
-	| "/u/:uid/you/moderation/lists"
 	| "/u/:uid/settings/languages"
 	| "/u/:uid/settings/profile"
 	| "/u/:uid/explore"
@@ -61,15 +64,18 @@ export interface Params {
 	"/u/:uid/you/moderation/keyword-filter/add": { "uid": string };
 	"/u/:uid/you/moderation/repost-filter": { "uid": string };
 	"/u/:uid/profile/:actor/lists/:list": { "uid": string, "actor": string, "list": string };
+	"/u/:uid/you/moderation/lists": { "uid": string };
 	"/u/:uid/you/moderation/muted": { "uid": string };
 	"/u/:uid/profile/:actor/feed/:feed": { "uid": string, "actor": string, "feed": string };
+	"/u/:uid/you/moderation/lists/block": { "uid": string };
 	"/u/:uid/profile/:actor/followers": { "uid": string, "actor": string };
+	"/u/:uid/you/moderation/lists/mute": { "uid": string };
+	"/u/:uid/you/moderation/lists/self": { "uid": string };
 	"/u/:uid/you/moderation/muted/temp": { "uid": string };
 	"/u/:uid/profile/:actor/follows": { "uid": string, "actor": string };
 	"/u/:uid/settings/explore": { "uid": string };
 	"/u/:uid/you/moderation/blocked": { "uid": string };
 	"/u/:uid/settings/explore/add": { "uid": string };
-	"/u/:uid/you/moderation/lists": { "uid": string };
 	"/u/:uid/settings/languages": { "uid": string };
 	"/u/:uid/settings/profile": { "uid": string };
 	"/u/:uid/explore": { "uid": string };

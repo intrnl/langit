@@ -59,6 +59,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.lists.$list/route.tsx")),
       },
       {
+        path: "you/moderation/lists",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.lists._index/route.tsx")),
+      },
+      {
         path: "you/moderation/muted",
         component: lazy(() => import("./routes/u.$uid.you.moderation.muted._index/route.tsx")),
       },
@@ -67,8 +71,20 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.feed.$feed/route.tsx")),
       },
       {
+        path: "you/moderation/lists/block",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.lists.block/route.tsx")),
+      },
+      {
         path: "profile/:actor/followers",
         component: lazy(() => import("./routes/u.$uid.profile.$actor_.followers/route.tsx")),
+      },
+      {
+        path: "you/moderation/lists/mute",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.lists.mute/route.tsx")),
+      },
+      {
+        path: "you/moderation/lists/self",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.lists.self/route.tsx")),
       },
       {
         path: "you/moderation/muted/temp",
@@ -89,10 +105,6 @@ const routes: RouteDefinition[] = [
       {
         path: "settings/explore/add",
         component: lazy(() => import("./routes/u.$uid.settings.explore.add/route.tsx")),
-      },
-      {
-        path: "you/moderation/lists",
-        component: lazy(() => import("./routes/u.$uid.you.moderation.lists/route.tsx")),
       },
       {
         path: "settings/languages",

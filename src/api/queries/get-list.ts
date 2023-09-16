@@ -37,7 +37,11 @@ export const getList: QueryFn<Collection<ListPage>, ReturnType<typeof getListKey
 	const items = data.items;
 
 	const page: ListPage = {
-		cursor: items.length >= limit ? data.cursor : undefined,
+		// NOTE: `items` are likely to return less than what we requested, because
+		// the API does not skip over records of users that have been deleted, so
+		// use the cursor as is.
+		// cursor: items.length >= limit ? data.cursor : undefined,
+		cursor: data.cursor,
 		list: mergeSignalizedList(uid, data.list),
 		items: items.map((item) => ({ subject: mergeSignalizedProfile(uid, item.subject) })),
 	};

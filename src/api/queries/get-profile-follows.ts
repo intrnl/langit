@@ -31,7 +31,11 @@ export const getProfileFollows: QueryFn<
 	const follows = data.follows;
 
 	const page: ProfilesListWithSubjectPage = {
-		cursor: follows.length >= limit ? data.cursor : undefined,
+		// NOTE: `profiles` are likely to return less than what we requested,
+		// because the API does not skip over records of users that have been
+		// deleted, so use the cursor as is.
+		// cursor: follows.length >= limit ? data.cursor : undefined,
+		cursor: data.cursor,
 		subject: mergeSignalizedProfile(uid, data.subject),
 		profiles: follows.map((profile) => mergeSignalizedProfile(uid, profile)),
 	};

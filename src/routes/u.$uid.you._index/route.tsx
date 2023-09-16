@@ -16,8 +16,8 @@ import BlockIcon from '~/icons/baseline-block.tsx';
 import BrightnessMediumIcon from '~/icons/baseline-brightness-medium.tsx';
 import ConfirmationNumberIcon from '~/icons/baseline-confirmation-number.tsx';
 import FilterAltIcon from '~/icons/baseline-filter-alt.tsx';
-import GroupOffIcon from '~/icons/baseline-group-off.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
+import ListIcon from '~/icons/baseline-list.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 import PersonOffIcon from '~/icons/baseline-person-off.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
@@ -207,8 +207,8 @@ const AuthenticatedYouPage = () => {
 				href={generatePath('/u/:uid/you/moderation/lists', params)}
 				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
 			>
-				<GroupOffIcon class="text-xl" />
-				<span>Mute lists</span>
+				<ListIcon class="text-xl" />
+				<span>User lists</span>
 			</a>
 
 			<a

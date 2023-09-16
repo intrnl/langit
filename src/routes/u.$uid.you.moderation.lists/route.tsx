@@ -32,12 +32,12 @@ const AuthenticatedListsModerationPage = () => {
 	return (
 		<div class="flex flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
-				<p class="text-base font-bold">Mute lists</p>
+				<p class="text-base font-bold">User lists</p>
 			</div>
 
 			<div class="flex flex-col">
 				<div class="sticky top-13 flex items-center justify-between gap-4 bg-background px-4 py-4">
-					<p class="text-base font-bold leading-5">Your mute lists</p>
+					<p class="text-base font-bold leading-5">Your user lists</p>
 					{/* <button class="text-sm text-accent hover:underline">Create</button> */}
 				</div>
 
@@ -45,7 +45,7 @@ const AuthenticatedListsModerationPage = () => {
 					uid={uid()}
 					list={myLists}
 					fallback={
-						<div class="p-4 pt-2 text-sm text-muted-fg">Mute lists you've created will show up here.</div>
+						<div class="p-4 pt-2 text-sm text-muted-fg">User lists you've created will show up here.</div>
 					}
 					disableEndMarker
 					onLoadMore={(cursor) => refetchMyLists(true, cursor)}
@@ -58,7 +58,7 @@ const AuthenticatedListsModerationPage = () => {
 
 			<div class="flex flex-col">
 				<div class="sticky top-13 flex items-center justify-between gap-4 bg-background px-4 py-4">
-					<p class="text-base font-bold leading-5">Subscribed mute lists</p>
+					<p class="text-base font-bold leading-5">Subscribed user lists</p>
 				</div>
 
 				<ListList
@@ -66,7 +66,7 @@ const AuthenticatedListsModerationPage = () => {
 					list={subbedLists}
 					fallback={
 						<div class="p-4 pt-2 text-sm text-muted-fg">
-							Mute lists created by other users will show up here.
+							User lists created by other users will show up here.
 						</div>
 					}
 					hideSubscribedBadge

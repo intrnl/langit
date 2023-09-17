@@ -146,6 +146,7 @@ const AuthenticatedFeedPage = () => {
 			<Show when={info()}>
 				{(info) => {
 					const creator = () => info().creator;
+					const isLiked = () => info().viewer.like.value;
 
 					return (
 						<>
@@ -184,10 +185,11 @@ const AuthenticatedFeedPage = () => {
 									</button>
 
 									<button
+										title={isLiked() ? 'Unlike this feed' : 'Like this feed'}
 										onClick={() => favoriteFeed(uid(), info())}
 										class={/* @once */ button({ color: 'outline' })}
 									>
-										{info().viewer.like.value ? (
+										{isLiked() ? (
 											<FavoriteIcon class="-mx-1.5 text-base text-red-600" />
 										) : (
 											<FavoriteOutlinedIcon class="-mx-1.5 text-base" />

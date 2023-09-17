@@ -1,6 +1,7 @@
 import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
@@ -70,7 +71,7 @@ const AuthenticatedListPage = () => {
 	};
 
 	return (
-		<div class="flex flex-col">
+		<div class="flex grow flex-col">
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<Switch>
 					<Match when={list()}>
@@ -197,6 +198,17 @@ const AuthenticatedListPage = () => {
 					<div class="flex h-13 items-center justify-center border-divider">
 						<CircularProgress />
 					</div>
+				</Match>
+
+				<Match when={listing.error} keyed>
+					{(err) => (
+						<div class="grid grow place-items-center">
+							<div class="max-w-sm p-4">
+								<h1 class="mb-1 text-xl font-bold">Failed to load</h1>
+								<p class="break-words text-sm">{err instanceof XRPCError ? err.message : '' + err}</p>
+							</div>
+						</div>
+					)}
 				</Match>
 
 				<Match when={getCollectionCursor(listing(), 'cursor')}>

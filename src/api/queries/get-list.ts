@@ -16,9 +16,11 @@ export interface ListPage {
 	items: Array<{ subject: SignalizedProfile }>;
 }
 
-export const getListKey = (uid: DID, actor: string, list: string, limit: number) =>
-	['getList', uid, actor, list, limit] as const;
+const PAGE_SIZE = 30;
 
+export const getListKey = (uid: DID, actor: string, list: string, limit = PAGE_SIZE) => {
+	return ['getList', uid, actor, list, limit] as const;
+};
 export const getList: QueryFn<Collection<ListPage>, ReturnType<typeof getListKey>, string> = async (
 	key,
 	{ data: collection, param },

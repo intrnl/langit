@@ -30,8 +30,6 @@ const ListPurposeLabels: Record<ListPurpose, string> = {
 	'app.bsky.graph.defs#curatelist': 'Curation list',
 };
 
-const PAGE_SIZE = 30;
-
 const AuthenticatedListPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/lists/:list');
 	const navigate = useNavigate();
@@ -39,7 +37,7 @@ const AuthenticatedListPage = () => {
 	const uid = () => params.uid as DID;
 
 	const [listing, { refetch }] = createQuery({
-		key: () => getListKey(uid(), params.actor, params.list, PAGE_SIZE),
+		key: () => getListKey(uid(), params.actor, params.list),
 		fetch: getList,
 		refetchOnMount: false,
 		refetchOnReconnect: false,

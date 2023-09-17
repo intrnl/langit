@@ -9,7 +9,11 @@ import { flatRoutes } from './lib/router-plugin/flat-routes';
 
 export default defineConfig({
 	plugins: [
-		solid(),
+		solid({
+			typescript: {
+				optimizeConstEnums: true,
+			},
+		}),
 		VitePWA({
 			registerType: 'prompt',
 			injectRegister: null,

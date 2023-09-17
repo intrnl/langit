@@ -35,7 +35,8 @@ export const getPostLikedBy: QueryFn<
 	const likes = data.likes;
 
 	const page: ProfilesListPage = {
-		cursor: likes.length >= limit ? data.cursor : undefined,
+		// cursor: likes.length >= limit ? data.cursor : undefined,
+		cursor: data.cursor,
 		profiles: likes.map((record) => mergeSignalizedProfile(uid, record.actor)),
 	};
 

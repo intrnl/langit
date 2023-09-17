@@ -35,7 +35,8 @@ export const getPostRepostedBy: QueryFn<
 	const reposts = data.repostedBy;
 
 	const page: ProfilesListPage = {
-		cursor: reposts.length >= limit ? data.cursor : undefined,
+		// cursor: reposts.length >= limit ? data.cursor : undefined,
+		cursor: data.cursor,
 		profiles: reposts.map((profile) => mergeSignalizedProfile(uid, profile)),
 	};
 

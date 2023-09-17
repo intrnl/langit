@@ -31,7 +31,8 @@ export const getProfileFollowers: QueryFn<
 	const followers = data.followers;
 
 	const page: ProfilesListWithSubjectPage = {
-		cursor: followers.length >= limit ? data.cursor : undefined,
+		// cursor: followers.length >= limit ? data.cursor : undefined,
+		cursor: data.cursor,
 		subject: mergeSignalizedProfile(uid, data.subject),
 		profiles: followers.map((profile) => mergeSignalizedProfile(uid, profile)),
 	};

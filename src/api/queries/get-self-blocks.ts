@@ -26,7 +26,8 @@ export const getSelfBlocks: QueryFn<
 	const blocks = data.blocks;
 
 	const page: ProfilesListPage = {
-		cursor: blocks.length >= limit ? data.cursor : undefined,
+		// cursor: blocks.length >= limit ? data.cursor : undefined,
+		cursor: data.cursor,
 		profiles: blocks.map((profile) => mergeSignalizedProfile(uid, profile)),
 	};
 

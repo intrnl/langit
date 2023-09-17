@@ -105,7 +105,8 @@ export const getPopularFeedGenerators: QueryFn<
 	const feeds = data.feeds;
 
 	const page: FeedsPage = {
-		cursor: feeds.length >= limit ? data.cursor : undefined,
+		// cursor: feeds.length >= limit ? data.cursor : undefined,
+		cursor: data.cursor,
 		feeds: feeds.map((feed) => mergeSignalizedFeedGenerator(uid, feed)),
 	};
 

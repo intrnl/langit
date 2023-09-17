@@ -32,7 +32,8 @@ export const searchProfiles: QueryFn<
 	const profiles = data.actors;
 
 	const page: ProfilesListPage = {
-		cursor: profiles.length >= limit ? data.cursor : undefined,
+		// cursor: profiles.length >= limit ? data.cursor : undefined,
+		cursor: data.cursor,
 		profiles: profiles.map((profile) => mergeSignalizedProfile(uid, profile)),
 	};
 

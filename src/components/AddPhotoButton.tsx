@@ -3,13 +3,12 @@ import { Show, createSignal } from 'solid-js';
 import { openModal } from '~/globals/modals.tsx';
 import { compressProfileImage } from '~/utils/image.ts';
 
+import PhotoPickerMenu from '~/components/menus/PhotoPickerMenu.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 
 import AddPhotoAlternateIcon from '~/icons/baseline-add-photo-alternate.tsx';
 
-import ImageUploadCompressDialog from '../u.$uid.compose/ImageUploadCompressDialog.tsx';
-
-import PhotoPickerMenu from './PhotoPickerMenu.tsx';
+import ImageUploadCompressDialog from '~/routes/u.$uid.compose/ImageUploadCompressDialog.tsx';
 
 export interface AddPhotoButtonProps {
 	exists: boolean;

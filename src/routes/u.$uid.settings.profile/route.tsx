@@ -11,13 +11,12 @@ import { useParams } from '~/router.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
 import { createId, model } from '~/utils/misc.ts';
 
+import AddPhotoButton from '~/components/AddPhotoButton.tsx';
 import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
 import input from '~/styles/primitives/input';
 import textarea from '~/styles/primitives/textarea.ts';
-
-import AddPhotoButton from './AddPhotoButton.tsx';
 
 const MAX_NAME_LENGTH = 64;
 const MAX_BIO_LENGTH = 256;

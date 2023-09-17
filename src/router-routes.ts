@@ -51,6 +51,14 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.you.moderation.keyword-filter.add/route.tsx")),
       },
       {
+        path: "you/moderation/lists/self",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.lists.self._index/route.tsx")),
+      },
+      {
+        path: "you/moderation/lists/self/new",
+        component: lazy(() => import("./routes/u.$uid.you.moderation.lists.self.new/route.tsx")),
+      },
+      {
         path: "you/moderation/repost-filter",
         component: lazy(() => import("./routes/u.$uid.you.moderation.repost-filter/route.tsx")),
       },
@@ -81,10 +89,6 @@ const routes: RouteDefinition[] = [
       {
         path: "you/moderation/lists/mute",
         component: lazy(() => import("./routes/u.$uid.you.moderation.lists.mute/route.tsx")),
-      },
-      {
-        path: "you/moderation/lists/self",
-        component: lazy(() => import("./routes/u.$uid.you.moderation.lists.self/route.tsx")),
       },
       {
         path: "you/moderation/muted/temp",

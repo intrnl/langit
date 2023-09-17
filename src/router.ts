@@ -17,6 +17,8 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/post/:status"
 	| "/u/:uid/profile/:actor/post/:status/likes"
 	| "/u/:uid/you/moderation/keyword-filter/add"
+	| "/u/:uid/you/moderation/lists/self"
+	| "/u/:uid/you/moderation/lists/self/new"
 	| "/u/:uid/you/moderation/repost-filter"
 	| "/u/:uid/profile/:actor/lists/:list"
 	| "/u/:uid/you/moderation/lists"
@@ -25,7 +27,6 @@ export type PathsWithParams =
 	| "/u/:uid/you/moderation/lists/block"
 	| "/u/:uid/profile/:actor/followers"
 	| "/u/:uid/you/moderation/lists/mute"
-	| "/u/:uid/you/moderation/lists/self"
 	| "/u/:uid/you/moderation/muted/temp"
 	| "/u/:uid/profile/:actor/follows"
 	| "/u/:uid/settings/explore"
@@ -62,6 +63,8 @@ export interface Params {
 	"/u/:uid/profile/:actor/post/:status": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/profile/:actor/post/:status/likes": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/you/moderation/keyword-filter/add": { "uid": string };
+	"/u/:uid/you/moderation/lists/self": { "uid": string };
+	"/u/:uid/you/moderation/lists/self/new": { "uid": string };
 	"/u/:uid/you/moderation/repost-filter": { "uid": string };
 	"/u/:uid/profile/:actor/lists/:list": { "uid": string, "actor": string, "list": string };
 	"/u/:uid/you/moderation/lists": { "uid": string };
@@ -70,7 +73,6 @@ export interface Params {
 	"/u/:uid/you/moderation/lists/block": { "uid": string };
 	"/u/:uid/profile/:actor/followers": { "uid": string, "actor": string };
 	"/u/:uid/you/moderation/lists/mute": { "uid": string };
-	"/u/:uid/you/moderation/lists/self": { "uid": string };
 	"/u/:uid/you/moderation/muted/temp": { "uid": string };
 	"/u/:uid/profile/:actor/follows": { "uid": string, "actor": string };
 	"/u/:uid/settings/explore": { "uid": string };

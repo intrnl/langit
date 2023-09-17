@@ -1,3 +1,6 @@
+// TODO: move ImageUploadCompressDialog to the shared components folder at some
+// point in the future.
+
 import { For } from 'solid-js';
 
 import { closeModal } from '~/globals/modals.tsx';

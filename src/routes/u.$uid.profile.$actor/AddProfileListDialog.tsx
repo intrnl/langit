@@ -162,8 +162,9 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 					<Match when={getCollectionCursor(lists(), 'cursor')}>
 						{(cursor) => (
 							<button
+								disabled={mutating()}
 								onClick={() => refetch(true, cursor())}
-								class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none"
+								class="flex h-13 items-center justify-center text-sm text-accent hover:bg-hinted disabled:pointer-events-none disabled:opacity-50"
 							>
 								Show more
 							</button>

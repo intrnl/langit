@@ -88,6 +88,7 @@ const AddPhotoButton = (props: AddPhotoButtonProps) => {
 				}
 			>
 				<button
+					type="button"
 					title={props.title}
 					onClick={handleClick}
 					class="absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 outline-2 outline-primary hover:bg-secondary focus-visible:outline"

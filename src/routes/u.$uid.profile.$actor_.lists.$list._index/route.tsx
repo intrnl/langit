@@ -18,6 +18,7 @@ import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import SubscribeListDialog from './SubscribeListDialog.tsx';
+import EditIcon from '~/icons/baseline-edit.tsx';
 
 const enum Subscription {
 	MUTED = 1,
@@ -132,6 +133,19 @@ const AuthenticatedListPage = () => {
 									>
 										{subscription() ? 'Unsubscribe list' : 'Subscribe list'}
 									</button>
+
+									<div class="grow" />
+
+									<Show when={creator().did === uid()}>
+										<a
+											link
+											href={generatePath('/u/:uid/profile/:actor/lists/:list/edit', params)}
+											title="Edit list"
+											class={/* @once */ button({ color: 'outline' })}
+										>
+											<EditIcon class="-mx-1.5 text-base" />
+										</a>
+									</Show>
 								</div>
 							</div>
 						</>

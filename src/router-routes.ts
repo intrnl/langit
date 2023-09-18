@@ -55,6 +55,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.you.moderation.keyword-filter.add/route.tsx")),
       },
       {
+        path: "profile/:actor/lists/:list/edit",
+        component: lazy(() => import("./routes/u.$uid.profile.$actor_.lists.$list.edit/route.tsx")),
+      },
+      {
         path: "you/moderation/lists/self",
         component: lazy(() => import("./routes/u.$uid.you.moderation.lists.self._index/route.tsx")),
       },

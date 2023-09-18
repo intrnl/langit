@@ -18,6 +18,7 @@ export type PathsWithParams =
 	| "/u/:uid/profile/:actor/lists/:list"
 	| "/u/:uid/profile/:actor/post/:status/likes"
 	| "/u/:uid/you/moderation/keyword-filter/add"
+	| "/u/:uid/profile/:actor/lists/:list/edit"
 	| "/u/:uid/you/moderation/lists/self"
 	| "/u/:uid/you/moderation/lists/self/new"
 	| "/u/:uid/you/moderation/repost-filter"
@@ -64,6 +65,7 @@ export interface Params {
 	"/u/:uid/profile/:actor/lists/:list": { "uid": string, "actor": string, "list": string };
 	"/u/:uid/profile/:actor/post/:status/likes": { "uid": string, "actor": string, "status": string };
 	"/u/:uid/you/moderation/keyword-filter/add": { "uid": string };
+	"/u/:uid/profile/:actor/lists/:list/edit": { "uid": string, "actor": string, "list": string };
 	"/u/:uid/you/moderation/lists/self": { "uid": string };
 	"/u/:uid/you/moderation/lists/self/new": { "uid": string };
 	"/u/:uid/you/moderation/repost-filter": { "uid": string };

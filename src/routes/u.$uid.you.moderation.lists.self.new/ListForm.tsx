@@ -1,9 +1,8 @@
-import { Show, createSignal } from 'solid-js';
+import { Show, createRenderEffect, createSignal } from 'solid-js';
 
 import type { SignalizedList } from '~/api/cache/lists.ts';
 
 import type { Facet } from '~/api/richtext/types.ts';
-
 import { createId, model } from '~/utils/misc.ts';
 
 import BlobImage from '~/components/BlobImage.tsx';
@@ -34,14 +33,24 @@ const enum ListType {
 }
 
 const ListForm = (props: ListFormProps) => {
-	const init = props.initialData;
-
 	const id = createId();
 
-	const [avatar, setAvatar] = createSignal<Blob | string | undefined>(init ? init.avatar.value : undefined);
-	const [name, setName] = createSignal((init && init.name.peek()) || '');
-	const [desc, setDesc] = createSignal((init && init.description.peek()) || '');
-	const [type, setType] = createSignal(init ? init.purpose.peek() : ListType.CURATION);
+	const [avatar, setAvatar] = createSignal<Blob | string | undefined>(undefined);
+	const [name, setName] = createSignal('');
+	const [desc, setDesc] = createSignal('');
+	const [type, setType] = createSignal<string>(ListType.CURATION);
+
+	createRenderEffect(() => {
+		const $init = props.initialData;
+
+		if ($init) {
+			// NOTE: this tracks them, should it?
+			setAvatar($init.avatar.value);
+			setName($init.name.value);
+			setDesc($init.description.value || '');
+			setType($init.purpose.value);
+		}
+	});
 
 	const handleSubmit = (ev: SubmitEvent) => {
 		ev.preventDefault();

@@ -49,11 +49,8 @@ const AuthenticatedAddListsModerationPage = () => {
 			return { uid: $uid, ...response.data };
 		},
 		onSuccess: ({ uid, uri }) => {
-			if (history.state) {
-				navigate(-1);
-			}
-
 			navigate('/u/:uid/profile/:actor/lists/:list', {
+				replace: true,
 				params: {
 					uid: uid,
 					actor: uid,

@@ -183,7 +183,12 @@ const DeleteListDialog = (props: DeleteListDialogProps) => {
 							<strong>{list.name.value}</strong> is on its way to being deleted...
 						</p>
 
-						<progress class="mt-3" value={progress.value} max={progress.max} style="border: revert" />
+						<div class="mt-3 h-1.5 w-full overflow-hidden rounded bg-hinted">
+							<div
+								class="h-full bg-accent"
+								style={{ width: `${(progress.value / progress.max) * 100}%` }}
+							></div>
+						</div>
 
 						<p
 							class="mt-3 text-sm"

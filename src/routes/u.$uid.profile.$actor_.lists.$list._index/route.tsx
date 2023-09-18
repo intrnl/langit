@@ -17,8 +17,11 @@ import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils
 import CircularProgress from '~/components/CircularProgress.tsx';
 import button from '~/styles/primitives/button.ts';
 
-import SubscribeListDialog from './SubscribeListDialog.tsx';
 import EditIcon from '~/icons/baseline-edit.tsx';
+import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+
+import ListMenu from './ListMenu.tsx';
+import SubscribeListDialog from './SubscribeListDialog.tsx';
 
 const enum Subscription {
 	MUTED = 1,
@@ -146,6 +149,14 @@ const AuthenticatedListPage = () => {
 											<EditIcon class="-mx-1.5 text-base" />
 										</a>
 									</Show>
+
+									<button
+										title="More actions"
+										onClick={() => openModal(() => <ListMenu uid={uid()} list={list()} />)}
+										class={/* @once */ button({ color: 'outline' })}
+									>
+										<MoreHorizIcon class="-mx-1.5 text-base" />
+									</button>
 								</div>
 							</div>
 						</>

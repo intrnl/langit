@@ -16,6 +16,7 @@ export const lists: Record<string, WeakRef<SignalizedList>> = {};
 export interface SignalizedList {
 	_key?: number;
 	uri: List['uri'];
+	cid: Signal<List['cid']>;
 	creator: SignalizedProfile;
 	name: Signal<List['name']>;
 	purpose: Signal<List['purpose']>;
@@ -34,6 +35,7 @@ const createSignalizedList = (uid: DID, list: List, key?: number): SignalizedLis
 	return {
 		_key: key,
 		uri: list.uri,
+		cid: signal(list.cid),
 		creator: mergeSignalizedProfile(uid, list.creator, key),
 		name: signal(list.name),
 		purpose: signal(list.purpose),
@@ -59,6 +61,8 @@ export const mergeSignalizedList = (uid: DID, list: List, key?: number) => {
 		lists[id] = new WeakRef(val);
 	} else if (!key || val._key !== key) {
 		val._key = key;
+
+		val.cid.value = list.cid;
 
 		val.creator = mergeSignalizedProfile(uid, list.creator, key);
 

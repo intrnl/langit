@@ -15,12 +15,14 @@ import * as menu from '~/styles/primitives/menu.ts';
 
 import CheckIcon from '~/icons/baseline-check';
 
-export const REPORT_POST = 1; // 1 << 0
-export const REPORT_PROFILE = 2; // 1 << 1
+export const REPORT_PROFILE = 1; // 1 << 0
+export const REPORT_POST = 2; // 1 << 1
+export const REPORT_LIST = 4; // 1 << 2
 
 export type ReportMessage =
+	| { type: typeof REPORT_PROFILE; did: DID }
 	| { type: typeof REPORT_POST; uri: AtUri; cid: string }
-	| { type: typeof REPORT_PROFILE; did: DID };
+	| { type: typeof REPORT_LIST; uri: AtUri; cid: string };
 
 interface ReportOption {
 	label: number;
@@ -36,11 +38,19 @@ const options: ReportOption[] = [
 		name: 'Misleading profile',
 		desc: 'False claims about identity or affiliation',
 	},
+
 	{
-		label: REPORT_PROFILE,
+		label: REPORT_POST | REPORT_LIST,
+		value: 'com.atproto.moderation.defs#reasonRude',
+		name: 'Anti-social behavior',
+		desc: 'Harassment, trolling or intolerance',
+	},
+
+	{
+		label: REPORT_PROFILE | REPORT_LIST,
 		value: 'com.atproto.moderation.defs#reasonViolation',
 		name: 'Community standards violation',
-		desc: 'Profile uses terms that violate community standards',
+		desc: 'Contains terms that violate community standards',
 	},
 
 	{
@@ -49,23 +59,12 @@ const options: ReportOption[] = [
 		name: 'Unwanted sexual content',
 		desc: 'Nudity or pornography not labeled as such',
 	},
-	{
-		label: REPORT_POST,
-		value: 'com.atproto.moderation.defs#reasonRude',
-		name: 'Anti-social behavior',
-		desc: 'Harassment, trolling or intolerance',
-	},
+
 	{
 		label: REPORT_POST,
 		value: 'com.atproto.moderation.defs#reasonViolation',
 		name: 'Illegal and urgent',
 		desc: 'Glaring violations of law or terms of service',
-	},
-	{
-		label: REPORT_POST,
-		value: 'com.atproto.moderation.defs#reasonOther',
-		name: 'Other issues',
-		desc: 'Issues not covered by the options above',
 	},
 
 	{
@@ -73,6 +72,13 @@ const options: ReportOption[] = [
 		value: 'com.atproto.moderation.defs#reasonSpam',
 		name: 'Spam',
 		desc: 'Excessive mentions or replies',
+	},
+
+	{
+		label: REPORT_POST | REPORT_LIST,
+		value: 'com.atproto.moderation.defs#reasonOther',
+		name: 'Other issues',
+		desc: 'Issues not covered by the options above',
 	},
 ];
 
@@ -108,19 +114,17 @@ const ReportDialog = (props: ReportDialogProps) => {
 
 			let subject: UnionOf<'com.atproto.admin.defs#repoRef'> | UnionOf<'com.atproto.repo.strongRef'>;
 
-			if ($report.type === REPORT_POST) {
-				subject = {
-					$type: 'com.atproto.repo.strongRef',
-					uri: $report.uri,
-					cid: $report.cid,
-				};
-			} else if ($report.type === REPORT_PROFILE) {
+			if ($report.type === REPORT_PROFILE) {
 				subject = {
 					$type: 'com.atproto.admin.defs#repoRef',
 					did: $report.did,
 				};
 			} else {
-				assert(false, `unexpected report: ${$report}`);
+				subject = {
+					$type: 'com.atproto.repo.strongRef',
+					uri: $report.uri,
+					cid: $report.cid,
+				};
 			}
 
 			await agent.rpc.call('com.atproto.moderation.createReport', {

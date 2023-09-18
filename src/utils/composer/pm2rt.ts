@@ -134,6 +134,12 @@ export const pm2rt = (json: JSONContent) => {
 
 	delve(json, true);
 
+	const trimmed = text.trimEnd();
+	const trailOffset = text.length - trimmed.length;
+
+	text = trimmed;
+	length -= trailOffset;
+
 	return {
 		length: ascii ? length : graphemeLen(text),
 		text,

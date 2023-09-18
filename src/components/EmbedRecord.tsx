@@ -154,7 +154,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 							</div>
 						</Show>
 
-						<div class="mx-3 mb-3 mt-1 min-w-0 grow-4 basis-0 whitespace-pre-wrap break-words text-sm empty:hidden">
+						<div class="mx-3 mb-3 mt-1 line-clamp-6 min-w-0 grow-4 basis-0 whitespace-pre-wrap break-words text-sm empty:hidden">
 							{(val() as PostRecord).text}
 						</div>
 					</div>

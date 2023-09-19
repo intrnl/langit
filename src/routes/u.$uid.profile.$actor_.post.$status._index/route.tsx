@@ -119,13 +119,25 @@ const AuthenticatedPostPage = () => {
 								</div>
 							}
 						>
-							<Match when={error instanceof XRPCError && error.error === 'NotFound'}>
+							<Match
+								when={(() => {
+									if (error instanceof XRPCError && error.error === 'NotFound') {
+										return error;
+									}
+								})()}
+							>
 								<div class="p-3">
 									<EmbedRecordNotFound />
 								</div>
 							</Match>
 
-							<Match when={error instanceof BlockedThreadError && error}>
+							<Match
+								when={(() => {
+									if (error instanceof BlockedThreadError) {
+										return error;
+									}
+								})()}
+							>
 								{(err) => {
 									const viewer = () => err().view.author.viewer;
 

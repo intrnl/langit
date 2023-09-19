@@ -25,15 +25,6 @@ const TimelineList = (props: TimelineListProps) => {
 	// change, they shouldn't.
 	const { timeline, latest, onRefetch, onLoadMore } = props;
 
-	const getTimelineCid = () => {
-		return timeline()?.pages[0].cid;
-	};
-
-	const isTimelineStale = () => {
-		const $latest = latest?.();
-		return $latest && $latest.cid !== getTimelineCid();
-	};
-
 	const flattenedSlices = () => {
 		if (timeline.error || !timeline()) {
 			return [];
@@ -54,7 +45,12 @@ const TimelineList = (props: TimelineListProps) => {
 					</div>
 				</Match>
 
-				<Match when={isTimelineStale()}>
+				<Match
+					when={(() => {
+						const $latest = latest?.();
+						return $latest && $latest.cid !== timeline()?.pages[0].cid;
+					})()}
+				>
 					<button
 						onClick={onRefetch}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"

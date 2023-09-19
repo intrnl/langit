@@ -63,11 +63,6 @@ const AuthenticatedMutedUsersModerationPage = () => {
 		},
 	});
 
-	const isProfileListStale = () => {
-		const $latest = latest?.();
-		return $latest && $latest.did !== getProfileListDid(mutes());
-	};
-
 	createEffect((prev: ReturnType<typeof mutes> | 0) => {
 		const next = mutes();
 
@@ -101,7 +96,12 @@ const AuthenticatedMutedUsersModerationPage = () => {
 					</div>
 				</Match>
 
-				<Match when={isProfileListStale()}>
+				<Match
+					when={(() => {
+						const $latest = latest?.();
+						return $latest && $latest.did !== getProfileListDid(mutes());
+					})()}
+				>
 					<button
 						onClick={() => refetch(true)}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"

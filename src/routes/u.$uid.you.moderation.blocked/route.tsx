@@ -60,11 +60,6 @@ const AuthenticatedBlockedUsersModerationPage = () => {
 		},
 	});
 
-	const isProfileListStale = () => {
-		const $latest = latest?.();
-		return $latest && $latest.did !== getProfileListDid(blocks());
-	};
-
 	createEffect((prev: ReturnType<typeof blocks> | 0) => {
 		const next = blocks();
 
@@ -98,7 +93,12 @@ const AuthenticatedBlockedUsersModerationPage = () => {
 					</div>
 				</Match>
 
-				<Match when={isProfileListStale()}>
+				<Match
+					when={(() => {
+						const $latest = latest?.();
+						return $latest && $latest.did !== getProfileListDid(blocks());
+					})()}
+				>
 					<button
 						onClick={() => refetch(true)}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"

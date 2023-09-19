@@ -109,15 +109,6 @@ const AuthenticatedNotificationsPage = () => {
 		return next;
 	}, 0 as const);
 
-	const getNotificationsCid = () => {
-		return notifications()?.pages[0].cid;
-	};
-
-	const isNotificationsStale = () => {
-		const $latest = latest();
-		return $latest && $latest.cid !== getNotificationsCid();
-	};
-
 	return (
 		<div class="flex grow flex-col">
 			<Title>Notifications / Langit</Title>
@@ -144,7 +135,12 @@ const AuthenticatedNotificationsPage = () => {
 					</div>
 				</Match>
 
-				<Match when={isNotificationsStale()}>
+				<Match
+					when={(() => {
+						const $latest = latest();
+						return $latest && $latest.cid !== notifications()?.pages[0].cid;
+					})()}
+				>
 					<button
 						onClick={() => refetch(true)}
 						class="flex h-13 items-center justify-center border-b border-divider text-sm text-accent hover:bg-hinted"

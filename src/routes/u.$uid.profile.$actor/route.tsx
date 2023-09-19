@@ -1,7 +1,7 @@
 import { Match, Show, Switch, lazy } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import type { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
+import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { Outlet } from '@solidjs/router';
@@ -99,13 +99,23 @@ const AuthenticatedProfileLayout = () => {
 				<Match when={profile.error}>
 					{(error) => (
 						<Switch fallback={<div class="p-3 text-sm">Something went wrong.</div>}>
-							<Match when={ERROR_NAMES.includes((error() as XRPCError).error!)}>
-								<div class="grid grow place-items-center">
-									<div class="max-w-sm p-4">
-										<h1 class="mb-1 text-xl font-bold">Failed to load profile</h1>
-										<p class="text-sm">{(error() as XRPCError).message}</p>
+							<Match
+								when={(() => {
+									const $error = error();
+
+									if ($error instanceof XRPCError && ERROR_NAMES.includes($error.error!)) {
+										return $error;
+									}
+								})()}
+							>
+								{(error) => (
+									<div class="grid grow place-items-center">
+										<div class="max-w-sm p-4">
+											<h1 class="mb-1 text-xl font-bold">Failed to load profile</h1>
+											<p class="text-sm">{error().message}</p>
+										</div>
 									</div>
-								</div>
+								)}
 							</Match>
 						</Switch>
 					)}

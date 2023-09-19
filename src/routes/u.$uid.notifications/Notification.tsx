@@ -1,4 +1,4 @@
-import { type Accessor, For, Match, Show, Switch } from 'solid-js';
+import { For, Match, Show, Switch } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 import { Dynamic } from 'solid-js/web';
 
@@ -8,10 +8,7 @@ import { createQuery } from '@intrnl/sq';
 import {
 	type FollowNotificationSlice,
 	type LikeNotificationSlice,
-	type MentionNotificationSlice,
 	type NotificationSlice,
-	type QuoteNotificationSlice,
-	type ReplyNotificationSlice,
 	type RepostNotificationSlice,
 } from '~/api/models/notifications.ts';
 
@@ -49,23 +46,21 @@ const ICON_MAP = {
 
 const Notification = (props: NotificationProps) => {
 	const uid = () => props.uid;
-	const _data = () => props.data;
-
-	const isReply = () => {
-		const $data = _data();
-		const type = $data.type;
-
-		return type === 'reply' || type === 'quote' || type === 'mention';
-	};
+	const data = () => props.data;
 
 	return (
 		<Switch>
-			<Match when={isReply()}>
-				{(_value) => {
-					const data = _data as any as Accessor<
-						ReplyNotificationSlice | QuoteNotificationSlice | MentionNotificationSlice
-					>;
+			<Match
+				when={(() => {
+					const $data = data();
+					const type = $data.type;
 
+					if (type === 'reply' || type === 'quote' || type === 'mention') {
+						return $data;
+					}
+				})()}
+			>
+				{(data) => {
 					const replyObj = () => data().item;
 					const replyUri = () => replyObj().uri;
 
@@ -94,12 +89,17 @@ const Notification = (props: NotificationProps) => {
 				}}
 			</Match>
 
-			<Match when>
-				{(_value) => {
-					const data = _data as Accessor<
-						FollowNotificationSlice | LikeNotificationSlice | RepostNotificationSlice
-					>;
+			<Match
+				when={(() => {
+					const $data = data();
+					const type = $data.type;
 
+					if (type === 'follow' || type === 'like' || type === 'repost') {
+						return $data;
+					}
+				})()}
+			>
+				{(data) => {
 					return (
 						<div
 							class="flex gap-3 border-b border-divider px-4 py-3"
@@ -147,10 +147,17 @@ const Notification = (props: NotificationProps) => {
 
 								<div class="break-words text-sm">{renderText(uid(), data())}</div>
 
-								<Show when={data().type === 'like' || data().type === 'repost'}>
-									{(_value) => {
-										const data = _data as Accessor<LikeNotificationSlice | RepostNotificationSlice>;
+								<Show
+									when={(() => {
+										const $data = data();
+										const type = $data.type;
 
+										if (type === 'like' || type === 'repost') {
+											return $data;
+										}
+									})()}
+								>
+									{(data) => {
 										const subject = () => data().items[0].record.subject;
 										const uri = () => subject().uri;
 

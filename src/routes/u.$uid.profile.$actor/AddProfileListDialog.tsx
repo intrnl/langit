@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch, createSignal } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import { getCollectionCursor, getRecordId } from '~/api/utils.ts';
@@ -29,6 +29,13 @@ export interface AddProfileListDialogProps {
 }
 
 const PAGE_SIZE = 30;
+
+type ListPurpose = RefOf<'app.bsky.graph.defs#listPurpose'>;
+
+const ListPurposeLabels: Record<ListPurpose, string> = {
+	'app.bsky.graph.defs#modlist': 'Moderation list',
+	'app.bsky.graph.defs#curatelist': 'Curation list',
+};
 
 const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 	let listEl: HTMLDivElement | undefined;
@@ -122,6 +129,11 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 							const loading = () => !result() || mutating();
 							const [checked, setChecked] = createDerivedSignal(() => !!result()?.exists.value);
 
+							const purpose = () => {
+								const raw = list.purpose.value;
+								return raw in ListPurposeLabels ? ListPurposeLabels[raw] : `Unknown list`;
+							};
+
 							return (
 								<button
 									disabled={loading()}
@@ -140,7 +152,7 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 
 									<div class="min-w-0 grow">
 										<p class="break-words text-sm font-bold">{list.name.value}</p>
-										<p class="text-sm text-muted-fg">Mute list</p>
+										<p class="text-sm text-muted-fg">{purpose()}</p>
 									</div>
 
 									<Show when={checked()}>

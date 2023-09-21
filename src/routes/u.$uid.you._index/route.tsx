@@ -44,6 +44,11 @@ const AuthenticatedYouPage = () => {
 		return Object.values(store).sort((account) => (account.did === uid() ? -1 : 1));
 	});
 
+	const isAppPassword = createMemo(() => {
+		const session = multiagent.accounts[uid()];
+		return session ? session.isAppPassword !== false : true;
+	});
+
 	return (
 		<div class="flex flex-col pb-4">
 			<div class="flex h-13 items-center px-4">
@@ -130,14 +135,16 @@ const AuthenticatedYouPage = () => {
 				<span>Profile</span>
 			</a>
 
-			<a
-				link
-				href={generatePath('/u/:uid/you/invites', params)}
-				class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
-			>
-				<ConfirmationNumberIcon class="text-xl" />
-				<span>Invite codes</span>
-			</a>
+			<Show when={!isAppPassword()}>
+				<a
+					link
+					href={generatePath('/u/:uid/you/invites', params)}
+					class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+				>
+					<ConfirmationNumberIcon class="text-xl" />
+					<span>Invite codes</span>
+				</a>
+			</Show>
 
 			<a
 				link

@@ -6,6 +6,7 @@ import { createQuery } from '@intrnl/sq';
 import { getProfileKey, getProfile, getInitialProfile } from '~/api/queries/get-profile.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
+import { generatePath } from '~/router.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -34,7 +35,7 @@ const InvitedUsersDialog = (props: InvitedUsersDialogProps) => {
 					<For
 						each={invite().uses}
 						fallback={
-							<div class="px-4 pb-1">
+							<div class="mt-1 px-4">
 								<p class="text-sm text-muted-fg">Users you invite with this code will show up here.</p>
 							</div>
 						}
@@ -52,12 +53,23 @@ const InvitedUsersDialog = (props: InvitedUsersDialogProps) => {
 							return (
 								<Suspense
 									fallback={
-										<div class="flex h-13 justify-center">
+										<div class="flex h-13 items-center justify-center">
 											<CircularProgress />
 										</div>
 									}
 								>
-									<div class="flex gap-3 px-4 py-3">
+									<a
+										link
+										href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: used.usedBy })}
+										onClick={(ev) => {
+											if (ev.ctrlKey || ev.altKey || ev.metaKey) {
+												return;
+											}
+
+											closeModal();
+										}}
+										class="flex gap-3 px-4 py-3 hover:bg-hinted"
+									>
 										<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg">
 											<Show when={profile()?.avatar.value}>
 												{(avatar) => <img src={avatar()} class="h-full w-full" />}
@@ -83,7 +95,7 @@ const InvitedUsersDialog = (props: InvitedUsersDialogProps) => {
 
 											<p class="text-sm text-muted-fg">Invited on {relformat.formatAbs(used.usedAt)}</p>
 										</div>
-									</div>
+									</a>
 								</Suspense>
 							);
 						}}

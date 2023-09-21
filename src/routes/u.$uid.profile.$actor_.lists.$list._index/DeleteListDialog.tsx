@@ -206,7 +206,7 @@ const DeleteListDialog = (props: DeleteListDialogProps) => {
 								onClick={closeModal}
 								class={/* @once */ button({ color: 'primary' })}
 							>
-								Ok
+								Close
 							</button>
 						</div>
 					</div>

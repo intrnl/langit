@@ -165,7 +165,7 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 
 								<div class={/* @once */ dialog.actions()}>
 									<button onClick={closeModal} class={/* @once */ button({ color: 'primary' })}>
-										Ok
+										Dismiss
 									</button>
 								</div>
 							</>

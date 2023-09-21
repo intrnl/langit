@@ -14,8 +14,8 @@ dependencies:
     specifier: ^1.5.3
     version: 1.5.3
   '@intrnl/bluesky-client':
-    specifier: ^0.2.2
-    version: 0.2.2
+    specifier: ^0.2.3
+    version: 0.2.3
   '@intrnl/sq':
     specifier: ^0.2.1
     version: 0.2.1(solid-js@1.7.12)
@@ -91,8 +91,8 @@ devDependencies:
     specifier: ^20.6.2
     version: 20.6.2
   autoprefixer:
-    specifier: ^10.4.15
-    version: 10.4.15(postcss@8.4.30)
+    specifier: ^10.4.16
+    version: 10.4.16(postcss@8.4.30)
   glob-to-regexp:
     specifier: ^0.4.1
     version: 0.4.1
@@ -109,14 +109,14 @@ devDependencies:
     specifier: ^3.3.3
     version: 3.3.3
   terser:
-    specifier: ^5.19.4
-    version: 5.19.4
+    specifier: ^5.20.0
+    version: 5.20.0
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
   vite:
     specifier: ^4.4.9
-    version: 4.4.9(@types/node@20.6.2)(terser@5.19.4)
+    version: 4.4.9(@types/node@20.6.2)(terser@5.20.0)
   vite-plugin-pwa:
     specifier: ^0.16.5
     version: 0.16.5(vite@4.4.9)
@@ -1578,8 +1578,8 @@ packages:
     resolution: {integrity: sha512-qprfWkn82Iw821mcKofJ5Pk9wgioHicxcQMxx+5zt5GSKoqdWvgG5AxVmpmUUjzTLPVSH5auBrhI93Deayn/DA==}
     dev: false
 
-  /@intrnl/bluesky-client@0.2.2:
-    resolution: {integrity: sha512-ULjOaHy1nkmsYg7B/6/02bRLUPDu3nznYhQTmqQbQfYhq5OkNVLLzPN15G9rnh24vWd68DeJTGCfmFbqcDKwfQ==}
+  /@intrnl/bluesky-client@0.2.3:
+    resolution: {integrity: sha512-2i8RIuzZ/+Jva2TmUbmw+gl0P51cpqH879jtgEa9Vn+g3rA1ZucKja2x4b4mI4dZFFS45R0Ty9e4T0EwWAMBiQ==}
     dev: false
 
   /@intrnl/sq@0.2.1(solid-js@1.7.12):
@@ -2084,15 +2084,15 @@ packages:
     engines: {node: '>= 4.0.0'}
     dev: true
 
-  /autoprefixer@10.4.15(postcss@8.4.30):
-    resolution: {integrity: sha512-KCuPB8ZCIqFdA4HwKXsvz7j6gvSDNhDP7WnUjBleRkKjPdvCmHFuQ77ocavI8FT6NdvlBnE2UFr2H4Mycn8Vew==}
+  /autoprefixer@10.4.16(postcss@8.4.30):
+    resolution: {integrity: sha512-7vd3UC6xKp0HLfua5IjZlcXvGAGy7cBAXTg2lyQ/8WpNhd6SiZ8Be+xm3FyBSYJx5GKcpRCzBh7RH4/0dnY+uQ==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.10
-      caniuse-lite: 1.0.30001535
+      caniuse-lite: 1.0.30001538
       fraction.js: 4.3.6
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -2226,6 +2226,10 @@ packages:
 
   /caniuse-lite@1.0.30001535:
     resolution: {integrity: sha512-48jLyUkiWFfhm/afF7cQPqPjaUmSraEhK4j+FCTJpgnGGEZHqyLe3hmWH7lIooZdSzXL0ReMvHz0vKDoTBsrwg==}
+    dev: true
+
+  /caniuse-lite@1.0.30001538:
+    resolution: {integrity: sha512-HWJnhnID+0YMtGlzcp3T9drmBJUVDchPJ08tpUGFLs9CYlwWPH2uLgpHn8fND5pCgXVtnGS3H4QR9XLMHVNkHw==}
     dev: true
 
   /case-anything@2.1.13:
@@ -3617,7 +3621,7 @@ packages:
       jest-worker: 26.6.2
       rollup: 2.79.1
       serialize-javascript: 4.0.0
-      terser: 5.19.4
+      terser: 5.20.0
     dev: true
 
   /rollup@2.79.1:
@@ -3891,8 +3895,8 @@ packages:
       unique-string: 2.0.0
     dev: true
 
-  /terser@5.19.4:
-    resolution: {integrity: sha512-6p1DjHeuluwxDXcuT9VR8p64klWJKo1ILiy19s6C9+0Bh2+NWTX6nD9EPppiER4ICkHDVB1RkVpin/YW2nQn/g==}
+  /terser@5.20.0:
+    resolution: {integrity: sha512-e56ETryaQDyebBwJIWYB2TT6f2EZ0fL0sW/JRXNMN26zZdKi2u/E/5my5lG6jNxym6qsrVXfFRmOdV42zlAgLQ==}
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
@@ -4083,7 +4087,7 @@ packages:
       debug: 4.3.4
       fast-glob: 3.3.1
       pretty-bytes: 6.1.1
-      vite: 4.4.9(@types/node@20.6.2)(terser@5.19.4)
+      vite: 4.4.9(@types/node@20.6.2)(terser@5.20.0)
       workbox-build: 7.0.0
       workbox-window: 7.0.0
     transitivePeerDependencies:
@@ -4104,13 +4108,13 @@ packages:
       merge-anything: 5.1.7
       solid-js: 1.7.12
       solid-refresh: 0.5.3(solid-js@1.7.12)
-      vite: 4.4.9(@types/node@20.6.2)(terser@5.19.4)
+      vite: 4.4.9(@types/node@20.6.2)(terser@5.20.0)
       vitefu: 0.2.4(vite@4.4.9)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite@4.4.9(@types/node@20.6.2)(terser@5.19.4):
+  /vite@4.4.9(@types/node@20.6.2)(terser@5.20.0):
     resolution: {integrity: sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -4142,7 +4146,7 @@ packages:
       esbuild: 0.18.20
       postcss: 8.4.30
       rollup: 3.29.2
-      terser: 5.19.4
+      terser: 5.20.0
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
@@ -4155,7 +4159,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.4.9(@types/node@20.6.2)(terser@5.19.4)
+      vite: 4.4.9(@types/node@20.6.2)(terser@5.20.0)
     dev: true
 
   /w3c-keyname@2.2.8:

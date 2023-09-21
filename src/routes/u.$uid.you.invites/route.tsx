@@ -92,6 +92,7 @@ const AuthenticatedInviteCodesPage = () => {
 
 												<div class="-mr-2 flex gap-2">
 													<button
+														title="View invited users"
 														onClick={() => {
 															openModal(() => <InvitedUsersDialog uid={uid()} invite={invite} />);
 														}}
@@ -101,6 +102,7 @@ const AuthenticatedInviteCodesPage = () => {
 													</button>
 
 													<button
+														title="Copy invite code"
 														onClick={() => navigator.clipboard.writeText(invite.code)}
 														class="flex h-9 w-9 items-center justify-center rounded-full text-xl hover:bg-secondary"
 													>

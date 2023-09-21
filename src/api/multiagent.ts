@@ -1,7 +1,13 @@
 import { batch } from 'solid-js';
 
-import { Agent, type AtpLoginOptions, type AtpSessionData } from '@intrnl/bluesky-client/agent';
+import {
+	Agent,
+	type AtpAccessJwt,
+	type AtpLoginOptions,
+	type AtpSessionData,
+} from '@intrnl/bluesky-client/agent';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import { decodeJwt } from '@intrnl/bluesky-client/jwt';
 
 import { createReactiveLocalStorage } from './storage.ts';
 
@@ -27,6 +33,7 @@ export interface MultiagentAccountData {
 	did: DID;
 	service: string;
 	session: AtpSessionData;
+	isAppPassword?: boolean;
 	profile?: MultiagentProfileData;
 }
 
@@ -81,6 +88,8 @@ export class Multiagent {
 			const session = agent.session!;
 			const did = session.did;
 
+			const sessionJwt = decodeJwt(session.accessJwt) as AtpAccessJwt;
+
 			batch(() => {
 				const $store = this.store;
 				const $accounts = $store.accounts!;
@@ -90,6 +99,7 @@ export class Multiagent {
 					did: did,
 					service: service,
 					session: session,
+					isAppPassword: sessionJwt.scope === 'com.atproto.appPass',
 				};
 			});
 

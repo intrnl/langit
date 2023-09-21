@@ -19,6 +19,7 @@ import FilterAltIcon from '~/icons/baseline-filter-alt.tsx';
 import LanguageIcon from '~/icons/baseline-language.tsx';
 import ListIcon from '~/icons/baseline-list.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+import PasswordIcon from '~/icons/baseline-password.tsx';
 import PersonOffIcon from '~/icons/baseline-person-off.tsx';
 import RepeatIcon from '~/icons/baseline-repeat.tsx';
 import VisibilityIcon from '~/icons/baseline-visibility.tsx';
@@ -143,6 +144,15 @@ const AuthenticatedYouPage = () => {
 				>
 					<ConfirmationNumberIcon class="text-xl" />
 					<span>Invite codes</span>
+				</a>
+
+				<a
+					link
+					href={generatePath('/u/:uid/you/app-passwords', params)}
+					class="flex items-center gap-4 px-4 py-3 text-sm hover:bg-hinted"
+				>
+					<PasswordIcon class="text-xl" />
+					<span>App passwords</span>
 				</a>
 			</Show>
 

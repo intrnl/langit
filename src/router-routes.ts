@@ -119,6 +119,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.settings.languages/route.tsx")),
       },
       {
+        path: "you/app-passwords",
+        component: lazy(() => import("./routes/u.$uid.you.app-passwords/route.tsx")),
+      },
+      {
         path: "settings/profile",
         component: lazy(() => import("./routes/u.$uid.settings.profile/route.tsx")),
       },

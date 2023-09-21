@@ -1,3 +1,5 @@
+import type { JSX } from 'solid-js/jsx-runtime';
+
 import { closeModal } from '~/globals/modals.tsx';
 
 import button from '~/styles/primitives/button.ts';
@@ -5,7 +7,7 @@ import * as dialog from '~/styles/primitives/dialog.ts';
 
 export interface ConfirmDialogProps {
 	title: string;
-	body: string;
+	body: JSX.Element;
 	confirmation: string;
 	onConfirm: () => void;
 }

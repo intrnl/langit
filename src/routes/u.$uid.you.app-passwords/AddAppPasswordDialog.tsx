@@ -55,7 +55,7 @@ const AddAppPasswordDialog = (props: AddAppPasswordDialogProps) => {
 			return;
 		}
 
-		setState(FormState.IDLE);
+		setState(FormState.LOADING);
 		setError('');
 
 		let data: CreatedAppPassword | undefined;

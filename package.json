@@ -51,6 +51,10 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"@solidjs/router@0.8.3": "patches/@solidjs__router@0.8.3.patch"
+		},
+		"overrides": {
+			"has": "npm:@nolyfill/has@latest",
+			"string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@latest"
 		}
 	}
 }

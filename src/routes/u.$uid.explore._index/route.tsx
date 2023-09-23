@@ -25,7 +25,7 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 import RefreshIcon from '~/icons/baseline-refresh.tsx';
 import SettingsIcon from '~/icons/baseline-settings.tsx';
 
-const MAX_POSTS = 5;
+const MAX_POSTS = 6;
 
 const AuthenticatedExplorePage = () => {
 	const params = useParams('/u/:uid/explore');

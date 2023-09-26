@@ -153,22 +153,21 @@ export const lexical2rt = (state: EditorState) => {
 			});
 		} else if (type === 'autolink') {
 			const $node = node as AutoLinkNode;
-			const sibling = node.getNextSibling();
 
 			let content = $node.getTextContent();
 			let url = $node.getURL();
 
-			if (sibling && sibling.getType() === 'autolink') {
-				const $sibling = sibling as AutoLinkNode;
+			let sibling = node.getNextSibling();
 
+			while (sibling && sibling.getType() === 'autolink' && !content.includes('/')) {
+				const $sibling = sibling as AutoLinkNode;
 				const siblingContent = $sibling.getTextContent();
 
-				if (!content.includes('/')) {
-					content += siblingContent;
-					url += siblingContent;
+				content += siblingContent;
+				url += siblingContent;
 
-					ignored.add(sibling);
-				}
+				ignored.add(sibling);
+				sibling = sibling.getNextSibling();
 			}
 
 			const start = length;

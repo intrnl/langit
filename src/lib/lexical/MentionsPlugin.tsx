@@ -8,7 +8,11 @@ import { useFloating } from 'solid-floating-ui';
 import { $createTextNode, TextNode } from 'lexical';
 
 import { useLexicalComposerContext } from 'lexical-solid/LexicalComposerContext';
-import { type QueryMatch, LexicalTypeaheadMenuPlugin, MenuOption } from 'lexical-solid/LexicalTypeaheadMenuPlugin';
+import {
+	type QueryMatch,
+	LexicalTypeaheadMenuPlugin,
+	MenuOption,
+} from 'lexical-solid/LexicalTypeaheadMenuPlugin';
 
 import { multiagent } from '~/globals/agent.ts';
 import { useDebouncedValue } from '~/utils/hooks.ts';
@@ -18,7 +22,6 @@ import { $createMentionNode } from './MentionNode.ts';
 const MENTION_SUGGESTIONS_LIMIT = 6;
 
 const MENTION_RE = /(^|\s|\()(@[a-zA-Z0-9.-]+)$/;
-const MIN_MATCH_LENGTH = 1;
 
 const getPossibleQueryMatch = (text: string): QueryMatch | null => {
 	const match = MENTION_RE.exec(text);
@@ -29,13 +32,11 @@ const getPossibleQueryMatch = (text: string): QueryMatch | null => {
 		const maybeLeadingWhitespace = match[1];
 		const matchingString = match[2];
 
-		if (matchingString != null && matchingString.length >= MIN_MATCH_LENGTH) {
-			return {
-				leadOffset: match.index + maybeLeadingWhitespace.length,
-				matchingString,
-				replaceableString: matchingString,
-			};
-		}
+		return {
+			leadOffset: match.index + maybeLeadingWhitespace.length,
+			matchingString,
+			replaceableString: matchingString,
+		};
 	}
 
 	return null;

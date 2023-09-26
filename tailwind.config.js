@@ -74,7 +74,7 @@ export default {
 	corePlugins: {
 		outlineStyle: false,
 	},
-	darkMode: ['class', 'is-dark'],
+	darkMode: ['class', '.is-dark'],
 	plugins: [
 		plugin(({ addVariant, addUtilities }) => {
 			addVariant('modal', '&:modal');

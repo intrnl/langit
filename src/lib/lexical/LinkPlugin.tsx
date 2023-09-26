@@ -12,13 +12,11 @@ const LinkPlugin = () => {
 				if (match) {
 					const idx = match.index;
 
-					let uri = match[0];
-
 					if (idx > 0 && text[idx - 1] === '@') {
 						return null;
 					}
 
-					uri = uri.replace(TRAILING_RE, '');
+					const uri = match[0].replace(TRAILING_RE, '');
 
 					return {
 						index: idx,

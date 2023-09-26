@@ -9,28 +9,22 @@
 	},
 	"dependencies": {
 		"@floating-ui/dom": "^1.5.3",
+		"@intrnl/bloom-filter": "^0.1.2",
 		"@intrnl/bluesky-client": "^0.2.3",
 		"@intrnl/sq": "^0.2.1",
 		"@intrnl/use-gesture-solid": "^0.1.0",
+		"@lexical/link": "^0.11.3",
+		"@lexical/utils": "~0.11.0",
 		"@solid-primitives/deep": "^0.2.3",
 		"@solidjs/meta": "^0.28.6",
 		"@solidjs/router": "^0.8.3",
 		"@thisbeyond/solid-dnd": "^0.7.4",
-		"@tiptap/core": "^2.1.10",
-		"@tiptap/extension-document": "^2.1.10",
-		"@tiptap/extension-hard-break": "^2.1.10",
-		"@tiptap/extension-history": "^2.1.10",
-		"@tiptap/extension-link": "^2.1.10",
-		"@tiptap/extension-mention": "^2.1.10",
-		"@tiptap/extension-paragraph": "^2.1.10",
-		"@tiptap/extension-placeholder": "^2.1.10",
-		"@tiptap/extension-text": "^2.1.10",
-		"@tiptap/pm": "^2.1.10",
-		"@tiptap/suggestion": "^2.1.10",
 		"class-variance-authority": "^0.7.0",
 		"immer": "^10.0.2",
-		"solid-js": "^1.7.12",
-		"solid-tiptap": "^0.6.0"
+		"lexical": "^0.11.3",
+		"lexical-solid": "^0.6.3",
+		"solid-floating-ui": "^0.2.1",
+		"solid-js": "^1.7.12"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20230914.0",
@@ -50,7 +44,8 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
-			"@solidjs/router@0.8.3": "patches/@solidjs__router@0.8.3.patch"
+			"@solidjs/router@0.8.3": "patches/@solidjs__router@0.8.3.patch",
+			"lexical-solid@0.6.3": "patches/lexical-solid@0.6.3.patch"
 		},
 		"overrides": {
 			"has": "npm:@nolyfill/has@latest",

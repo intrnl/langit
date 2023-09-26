@@ -1,30 +1,19 @@
-import { type Accessor, For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
-import { render } from 'solid-js/web';
+import { For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
 
 import type { AtBlob, DID, Records, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Title } from '@solidjs/meta';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
-import { Extension } from '@tiptap/core';
-import { History } from '@tiptap/extension-history';
+import { AutoLinkNode } from '@lexical/link';
 
-import { Document } from '@tiptap/extension-document';
-import { Link } from '@tiptap/extension-link';
-import { Mention, type MentionOptions } from '@tiptap/extension-mention';
-import { Paragraph } from '@tiptap/extension-paragraph';
-import { Placeholder } from '@tiptap/extension-placeholder';
-import { Text } from '@tiptap/extension-text';
+import { LexicalComposer } from 'lexical-solid/LexicalComposer';
+import { PlainTextPlugin } from 'lexical-solid/LexicalPlainTextPlugin';
+import { ContentEditable } from 'lexical-solid/LexicalContentEditable';
+import { LexicalErrorBoundary } from 'lexical-solid/LexicalErrorBoundary';
 
-import {
-	type ComputePositionConfig,
-	type ComputePositionReturn,
-	computePosition,
-	size,
-} from '@floating-ui/dom';
-import { createTiptapEditor } from 'solid-tiptap';
-
-import { getCurrentDate, getRecordId } from '~/api/utils.ts';
+import { HistoryPlugin } from 'lexical-solid/LexicalHistoryPlugin';
+import { OnChangePlugin } from 'lexical-solid/LexicalOnChangePlugin';
 
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
@@ -37,18 +26,23 @@ import { getLinkMeta, getLinkMetaKey } from '~/api/queries/get-link-meta';
 import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { multiagent } from '~/globals/agent.ts';
+import { getCurrentDate, getRecordId } from '~/api/utils.ts';
+
+import { MentionNode } from '~/lib/lexical/MentionNode.ts';
+import LinkPlugin from '~/lib/lexical/LinkPlugin.tsx';
+import MentionsPlugin from '~/lib/lexical/MentionsPlugin.tsx';
+import ShortcutsPlugin from '~/lib/lexical/ShortcutsPlugin.tsx';
+import { lexical2rt } from '~/lib/lexical/lexical2rt.ts';
+
 import { openModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
 import { preferences } from '~/globals/preferences.ts';
 import { useNavigate, useParams } from '~/router.ts';
 
-import { pm2rt } from '~/utils/composer/pm2rt.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
 import { compressPostImage } from '~/utils/image.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
-import { Locker } from '~/utils/lock.ts';
 import { signal } from '~/utils/signals.ts';
 
 import BlobImage from '~/components/BlobImage.tsx';
@@ -72,14 +66,13 @@ import ComposeLanguageMenu from './ComposeLanguageMenu.tsx';
 import ImageAltEditDialog from './ImageAltEditDialog.tsx';
 import ImageUploadCompressDialog from './ImageUploadCompressDialog.tsx';
 
-import './compose.css';
+import './lexical-compose.css';
 
 type PostRecord = Records['app.bsky.feed.post'];
 type StrongRef = RefOf<'com.atproto.repo.strongRef'>;
 
 type PostRecordEmbed = UnionOf<'app.bsky.embed.record'>;
 
-const MENTION_SUGGESTION_LIMIT = 6;
 const GRAPHEME_LIMIT = 300;
 const MAX_IMAGE = 4;
 
@@ -103,7 +96,6 @@ const getLanguages = (uid: DID): string[] => {
 };
 
 const AuthenticatedComposePage = () => {
-	let editorRef: HTMLDivElement | undefined;
 	let fileInputRef: HTMLInputElement | undefined;
 
 	const navigate = useNavigate();
@@ -126,7 +118,7 @@ const AuthenticatedComposePage = () => {
 
 	const [message, setMessage] = createSignal<string>();
 	const [state, setState] = createSignal(PostState.IDLE);
-	const [richtext, setRichtext] = createSignal<ReturnType<typeof pm2rt>>();
+	const [richtext, setRichtext] = createSignal<ReturnType<typeof lexical2rt>>();
 
 	const links = createMemo(() => richtext()?.links, undefined, {
 		equals: (a, b) => {
@@ -451,77 +443,9 @@ const AuthenticatedComposePage = () => {
 		const files = Array.from(target.files!);
 
 		target.value = '';
-		editor()!.view.focus();
 
 		addImages(files);
 	};
-
-	const editor = createTiptapEditor(() => ({
-		element: editorRef!,
-		autofocus: true,
-		extensions: [
-			Document,
-			Paragraph,
-			Text,
-
-			History,
-
-			Placeholder.configure({
-				placeholder: "What's happening?",
-			}),
-
-			Link.configure({
-				protocols: ['http', 'https'],
-				autolink: true,
-				openOnClick: false,
-				linkOnPaste: false,
-			}),
-			Mention.configure({
-				suggestion: createMentionSuggestion(uid),
-			}),
-
-			Extension.create({
-				addKeyboardShortcuts() {
-					const submit = () => {
-						handleSubmit();
-						return true;
-					};
-
-					return {
-						'Ctrl-Enter': submit,
-						'Cmd-Enter': submit,
-					};
-				},
-			}),
-		],
-		editorProps: {
-			handlePaste(_view, event) {
-				const items = event.clipboardData?.items;
-
-				if (!items) {
-					return;
-				}
-
-				for (let idx = 0, len = items.length; idx < len; idx++) {
-					const item = items[idx];
-					const kind = item.kind;
-
-					if (kind === 'file') {
-						const blob = item.getAsFile();
-
-						if (blob) {
-							addImages([blob]);
-						}
-					}
-				}
-			},
-		},
-		onUpdate({ editor }) {
-			const json = editor.getJSON();
-			const rt = pm2rt(json);
-			setRichtext(rt);
-		},
-	}));
 
 	useBeforeLeave((ev) => {
 		if (state() < PostState.SENT && (length() > 0 || images().length > 0)) {
@@ -570,7 +494,41 @@ const AuthenticatedComposePage = () => {
 				</div>
 
 				<div class="min-w-0 grow">
-					<div ref={editorRef} class="compose-editor" />
+					<LexicalComposer
+						initialConfig={{
+							namespace: 'lexical',
+							onError(error, _editor) {
+								throw error;
+							},
+							nodes: [MentionNode, AutoLinkNode],
+							theme: {
+								ltr: 'lexical-ltr',
+								rtl: 'lexical-rtl',
+								paragraph: 'lexical-paragraph',
+								link: 'lexical-link',
+							},
+						}}
+					>
+						<div class="lexical-container">
+							<PlainTextPlugin
+								errorBoundary={LexicalErrorBoundary}
+								contentEditable={<ContentEditable class="lexical-content" />}
+								placeholder={<div class="lexical-placeholder">What's happening?</div>}
+							/>
+
+							<HistoryPlugin />
+							<OnChangePlugin
+								onChange={(state) => {
+									const rt = lexical2rt(state);
+									setRichtext(rt);
+								}}
+							/>
+
+							<MentionsPlugin uid={uid()} />
+							<LinkPlugin />
+							<ShortcutsPlugin onSubmit={handleSubmit} onImageDrop={addImages} />
+						</div>
+					</LexicalComposer>
 
 					<div class="pb-4 pr-3 empty:hidden">
 						<Show when={message()}>
@@ -672,7 +630,7 @@ const AuthenticatedComposePage = () => {
 														setLabels([]);
 													}
 												}}
-												class="absolute right-0 top-0 m-1 flex h-7 w-7 items-center justify-center rounded-full bg-black text-base hover:bg-secondary"
+												class="absolute right-0 top-0 m-1 flex h-7 w-7 items-center justify-center rounded-full bg-black text-base text-white hover:bg-secondary"
 											>
 												<CloseIcon />
 											</button>
@@ -682,7 +640,7 @@ const AuthenticatedComposePage = () => {
 												onClick={() => {
 													openModal(() => <ImageAltEditDialog image={image} />);
 												}}
-												class="absolute bottom-0 left-0 m-1 flex h-5 items-center rounded bg-black/70 px-1 text-xs font-medium"
+												class="absolute bottom-0 left-0 m-1 flex h-5 items-center rounded bg-black/70 px-1 text-xs font-medium text-white"
 											>
 												<span>ALT</span>
 												{image.alt.value && <CheckIcon class="ml-1" />}
@@ -857,178 +815,3 @@ const AuthenticatedComposePage = () => {
 };
 
 export default AuthenticatedComposePage;
-
-// Mentions
-const createMentionSuggestion = (uid: Accessor<DID>): MentionOptions['suggestion'] => {
-	const lock = new Locker<void>(undefined);
-
-	let current = '';
-	let suggestions: RefOf<'app.bsky.actor.defs#profileViewBasic'>[] = [];
-
-	return {
-		char: '@',
-		async items({ query }) {
-			current = query;
-
-			const handle = await lock.acquire();
-			const agent = await multiagent.connect(uid());
-
-			try {
-				if (current !== query) {
-					// Return because another search query has been set
-					return suggestions;
-				}
-
-				const response = await agent.rpc.get('app.bsky.actor.searchActorsTypeahead', {
-					params: {
-						term: query,
-						limit: MENTION_SUGGESTION_LIMIT,
-					},
-				});
-
-				return (suggestions = response.data.actors);
-			} finally {
-				handle.release();
-			}
-		},
-		render() {
-			let destroy: (() => void) | undefined;
-			let onKeyDownRef: ((ev: KeyboardEvent) => boolean) | undefined;
-			let popper: HTMLDivElement | undefined;
-
-			const [items, setItems] = createSignal<RefOf<'app.bsky.actor.defs#profileViewBasic'>[]>([]);
-
-			const floatOptions: Partial<ComputePositionConfig> = {
-				strategy: 'fixed',
-				placement: 'bottom-start',
-				middleware: [
-					size({
-						padding: 12,
-						apply({ availableWidth, availableHeight, elements }) {
-							Object.assign(elements.floating.style, {
-								maxWidth: `${availableWidth}px`,
-								maxHeight: `${availableHeight}px`,
-							});
-						},
-					}),
-				],
-			};
-
-			const applyFloat = ({ x, y }: ComputePositionReturn) => {
-				Object.assign(popper!.style, {
-					left: `${x}px`,
-					top: `${y}px`,
-				});
-			};
-
-			return {
-				onKeyDown(props) {
-					if (onKeyDownRef) {
-						return onKeyDownRef(props.event);
-					}
-
-					return false;
-				},
-				onExit() {
-					if (destroy) {
-						destroy();
-						popper!.remove();
-
-						popper = undefined;
-						onKeyDownRef = undefined;
-						destroy = undefined;
-					}
-				},
-				onUpdate(props) {
-					const getBoundingClientRect = props.clientRect as (() => DOMRect) | null;
-
-					setItems(props.items);
-
-					if (popper && getBoundingClientRect) {
-						computePosition({ getBoundingClientRect }, popper, floatOptions).then(applyFloat);
-					}
-				},
-				onStart(props) {
-					const command = props.command;
-					const getBoundingClientRect = props.clientRect as (() => DOMRect) | null;
-
-					setItems(props.items);
-
-					popper = document.createElement('div');
-					popper.className = 'fixed';
-					document.body.append(popper);
-
-					destroy = render(() => {
-						const [selected, setSelected] = createSignal(0);
-
-						const handleSelected = (idx: number) => {
-							const arr = items();
-							const item = arr[idx];
-
-							if (item) {
-								command({ label: item.handle, id: item.did });
-							}
-						};
-
-						onKeyDownRef = (ev) => {
-							const idx = selected();
-
-							const arr = items();
-							const len = arr.length;
-
-							if (ev.key === 'ArrowUp') {
-								setSelected((idx + len - 1) % len);
-								return true;
-							}
-
-							if (ev.key === 'ArrowDown') {
-								setSelected((idx + 1) % len);
-								return true;
-							}
-
-							if (ev.key === 'Enter') {
-								handleSelected(idx);
-								return true;
-							}
-
-							return false;
-						};
-
-						return (
-							<ul class="overflow-hidden rounded-md bg-background shadow-lg">
-								<For each={items()}>
-									{(item, index) => (
-										<li
-											role="option"
-											tabindex={-1}
-											class="flex cursor-pointer items-center gap-4 px-4 py-3"
-											classList={{ 'bg-hinted': selected() === index() }}
-											onMouseEnter={() => setSelected(index())}
-											onClick={() => handleSelected(index())}
-										>
-											<div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-												<Show when={item.avatar} keyed>
-													{(avatar) => <img src={avatar} class="h-full w-full" />}
-												</Show>
-											</div>
-
-											<div class="flex grow flex-col text-sm">
-												<span class="line-clamp-1 break-all font-bold">{item.displayName}</span>
-
-												<span class="line-clamp-1 shrink-0 break-all text-muted-fg">@{item.handle}</span>
-											</div>
-										</li>
-									)}
-								</For>
-							</ul>
-						);
-					}, popper);
-
-					if (getBoundingClientRect) {
-						computePosition({ getBoundingClientRect }, popper, floatOptions).then(applyFloat);
-					}
-				},
-			};
-		},
-	};
-};

@@ -2,7 +2,7 @@
 
 > la‧ngit - **sky**
 
-Alternative client for Bluesky, designed primarily for mobile. Currently work-in-progress.
+Opinionated web client for Bluesky.
 
 Only latest versions of Chrome and Firefox is supported, Safari is not supported due to lack of Apple hardware.
 

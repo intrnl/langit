@@ -162,11 +162,10 @@ export const lexical2rt = (state: EditorState) => {
 				const $sibling = sibling as AutoLinkNode;
 
 				const siblingContent = $sibling.getTextContent();
-				const siblingUrl = $sibling.getURL();
 
 				if (!content.includes('/')) {
 					content += siblingContent;
-					url += siblingUrl.replace(/^[a-z]+:\/\//g, '');
+					url += siblingContent;
 
 					ignored.add(sibling);
 				}

@@ -74,10 +74,10 @@ export default {
 	corePlugins: {
 		outlineStyle: false,
 	},
+	darkMode: ['class', 'is-dark'],
 	plugins: [
 		plugin(({ addVariant, addUtilities }) => {
 			addVariant('modal', '&:modal');
-			addVariant('dark', '.is-dark &');
 
 			addUtilities({
 				'.scrollbar-hide': {

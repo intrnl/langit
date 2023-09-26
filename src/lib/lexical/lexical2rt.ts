@@ -10,8 +10,9 @@ import {
 import type { AutoLinkNode } from '@lexical/link';
 import type { HashtagNode } from '@lexical/hashtag';
 
-import type { Facet } from '~/api/richtext/types.ts';
 import { graphemeLen } from '~/api/richtext/intl.ts';
+import { toShortUrl } from '~/api/richtext/renderer.ts';
+import type { Facet } from '~/api/richtext/types.ts';
 
 import type { MentionNode } from './MentionNode.ts';
 
@@ -154,21 +155,8 @@ export const lexical2rt = (state: EditorState) => {
 		} else if (type === 'autolink') {
 			const $node = node as AutoLinkNode;
 
-			let content = $node.getTextContent();
-			let url = $node.getURL();
-
-			let sibling = node.getNextSibling();
-
-			while (sibling && sibling.getType() === 'autolink' && !content.includes('/')) {
-				const $sibling = sibling as AutoLinkNode;
-				const siblingContent = $sibling.getTextContent();
-
-				content += siblingContent;
-				url += siblingContent;
-
-				ignored.add(sibling);
-				sibling = sibling.getNextSibling();
-			}
+			const url = $node.getURL();
+			const content = toShortUrl(url);
 
 			const start = length;
 

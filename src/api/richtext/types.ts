@@ -1,8 +1,9 @@
 import type { RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 
 export type Facet = RefOf<'app.bsky.richtext.facet'>;
-export type LinkFacet = UnionOf<'app.bsky.richtext.facet#link'>;
-export type MentionFacet = UnionOf<'app.bsky.richtext.facet#mention'>;
+export type LinkFeature = UnionOf<'app.bsky.richtext.facet#link'>;
+export type MentionFeature = UnionOf<'app.bsky.richtext.facet#mention'>;
+export type TagFeature = UnionOf<'app.bsky.richtext.facet#tag'>;
 
 /** This is a non-standard facet so that we don't mix up MentionFacet for unresolved handles */
 export interface UnresolvedMentionFacet {
@@ -12,6 +13,7 @@ export interface UnresolvedMentionFacet {
 
 export interface RichTextSegment {
 	text: string;
-	link?: LinkFacet;
-	mention?: MentionFacet;
+	link?: LinkFeature;
+	mention?: MentionFeature;
+	tag?: TagFeature;
 }

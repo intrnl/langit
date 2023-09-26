@@ -12,6 +12,7 @@
 }
 
 .lexical-link,
-.lexical-mention {
+.lexical-mention,
+.lexical-hashtag {
 	@apply text-accent;
 }

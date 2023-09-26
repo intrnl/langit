@@ -16,12 +16,23 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 
 		const mention = segment.mention;
 		const link = segment.link;
+		const tag = segment.tag;
 
 		if (mention) {
 			const did = mention.did;
 			const anchor = document.createElement('a');
 
 			anchor.href = `/u/${uid}/profile/${did}`;
+			anchor.className = 'text-accent hover:underline';
+			anchor.textContent = segment.text;
+			anchor.toggleAttribute('link', true);
+
+			div.appendChild(anchor);
+		} else if (tag) {
+			const hashtag = tag.tag;
+			const anchor = document.createElement('a');
+
+			anchor.href = `/u/${uid}/explore/search?t=post&q=${encodeURIComponent(hashtag)}`;
 			anchor.className = 'text-accent hover:underline';
 			anchor.textContent = segment.text;
 			anchor.toggleAttribute('link', true);

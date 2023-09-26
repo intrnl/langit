@@ -8,6 +8,7 @@ import {
 } from 'lexical';
 
 import type { AutoLinkNode } from '@lexical/link';
+import type { HashtagNode } from '@lexical/hashtag';
 
 import type { Facet } from '~/api/richtext/types.ts';
 import { graphemeLen } from '~/api/richtext/intl.ts';
@@ -49,9 +50,7 @@ export const lexical2rt = (state: EditorState) => {
 				const child = children[idx];
 				delve(child);
 			}
-
 		} else if (type === 'linebreak') {
-
 			if (!leading) {
 				text += '\n';
 				length += 1;
@@ -113,6 +112,36 @@ export const lexical2rt = (state: EditorState) => {
 					{
 						$type: 'app.bsky.richtext.facet#mention',
 						did: did,
+					},
+				],
+			});
+		} else if (type === 'hashtag') {
+			const $node = node as HashtagNode;
+
+			const content = $node.getTextContent();
+
+			const start = length;
+
+			text += content;
+
+			if (isAscii(content)) {
+				length += content.length;
+			} else {
+				length += encoder.encode(content).byteLength;
+				ascii = false;
+			}
+
+			leading = false;
+
+			facets.push({
+				index: {
+					byteStart: start,
+					byteEnd: length,
+				},
+				features: [
+					{
+						$type: 'app.bsky.richtext.facet#tag',
+						tag: content.slice(1),
 					},
 				],
 			});

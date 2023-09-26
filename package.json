@@ -10,7 +10,7 @@
 	"dependencies": {
 		"@floating-ui/dom": "^1.5.3",
 		"@intrnl/bloom-filter": "^0.1.2",
-		"@intrnl/bluesky-client": "^0.2.3",
+		"@intrnl/bluesky-client": "^0.2.4",
 		"@intrnl/sq": "^0.2.1",
 		"@intrnl/use-gesture-solid": "^0.1.0",
 		"@lexical/link": "^0.11.3",

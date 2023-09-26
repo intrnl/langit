@@ -22,7 +22,7 @@ export const searchProfiles: QueryFn<
 
 	const response = await agent.rpc.get('app.bsky.actor.searchActors', {
 		params: {
-			term: query,
+			q: query,
 			limit: limit,
 			cursor: param,
 		},

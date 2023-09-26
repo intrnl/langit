@@ -6,7 +6,7 @@ import { useLexicalTextEntity } from 'lexical-solid/useLexicalTextEntity';
 import type { TextNode } from 'lexical';
 import { $createHashtagNode, HashtagNode } from '@lexical/hashtag';
 
-const HASHTAG_RE = /(?:^|\s)(#[^\d\s]\S*)(?=\s)?/;
+const HASHTAG_RE = /(?:^|\s)(#[^\d\s#][^\s#]*)(?=\s)?/;
 const LEADING_WHITESPACE_RE = /^\s/;
 const PUNCTUATION_RE = /\p{P}+$/gu;
 

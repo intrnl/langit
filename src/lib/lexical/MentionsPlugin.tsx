@@ -72,7 +72,7 @@ const MentionsPlugin = (props: MentionsPluginProps) => {
 
 			const response = await agent.rpc.get('app.bsky.actor.searchActorsTypeahead', {
 				params: {
-					q: $query,
+					term: $query,
 					limit: MENTION_SUGGESTIONS_LIMIT,
 				},
 			});

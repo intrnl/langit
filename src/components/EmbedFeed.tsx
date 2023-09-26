@@ -5,6 +5,7 @@ import type { DID, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 import { getRecordId } from '~/api/utils.ts';
 
 import { generatePath } from '~/router.ts';
+import * as comformat from '~/utils/intl/comformatter.ts';
 
 type EmbeddedGeneratorRecord = UnionOf<'app.bsky.feed.defs#generatorView'>;
 
@@ -38,7 +39,7 @@ const EmbedFeed = (props: EmbedFeedProps) => {
 				</div>
 			</div>
 
-			<p class="text-muted-fg">Liked by {feed().likeCount || 0} users</p>
+			<p class="text-muted-fg">Liked by {comformat.format(feed().likeCount || 0)} users</p>
 		</a>
 	);
 };

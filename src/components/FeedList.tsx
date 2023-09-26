@@ -9,6 +9,7 @@ import { type Collection, getCollectionCursor, getRepoId, getRecordId } from '~/
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath } from '~/router.ts';
+import * as comformat from '~/utils/intl/comformatter.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -129,7 +130,7 @@ const FeedList = (props: FeedListProps) => {
 									<div class="whitespace-pre-wrap break-words text-sm">{feed.$renderedDescription()}</div>
 								</Show>
 
-								<p class="text-muted-fg">Liked by {feed.likeCount.value} users</p>
+								<p class="text-muted-fg">Liked by {comformat.format(feed.likeCount.value)} users</p>
 							</div>
 						</VirtualContainer>
 					);

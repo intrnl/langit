@@ -22,6 +22,7 @@ import {
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
+import * as comformat from '~/utils/intl/comformatter.ts';
 
 import TimelineList from '~/components/TimelineList.tsx';
 import button from '~/styles/primitives/button.ts';
@@ -177,7 +178,7 @@ const AuthenticatedFeedPage = () => {
 									<div class="whitespace-pre-wrap break-words text-sm">{info().$renderedDescription()}</div>
 								</Show>
 
-								<p class="text-sm text-muted-fg">Liked by {info().likeCount.value} users</p>
+								<p class="text-sm text-muted-fg">Liked by {comformat.format(info().likeCount.value)} users</p>
 
 								<div class="flex gap-2">
 									<button onClick={toggleSave} class={button({ color: isSaved() ? 'outline' : 'primary' })}>

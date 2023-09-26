@@ -20,9 +20,6 @@ dependencies:
   '@floating-ui/dom':
     specifier: ^1.5.3
     version: 1.5.3
-  '@intrnl/bloom-filter':
-    specifier: ^0.1.2
-    version: 0.1.2
   '@intrnl/bluesky-client':
     specifier: ^0.2.4
     version: 0.2.4
@@ -1568,10 +1565,6 @@ packages:
 
   /@floating-ui/utils@0.1.4:
     resolution: {integrity: sha512-qprfWkn82Iw821mcKofJ5Pk9wgioHicxcQMxx+5zt5GSKoqdWvgG5AxVmpmUUjzTLPVSH5auBrhI93Deayn/DA==}
-    dev: false
-
-  /@intrnl/bloom-filter@0.1.2:
-    resolution: {integrity: sha512-a/2gc2nyxUhZSXLcNN7T1eKczWNBZmhn+Ozgf1hddfq7kP5ZMQn0xM6WVWvr9dapK9JhxAmzmU+h3tSw4eDziA==}
     dev: false
 
   /@intrnl/bluesky-client@0.2.4:

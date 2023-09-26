@@ -33,6 +33,8 @@ export const lexical2rt = (state: EditorState) => {
 	const facets: Facet[] = [];
 	const links: string[] = [];
 
+	const ignored = new WeakSet<LexicalNode>();
+
 	let text = '';
 	let length = 0;
 
@@ -40,6 +42,10 @@ export const lexical2rt = (state: EditorState) => {
 	let ascii = true;
 
 	const delve = (node: LexicalNode) => {
+		if (ignored.has(node)) {
+			return;
+		}
+
 		const type = node.getType();
 
 		if (type === 'root' || type === 'paragraph') {
@@ -147,9 +153,24 @@ export const lexical2rt = (state: EditorState) => {
 			});
 		} else if (type === 'autolink') {
 			const $node = node as AutoLinkNode;
+			const sibling = node.getNextSibling();
 
-			const content = $node.getTextContent();
-			const url = $node.getURL();
+			let content = $node.getTextContent();
+			let url = $node.getURL();
+
+			if (sibling && sibling.getType() === 'autolink') {
+				const $sibling = sibling as AutoLinkNode;
+
+				const siblingContent = $sibling.getTextContent();
+				const siblingUrl = $sibling.getURL();
+
+				if (!content.includes('/')) {
+					content += siblingContent;
+					url += siblingUrl.replace(/^[a-z]+:\/\//g, '');
+
+					ignored.add(sibling);
+				}
+			}
 
 			const start = length;
 

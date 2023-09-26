@@ -21,9 +21,10 @@ export type SerializedMentionNode = Spread<
 	SerializedTextNode
 >;
 
+const MENTION_TAG = 'span';
 const DID_ATTRIBUTE = 'data-mention-did';
 
-function convertMentionElement(domNode: HTMLElement): DOMConversionOutput | null {
+const convertMentionElement = (domNode: HTMLElement): DOMConversionOutput | null => {
 	const did = domNode.getAttribute(DID_ATTRIBUTE) as DID | null;
 	const handle = domNode.textContent;
 
@@ -35,9 +36,7 @@ function convertMentionElement(domNode: HTMLElement): DOMConversionOutput | null
 	}
 
 	return null;
-}
-
-const MENTION_TAG = 'span';
+};
 
 export class MentionNode extends TextNode {
 	__did: DID;

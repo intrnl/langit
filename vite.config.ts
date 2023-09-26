@@ -60,6 +60,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'~': path.join(__dirname, './src'),
+			yjs: path.join(__dirname, './src/lib/lexical/yjs-stub.ts'),
 		},
 	},
 });

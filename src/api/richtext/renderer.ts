@@ -31,6 +31,11 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			div.appendChild(anchor);
 		} else if (tag) {
 			const hashtag = tag.tag;
+
+			if (text !== '#' + hashtag) {
+				continue;
+			}
+
 			const anchor = document.createElement('a');
 
 			anchor.href = `/u/${uid}/explore/search?t=post&q=${encodeURIComponent(hashtag)}`;

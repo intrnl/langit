@@ -290,6 +290,31 @@ const AuthenticatedPostPage = () => {
 										onTranslate={() => setSearchParams({ tl: 'y' }, { replace: true })}
 									/>
 
+									<Show
+										when={(() => {
+											const $tags = record().tags;
+											if ($tags && $tags.length > 0) {
+												return $tags;
+											}
+										})()}
+									>
+										{(tags) => (
+											<div class="my-3 flex flex-wrap gap-2 text-sm">
+												<For each={tags()}>
+													{(tag) => (
+														<a
+															link
+															href={`/u/${uid()}/explore/search?t=post&q=${encodeURIComponent(tag)}`}
+															class="text-muted-fg hover:underline"
+														>
+															#{tag}
+														</a>
+													)}
+												</For>
+											</div>
+										)}
+									</Show>
+
 									<div class="my-3">
 										<span class="text-sm text-muted-fg">
 											{relformat.formatAbsWithTime(record().createdAt)}
@@ -537,8 +562,8 @@ const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostConten
 				</Match>
 
 				<Match when={needTranslation()}>
-					<button onClick={onTranslate} class="mt-3 text-sm text-accent hover:underline">
-						Translate this post
+					<button onClick={onTranslate} class="mt-1 text-sm text-accent hover:underline">
+						Translate post
 					</button>
 				</Match>
 			</Switch>

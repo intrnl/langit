@@ -12,6 +12,7 @@ import { PlainTextPlugin } from 'lexical-solid/LexicalPlainTextPlugin';
 import { ContentEditable } from 'lexical-solid/LexicalContentEditable';
 import { LexicalErrorBoundary } from 'lexical-solid/LexicalErrorBoundary';
 
+import { AutoFocusPlugin } from 'lexical-solid/LexicalAutoFocusPlugin';
 import { HistoryPlugin } from 'lexical-solid/LexicalHistoryPlugin';
 import { OnChangePlugin } from 'lexical-solid/LexicalOnChangePlugin';
 
@@ -520,6 +521,8 @@ const AuthenticatedComposePage = () => {
 							/>
 
 							<HistoryPlugin />
+							<AutoFocusPlugin />
+
 							<OnChangePlugin
 								onChange={(state) => {
 									const rt = lexical2rt(state);

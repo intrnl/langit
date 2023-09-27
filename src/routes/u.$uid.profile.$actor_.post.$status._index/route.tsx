@@ -290,6 +290,24 @@ const AuthenticatedPostPage = () => {
 										onTranslate={() => setSearchParams({ tl: 'y' }, { replace: true })}
 									/>
 
+									<Show when={record().tags}>
+										{(tags) => (
+											<div class="my-3 flex flex-wrap gap-2 text-sm">
+												<For each={tags()}>
+													{(tag) => (
+														<a
+															link
+															href={`/u/${uid()}/explore/search?t=post&q=${encodeURIComponent(tag)}`}
+															class="text-muted-fg hover:underline"
+														>
+															#{tag}
+														</a>
+													)}
+												</For>
+											</div>
+										)}
+									</Show>
+
 									<div class="my-3">
 										<span class="text-sm text-muted-fg">
 											{relformat.formatAbsWithTime(record().createdAt)}

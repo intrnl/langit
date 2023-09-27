@@ -555,8 +555,8 @@ const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostConten
 				</Match>
 
 				<Match when={needTranslation()}>
-					<button onClick={onTranslate} class="mt-3 text-sm text-accent hover:underline">
-						Translate this post
+					<button onClick={onTranslate} class="mt-1 text-sm text-accent hover:underline">
+						Translate post
 					</button>
 				</Match>
 			</Switch>

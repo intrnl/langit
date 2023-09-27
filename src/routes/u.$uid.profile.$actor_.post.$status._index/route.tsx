@@ -290,7 +290,14 @@ const AuthenticatedPostPage = () => {
 										onTranslate={() => setSearchParams({ tl: 'y' }, { replace: true })}
 									/>
 
-									<Show when={record().tags}>
+									<Show
+										when={(() => {
+											const $tags = record().tags;
+											if ($tags && $tags.length > 0) {
+												return $tags;
+											}
+										})()}
+									>
 										{(tags) => (
 											<div class="my-3 flex flex-wrap gap-2 text-sm">
 												<For each={tags()}>

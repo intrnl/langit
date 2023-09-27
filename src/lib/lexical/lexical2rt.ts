@@ -8,7 +8,6 @@ import {
 } from 'lexical';
 
 import type { AutoLinkNode } from '@lexical/link';
-import type { HashtagNode } from '@lexical/hashtag';
 
 import { graphemeLen } from '~/api/richtext/intl.ts';
 import { toShortUrl } from '~/api/richtext/renderer.ts';
@@ -16,6 +15,7 @@ import type { Facet } from '~/api/richtext/types.ts';
 
 import { Queue } from '~/utils/stack.ts';
 
+import type { HashtagNode } from './HashtagNode.ts';
 import type { MentionNode } from './MentionNode.ts';
 
 const encoder = new TextEncoder();

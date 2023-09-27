@@ -6,7 +6,6 @@ import { Title } from '@solidjs/meta';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
 import { AutoLinkNode } from '@lexical/link';
-import { HashtagNode } from '@lexical/hashtag';
 
 import { LexicalComposer } from 'lexical-solid/LexicalComposer';
 import { PlainTextPlugin } from 'lexical-solid/LexicalPlainTextPlugin';
@@ -30,7 +29,8 @@ import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-
 import { getCurrentDate, getRecordId } from '~/api/utils.ts';
 
 import { MentionNode } from '~/lib/lexical/MentionNode.ts';
-import HashtagPlugin from '~/lib/lexical/HashtagPlugin.tsx';
+import { HashtagNode } from '~/lib/lexical/HashtagNode.ts';
+import HashtagsPlugin from '~/lib/lexical/HashtagsPlugin.tsx';
 import LinkPlugin from '~/lib/lexical/LinkPlugin.tsx';
 import MentionsPlugin from '~/lib/lexical/MentionsPlugin.tsx';
 import ShortcutsPlugin from '~/lib/lexical/ShortcutsPlugin.tsx';
@@ -528,7 +528,7 @@ const AuthenticatedComposePage = () => {
 							/>
 
 							<MentionsPlugin uid={uid()} />
-							<HashtagPlugin />
+							<HashtagsPlugin />
 							<LinkPlugin />
 							<ShortcutsPlugin onSubmit={handleSubmit} onImageDrop={addImages} />
 						</div>

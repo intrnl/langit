@@ -13,6 +13,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 
 	for (let idx = 0, len = segments.length; idx < len; idx++) {
 		const segment = segments[idx];
+		const text = segment.text;
 
 		const mention = segment.mention;
 		const link = segment.link;
@@ -24,7 +25,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 
 			anchor.href = `/u/${uid}/profile/${did}`;
 			anchor.className = 'text-accent hover:underline';
-			anchor.textContent = segment.text;
+			anchor.textContent = text;
 			anchor.toggleAttribute('link', true);
 
 			div.appendChild(anchor);
@@ -34,7 +35,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 
 			anchor.href = `/u/${uid}/explore/search?t=post&q=${encodeURIComponent(hashtag)}`;
 			anchor.className = 'text-accent hover:underline';
-			anchor.textContent = segment.text;
+			anchor.textContent = text;
 			anchor.toggleAttribute('link', true);
 
 			div.appendChild(anchor);
@@ -45,7 +46,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			let match: RegExpExecArray | null | undefined;
 
 			anchor.className = 'text-accent hover:underline';
-			anchor.textContent = segment.text;
+			anchor.textContent = text;
 
 			if (isAppUrl(uri)) {
 				if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
@@ -69,7 +70,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 
 			div.appendChild(anchor);
 		} else {
-			div.appendChild(document.createTextNode(segment.text));
+			div.appendChild(document.createTextNode(text));
 		}
 	}
 

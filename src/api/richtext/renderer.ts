@@ -51,7 +51,20 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			let match: RegExpExecArray | null | undefined;
 
 			anchor.className = 'text-accent hover:underline';
-			anchor.textContent = text;
+
+			if (isValidUrl(uri, text)) {
+				anchor.textContent = text;
+			} else {
+				const fake = document.createElement('span');
+				const real = document.createElement('span');
+
+				fake.textContent = text;
+				real.textContent = `(${toShortUrl(uri)})`;
+
+				real.className = 'text-muted-fg ml-1';
+
+				anchor.append(fake, real);
+			}
 
 			if (isAppUrl(uri)) {
 				if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
@@ -105,4 +118,26 @@ export const toShortUrl = (uri: string): string => {
 	} catch {}
 
 	return uri;
+};
+
+// Regular expression for matching domains on text, this also takes care of bots
+// that would wrap the URL domain with square brackets.
+const MATCH_DOMAIN_RE =
+	/(?:^|\[(?=.*\]))(?:https?:\/\/)?((?:[a-z][a-z0-9]*(?:\.[a-z0-9]+)*|\d+(?:\.\d+){3})(?:\:\d+)?)(?:$|\/|\?|(?<=\[.*)\])/;
+
+export const isValidUrl = (uri: string, text: string) => {
+	const match = MATCH_DOMAIN_RE.exec(text);
+
+	if (match) {
+		try {
+			const url = new URL(uri);
+			const domain = url.host.replace(TRIM_HOST_RE, '');
+
+			const matched = match[1].replace(TRIM_HOST_RE, '');
+
+			return domain === matched;
+		} catch {}
+	}
+
+	return false;
 };

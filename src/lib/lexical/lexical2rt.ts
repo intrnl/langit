@@ -156,7 +156,7 @@ export const lexical2rt = (state: EditorState) => {
 					features: [
 						{
 							$type: 'app.bsky.richtext.facet#tag',
-							tag: content.slice(1),
+							tag: content[0] === '#' ? content.slice(1) : content,
 						},
 					],
 				});

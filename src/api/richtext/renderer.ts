@@ -82,19 +82,6 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 	return div;
 };
 
-const U_RE = /^\/u\/[^\/]+/;
-
-export const alterRenderedRichTextUid = (template: HTMLElement, uid: string) => {
-	const links = template.querySelectorAll<HTMLAnchorElement>('a[link]');
-
-	for (let idx = 0, len = links.length; idx < len; idx++) {
-		const node = links[idx];
-		const href = node.getAttribute('href')!;
-
-		node.href = href.replace(U_RE, `/u/${uid}`);
-	}
-};
-
 const TRIM_HOST_RE = /^www\./;
 const PATH_MAX_LENGTH = 18;
 

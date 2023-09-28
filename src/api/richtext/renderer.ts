@@ -134,7 +134,7 @@ export const toShortUrl = (uri: string): string => {
 // Regular expression for matching domains on text, this also takes care of bots
 // that would wrap the URL domain with square brackets.
 const MATCH_DOMAIN_RE =
-	/(?:^|\[(?=.*\]))(?:https?:\/\/)?((?:[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*|\d+(?:\.\d+){3})(?:\:\d+)?)(?:$|\/|\?|(?<=\[.*)\])/;
+	/(?:^|\[(?=.*\]))(?:https?:\/\/)?((?:[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*|\d+(?:\.\d+){3})(?:\:\d+)?)(?:$|[\/?#]|(?<=\[.*)\])/;
 
 export const checkLinkValidity = (uri: string, text: string) => {
 	let url: URL;

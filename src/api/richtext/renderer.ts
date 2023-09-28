@@ -147,13 +147,12 @@ export const checkLinkValidity = (uri: string, text: string) => {
 	const match = MATCH_DOMAIN_RE.exec(text);
 
 	const protocol = url.protocol;
-	const host = url.host;
+	const host = url.host.replace(TRIM_HOST_RE, '');
 
 	if (match) {
-		const domain = host.replace(TRIM_HOST_RE, '');
 		const matched = match[1].replace(TRIM_HOST_RE, '');
 
-		if (domain === matched) {
+		if (host.toLowerCase() === matched.toLowerCase()) {
 			return true;
 		}
 	}

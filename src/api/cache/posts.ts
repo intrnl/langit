@@ -89,7 +89,7 @@ export const mergeSignalizedPost = (uid: DID, post: Post, key?: number) => {
 		val.cid.value = post.cid;
 		mergeSignalizedProfile(uid, post.author, key);
 
-		val.record.value = post.record as PostRecord;
+		// val.record.value = post.record as PostRecord;
 		val.embed.value = post.embed;
 		val.replyCount.value = post.replyCount ?? 0;
 		val.repostCount.value = post.repostCount ?? 0;

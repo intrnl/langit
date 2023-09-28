@@ -51,6 +51,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			let match: RegExpExecArray | null | undefined;
 
 			anchor.className = 'text-accent hover:underline';
+			anchor.title = uri;
 
 			if (isValidUrl(uri, text)) {
 				anchor.textContent = text;
@@ -59,7 +60,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 				const real = document.createElement('span');
 
 				fake.textContent = text;
-				real.textContent = `(${toShortUrl(uri)})`;
+				real.textContent = `(${toShortDomain(uri)})`;
 
 				real.className = 'text-muted-fg ml-1';
 
@@ -114,6 +115,21 @@ export const toShortUrl = (uri: string): string => {
 			}
 
 			return host + path;
+		}
+	} catch {}
+
+	return uri;
+};
+
+export const toShortDomain = (uri: string): string => {
+	try {
+		const url = new URL(uri);
+
+		const protocol = url.protocol;
+		const host = url.host.replace(TRIM_HOST_RE, '');
+
+		if (protocol === 'http:' || protocol === 'https:') {
+			return host;
 		}
 	} catch {}
 

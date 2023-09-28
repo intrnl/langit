@@ -46,45 +46,55 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			div.appendChild(anchor);
 		} else if (link) {
 			const uri = link.uri;
+			const validity = checkLinkValidity(uri, text);
+
 			const anchor = document.createElement('a');
 
 			let match: RegExpExecArray | null | undefined;
 
-			anchor.className = 'text-accent hover:underline';
 			anchor.title = uri;
 
-			if (isValidUrl(uri, text)) {
-				anchor.textContent = text;
-			} else {
-				const fake = document.createElement('span');
-				const real = document.createElement('span');
-
-				fake.textContent = text;
-				real.textContent = `(${toShortDomain(uri)})`;
-
-				real.className = 'text-muted-fg ml-1';
-
-				anchor.append(fake, real);
-			}
-
-			if (isAppUrl(uri)) {
-				if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
-					anchor.href = `/u/${uid}/profile/${match[1]}`;
-				} else if ((match = BSKY_POST_URL_RE.exec(uri))) {
-					anchor.href = `/u/${uid}/profile/${match[1]}/post/${match[2]}`;
-				} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
-					anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
-				} else if ((match = BSKY_LIST_URL_RE.exec(uri))) {
-					anchor.href = `/u/${uid}/profile/${match[1]}/lists/${match[2]}`;
+			if (validity) {
+				if (isAppUrl(uri)) {
+					if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
+						anchor.href = `/u/${uid}/profile/${match[1]}`;
+					} else if ((match = BSKY_POST_URL_RE.exec(uri))) {
+						anchor.href = `/u/${uid}/profile/${match[1]}/post/${match[2]}`;
+					} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
+						anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
+					} else if ((match = BSKY_LIST_URL_RE.exec(uri))) {
+						anchor.href = `/u/${uid}/profile/${match[1]}/lists/${match[2]}`;
+					}
 				}
-			}
 
-			if (!match) {
-				anchor.href = uri;
-				anchor.rel = 'noopener noreferrer nofollow';
-				anchor.target = '_blank';
+				if (!match) {
+					anchor.href = uri;
+					anchor.rel = 'noopener noreferrer nofollow';
+					anchor.target = '_blank';
+				} else {
+					anchor.toggleAttribute('link', true);
+				}
+
+				if (validity === true) {
+					anchor.className = 'text-accent hover:underline';
+					anchor.textContent = text;
+				} else {
+					const fake = document.createElement('span');
+					const real = document.createElement('span');
+
+					anchor.className = 'group';
+
+					fake.textContent = text;
+					fake.className = 'text-accent group-hover:underline';
+
+					real.textContent = `(${validity})`;
+					real.className = 'text-muted-fg ml-1';
+
+					anchor.append(fake, real);
+				}
 			} else {
-				anchor.toggleAttribute('link', true);
+				anchor.className = 'text-muted';
+				anchor.textContent = `${text} (invalid URL)`;
 			}
 
 			div.appendChild(anchor);
@@ -121,39 +131,36 @@ export const toShortUrl = (uri: string): string => {
 	return uri;
 };
 
-export const toShortDomain = (uri: string): string => {
-	try {
-		const url = new URL(uri);
-
-		const protocol = url.protocol;
-		const host = url.host.replace(TRIM_HOST_RE, '');
-
-		if (protocol === 'http:' || protocol === 'https:') {
-			return host;
-		}
-	} catch {}
-
-	return uri;
-};
-
 // Regular expression for matching domains on text, this also takes care of bots
 // that would wrap the URL domain with square brackets.
 const MATCH_DOMAIN_RE =
-	/(?:^|\[(?=.*\]))(?:https?:\/\/)?((?:[a-z][a-z0-9]*(?:\.[a-z0-9]+)*|\d+(?:\.\d+){3})(?:\:\d+)?)(?:$|\/|\?|(?<=\[.*)\])/;
+	/(?:^|\[(?=.*\]))(?:https?:\/\/)?((?:[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*|\d+(?:\.\d+){3})(?:\:\d+)?)(?:$|\/|\?|(?<=\[.*)\])/;
 
-export const isValidUrl = (uri: string, text: string) => {
-	const match = MATCH_DOMAIN_RE.exec(text);
-
-	if (match) {
-		try {
-			const url = new URL(uri);
-			const domain = url.host.replace(TRIM_HOST_RE, '');
-
-			const matched = match[1].replace(TRIM_HOST_RE, '');
-
-			return domain === matched;
-		} catch {}
+export const checkLinkValidity = (uri: string, text: string) => {
+	let url: URL;
+	try {
+		url = new URL(uri);
+	} catch {
+		return null;
 	}
 
-	return false;
+	const match = MATCH_DOMAIN_RE.exec(text);
+
+	const protocol = url.protocol;
+	const host = url.host;
+
+	if (match) {
+		const domain = host.replace(TRIM_HOST_RE, '');
+		const matched = match[1].replace(TRIM_HOST_RE, '');
+
+		if (domain === matched) {
+			return true;
+		}
+	}
+
+	if (protocol === 'https:' || protocol === 'http:') {
+		return host;
+	}
+
+	return uri;
 };

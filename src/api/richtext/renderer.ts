@@ -156,8 +156,13 @@ export const checkLinkValidity = (uri: string, text: string) => {
 	const match = MATCH_DOMAIN_RE.exec(text);
 
 	const protocol = url.protocol;
-	const auth = buildAuthPart(url);
 	const host = url.host;
+
+	// Not sure if we need to check for username:password@ within the URL,
+	// we still need to match for them in the regex, but we can just skip the
+	// validation for now.
+
+	//const auth = buildAuthPart(url);
 
 	const isHttp = protocol === 'https:' || protocol === 'http:';
 
@@ -168,11 +173,11 @@ export const checkLinkValidity = (uri: string, text: string) => {
 			break jump;
 		}
 
-		const actualAuth = match[2];
+		//const actualAuth = match[2];
 
-		if (actualAuth ? auth !== actualAuth : auth) {
-			break jump;
-		}
+		//if (actualAuth ? auth !== actualAuth : auth) {
+		//	break jump;
+		//}
 
 		const actualHost = match[3].replace(TRIM_HOST_RE, '').toLowerCase();
 		const expectedHost = host.replace(TRIM_HOST_RE, '').toLowerCase();
@@ -185,15 +190,16 @@ export const checkLinkValidity = (uri: string, text: string) => {
 	}
 
 	if (isHttp) {
-		return auth + host;
+		//return auth + host;
+		return host;
 	}
 
 	return uri;
 };
 
-const buildAuthPart = (url: URL) => {
-	const user = url.username;
-	const password = url.password;
+// const buildAuthPart = (url: URL) => {
+// 	const user = url.username;
+// 	const password = url.password;
 
-	return user && password ? `${user}:${password}@` : user ? `${user}@` : '';
-};
+// 	return user && password ? `${user}:${password}@` : user ? `${user}@` : '';
+// };

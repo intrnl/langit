@@ -12,7 +12,7 @@ import {
 	finalizeModeration,
 } from '../moderation/action.ts';
 import { PreferenceWarn } from '../moderation/enums.ts';
-import { createRenderedRichText } from '../richtext/renderer.ts';
+import { createRenderedRichText, handleInvalidLinkClick } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
@@ -154,7 +154,10 @@ const createPostRenderer = (uid: DID) => {
 		}
 
 		if (template) {
-			return template.cloneNode(true);
+			const cloned = template.cloneNode(true);
+			cloned.addEventListener('click', handleInvalidLinkClick);
+
+			return cloned;
 		} else {
 			return record.text;
 		}

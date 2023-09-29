@@ -1,7 +1,7 @@
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { detectFacets } from '../richtext/detection.ts';
-import { createRenderedRichText } from '../richtext/renderer.ts';
+import { createRenderedRichText, handleInvalidLinkClick } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
 import { UnicodeString } from '../richtext/unicode.ts';
 
@@ -141,7 +141,10 @@ const createProfileDescriptionRenderer = (uid: DID) => {
 		}
 
 		if (template) {
-			return template.cloneNode(true);
+			const cloned = template.cloneNode(true);
+			cloned.addEventListener('click', handleInvalidLinkClick);
+
+			return cloned;
 		} else {
 			return description;
 		}

@@ -1,3 +1,4 @@
+import { openModal } from '~/globals/modals.tsx';
 import {
 	BSKY_FEED_URL_RE,
 	BSKY_LIST_URL_RE,
@@ -6,7 +7,36 @@ import {
 	isAppUrl,
 } from '~/utils/link.ts';
 
+import LinkWarningDialog from '~/components/dialogs/LinkWarningDialog.tsx';
+
 import type { RichTextSegment } from './types.ts';
+
+type IgnoredLinkNode = HTMLAnchorElement & { _ignored?: boolean };
+
+export const handleInvalidLinkClick = (ev: Event) => {
+	const target = ev.target as Element;
+	const anchor = target.closest<IgnoredLinkNode>('a[data-invalid=true]');
+
+	if (!anchor || anchor._ignored) {
+		return;
+	}
+
+	ev.preventDefault();
+
+	openModal(() => {
+		return LinkWarningDialog({
+			uri: anchor.href,
+			onConfirm: () => {
+				try {
+					anchor._ignored = true;
+					anchor.click();
+				} finally {
+					anchor._ignored = false;
+				}
+			},
+		});
+	});
+};
 
 export const createRenderedRichText = (uid: string, segments: RichTextSegment[]) => {
 	const div = document.createElement('div');
@@ -46,55 +76,41 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 			div.appendChild(anchor);
 		} else if (link) {
 			const uri = link.uri;
-			const validity = checkLinkValidity(uri, text);
+			const valid = isLinkValid(uri, text);
 
 			const anchor = document.createElement('a');
 
 			let match: RegExpExecArray | null | undefined;
+			let href = uri;
+
+			anchor.className = 'text-accent hover:underline';
 
 			anchor.title = uri;
+			anchor.textContent = text;
 
-			if (validity) {
-				if (isAppUrl(uri)) {
-					if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
-						anchor.href = `/u/${uid}/profile/${match[1]}`;
-					} else if ((match = BSKY_POST_URL_RE.exec(uri))) {
-						anchor.href = `/u/${uid}/profile/${match[1]}/post/${match[2]}`;
-					} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
-						anchor.href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
-					} else if ((match = BSKY_LIST_URL_RE.exec(uri))) {
-						anchor.href = `/u/${uid}/profile/${match[1]}/lists/${match[2]}`;
-					}
+			if (!valid) {
+				anchor.dataset.invalid = '' + true;
+			}
+
+			if (isAppUrl(uri)) {
+				if ((match = BSKY_PROFILE_URL_RE.exec(uri))) {
+					href = `/u/${uid}/profile/${match[1]}`;
+				} else if ((match = BSKY_POST_URL_RE.exec(uri))) {
+					href = `/u/${uid}/profile/${match[1]}/post/${match[2]}`;
+				} else if ((match = BSKY_FEED_URL_RE.exec(uri))) {
+					href = `/u/${uid}/profile/${match[1]}/feed/${match[2]}`;
+				} else if ((match = BSKY_LIST_URL_RE.exec(uri))) {
+					href = `/u/${uid}/profile/${match[1]}/lists/${match[2]}`;
 				}
+			}
 
-				if (!match) {
-					anchor.href = uri;
-					anchor.rel = 'noopener noreferrer nofollow';
-					anchor.target = '_blank';
-				} else {
-					anchor.toggleAttribute('link', true);
-				}
+			anchor.href = href;
 
-				if (validity === true) {
-					anchor.className = 'text-accent hover:underline';
-					anchor.textContent = text;
-				} else {
-					const fake = document.createElement('span');
-					const real = document.createElement('span');
-
-					anchor.className = 'group';
-
-					fake.textContent = text;
-					fake.className = 'text-accent group-hover:underline';
-
-					real.textContent = `(${validity})`;
-					real.className = 'text-muted-fg ml-1';
-
-					anchor.append(fake, real);
-				}
+			if (!match) {
+				anchor.rel = 'noopener noreferrer nofollow';
+				anchor.target = '_blank';
 			} else {
-				anchor.className = 'text-muted';
-				anchor.textContent = `${text} (invalid URL)`;
+				anchor.toggleAttribute('link', true);
 			}
 
 			div.appendChild(anchor);
@@ -107,6 +123,7 @@ export const createRenderedRichText = (uid: string, segments: RichTextSegment[])
 };
 
 const TRIM_HOST_RE = /^www\./;
+const TRIM_URLTEXT_RE = /^\s*(https?:\/\/)?(?:www\.)?/;
 const PATH_MAX_LENGTH = 18;
 
 export const toShortUrl = (uri: string): string => {
@@ -131,75 +148,46 @@ export const toShortUrl = (uri: string): string => {
 	return uri;
 };
 
-// Regular expression for matching domains on text, this also takes care of bots
-// that would wrap the URL domain with square brackets.
-const MATCH_DOMAIN_RE =
-	/(?:^|\[(?=.*\]))(?:([a-z]+:)\/\/)?(.+@)?([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(?:\:\d+)?)(?:$|[\/?#]|(?<=\[.*)\])/;
+const buildHostPart = (url: URL) => {
+	const username = url.username;
+	// const password = url.password;
 
-/**
- * Checks if the link at least contains the same host as what's being described
- * on text, if no protocol is defined on the text itself then it is assumed to
- * be http:
- *
- * Returns `null` if parsing the actual URL fails, `true` if it is valid, or a
- * string containing what should be shown as the "real" host, so long as it is
- * in fact, an http: URL, otherwise it just returns the passed URL.
- */
-export const checkLinkValidity = (uri: string, text: string) => {
-	let url: URL;
-	try {
-		url = new URL(uri);
-	} catch {
-		return null;
-	}
+	const hostname = url.hostname.replace(TRIM_HOST_RE, '').toLowerCase();
+	const port = url.port;
 
-	const match = MATCH_DOMAIN_RE.exec(text);
+	// const auth = username ? username + (password ? ':' + password : '') + '@' : '';
 
-	const protocol = url.protocol;
-	const host = url.host;
+	// Perhaps might be best if we always warn on authentication being passed.
+	const auth = username ? '\0@@\0' : '';
+	const host = hostname + (port ? ':' + port : '');
 
-	// Not sure if we need to check for username:password@ within the URL,
-	// we still need to match for them in the regex, but we can just skip the
-	// validation for now.
-
-	//const auth = buildAuthPart(url);
-
-	const isHttp = protocol === 'https:' || protocol === 'http:';
-
-	jump: if (match) {
-		const actualProtocol = match[1];
-
-		if (actualProtocol ? actualProtocol !== protocol : !isHttp) {
-			break jump;
-		}
-
-		//const actualAuth = match[2];
-
-		//if (actualAuth ? auth !== actualAuth : auth) {
-		//	break jump;
-		//}
-
-		const actualHost = match[3].replace(TRIM_HOST_RE, '').toLowerCase();
-		const expectedHost = host.replace(TRIM_HOST_RE, '').toLowerCase();
-
-		if (actualHost !== expectedHost) {
-			break jump;
-		}
-
-		return true;
-	}
-
-	if (isHttp) {
-		//return auth + host;
-		return host;
-	}
-
-	return uri;
+	return auth + host;
 };
 
-// const buildAuthPart = (url: URL) => {
-// 	const user = url.username;
-// 	const password = url.password;
+export const isLinkValid = (uri: string, text: string) => {
+	let url: URL;
+	let protocol: string;
+	try {
+		url = new URL(uri);
+		protocol = url.protocol;
 
-// 	return user && password ? `${user}:${password}@` : user ? `${user}@` : '';
-// };
+		if (protocol !== 'https:' && protocol !== 'http:') {
+			return false;
+		}
+	} catch {
+		return false;
+	}
+
+	const expectedHost = buildHostPart(url);
+	const length = expectedHost.length;
+
+	const normalized = text.replace(TRIM_URLTEXT_RE, '').toLowerCase();
+	const normalizedLength = normalized.length;
+
+	const boundary = normalizedLength >= length ? normalized[length] : undefined;
+
+	return (
+		(!boundary || boundary === '/' || boundary === '?' || boundary === '#') &&
+		normalized.startsWith(expectedHost)
+	);
+};

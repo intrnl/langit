@@ -134,8 +134,17 @@ export const toShortUrl = (uri: string): string => {
 // Regular expression for matching domains on text, this also takes care of bots
 // that would wrap the URL domain with square brackets.
 const MATCH_DOMAIN_RE =
-	/(?:^|\[(?=.*\]))(?:https?:\/\/)?((?:[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*|\d+(?:\.\d+){3})(?:\:\d+)?)(?:$|[\/?#]|(?<=\[.*)\])/;
+	/(?:^|\[(?=.*\]))(?:([a-z]+:)\/\/)?(.+@)?([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(?:\:\d+)?)(?:$|[\/?#]|(?<=\[.*)\])/;
 
+/**
+ * Checks if the link at least contains the same host as what's being described
+ * on text, if no protocol is defined on the text itself then it is assumed to
+ * be http:
+ *
+ * Returns `null` if parsing the actual URL fails, `true` if it is valid, or a
+ * string containing what should be shown as the "real" host, so long as it is
+ * in fact, an http: URL, otherwise it just returns the passed URL.
+ */
 export const checkLinkValidity = (uri: string, text: string) => {
 	let url: URL;
 	try {
@@ -147,19 +156,44 @@ export const checkLinkValidity = (uri: string, text: string) => {
 	const match = MATCH_DOMAIN_RE.exec(text);
 
 	const protocol = url.protocol;
-	const host = url.host.replace(TRIM_HOST_RE, '');
+	const auth = buildAuthPart(url);
+	const host = url.host;
 
-	if (match) {
-		const matched = match[1].replace(TRIM_HOST_RE, '');
+	const isHttp = protocol === 'https:' || protocol === 'http:';
 
-		if (host.toLowerCase() === matched.toLowerCase()) {
-			return true;
+	jump: if (match) {
+		const actualProtocol = match[1];
+
+		if (actualProtocol ? actualProtocol !== protocol : !isHttp) {
+			break jump;
 		}
+
+		const actualAuth = match[2];
+
+		if (actualAuth ? auth !== actualAuth : auth) {
+			break jump;
+		}
+
+		const actualHost = match[3].replace(TRIM_HOST_RE, '').toLowerCase();
+		const expectedHost = host.replace(TRIM_HOST_RE, '').toLowerCase();
+
+		if (actualHost !== expectedHost) {
+			break jump;
+		}
+
+		return true;
 	}
 
-	if (protocol === 'https:' || protocol === 'http:') {
-		return host;
+	if (isHttp) {
+		return auth + host;
 	}
 
 	return uri;
+};
+
+const buildAuthPart = (url: URL) => {
+	const user = url.username;
+	const password = url.password;
+
+	return user && password ? `${user}:${password}@` : user ? `${user}@` : '';
 };

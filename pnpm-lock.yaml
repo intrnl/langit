@@ -13,7 +13,7 @@ patchedDependencies:
     hash: gcvajasovcbiq2qrorgjn6zpci
     path: patches/@solidjs__router@0.8.3.patch
   lexical-solid@0.6.3:
-    hash: vxh7d6mhvrcncclrnacz7evzim
+    hash: lrjxccxkusgzy2wxtm3zogmjvq
     path: patches/lexical-solid@0.6.3.patch
 
 dependencies:
@@ -58,7 +58,7 @@ dependencies:
     version: 0.11.3
   lexical-solid:
     specifier: ^0.6.3
-    version: 0.6.3(patch_hash=vxh7d6mhvrcncclrnacz7evzim)
+    version: 0.6.3(patch_hash=lrjxccxkusgzy2wxtm3zogmjvq)
   solid-floating-ui:
     specifier: ^0.2.1
     version: 0.2.1(@floating-ui/dom@1.5.3)(solid-js@1.7.12)
@@ -2704,7 +2704,7 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /lexical-solid@0.6.3(patch_hash=vxh7d6mhvrcncclrnacz7evzim):
+  /lexical-solid@0.6.3(patch_hash=lrjxccxkusgzy2wxtm3zogmjvq):
     resolution: {integrity: sha512-KZ5qTlTnn6C57dA03XkQKErcJ+rjAeQixSxjBDGm911vojCWw69Z/1rFXZ7oJ6nemKNw6DonzKpqqlhE0w8ChA==}
     peerDependencies:
       utility-types: 3.10.0

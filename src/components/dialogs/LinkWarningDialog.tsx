@@ -1,5 +1,7 @@
 import { createMemo } from 'solid-js';
 
+import * as tldts from 'tldts';
+
 import { closeModal } from '~/globals/modals.tsx';
 
 import button from '~/styles/primitives/button.ts';
@@ -16,18 +18,46 @@ const buildAuth = (url: URL) => {
 
 	return username ? username + (password ? ':' + password : '') + '@' : '';
 };
-
 const LinkWarningDialog = (props: LinkWarningDialogProps) => {
-	const decor = createMemo((): [prefix: string, main: string, suffix: string] => {
-		const $uri = props.uri;
+	const formattedHref = createMemo(() => {
+		const uri = props.uri;
 
+		let url: URL;
 		try {
-			const url = new URL($uri);
-
-			return [url.protocol + '//', buildAuth(url) + url.host, url.pathname + url.search + url.hash];
+			url = new URL(uri);
 		} catch {
-			return ['', $uri, ''];
+			const strong = document.createElement('strong');
+			strong.textContent = uri;
+			return strong;
 		}
+
+		const span = document.createElement('span');
+		const strong = document.createElement('strong');
+
+		const hostname = url.hostname;
+		const port = url.port;
+
+		const tld = tldts.parse(hostname);
+		const domain = tld.domain;
+		const subdomain = tld.subdomain;
+
+		let prefix = '';
+		let emboldened = '';
+
+		if (domain) {
+			if (subdomain) {
+				prefix = subdomain + '.';
+			}
+
+			emboldened = domain + (port ? ':' + port : '');
+		} else {
+			emboldened = url.host;
+		}
+
+		strong.className = 'text-primary';
+		strong.textContent = emboldened;
+		span.append(url.protocol + '//' + buildAuth(url) + prefix, strong, url.pathname + url.search + url.hash);
+		return span;
 	});
 
 	return (
@@ -36,10 +66,8 @@ const LinkWarningDialog = (props: LinkWarningDialogProps) => {
 
 			<p class="my-3 text-sm">This link is taking you to the following site</p>
 
-			<div class="w-full break-words overflow-hidden rounded-md border border-input px-3 py-2 text-sm text-muted-fg">
-				<span>{decor()[0]}</span>
-				<span class="font-semibold text-primary">{decor()[1]}</span>
-				<span>{decor()[2]}</span>
+			<div class="w-full overflow-hidden break-words rounded-md border border-input px-3 py-2 text-sm text-muted-fg">
+				{formattedHref()}
 			</div>
 
 			<div class={/* @once */ dialog.actions()}>

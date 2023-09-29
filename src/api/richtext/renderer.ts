@@ -1,3 +1,5 @@
+import { lazy } from 'solid-js';
+
 import { openModal } from '~/globals/modals.tsx';
 import {
 	BSKY_FEED_URL_RE,
@@ -7,11 +9,11 @@ import {
 	isAppUrl,
 } from '~/utils/link.ts';
 
-import LinkWarningDialog from '~/components/dialogs/LinkWarningDialog.tsx';
-
 import type { RichTextSegment } from './types.ts';
 
 type IgnoredLinkNode = HTMLAnchorElement & { _ignored?: boolean };
+
+const LazyLinkWarningDialog = lazy(() => import('~/components/dialogs/LinkWarningDialog.tsx'));
 
 export const handleInvalidLinkClick = (ev: Event) => {
 	const target = ev.target as Element;
@@ -24,7 +26,7 @@ export const handleInvalidLinkClick = (ev: Event) => {
 	ev.preventDefault();
 
 	openModal(() => {
-		return LinkWarningDialog({
+		return LazyLinkWarningDialog({
 			uri: anchor.href,
 			onConfirm: () => {
 				try {

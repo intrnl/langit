@@ -23,7 +23,8 @@
 		"lexical": "^0.11.3",
 		"lexical-solid": "^0.6.3",
 		"solid-floating-ui": "^0.2.1",
-		"solid-js": "^1.7.12"
+		"solid-js": "^1.7.12",
+		"tldts": "^6.0.15"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20230914.0",

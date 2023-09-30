@@ -1,4 +1,4 @@
-import { AutoLinkPlugin } from 'lexical-solid/LexicalAutoLinkPlugin';
+import { AutoLinkPlugin } from './AutoLinkPlugin.tsx';
 
 const ABS_LINK_RE = /https?:\/\/[\S]+/;
 const TRAILING_RE = /(?:(?<!\(.*)\))?[.,;]*$/;

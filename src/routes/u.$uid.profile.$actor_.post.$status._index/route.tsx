@@ -305,7 +305,7 @@ const AuthenticatedPostPage = () => {
 														<a
 															link
 															href={`/u/${uid()}/explore/search?t=post&q=${encodeURIComponent(tag)}`}
-															class="text-muted-fg hover:underline"
+															class="max-w-full break-words text-muted-fg hover:underline"
 														>
 															#{tag}
 														</a>

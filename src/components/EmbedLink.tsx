@@ -42,7 +42,7 @@ const EmbedLink = (props: EmbedLinkProps) => {
 				{(thumb) => (
 					<BlobImage
 						src={thumb}
-						class="aspect-square w-[86px] border-r border-divider object-cover sm:w-32"
+						class="aspect-square w-[86px] border-r border-divider object-cover sm:w-30"
 					/>
 				)}
 			</Show>

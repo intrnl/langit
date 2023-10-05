@@ -10,6 +10,7 @@ export default {
 				7.5: '1.875rem',
 				13: '3.25rem',
 				17: '4.24rem',
+				30: '7.5rem',
 			},
 			minWidth: {
 				14: '3.5rem',

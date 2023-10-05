@@ -24,12 +24,12 @@ const EmbedImage = (props: EmbedImageProps) => {
 	const borderless = props.borderless;
 	const blur = () => props.blur;
 
-	const render = (index: number, className?: string) => {
+	const render = (index: number, standalone: boolean) => {
 		const image = images()[index];
 		const alt = image.alt;
 
 		return (
-			<div class={'relative overflow-hidden ' + (className || 'min-h-0 grow basis-0')}>
+			<div class={'relative overflow-hidden ' + (standalone ? 'aspect-video' : 'min-h-0 grow basis-0')}>
 				<img
 					src={/* @once */ image.thumb}
 					alt={alt}
@@ -68,13 +68,13 @@ const EmbedImage = (props: EmbedImageProps) => {
 				<Match when={images().length >= 4}>
 					<div class="flex aspect-video gap-0.5">
 						<div class="flex grow basis-0 flex-col gap-0.5">
-							{render(0)}
-							{render(1)}
+							{render(0, false)}
+							{render(1, false)}
 						</div>
 
 						<div class="flex grow basis-0 flex-col gap-0.5">
-							{render(2)}
-							{render(3)}
+							{render(2, false)}
+							{render(3, false)}
 						</div>
 					</div>
 				</Match>
@@ -82,22 +82,22 @@ const EmbedImage = (props: EmbedImageProps) => {
 				<Match when={images().length >= 3}>
 					<div class="flex aspect-video gap-0.5">
 						<div class="flex grow basis-0 flex-col gap-0.5">
-							{render(0)}
-							{render(1)}
+							{render(0, false)}
+							{render(1, false)}
 						</div>
 
-						<div class="flex grow basis-0 flex-col gap-0.5">{render(2)}</div>
+						<div class="flex grow basis-0 flex-col gap-0.5">{render(2, false)}</div>
 					</div>
 				</Match>
 
 				<Match when={images().length >= 2}>
 					<div class="flex aspect-video gap-0.5">
-						<div class="flex grow basis-0 flex-col gap-0.5">{render(0)}</div>
-						<div class="flex grow basis-0 flex-col gap-0.5">{render(1)}</div>
+						<div class="flex grow basis-0 flex-col gap-0.5">{render(0, false)}</div>
+						<div class="flex grow basis-0 flex-col gap-0.5">{render(1, false)}</div>
 					</div>
 				</Match>
 
-				<Match when={images().length === 1}>{render(0, 'aspect-video')}</Match>
+				<Match when={images().length === 1}>{render(0, true)}</Match>
 			</Switch>
 		</div>
 	);

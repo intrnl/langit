@@ -4,7 +4,6 @@ import { unwrap } from 'solid-js/store';
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 import { useLocation, useSearchParams } from '@solidjs/router';
 
 import { type ModerationDecision, CauseLabel } from '~/api/moderation/action.ts';
@@ -20,6 +19,7 @@ import { systemLanguages } from '~/globals/platform.ts';
 import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Embed from '~/components/Embed.tsx';
@@ -79,24 +79,24 @@ const AuthenticatedPostPage = () => {
 		});
 	};
 
-	const renderTitle = () => {
-		const $thread = thread();
-
-		if ($thread) {
-			const post = $thread.post;
-
-			const author = post.author;
-			const record = post.record.value;
-
-			return `${author.displayName.value || `@${author.handle.value}`}: "${record.text}" / Langit`;
-		}
-
-		return `Post / Langit`;
-	};
-
 	return (
 		<div class="flex flex-col">
-			<Title>{renderTitle()}</Title>
+			<Title
+				render={() => {
+					const $thread = thread();
+
+					if ($thread) {
+						const post = $thread.post;
+
+						const author = post.author;
+						const record = post.record.value;
+
+						return `${author.displayName.value || `@${author.handle.value}`}: "${record.text}" / Langit`;
+					}
+
+					return `Post / Langit`;
+				}}
+			/>
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Post</p>

@@ -1,7 +1,7 @@
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { Title } from '@solidjs/meta';
 
 import { useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import FilterOptions, { TargetGlobal } from './FilterOptions.tsx';
 
@@ -12,7 +12,7 @@ const AuthenticatedGlobalFilterModerationPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Global content filters / Langit</Title>
+			<Title render={`Global content filters / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Global content filters</p>

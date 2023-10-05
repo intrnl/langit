@@ -2,13 +2,13 @@ import { For, Match, Switch, createSignal } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 
 import { getAppPasswords, getAppPasswordsKey } from '~/api/queries/get-app-passwords.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { openModal } from '~/globals/modals.tsx';
 import { useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
 import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
@@ -32,7 +32,7 @@ const AuthenticatedAppPasswordsPage = () => {
 
 	return (
 		<div>
-			<Title>App passwords / Langit</Title>
+			<Title render={`App passwords / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold leading-5">App passwords</p>

@@ -3,7 +3,6 @@ import { For, Match, Show, Switch, createMemo } from 'solid-js';
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
 
 import { getCollectionCursor } from '~/api/utils.ts';
@@ -12,6 +11,7 @@ import { getList, getListKey } from '~/api/queries/get-list.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { generatePath, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -81,14 +81,14 @@ const AuthenticatedListPage = () => {
 					<Match when={list()}>
 						{(info) => (
 							<>
-								<Title>List ({info().name.value}) / Langit</Title>
+								<Title render={() => `List (${info().name.value}) / Langit`} />
 								<p class="text-base font-bold">{info().name.value}</p>
 							</>
 						)}
 					</Match>
 
 					<Match when>
-						<Title>List ({params.list}) / Langit</Title>
+						<Title render={() => `List (${params.list}) / Langit`} />
 						<p class="text-base font-bold">List</p>
 					</Match>
 				</Switch>

@@ -1,8 +1,8 @@
 import { For, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { Title } from '@solidjs/meta';
 
 import { generatePath, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 import { openModal } from '~/globals/modals.tsx';
 import { getAccountModerationPreferences } from '~/globals/preferences.ts';
 
@@ -28,7 +28,7 @@ const AuthenticatedContentFilterModerationPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Content filters / Langit</Title>
+			<Title render={`Content filters / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Content filters</p>

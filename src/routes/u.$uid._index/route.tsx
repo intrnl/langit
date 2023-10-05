@@ -2,7 +2,6 @@ import { For, Show, Suspense, createEffect, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 import { useSearchParams } from '@solidjs/router';
 
 import {
@@ -21,6 +20,7 @@ import {
 
 import { preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import { Tab } from '~/components/Tab.tsx';
 import TimelineList from '~/components/TimelineList.tsx';
@@ -108,7 +108,7 @@ const AuthenticatedHome = () => {
 
 	return (
 		<div class="flex grow flex-col">
-			<Title>Home / Langit</Title>
+			<Title render="Home / Langit" />
 
 			<div
 				class="flex h-13 items-center px-4"

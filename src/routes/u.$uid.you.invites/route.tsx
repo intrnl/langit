@@ -2,12 +2,12 @@ import { For, Match, Switch, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 
 import { getInviteCodes, getInviteCodesKey } from '~/api/queries/get-invite-codes.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -29,7 +29,7 @@ const AuthenticatedInviteCodesPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Invite codes / Langit</Title>
+			<Title render={`Invite codes / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold leading-5">Invite codes</p>

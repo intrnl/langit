@@ -38,9 +38,6 @@ dependencies:
   '@solid-primitives/deep':
     specifier: ^0.2.3
     version: 0.2.3(solid-js@1.7.12)
-  '@solidjs/meta':
-    specifier: ^0.28.6
-    version: 0.28.6(solid-js@1.7.12)
   '@solidjs/router':
     specifier: ^0.8.3
     version: 0.8.3(patch_hash=gcvajasovcbiq2qrorgjn6zpci)(solid-js@1.7.12)
@@ -1947,14 +1944,6 @@ packages:
     resolution: {integrity: sha512-TsecNzxiO5bLfzqb4OOuzfUmdOROcssuGqgh5rXMMaasoFZ3GoveUgdY1wcf17frMJM7kCNGNuK34EjErneZkg==}
     peerDependencies:
       solid-js: ^1.6.12
-    dependencies:
-      solid-js: 1.7.12
-    dev: false
-
-  /@solidjs/meta@0.28.6(solid-js@1.7.12):
-    resolution: {integrity: sha512-mplUfmp7tjGgDTiVbEAqkWDLpr0ZNyR1+OOETNyJt759MqPzh979X3oJUk8SZisGII0BNycmHDIGc0Shqx7bIg==}
-    peerDependencies:
-      solid-js: '>=1.4.0'
     dependencies:
       solid-js: 1.7.12
     dev: false

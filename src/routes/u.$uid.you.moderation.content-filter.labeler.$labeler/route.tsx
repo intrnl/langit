@@ -1,9 +1,9 @@
 import { Match, Show, Switch, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { Title } from '@solidjs/meta';
 
 import { useParams } from '~/router.ts';
 import { getAccountModerationPreferences } from '~/globals/preferences.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import { LABELERS } from '../u.$uid.you.moderation.content-filter._index/types.ts';
 import FilterOptions, {
@@ -28,15 +28,19 @@ const AuthenticatedLabelProviderFilterModerationPage = () => {
 		return $settings[labeler()];
 	});
 
-	const renderTitle = () => {
-		const $provider = labelerSettings() && labelProvider();
-
-		return `Label provider content filters${$provider ? ` (@${$provider.handle})` : ``} / Langit`;
-	};
-
 	return (
 		<div class="flex grow flex-col">
-			<Title>{renderTitle()}</Title>
+			<Title
+				render={() => {
+					const $provider = labelerSettings() && labelProvider();
+
+					if ($provider) {
+						return `Label provider content filters (@${$provider.handle}) / Langit`;
+					}
+
+					return `Label provider content filters / Langit`;
+				}}
+			/>
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<div class="flex flex-col gap-0.5">

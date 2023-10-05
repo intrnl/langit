@@ -1,8 +1,8 @@
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { Title } from '@solidjs/meta';
 
 import { getAccountModerationPreferences } from '~/globals/preferences.ts';
 import { useNavigate, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import { createRegexMatcher } from './utils.ts';
 import KeywordFilterForm from './KeywordFilterForm.tsx';
@@ -15,7 +15,7 @@ const AuthenticatedFilterModerationPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Add keyword filter / Langit</Title>
+			<Title render={`Add keyword filter / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Add keyword filter</p>

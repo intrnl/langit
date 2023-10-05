@@ -1,12 +1,12 @@
-import { MetaProvider, Title } from '@solidjs/meta';
 import { Outlet } from '@solidjs/router';
 
 import { ModalProvider } from '~/globals/modals.tsx';
+import { MetaProvider, Title } from '~/utils/meta.tsx';
 
 const Root = () => {
 	return (
 		<MetaProvider>
-			<Title>Langit</Title>
+			<Title render="Langit" />
 
 			<Outlet />
 			<ModalProvider />

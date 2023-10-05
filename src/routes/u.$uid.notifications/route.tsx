@@ -2,7 +2,6 @@ import { For, Match, Switch, createEffect } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 
 import { getCollectionCursor } from '~/api/utils.ts';
 
@@ -15,6 +14,7 @@ import {
 } from '~/api/queries/get-notifications.ts';
 
 import { useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
@@ -111,7 +111,7 @@ const AuthenticatedNotificationsPage = () => {
 
 	return (
 		<div class="flex grow flex-col">
-			<Title>Notifications / Langit</Title>
+			<Title render="Notifications / Langit" />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center justify-between gap-4 border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Notifications</p>

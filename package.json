@@ -15,7 +15,6 @@
 		"@lexical/link": "~0.11.3",
 		"@lexical/utils": "~0.11.3",
 		"@solid-primitives/deep": "^0.2.3",
-		"@solidjs/meta": "^0.28.6",
 		"@solidjs/router": "^0.8.3",
 		"@thisbeyond/solid-dnd": "^0.7.4",
 		"immer": "^10.0.2",

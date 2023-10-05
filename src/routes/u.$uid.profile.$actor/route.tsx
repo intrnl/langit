@@ -3,7 +3,6 @@ import { Match, Show, Switch, lazy } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 import { Outlet } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
@@ -17,6 +16,7 @@ import { isProfileTemporarilyMuted } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import FollowButton from '~/components/FollowButton.tsx';
@@ -73,12 +73,15 @@ const AuthenticatedProfileLayout = () => {
 					<Match when={profile()}>
 						{(profile) => (
 							<div class="flex flex-col gap-0.5">
-								<Title>
-									{profile().displayName.value
-										? `${profile().displayName.value} (@${profile().handle.value})`
-										: `@${profile().handle.value}`}{' '}
-									/ Langit
-								</Title>
+								<Title
+									render={() => {
+										const $profile = profile();
+										const displayName = $profile.displayName.value;
+										const handle = $profile.handle.value;
+
+										return `${displayName ? `${displayName} (@${handle})` : `@${handle}`} / Langit`;
+									}}
+								/>
 
 								<p dir="auto" class="line-clamp-1 break-all text-base font-bold leading-5">
 									{profile().displayName.value || profile().handle.value}
@@ -89,7 +92,7 @@ const AuthenticatedProfileLayout = () => {
 					</Match>
 
 					<Match when>
-						<Title>Profile ({actor()}) / Langit</Title>
+						<Title render={() => `Profile (${actor()}) / Langit`} />
 						<p class="text-base font-bold">Profile</p>
 					</Match>
 				</Switch>

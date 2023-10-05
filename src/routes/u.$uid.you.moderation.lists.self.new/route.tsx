@@ -1,14 +1,13 @@
 import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
 import { createMutation } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
 import { getCurrentDate, getRecordId } from '~/api/utils.ts';
 
 import { multiagent } from '~/globals/agent.ts';
-
-import { assert } from '~/utils/misc.ts';
 import { useNavigate, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
+import { assert } from '~/utils/misc.ts';
 
 import ListForm, { type ListSubmissionData } from './ListForm.tsx';
 
@@ -62,7 +61,7 @@ const AuthenticatedAddListsModerationPage = () => {
 
 	return (
 		<div>
-			<Title>New user list / Langit</Title>
+			<Title render={`New user list / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">New user list</p>

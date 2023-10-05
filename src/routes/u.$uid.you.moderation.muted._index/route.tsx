@@ -2,7 +2,6 @@ import { For, Match, Show, Switch, createEffect } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
@@ -14,10 +13,11 @@ import {
 	getSelfMutesLatestKey,
 } from '~/api/queries/get-self-mutes.ts';
 
-import { openModal } from '~/globals/modals.tsx';
 import { getCollectionCursor } from '~/api/utils.ts';
 
+import { openModal } from '~/globals/modals.tsx';
 import { generatePath, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import MuteConfirmDialog from '~/components/dialogs/MuteConfirmDialog.tsx';
@@ -26,7 +26,7 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
-import VolumeUpIcon from '~/icons/baseline-volume-up';
+import VolumeUpIcon from '~/icons/baseline-volume-up.tsx';
 
 const AuthenticatedMutedUsersModerationPage = () => {
 	const params = useParams('/u/:uid/you/moderation/muted');
@@ -80,7 +80,7 @@ const AuthenticatedMutedUsersModerationPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Muted users / Langit</Title>
+			<Title render={`Muted users / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Muted users</p>

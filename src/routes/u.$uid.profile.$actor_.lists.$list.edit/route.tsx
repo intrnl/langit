@@ -3,7 +3,6 @@ import { Match, Switch, createMemo } from 'solid-js';
 import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createMutation, createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 
 import { lists } from '~/api/cache/lists.ts';
 import { getList, getListKey } from '~/api/queries/get-list.ts';
@@ -12,6 +11,7 @@ import { getCurrentDate, getRecordId, isDid } from '~/api/utils.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 
@@ -114,16 +114,6 @@ const AuthenticatedListsEditPage = () => {
 		},
 	});
 
-	const renderTitle = () => {
-		const $list = list();
-
-		if ($list) {
-			return `Edit "${$list.name.value}" list / Langit`;
-		}
-
-		return `Edit list / Langit`;
-	};
-
 	const isInvalidEdit = () => {
 		const $list = list();
 		return $list ? $list.creator.did !== uid() : false;
@@ -131,7 +121,17 @@ const AuthenticatedListsEditPage = () => {
 
 	return (
 		<div>
-			<Title>{renderTitle()}</Title>
+			<Title
+				render={() => {
+					const $list = list();
+
+					if ($list) {
+						return `Edit "${$list.name.value}" list / Langit`;
+					}
+
+					return `Edit list / Langit`;
+				}}
+			/>
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Edit user list</p>

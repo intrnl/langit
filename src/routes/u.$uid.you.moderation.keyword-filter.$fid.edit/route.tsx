@@ -1,10 +1,10 @@
 import { Match, Switch, batch, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { Title } from '@solidjs/meta';
 
 import { getAccountModerationPreferences } from '~/globals/preferences.ts';
 import { useNavigate, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import { createRegexMatcher } from '../u.$uid.you.moderation.keyword-filter.add/utils.ts';
 import KeywordFilterForm from '../u.$uid.you.moderation.keyword-filter.add/KeywordFilterForm.tsx';
@@ -23,16 +23,6 @@ const AuthenticatedEditFilterModerationPage = () => {
 		return prefs.filters.find((def) => def.id === id);
 	});
 
-	const renderTitle = () => {
-		const $filter = filter();
-
-		if ($filter) {
-			return `Edit "${$filter.name}" keyword filter / Langit`;
-		}
-
-		return `Edit keyword filter / Langit`;
-	};
-
 	const navigateBack = () => {
 		if (history.state) {
 			navigate(-1);
@@ -43,7 +33,17 @@ const AuthenticatedEditFilterModerationPage = () => {
 
 	return (
 		<div class="flex grow flex-col">
-			<Title>{renderTitle()}</Title>
+			<Title
+				render={() => {
+					const $filter = filter();
+
+					if ($filter) {
+						return `Edit "${$filter.name}" keyword filter / Langit`;
+					}
+
+					return `Edit keyword filter / Langit`;
+				}}
+			/>
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Edit keyword filter</p>

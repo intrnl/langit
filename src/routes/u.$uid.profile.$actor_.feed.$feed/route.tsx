@@ -2,7 +2,6 @@ import { Match, Show, Switch, createEffect, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 
 import { favoriteFeed } from '~/api/mutations/favorite-feed.ts';
 import {
@@ -23,6 +22,7 @@ import {
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import TimelineList from '~/components/TimelineList.tsx';
 import button from '~/styles/primitives/button.ts';
@@ -131,14 +131,19 @@ const AuthenticatedFeedPage = () => {
 					<Match when={info()}>
 						{(info) => (
 							<>
-								<Title>Feed ({info().displayName.value}) / Langit</Title>
+								<Title
+									render={() => {
+										const $info = info();
+										return `Feed (${$info.displayName.value || feed()}) / Langit`;
+									}}
+								/>
 								<p class="text-base font-bold">{info().displayName.value}</p>
 							</>
 						)}
 					</Match>
 
 					<Match when>
-						<Title>Feed ({feed()})</Title>
+						<Title render={() => `Feed (${feed()}) / Langit`} />
 						<p class="text-base font-bold">Feed</p>
 					</Match>
 				</Switch>

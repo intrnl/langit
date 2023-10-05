@@ -1,7 +1,6 @@
 import { For, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { Title } from '@solidjs/meta';
 
 import {
 	type KeywordPreference,
@@ -12,6 +11,7 @@ import {
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import AddIcon from '~/icons/baseline-add.tsx';
 
@@ -37,7 +37,7 @@ const AuthenticatedAddFilterModerationPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Keyword filters / Langit</Title>
+			<Title render={`Keyword filters / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Keyword filters</p>

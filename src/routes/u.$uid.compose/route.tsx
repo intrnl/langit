@@ -2,7 +2,6 @@ import { For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid
 
 import type { AtBlob, DID, Records, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
 import { AutoLinkNode } from '@lexical/link';
@@ -46,6 +45,7 @@ import { createDerivedSignal } from '~/utils/hooks.ts';
 import { compressPostImage } from '~/utils/image.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
+import { Title } from '~/utils/meta.tsx';
 import { signal } from '~/utils/signals.ts';
 
 import BlobImage from '~/components/BlobImage.tsx';
@@ -462,7 +462,7 @@ const AuthenticatedComposePage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Compose / Langit</Title>
+			<Title render="Compose / Langit" />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Compose</p>

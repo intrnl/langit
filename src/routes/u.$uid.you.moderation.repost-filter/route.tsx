@@ -2,7 +2,6 @@ import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
 
 import { mergeSignalizedProfile, type SignalizedProfile } from '~/api/cache/profiles.ts';
@@ -11,6 +10,7 @@ import { fetchProfileBatched } from '~/api/queries/get-profile-batched.ts';
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -30,7 +30,7 @@ const AuthenticatedRepostFilterModerationPage = () => {
 
 	return (
 		<div class="flex flex-col">
-			<Title>Hidden reposts / Langit</Title>
+			<Title render={`Hidden reposts / Langit`} />
 
 			<div class="sticky top-0 z-10 flex h-13 items-center border-b border-divider bg-background px-4">
 				<p class="text-base font-bold">Hidden reposts</p>

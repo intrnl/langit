@@ -2,7 +2,6 @@ import { For, Match, Show, Switch, createMemo, createSignal, onCleanup } from 's
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { Title } from '@solidjs/meta';
 import { useNavigate } from '@solidjs/router';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
@@ -16,6 +15,7 @@ import { getTimeline, getTimelineKey } from '~/api/queries/get-timeline';
 
 import { preferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
+import { Title } from '~/utils/meta.tsx';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post, { createPostKey } from '~/components/Post.tsx';
@@ -60,7 +60,7 @@ const AuthenticatedExplorePage = () => {
 
 	return (
 		<div class="flex flex-col pb-4">
-			<Title>Explore / Langit</Title>
+			<Title render='Explore / Langit' />
 
 			<div class="sticky top-0 z-20 flex h-13 items-center gap-2 border-b border-divider bg-background px-4">
 				<SearchInput

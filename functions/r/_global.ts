@@ -1,9 +1,9 @@
 import { XRPC } from '@intrnl/bluesky-client/xrpc';
-import type { AtBlob, DID, Procedures, Queries } from '@intrnl/bluesky-client/atp-schema';
+import type { Procedures, Queries } from '@intrnl/bluesky-client/atp-schema';
 
 export const INSTANCE_URL = `https://bsky.social`;
 
-export const rpc = new XRPC<Queries, Procedures>(INSTANCE_URL);
+export const rpc = new XRPC<Queries, Procedures>('https://api.bsky.app');
 
 export const escape = (value: string, isAttribute: boolean) => {
 	const str = '' + value;
@@ -25,14 +25,4 @@ export const escape = (value: string, isAttribute: boolean) => {
 	}
 
 	return escaped + str.substring(last);
-};
-
-export const getBlobUrl = (did: DID, blob: AtBlob) => {
-	return `${INSTANCE_URL}/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${blob.ref.$link}`;
-};
-
-export type ImageType = 'avatar' | 'banner' | 'feed_thumbnail' | 'feed_fullsize';
-
-export const getImageUrl = (did: DID, blob: AtBlob, type: ImageType) => {
-	return `https://av-cdn.bsky.app/img/${type}/plain/${did}/${blob.ref.$link}@jpeg`;
 };

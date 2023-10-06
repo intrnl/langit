@@ -1,50 +1,59 @@
-import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
-import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
+import type { AtUri, DID } from '@intrnl/bluesky-client/atp-schema';
 
 import { rpc } from './_global.ts';
 
-export const resolveRepo = async (actor: string) => {
-	const response = await rpc.get('com.atproto.repo.describeRepo', {
+const isDid = (str: string): str is DID => {
+	return str.startsWith('did:');
+};
+
+export const getDid = async (actor: string) => {
+	let did: DID;
+	if (isDid(actor)) {
+		did = actor;
+	} else {
+		const response = await rpc.get('com.atproto.identity.resolveHandle', {
+			params: {
+				handle: actor,
+			},
+		});
+
+		did = response.data.did;
+	}
+
+	return did;
+};
+
+export const getFeedGenerator = async (uri: AtUri) => {
+	const response = await rpc.get('app.bsky.feed.getFeedGenerator', {
 		params: {
-			repo: actor,
+			feed: uri,
+		},
+	});
+
+	const data = response.data;
+	return data.view;
+};
+
+export const getPostThread = async (uri: AtUri, height: number, depth: number) => {
+	const response = await rpc.get('app.bsky.feed.getPostThread', {
+		params: {
+			uri: uri,
+			parentHeight: height,
+			depth: depth,
+		},
+	});
+
+	const data = response.data;
+	return data.thread;
+};
+
+export const getProfile = async (actor: string) => {
+	const response = await rpc.get('app.bsky.actor.getProfile', {
+		params: {
+			actor: actor,
 		},
 	});
 
 	const data = response.data;
 	return data;
-};
-
-export const resolveRecord = async <TCollection extends keyof Records>(
-	did: DID,
-	collection: TCollection,
-	rkey: string,
-): Promise<Records[TCollection]> => {
-	const response = await rpc.get('com.atproto.repo.getRecord', {
-		params: {
-			repo: did,
-			collection: collection,
-			rkey: rkey,
-		},
-	});
-
-	const data = response.data;
-	return data.value as Records[TCollection];
-};
-
-export const tryResolveRecord = async <TCollection extends keyof Records>(
-	did: DID,
-	collection: TCollection,
-	rkey: string,
-): Promise<Records[TCollection] | null> => {
-	try {
-		return await resolveRecord(did, collection, rkey);
-	} catch (err) {
-		if (err instanceof XRPCError) {
-			if (err.error === 'InvalidRequest') {
-				return null;
-			}
-		}
-
-		throw err;
-	}
 };

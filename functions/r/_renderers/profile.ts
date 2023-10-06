@@ -1,29 +1,24 @@
-import { escape, getImageUrl } from '../_global.ts';
-import { resolveRepo, tryResolveRecord } from '../_resolvers.ts';
+import { escape } from '../_global.ts';
+import { getProfile } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
 
 export const renderProfile = async (actor: string) => {
-	const repo = await resolveRepo(actor);
-	const profile = await tryResolveRecord(repo.did, 'app.bsky.actor.profile', 'self');
+	const author = await getProfile(actor);
 
-	const title = profile?.displayName ? `${profile.displayName} (@${repo.handle})` : `@${repo.handle}`;
+	const title = author.displayName ? `${author.displayName} (@${author.handle})` : `@${author.handle}`;
 
 	let head = renderBase();
 	head += `<meta property="og:title" content="${escape(title, true)}" />`;
 
-	if (profile) {
-		const avatar = profile.avatar;
-		const description = profile.description;
+	const avatar = author.avatar;
+	const description = author.description;
 
-		if (avatar) {
-			const url = getImageUrl(repo.did, avatar, 'avatar');
-
-			head += `<meta property="og:image" content="${escape(url, true)}" />`;
-		}
-		if (description) {
-			head += `<meta property="og:description" content="${escape(description, true)}" />`;
-		}
+	if (avatar) {
+		head += `<meta property="og:image" content="${escape(avatar, true)}" />`;
+	}
+	if (description) {
+		head += `<meta property="og:description" content="${escape(description, true)}" />`;
 	}
 
 	return head;

@@ -1,39 +1,38 @@
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
-import { escape, getImageUrl } from '../_global.ts';
-import { resolveRecord, resolveRepo, tryResolveRecord } from '../_resolvers.ts';
+import { escape } from '../_global.ts';
+import { getDid, getPostThread } from '../_resolvers.ts';
 
 import { renderBase } from './base.ts';
 
 export const renderPost = async (actor: string, tid: string) => {
-	const repo = await resolveRepo(actor);
+	const did = await getDid(actor);
+	const thread = await getPostThread(`at://${did}/app.bsky.feed.post/${tid}`, 1, 1);
 
-	const [profile, post] = await Promise.all([
-		tryResolveRecord(repo.did, 'app.bsky.actor.profile', 'self'),
-		resolveRecord(repo.did, 'app.bsky.feed.post', tid),
-	]);
+	if (thread.$type !== 'app.bsky.feed.defs#threadViewPost') {
+		return '';
+	}
 
+	const parent = thread.parent;
+	const post = thread.post;
+
+	const author = post.author;
 	const embed = post.embed;
-	const reply = post.reply;
+	const record = post.record as Records['app.bsky.feed.post'];
 
-	const title = profile?.displayName ? `${profile.displayName} (@${repo.handle})` : `@${repo.handle}`;
+	const title = author.displayName ? `${author.displayName} (@${author.handle})` : `@${author.handle}`;
 
 	let head = renderBase();
 
 	let header = '';
-	let text = post.text;
+	let text = record.text;
 
-	if (reply) {
-		const parentUri = reply.parent.uri;
+	if (parent) {
+		if (parent.$type === 'app.bsky.feed.defs#threadViewPost') {
+			const repliedTo = parent.post.author;
 
-		try {
-			const repliedToRepo = await resolveRepo(getRepoId(parentUri));
-
-			header += `[replying to @${repliedToRepo.handle}] `;
-		} catch (err) {
-			console.log(`failed to resolve reply ${parentUri}`);
-			console.error(err);
-
+			header += `[replying to @${repliedTo.handle}]`;
+		} else {
 			header += `[reply: not found] `;
 		}
 	}
@@ -41,42 +40,53 @@ export const renderPost = async (actor: string, tid: string) => {
 	if (embed) {
 		const $type = embed.$type;
 
-		let images: RefOf<'app.bsky.embed.images#image'>[] | undefined;
-		let record: string | undefined;
+		let images: RefOf<'app.bsky.embed.images#viewImage'>[] | undefined;
+		let record: RefOf<'app.bsky.embed.record#viewRecord'> | null | undefined;
 
-		if ($type === 'app.bsky.embed.images') {
+		if ($type === 'app.bsky.embed.images#view') {
 			images = embed.images;
-		} else if ($type === 'app.bsky.embed.recordWithMedia') {
-			const media = embed.media;
+		} else if ($type === 'app.bsky.embed.recordWithMedia#view') {
+			const med = embed.media;
 
-			if (media.$type === 'app.bsky.embed.images') {
-				images = media.images;
+			const rec = embed.record.record;
+			const rectype = rec.$type;
+
+			if (med.$type === 'app.bsky.embed.images#view') {
+				images = med.images;
 			}
 
-			record = embed.record.record.uri;
-		} else if ($type === 'app.bsky.embed.record') {
-			record = embed.record.uri;
+			if (getCollectionId(rec.uri) === 'app.bsky.feed.post') {
+				if (rectype === 'app.bsky.embed.record#viewRecord') {
+					record = rec;
+				} else {
+					record = null;
+				}
+			}
+		} else if ($type === 'app.bsky.embed.record#view') {
+			const rec = embed.record;
+			const rectype = rec.$type;
+
+			if (getCollectionId(rec.uri) === 'app.bsky.feed.post') {
+				if (rectype === 'app.bsky.embed.record#viewRecord') {
+					record = rec;
+				} else {
+					record = null;
+				}
+			}
 		}
 
 		if (images) {
 			const img = images[0];
-			const url = getImageUrl(repo.did, img.image, 'feed_fullsize');
+			const url = img.fullsize;
 
 			head += `<meta name="twitter:card" content="summary_large_image" />`;
 			head += `<meta property="og:image" content="${escape(url, true)}" />`;
 		}
 
-		if (record && getCollectionId(record) === 'app.bsky.feed.post') {
-			try {
-				const quotedRepo = await resolveRepo(getRepoId(record));
-
-				header += `[quoting @${quotedRepo.handle}] `;
-			} catch (err) {
-				console.log(`failed to resolve quote ${record}`);
-				console.error(err);
-
-				header += `[quote: not found] `;
-			}
+		if (record) {
+			header += `[quoting @${record.author.handle}] `;
+		} else if (record === null) {
+			header += `[quote: not found]`;
 		}
 	}
 
@@ -95,9 +105,4 @@ const getCollectionId = (uri: string) => {
 	const second = uri.indexOf('/', first + 1);
 
 	return uri.slice(first + 1, second);
-};
-
-const getRepoId = (uri: string) => {
-	const idx = uri.indexOf('/', 5);
-	return uri.slice(5, idx);
 };

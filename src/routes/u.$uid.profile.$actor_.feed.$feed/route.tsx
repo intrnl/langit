@@ -19,6 +19,7 @@ import {
 	getTimelineLatestKey,
 } from '~/api/queries/get-timeline.ts';
 
+import { openModal } from '~/globals/modals.tsx';
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
@@ -27,8 +28,11 @@ import { Title } from '~/utils/meta.tsx';
 import TimelineList from '~/components/TimelineList.tsx';
 import button from '~/styles/primitives/button.ts';
 
+import FavoriteIcon from '~/icons/baseline-favorite.tsx';
 import FavoriteOutlinedIcon from '~/icons/outline-favorite.tsx';
-import FavoriteIcon from '~/icons/baseline-favorite';
+import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+
+import FeedMenu from './FeedMenu.tsx';
 
 const AuthenticatedFeedPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/feed/:feed');
@@ -200,6 +204,16 @@ const AuthenticatedFeedPage = () => {
 										) : (
 											<FavoriteOutlinedIcon class="-mx-1.5 text-base" />
 										)}
+									</button>
+
+									<div class="grow" />
+
+									<button
+										title="More actions"
+										onClick={() => openModal(() => <FeedMenu uid={uid()} feed={info()} />)}
+										class={/* @once */ button({ color: 'outline' })}
+									>
+										<MoreHorizIcon class="-mx-1.5 text-base" />
 									</button>
 								</div>
 							</div>

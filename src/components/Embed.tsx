@@ -2,6 +2,8 @@ import { Show, createMemo } from 'solid-js';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 
+import { getCollectionId } from '~/api/utils.ts';
+
 import EmbedFeed from '~/components/EmbedFeed.tsx';
 import EmbedImage from '~/components/EmbedImage.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';
@@ -67,16 +69,18 @@ const Embed = (props: EmbedProps) => {
 				{(record) => {
 					const type = record.$type;
 
-					if (type === 'app.bsky.embed.record#viewNotFound') {
-						return <EmbedRecordNotFound />;
-					}
+					if (getCollectionId(record.uri) === 'app.bsky.feed.post') {
+						if (type === 'app.bsky.embed.record#viewNotFound') {
+							return <EmbedRecordNotFound />;
+						}
 
-					if (type === 'app.bsky.embed.record#viewBlocked') {
-						return <EmbedRecordBlocked uid={uid()} record={record} />;
-					}
+						if (type === 'app.bsky.embed.record#viewBlocked') {
+							return <EmbedRecordBlocked uid={uid()} record={record} />;
+						}
 
-					if (type === 'app.bsky.embed.record#viewRecord') {
-						return <EmbedRecord uid={uid()} record={record} large={props.large} interactive />;
+						if (type === 'app.bsky.embed.record#viewRecord') {
+							return <EmbedRecord uid={uid()} record={record} large={props.large} interactive />;
+						}
 					}
 
 					if (type === 'app.bsky.feed.defs#generatorView') {

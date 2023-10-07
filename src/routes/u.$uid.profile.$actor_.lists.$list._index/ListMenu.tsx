@@ -58,11 +58,13 @@ const ListMenu = (props: ListMenuProps) => {
 				<Match when>
 					<button
 						onClick={() => {
+							const $list = list();
+
 							closeModal();
 							openModal(() => (
 								<ReportDialog
 									uid={uid()}
-									report={{ type: REPORT_LIST, uri: list().uri, cid: list().cid.value }}
+									report={{ type: REPORT_LIST, uri: $list.uri, cid: $list.cid.value }}
 								/>
 							));
 						}}

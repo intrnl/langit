@@ -254,7 +254,7 @@ const renderText = (
 				href={generatePath('/u/:uid/profile/:actor', { uid: uid, actor: author.did })}
 				class="font-bold hover:underline"
 			>
-				{author.displayName || `@${author.handle}`}
+				{author.displayName?.trim() || `@${author.handle}`}
 			</a>,
 		);
 	}

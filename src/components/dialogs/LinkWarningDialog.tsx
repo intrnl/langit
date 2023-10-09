@@ -66,7 +66,7 @@ const LinkWarningDialog = (props: LinkWarningDialogProps) => {
 
 			<p class="my-3 text-sm">This link is taking you to the following site</p>
 
-			<div class="w-full overflow-hidden break-words rounded-md border border-input px-3 py-2 text-sm text-muted-fg">
+			<div class="w-full overflow-y-auto break-words rounded-md border border-input px-3 py-2 text-sm text-muted-fg">
 				{formattedHref()}
 			</div>
 

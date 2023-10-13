@@ -12,15 +12,13 @@
 		"@intrnl/bluesky-client": "^0.2.5",
 		"@intrnl/sq": "^0.2.1",
 		"@intrnl/use-gesture-solid": "^0.1.0",
-		"@lexical/link": "~0.11.3",
-		"@lexical/utils": "~0.11.3",
+		"@solid-primitives/event-listener": "^2.3.0",
 		"@solidjs/router": "^0.8.3",
 		"@thisbeyond/solid-dnd": "^0.7.4",
 		"immer": "^10.0.3",
-		"lexical": "^0.11.3",
-		"lexical-solid": "^0.6.3",
 		"solid-floating-ui": "^0.2.1",
 		"solid-js": "^1.8.0",
+		"solid-textarea-autosize": "^0.0.5",
 		"tldts": "^6.0.16"
 	},
 	"devDependencies": {
@@ -42,7 +40,7 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"@solidjs/router@0.8.3": "patches/@solidjs__router@0.8.3.patch",
-			"lexical-solid@0.6.3": "patches/lexical-solid@0.6.3.patch"
+			"solid-textarea-autosize@0.0.5": "patches/solid-textarea-autosize@0.0.5.patch"
 		},
 		"overrides": {
 			"has": "npm:@nolyfill/has@latest",

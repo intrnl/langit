@@ -4,16 +4,7 @@ import type { AtBlob, DID, Records, RefOf, UnionOf } from '@intrnl/bluesky-clien
 import { createQuery } from '@intrnl/sq';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
-import { AutoLinkNode } from '@lexical/link';
-
-import { LexicalComposer } from 'lexical-solid/LexicalComposer';
-import { PlainTextPlugin } from 'lexical-solid/LexicalPlainTextPlugin';
-import { ContentEditable } from 'lexical-solid/LexicalContentEditable';
-import { LexicalErrorBoundary } from 'lexical-solid/LexicalErrorBoundary';
-
-import { AutoFocusPlugin } from 'lexical-solid/LexicalAutoFocusPlugin';
-import { HistoryPlugin } from 'lexical-solid/LexicalHistoryPlugin';
-import { OnChangePlugin } from 'lexical-solid/LexicalOnChangePlugin';
+import TextareaAutosize from 'solid-textarea-autosize';
 
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
@@ -26,15 +17,9 @@ import { getLinkMeta, getLinkMetaKey } from '~/api/queries/get-link-meta';
 import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { getCurrentDate, getRecordId } from '~/api/utils.ts';
+import { finalizePrelimFacets, textToPrelimRt } from '~/api/richtext/compose.ts';
 
-import { MentionNode } from '~/lib/lexical/MentionNode.ts';
-import { HashtagNode } from '~/lib/lexical/HashtagNode.ts';
-import HashtagsPlugin from '~/lib/lexical/HashtagsPlugin.tsx';
-import LinkPlugin from '~/lib/lexical/LinkPlugin.tsx';
-import MentionsPlugin from '~/lib/lexical/MentionsPlugin.tsx';
-import ShortcutsPlugin from '~/lib/lexical/ShortcutsPlugin.tsx';
-import { lexical2rt } from '~/lib/lexical/lexical2rt.ts';
+import { getCurrentDate, getRecordId } from '~/api/utils.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
@@ -46,6 +31,7 @@ import { compressPostImage } from '~/utils/image.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
 import { Title } from '~/utils/meta.tsx';
+import { model } from '~/utils/misc.ts';
 import { signal } from '~/utils/signals.ts';
 
 import BlobImage from '~/components/BlobImage.tsx';
@@ -68,8 +54,7 @@ import AddSelfLabelDialog from './AddSelfLabelDialog.tsx';
 import ComposeLanguageMenu from './ComposeLanguageMenu.tsx';
 import ImageAltEditDialog from './ImageAltEditDialog.tsx';
 import ImageUploadCompressDialog from './ImageUploadCompressDialog.tsx';
-
-import './lexical-compose.css';
+import RichtextComposer from '~/components/richtext/RichtextComposer.tsx';
 
 type PostRecord = Records['app.bsky.feed.post'];
 type StrongRef = RefOf<'com.atproto.repo.strongRef'>;
@@ -121,9 +106,11 @@ const AuthenticatedComposePage = () => {
 
 	const [message, setMessage] = createSignal<string>();
 	const [state, setState] = createSignal(PostState.IDLE);
-	const [richtext, setRichtext] = createSignal<ReturnType<typeof lexical2rt>>();
 
-	const links = createMemo(() => richtext()?.links, undefined, {
+	const [input, setInput] = createSignal('');
+	const prelimRichtext = createMemo(() => textToPrelimRt(input()));
+
+	const links = createMemo(() => prelimRichtext()?.links, undefined, {
 		equals: (a, b) => {
 			if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
 				for (let idx = a.length - 1; idx >= 0; idx--) {
@@ -191,7 +178,7 @@ const AuthenticatedComposePage = () => {
 	});
 
 	const length = createMemo(() => {
-		const rt = richtext();
+		const rt = prelimRichtext();
 		return rt ? rt.length : 0;
 	});
 
@@ -206,13 +193,15 @@ const AuthenticatedComposePage = () => {
 	});
 
 	const handleSubmit = async () => {
-		const rt = richtext();
+		const rt = prelimRichtext();
 
-		if (state() !== PostState.IDLE || !(rt || images().length > 0)) {
+		if (state() !== PostState.IDLE || !(rt.length > 0 || images().length > 0)) {
 			return;
 		}
 
 		setState(PostState.DISPATCHING);
+
+		const $uid = uid();
 
 		const $reply = reply();
 		const $quote = quote() || feed();
@@ -253,7 +242,7 @@ const AuthenticatedComposePage = () => {
 				setMessage(`Uploading image #${idx + 1}`);
 
 				try {
-					const blob = await uploadBlob(uid(), img.blob);
+					const blob = await uploadBlob($uid, img.blob);
 
 					img.record = blob;
 				} catch (err) {
@@ -278,7 +267,7 @@ const AuthenticatedComposePage = () => {
 				setMessage(`Uploading link thumbnail`);
 
 				try {
-					const blob = await uploadBlob(uid(), $link.thumb);
+					const blob = await uploadBlob($uid, $link.thumb);
 
 					$link.record = blob;
 				} catch (err) {
@@ -321,12 +310,24 @@ const AuthenticatedComposePage = () => {
 			}
 		}
 
+		if (!(rt as any).resolvedFacets) {
+			try {
+				(rt as any).resolvedFacets = await finalizePrelimFacets($uid, rt);
+			} catch (err) {
+				console.error(`Failed to resolve facets`, err);
+
+				setMessage(`Failed to resolve facets`);
+				setState(PostState.IDLE);
+				return;
+			}
+		}
+
 		setMessage(undefined);
 
 		const record: PostRecord = {
 			createdAt: getCurrentDate(),
-			facets: rt ? rt.facets : undefined,
-			text: rt ? rt.text : '',
+			facets: (rt as any).resolvedFacets,
+			text: rt.text,
 			reply: replyRecord,
 			embed: embedRecord,
 			langs: $languages.length > 0 ? $languages : undefined,
@@ -337,7 +338,7 @@ const AuthenticatedComposePage = () => {
 		};
 
 		try {
-			const response = await createPost(uid(), record);
+			const response = await createPost($uid, record);
 			const pid = getRecordId(response.uri);
 
 			setState(PostState.SENT);
@@ -497,45 +498,16 @@ const AuthenticatedComposePage = () => {
 				</div>
 
 				<div class="min-w-0 grow">
-					<LexicalComposer
-						initialConfig={{
-							namespace: 'lexical',
-							onError(error, _editor) {
-								throw error;
-							},
-							nodes: [HashtagNode, MentionNode, AutoLinkNode],
-							theme: {
-								ltr: 'lexical-ltr',
-								rtl: 'lexical-rtl',
-								paragraph: 'lexical-paragraph',
-								link: 'lexical-link',
-								hashtag: 'lexical-hashtag',
-							},
-						}}
-					>
-						<div class="lexical-container">
-							<PlainTextPlugin
-								errorBoundary={LexicalErrorBoundary}
-								contentEditable={<ContentEditable class="lexical-content" />}
-								placeholder={<div class="lexical-placeholder">What's happening?</div>}
-							/>
-
-							<HistoryPlugin />
-							<AutoFocusPlugin />
-
-							<OnChangePlugin
-								onChange={(state) => {
-									const rt = lexical2rt(state);
-									setRichtext(rt);
-								}}
-							/>
-
-							<MentionsPlugin uid={uid()} />
-							<HashtagsPlugin />
-							<LinkPlugin />
-							<ShortcutsPlugin onSubmit={handleSubmit} onImageDrop={addImages} />
-						</div>
-					</LexicalComposer>
+					<RichtextComposer
+						uid={uid()}
+						value={input()}
+						class="block w-full resize-none bg-transparent pb-4 pr-3 pt-5 text-xl outline-none"
+						placeholder="What's happening?"
+						minRows={4}
+						onChange={setInput}
+						onSubmit={handleSubmit}
+						onImageDrop={addImages}
+					/>
 
 					<div class="pb-4 pr-3 empty:hidden">
 						<Show when={message()}>

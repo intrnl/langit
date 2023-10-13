@@ -501,7 +501,7 @@ const AuthenticatedComposePage = () => {
 					<RichtextComposer
 						uid={uid()}
 						value={input()}
-						class="block w-full resize-none bg-transparent pb-4 pr-3 pt-5 text-xl outline-none"
+						class="block w-full resize-none overflow-hidden bg-transparent pb-4 pr-3 pt-5 text-xl outline-none"
 						placeholder="What's happening?"
 						minRows={4}
 						onChange={setInput}

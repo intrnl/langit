@@ -8,7 +8,7 @@ import { toShortUrl } from './renderer.ts';
 import type { Facet, PreliminaryFacet } from './types.ts';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 
-const WHITESPACE_RE = / +(?=\n|$)/g;
+const WHITESPACE_RE = /\s+$| +(?=\n|$)/g;
 
 const ABS_LINK_RE = /https?:\/\/[\S]+/;
 const TRAILING_RE = /\)?[.,;]*$/;

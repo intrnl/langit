@@ -39,7 +39,11 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 		const $val = props.value;
 		const $sel = inputSelection();
 
-		return $sel == null || $val.length === $sel ? $val : $val.slice(0, $sel);
+		if ($sel == null) {
+			return '';
+		}
+
+		return $val.length === $sel ? $val : $val.slice(0, $sel);
 	});
 
 	const matchedMention = createMemo(() => {

@@ -56,6 +56,11 @@ export default defineConfig({
 		modulePreload: {
 			polyfill: false,
 		},
+		terserOptions: {
+			compress: {
+				passes: 2,
+			},
+		},
 	},
 	resolve: {
 		alias: {

@@ -132,7 +132,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 				value={props.value}
 				placeholder={props.placeholder}
 				minRows={props.minRows}
-				class="relative z-10 block w-full resize-none overflow-hidden bg-transparent pb-4 pr-3 pt-5 text-xl text-transparent caret-primary outline-none"
+				class="relative z-10 block w-full resize-none overflow-hidden bg-transparent pb-4 pr-3 pt-5 text-xl text-transparent caret-primary outline-none selection:bg-accentDark selection:text-white"
 				onPaste={(ev) => {
 					const items = ev.clipboardData?.items ?? [];
 					let images: Blob[] = [];

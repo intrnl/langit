@@ -5,6 +5,8 @@ import { makeEventListener } from '@solid-primitives/event-listener';
 
 import TextareaAutosize from 'solid-textarea-autosize';
 
+import type { PreliminaryRichText } from '~/api/richtext/composer.ts';
+
 import { multiagent } from '~/globals/agent.ts';
 import { useDebouncedValue } from '~/utils/hooks.ts';
 
@@ -14,14 +16,13 @@ export interface RichtextComposerProps {
 	uid: DID;
 
 	value: string;
+	rt: PreliminaryRichText;
 	onChange: (next: string) => void;
 	onSubmit: () => void;
 	onImageDrop: (blob: Blob[]) => void;
 
 	minRows?: number;
 	placeholder?: string;
-
-	class?: string;
 }
 
 const MENTION_AUTOCOMPLETE_RE = /(?<=^|\s)@([a-zA-Z0-9-.]+)$/;
@@ -111,12 +112,27 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 
 	return (
 		<div class="relative">
+			<div class="absolute inset-0 z-0 whitespace-pre-wrap break-words pb-4 pr-3 pt-5 text-xl">
+				{props.rt.segments.map((segment) => {
+					const feature = segment.feature;
+
+					if (feature) {
+						const node = document.createElement('span');
+						node.textContent = segment.orig;
+						node.className = 'text-accent';
+						return node;
+					}
+
+					return segment.orig;
+				})}
+			</div>
+
 			<TextareaAutosize
 				ref={textarea}
 				value={props.value}
 				placeholder={props.placeholder}
 				minRows={props.minRows}
-				class={props.class}
+				class="relative z-10 block w-full resize-none overflow-hidden bg-transparent pb-4 pr-3 pt-5 text-xl text-transparent caret-primary outline-none"
 				onPaste={(ev) => {
 					const items = ev.clipboardData?.items ?? [];
 					let images: Blob[] = [];

@@ -46,6 +46,7 @@ export interface PreliminarySegment {
 }
 
 export interface PreliminaryRichText {
+	text: string;
 	segments: PreliminarySegment[];
 	links: string[];
 }
@@ -54,12 +55,14 @@ const matchSort = (a: PreliminaryMatch, b: PreliminaryMatch) => {
 	return a.m.index! - b.m.index!;
 };
 
-export const textToPrelimRt = (text: string): PreliminaryRichText => {
+export const textToPrelimRt = (text: string) => {
 	const links: string[] = [];
 	const segments: PreliminarySegment[] = [];
 
 	const matches: PreliminaryMatch[] = [];
 	let match: RegExpMatchArray | null;
+
+	let finalText = '';
 
 	text = text.replace(WHITESPACE_RE, '');
 
@@ -91,7 +94,9 @@ export const textToPrelimRt = (text: string): PreliminaryRichText => {
 
 			if (textCursor < start) {
 				const sliced = text.slice(textCursor, start);
+
 				segments.push({ text: sliced, orig: sliced });
+				finalText += sliced;
 			} else if (textCursor > start) {
 				matchCursor++;
 				continue;
@@ -151,38 +156,31 @@ export const textToPrelimRt = (text: string): PreliminaryRichText => {
 			}
 
 			if (segment) {
+				finalText += segment.text;
 				segments.push(segment);
 			}
 		} while (matchCursor < matchesLen);
 
 		if (textCursor < text.length) {
 			const sliced = text.slice(textCursor);
+
+			finalText += sliced;
 			segments.push({ text: sliced, orig: sliced });
 		}
 	} else {
+		finalText = text;
 		segments.push({ text: text, orig: text });
 	}
 
 	return {
+		text: finalText,
 		segments,
 		links,
 	};
 };
 
-export const getRtText = (rt: PreliminaryRichText) => {
-	const segments = rt.segments;
-	let str = '';
-
-	for (let idx = 0, len = segments.length; idx < len; idx++) {
-		const segment = segments[idx];
-		str += segment.text;
-	}
-
-	return str;
-};
-
-export const getRtLength = (rt: PreliminaryRichText) => {
-	const text = getRtText(rt);
+export const getRtLength = (rt: ReturnType<typeof textToPrelimRt>) => {
+	const text = rt.text;
 	return isAscii(text) ? text.length : graphemeLen(text);
 };
 
@@ -192,12 +190,10 @@ const getUtf8Length = (str: string): number => {
 	return isAscii(str) ? str.length : encoder.encode(str).byteLength;
 };
 
-export const finalizeRt = async (uid: DID, rt: PreliminaryRichText) => {
+export const finalizeRtFacets = async (uid: DID, rt: ReturnType<typeof textToPrelimRt>) => {
 	const agent = await multiagent.connect(uid);
 
 	const segments = rt.segments;
-
-	const text = getRtText(rt);
 	const facets: Facet[] = [];
 
 	let utf8Length = 0;
@@ -249,5 +245,5 @@ export const finalizeRt = async (uid: DID, rt: PreliminaryRichText) => {
 		}
 	}
 
-	return { text, facets };
+	return facets;
 };

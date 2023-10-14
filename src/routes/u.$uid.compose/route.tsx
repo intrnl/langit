@@ -15,7 +15,7 @@ import { getLinkMeta, getLinkMetaKey } from '~/api/queries/get-link-meta';
 import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { finalizeRt, getRtLength, textToPrelimRt } from '~/api/richtext/composer.ts';
+import { finalizeRtFacets, getRtLength, textToPrelimRt } from '~/api/richtext/composer.ts';
 
 import { getCurrentDate, getRecordId } from '~/api/utils.ts';
 
@@ -307,9 +307,9 @@ const AuthenticatedComposePage = () => {
 			}
 		}
 
-		if (!(rt as any).res) {
+		if (!(rt as any).resolvedFacets) {
 			try {
-				(rt as any).res = await finalizeRt($uid, rt);
+				(rt as any).resolvedFacets = await finalizeRtFacets($uid, rt);
 			} catch (err) {
 				console.error(`Failed to resolve facets`, err);
 
@@ -323,8 +323,8 @@ const AuthenticatedComposePage = () => {
 
 		const record: PostRecord = {
 			createdAt: getCurrentDate(),
-			facets: (rt as any).res.facets,
-			text: (rt as any).res.text,
+			facets: (rt as any).resolvedFacets,
+			text: rt.text,
 			reply: replyRecord,
 			embed: embedRecord,
 			langs: $languages.length > 0 ? $languages : undefined,

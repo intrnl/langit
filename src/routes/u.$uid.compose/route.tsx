@@ -498,7 +498,7 @@ const AuthenticatedComposePage = () => {
 					<RichtextComposer
 						uid={uid()}
 						value={input()}
-						rt={prelimRichtext()}
+						class="block w-full resize-none overflow-hidden bg-transparent pb-4 pr-3 pt-5 text-xl outline-none"
 						placeholder="What's happening?"
 						minRows={4}
 						onChange={setInput}

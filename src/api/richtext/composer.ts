@@ -39,16 +39,9 @@ interface PreliminaryMatch {
 	m: RegExpMatchArray;
 }
 
-export interface PreliminarySegment {
+interface PreliminarySegment {
 	text: string;
-	orig: string;
 	feature?: LinkFeature | TagFeature | MentionFeature | UnresolvedMentionFeature;
-}
-
-export interface PreliminaryRichText {
-	text: string;
-	segments: PreliminarySegment[];
-	links: string[];
 }
 
 const matchSort = (a: PreliminaryMatch, b: PreliminaryMatch) => {
@@ -95,7 +88,7 @@ export const textToPrelimRt = (text: string) => {
 			if (textCursor < start) {
 				const sliced = text.slice(textCursor, start);
 
-				segments.push({ text: sliced, orig: sliced });
+				segments.push({ text: sliced });
 				finalText += sliced;
 			} else if (textCursor > start) {
 				matchCursor++;
@@ -115,7 +108,6 @@ export const textToPrelimRt = (text: string) => {
 
 				segment = {
 					text: label,
-					orig: matched,
 					feature: {
 						$type: 'app.bsky.richtext.facet#link',
 						uri: uri,
@@ -124,13 +116,12 @@ export const textToPrelimRt = (text: string) => {
 			} else if (type === RichText.MENTION) {
 				if (match[1]) {
 					const sliced = matched.slice(1);
-					segment = { text: sliced, orig: matched };
+					segment = { text: sliced };
 				} else {
 					const handle = match[2];
 
 					segment = {
 						text: matched,
-						orig: matched,
 						feature: {
 							$type: 'io.github.intrnl.langit#unresolvedMention',
 							handle: handle,
@@ -140,13 +131,12 @@ export const textToPrelimRt = (text: string) => {
 			} else if (type === RichText.TAG) {
 				if (match[1]) {
 					const sliced = matched.slice(1);
-					segment = { text: sliced, orig: matched };
+					segment = { text: sliced };
 				} else {
 					const tag = match[2];
 
 					segment = {
 						text: matched,
-						orig: matched,
 						feature: {
 							$type: 'app.bsky.richtext.facet#tag',
 							tag: tag,
@@ -165,11 +155,11 @@ export const textToPrelimRt = (text: string) => {
 			const sliced = text.slice(textCursor);
 
 			finalText += sliced;
-			segments.push({ text: sliced, orig: sliced });
+			segments.push({ text: sliced });
 		}
 	} else {
 		finalText = text;
-		segments.push({ text: text, orig: text });
+		segments.push({ text: text });
 	}
 
 	return {

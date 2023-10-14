@@ -59,4 +59,8 @@
 	body:has(dialog[data-modal][open]) {
 		@apply overflow-hidden pr-[--sb-width];
 	}
+
+	::selection {
+		@apply bg-accentDark text-white;
+	}
 }

@@ -37,7 +37,7 @@ const LinkWarningDialog = (props: LinkWarningDialogProps) => {
 		const hostname = url.hostname;
 		const port = url.port;
 
-		const tld = tldts.parse(hostname);
+		const tld = tldts.parse(hostname, { allowPrivateDomains: true });
 		const domain = tld.domain;
 		const subdomain = tld.subdomain;
 

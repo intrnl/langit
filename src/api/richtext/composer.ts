@@ -113,6 +113,7 @@ export const textToPrelimRt = (text: string) => {
 						uri: uri,
 					},
 				};
+				textCursor = start + uri.length;
 			} else if (type === RichText.MENTION) {
 				if (match[1]) {
 					const sliced = matched.slice(1);

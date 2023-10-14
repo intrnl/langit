@@ -4,8 +4,6 @@ import type { AtBlob, DID, Records, RefOf, UnionOf } from '@intrnl/bluesky-clien
 import { createQuery } from '@intrnl/sq';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
-import TextareaAutosize from 'solid-textarea-autosize';
-
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
 import {
@@ -17,7 +15,7 @@ import { getLinkMeta, getLinkMetaKey } from '~/api/queries/get-link-meta';
 import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
-import { finalizePrelimFacets, textToPrelimRt } from '~/api/richtext/compose.ts';
+import { finalizeRtFacets, getRtLength, textToPrelimRt } from '~/api/richtext/composer.ts';
 
 import { getCurrentDate, getRecordId } from '~/api/utils.ts';
 
@@ -31,7 +29,6 @@ import { compressPostImage } from '~/utils/image.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
 import { Title } from '~/utils/meta.tsx';
-import { model } from '~/utils/misc.ts';
 import { signal } from '~/utils/signals.ts';
 
 import BlobImage from '~/components/BlobImage.tsx';
@@ -179,7 +176,7 @@ const AuthenticatedComposePage = () => {
 
 	const length = createMemo(() => {
 		const rt = prelimRichtext();
-		return rt ? rt.length : 0;
+		return getRtLength(rt);
 	});
 
 	const isEnabled = createMemo(() => {
@@ -195,7 +192,7 @@ const AuthenticatedComposePage = () => {
 	const handleSubmit = async () => {
 		const rt = prelimRichtext();
 
-		if (state() !== PostState.IDLE || !(rt.length > 0 || images().length > 0)) {
+		if (state() !== PostState.IDLE || !(length() > 0 || images().length > 0)) {
 			return;
 		}
 
@@ -312,7 +309,7 @@ const AuthenticatedComposePage = () => {
 
 		if (!(rt as any).resolvedFacets) {
 			try {
-				(rt as any).resolvedFacets = await finalizePrelimFacets($uid, rt);
+				(rt as any).resolvedFacets = await finalizeRtFacets($uid, rt);
 			} catch (err) {
 				console.error(`Failed to resolve facets`, err);
 

@@ -110,7 +110,7 @@ export const textToPrelimRt = (text: string): PreliminaryRichText => {
 
 				segment = {
 					text: label,
-					orig: matched,
+					orig: uri,
 					feature: {
 						$type: 'app.bsky.richtext.facet#link',
 						uri: uri,

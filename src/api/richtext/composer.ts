@@ -88,7 +88,7 @@ export const textToPrelimRt = (text: string) => {
 			if (textCursor < start) {
 				const sliced = text.slice(textCursor, start);
 
-				segments.push({ text: sliced, feature: undefined });
+				segments.push({ text: sliced });
 				finalText += sliced;
 			} else if (textCursor > start) {
 				matchCursor++;

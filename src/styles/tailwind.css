@@ -7,6 +7,7 @@
 		--background: 255 255 255; /* white */
 
 		--accent: 37 99 235; /* blue-600 */
+		--accent-dark: 30 64 175 /* blue-700 */;
 
 		--primary: 3 7 18; /* gray-950 */
 		--primary-fg: 243 244 246; /* gray-100 */

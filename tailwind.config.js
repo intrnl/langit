@@ -41,6 +41,7 @@ export default {
 		},
 		colors: {
 			accent: 'rgb(var(--accent))',
+			accentDark: 'rgb(var(--accent-dark))',
 			background: 'rgb(var(--background))',
 			primary: {
 				DEFAULT: 'rgb(var(--primary))',

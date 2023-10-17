@@ -1,11 +1,10 @@
-import { createSignal } from 'solid-js';
-
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
 
-import button from '~/styles/primitives/button.ts';
-import * as dialog from '~/styles/primitives/dialog.ts';
+import * as menu from '~/styles/primitives/menu.ts';
+
+import ContentCopyIcon from '~/icons/baseline-content-copy.tsx';
 
 export interface ProfileIdentifierDialogProps {
 	profile: SignalizedProfile;
@@ -54,53 +53,60 @@ const chunked = (str: string, size: number): string[] => {
 	return chunks;
 };
 
+const renderPart = (part: string) => {
+	const span = document.createElement('span');
+
+	span.textContent = part;
+	span.style.backgroundColor = color(part);
+	span.className = `text-white px-1.5 py-1 rounded`;
+
+	return span;
+};
+
 const ProfileIdentifierDialog = (props: ProfileIdentifierDialogProps) => {
 	const profile = () => props.profile;
 
-	const [copied, setCopied] = createSignal(false);
-
 	return (
-		<div class={/* @once */ dialog.content()}>
-			<h1 class={/* @once */ dialog.title()}>User identifier for @{profile().handle.value}</h1>
+		<div class={/* @once */ menu.content()}>
+			<h1 class={/* @once */ menu.title()}>User identifier</h1>
 
-			<div class="mb-2 mt-4 flex flex-wrap justify-center gap-1 rounded py-2 font-mono text-base font-bold text-black">
+			<div class="mb-2 flex flex-wrap justify-center gap-1 rounded py-2 font-mono text-base font-bold">
 				{(() => {
 					const [_prefix, method, id] = profile().did.split(':');
 
 					if (method === 'plc') {
-						return chunked(id, 4).map((part) => {
-							const span = document.createElement('span');
-
-							span.textContent = part;
-							span.style.backgroundColor = color(part);
-							span.className = `text-white px-1.5 py-1 rounded`;
-
-							return span;
-						});
+						return chunked(id, 4).map(renderPart);
 					}
 
-					return id;
+					return renderPart(id);
 				})()}
 			</div>
 
-			<div class={/* @once */ dialog.actions()}>
-				<button
-					disabled={copied()}
-					onClick={() => {
-						navigator.clipboard.writeText(profile().did).then(() => {
-							setCopied(true);
-							setTimeout(() => setCopied(false), 1000);
-						});
-					}}
-					class={/* @once */ button({ color: 'outline' })}
-				>
-					{!copied() ? 'Copy DID' : 'Copied!'}
-				</button>
+			<button
+				class={/* @once */ menu.item()}
+				onClick={() => {
+					closeModal();
+					navigator.clipboard.writeText(profile().did);
+				}}
+			>
+				<ContentCopyIcon class="text-lg" />
+				<span>Copy DID</span>
+			</button>
 
-				<button onClick={closeModal} class={/* @once */ button({ color: 'primary' })}>
-					Close
-				</button>
-			</div>
+			<button
+				class={/* @once */ menu.item()}
+				onClick={() => {
+					closeModal();
+					navigator.clipboard.writeText(profile().handle.value);
+				}}
+			>
+				<ContentCopyIcon class="text-lg" />
+				<span>Copy @{profile().handle.value}</span>
+			</button>
+
+			<button onClick={closeModal} class={/* @once */ menu.cancel()}>
+				Cancel
+			</button>
 		</div>
 	);
 };

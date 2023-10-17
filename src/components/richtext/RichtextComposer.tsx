@@ -95,19 +95,15 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 		textarea!.focus();
 	};
 
-	const handleSelectionChange = () => {
-		const start = textarea!.selectionStart;
-		const end = textarea!.selectionEnd;
-
-		setInputSelection(start === end ? start : undefined);
-	};
-
 	makeEventListener(document, 'selectionchange', () => {
 		if (document.activeElement !== textarea) {
 			return;
 		}
 
-		handleSelectionChange();
+		const start = textarea!.selectionStart;
+		const end = textarea!.selectionEnd;
+
+		setInputSelection(start === end ? start : undefined);
 	});
 
 	return (
@@ -188,7 +184,6 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 				onInput={(ev) => {
 					props.onChange(ev.target.value);
 					setMenuSelection(undefined);
-					handleSelectionChange();
 				}}
 				onKeyDown={(ev) => {
 					const key = ev.key;

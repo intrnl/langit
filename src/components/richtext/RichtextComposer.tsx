@@ -250,7 +250,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 							}
 						>
 							<For each={mentionSuggestions()}>
-								{(item, index) => {
+								{(user, index) => {
 									const selected = () => menuSelection() === index();
 
 									return (
@@ -259,7 +259,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 											tabIndex={-1}
 											aria-selected={selected()}
 											onClick={() => {
-												acceptMentionSuggestion(item);
+												acceptMentionSuggestion(user);
 											}}
 											onMouseEnter={() => {
 												setMenuSelection(index());
@@ -268,14 +268,16 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 											classList={{ 'bg-hinted': selected() }}
 										>
 											<div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-												<Show when={item.avatar} keyed>
+												<Show when={user.avatar} keyed>
 													{(avatar) => <img src={avatar} class="h-full w-full" />}
 												</Show>
 											</div>
 
 											<div class="flex grow flex-col text-sm">
-												<span class="line-clamp-1 break-all font-bold">{item.displayName}</span>
-												<span class="line-clamp-1 shrink-0 break-all text-muted-fg">@{item.handle}</span>
+												<span class="line-clamp-1 break-all font-bold">
+													{user.displayName || user.handle}
+												</span>
+												<span class="line-clamp-1 shrink-0 break-all text-muted-fg">@{user.handle}</span>
 											</div>
 										</li>
 									);

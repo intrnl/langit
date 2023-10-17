@@ -1,4 +1,13 @@
-import { ErrorBoundary, For, Show, Suspense, createMemo, createResource, createSignal } from 'solid-js';
+import {
+	ErrorBoundary,
+	For,
+	Show,
+	Suspense,
+	createMemo,
+	createResource,
+	createSignal,
+	untrack,
+} from 'solid-js';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { makeEventListener } from '@solid-primitives/event-listener';
@@ -37,8 +46,8 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 	const [menuSelection, setMenuSelection] = createSignal<number>();
 
 	const candidateMatch = createMemo(() => {
-		const $val = props.value;
 		const $sel = inputSelection();
+		const $val = untrack(() => props.value);
 
 		if ($sel == null) {
 			return '';

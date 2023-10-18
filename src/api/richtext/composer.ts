@@ -36,7 +36,7 @@ const isAscii = (str: string) => {
 
 interface PreliminaryMatch {
 	t: RichText;
-	m: RegExpMatchArray;
+	m: RegExpExecArray;
 }
 
 export interface PreliminarySegment {
@@ -59,7 +59,7 @@ export const textToPrelimRt = (text: string): PreliminaryRichText => {
 	const segments: PreliminarySegment[] = [];
 
 	const matches: PreliminaryMatch[] = [];
-	let match: RegExpMatchArray | null;
+	let match: RegExpExecArray | null;
 
 	text = text.replace(WHITESPACE_RE, '');
 

@@ -297,7 +297,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 					ref={setFloating}
 					class="absolute z-40 w-full overflow-hidden rounded-md border border-divider bg-background shadow-lg empty:hidden sm:w-max"
 					style={{
-						'max-width': 'calc(100% - 8px)',
+						'max-width': 'calc(100% - 12px)',
 						'min-width': `180px`,
 						top: `${position.y ?? 0}px`,
 						// left: `${position.x ?? 0}px`,

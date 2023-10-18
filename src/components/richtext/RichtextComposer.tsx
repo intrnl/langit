@@ -298,7 +298,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 					<ErrorBoundary fallback={null}>
 						<Suspense
 							fallback={
-								<div class="flex h-14 w-64 items-center justify-center">
+								<div class="flex h-14 w-full items-center justify-center">
 									<CircularProgress />
 								</div>
 							}

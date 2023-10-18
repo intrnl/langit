@@ -253,10 +253,9 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 						if ($suggestions) {
 							if (key === 'ArrowUp') {
 								ev.preventDefault();
-								setMenuSelection($sel == null ? $suggestions.length - 1 : $sel <= 0 ? undefined : $sel - 1);
+								setMenuSelection($sel == null || $sel <= 0 ? $suggestions.length - 1 : $sel - 1);
 							} else if (key === 'ArrowDown') {
 								ev.preventDefault();
-
 								setMenuSelection(($sel == null || $sel >= $suggestions.length - 1 ? -1 : $sel) + 1);
 							} else if ($sel != null && key === 'Enter') {
 								const item = $suggestions[$sel];

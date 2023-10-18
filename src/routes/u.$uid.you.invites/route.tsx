@@ -15,6 +15,7 @@ import ContentCopyIcon from '~/icons/baseline-content-copy.tsx';
 import PeopleIcon from '~/icons/baseline-people.tsx';
 
 import InvitedUsersDialog from './InvitedUsersDialog.tsx';
+import button from '~/styles/primitives/button.ts';
 
 const AuthenticatedInviteCodesPage = () => {
 	const params = useParams('/u/:uid/you/invites');
@@ -45,9 +46,9 @@ const AuthenticatedInviteCodesPage = () => {
 							let count = 0;
 
 							for (let idx = 0, len = array.length; idx < len; idx++) {
-								const code = array[idx];
+								const invite = array[idx];
 
-								if (code.available - code.uses.length <= 0 || code.disabled) {
+								if (invite.available - invite.uses.length <= 0 || invite.disabled) {
 									continue;
 								}
 
@@ -59,8 +60,35 @@ const AuthenticatedInviteCodesPage = () => {
 
 						return (
 							<div>
-								<p class="border-b border-divider p-4 text-sm">
-									You have <span class="font-bold">{availableCount()}</span> invite codes remaining.
+								<p class="flex flex-wrap items-center justify-between gap-4 border-b border-divider p-4 text-sm">
+									<span>
+										You have <span class="font-bold">{availableCount()}</span> invite codes remaining.
+									</span>
+									<button
+										disabled={availableCount() < 1}
+										onClick={() => {
+											const array = invites();
+											let str = '';
+
+											for (let idx = 0, len = array.length; idx < len; idx++) {
+												const invite = array[idx];
+
+												if (invite.available - invite.uses.length <= 0 || invite.disabled) {
+													continue;
+												}
+
+												str && (str += `\n`);
+												str += `${invite.code} - ${
+													invite.available - invite.uses.length
+												} uses - ${relformat.formatAbs(invite.createdAt)}`;
+											}
+
+											navigator.clipboard.writeText(str);
+										}}
+										class={/* @once */ button({ color: 'outline', size: 'xs' })}
+									>
+										Copy all
+									</button>
 								</p>
 
 								<For each={invites()}>

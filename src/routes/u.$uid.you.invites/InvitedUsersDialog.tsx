@@ -51,52 +51,57 @@ const InvitedUsersDialog = (props: InvitedUsersDialogProps) => {
 							});
 
 							return (
-								<Suspense
-									fallback={
-										<div class="flex h-13 items-center justify-center">
-											<CircularProgress />
+								<ErrorBoundary
+									fallback={(err) => (
+										<div class="flex gap-3 px-4 py-3">
+											<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg"></div>
+											<div class="flex min-w-0 grow flex-col gap-1">
+												<div class="text-sm text-muted-fg">
+													<p>{'' + err}</p>
+													<p>{used.usedBy}</p>
+												</div>
+											</div>
 										</div>
-									}
+									)}
 								>
-									<a
-										link
-										href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: used.usedBy })}
-										onClick={(ev) => {
-											if (ev.ctrlKey || ev.altKey || ev.metaKey) {
-												return;
-											}
-
-											closeModal();
-										}}
-										class="flex gap-3 px-4 py-3 hover:bg-hinted"
+									<Suspense
+										fallback={
+											<div class="flex h-13 items-center justify-center">
+												<CircularProgress />
+											</div>
+										}
 									>
-										<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-											<Show when={profile()?.avatar.value}>
-												{(avatar) => <img src={avatar()} class="h-full w-full" />}
-											</Show>
-										</div>
+										<a
+											link
+											href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: used.usedBy })}
+											onClick={(ev) => {
+												if (ev.ctrlKey || ev.altKey || ev.metaKey) {
+													return;
+												}
 
-										<div class="flex min-w-0 grow flex-col gap-1">
-											<ErrorBoundary
-												fallback={(err) => (
-													<div class="text-sm text-muted-fg">
-														<p>{'' + err}</p>
-														<p>{used.usedBy}</p>
-													</div>
-												)}
-											>
+												closeModal();
+											}}
+											class="flex gap-3 px-4 py-3 hover:bg-hinted"
+										>
+											<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg">
+												<Show when={profile()?.avatar.value}>
+													{(avatar) => <img src={avatar()} class="h-full w-full" />}
+												</Show>
+											</div>
+
+											<div class="flex min-w-0 grow flex-col gap-1">
 												<div class="flex flex-col text-sm">
 													<span class="line-clamp-1 break-all font-bold">
 														{profile()?.displayName.value || profile()?.handle.value}
 													</span>
 													<span class="line-clamp-1 break-all text-muted-fg">@{profile()?.handle.value}</span>
 												</div>
-											</ErrorBoundary>
 
-											<p class="text-sm text-muted-fg">Invited on {relformat.formatAbs(used.usedAt)}</p>
-										</div>
-									</a>
-								</Suspense>
+												<p class="text-sm text-muted-fg">Invited on {relformat.formatAbs(used.usedAt)}</p>
+											</div>
+										</a>
+									</Suspense>
+								</ErrorBoundary>
 							);
 						}}
 					</For>

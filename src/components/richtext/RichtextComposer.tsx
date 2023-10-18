@@ -3,11 +3,13 @@ import {
 	For,
 	Show,
 	Suspense,
+	createEffect,
 	createMemo,
 	createResource,
 	createSignal,
 	untrack,
 } from 'solid-js';
+import type { JSX } from 'solid-js/jsx-runtime';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { makeEventListener } from '@solid-primitives/event-listener';
@@ -21,8 +23,11 @@ import type { PreliminaryRichText } from '~/api/richtext/composer.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { useDebouncedValue } from '~/utils/hooks.ts';
+import { assert } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
+
+import emojiListJson from '~/assets/emoji.json?url';
 
 export interface RichtextComposerProps {
 	uid: DID;
@@ -38,6 +43,7 @@ export interface RichtextComposerProps {
 }
 
 const MENTION_AUTOCOMPLETE_RE = /(?<=^|\s)@([a-zA-Z0-9-.]+)$/;
+const EMOJI_AUTOCOMPLETE_RE = /(?<=^|\s):([a-zA-Z0-9+-_]+)$/;
 const TRIM_MENTION_RE = /[.]+$/;
 
 const findNodePosition = (node: Node, position: number): { node: Node; position: number } | undefined => {
@@ -60,6 +66,26 @@ const findNodePosition = (node: Node, position: number): { node: Node; position:
 	return undefined;
 };
 
+let emojiPromise: Promise<[string, string][]> | undefined;
+
+const enum Suggestion {
+	MENTION,
+	EMOJI,
+}
+
+interface EmojiSuggestionItem {
+	type: Suggestion.EMOJI;
+	name: string;
+	emoji: string;
+}
+
+interface MentionSuggestionItem {
+	type: Suggestion.MENTION;
+	data: RefOf<'app.bsky.actor.defs#profileViewBasic'>;
+}
+
+type SuggestionItem = EmojiSuggestionItem | MentionSuggestionItem;
+
 const RichtextComposer = (props: RichtextComposerProps) => {
 	let textarea: HTMLTextAreaElement | undefined;
 	let renderer: HTMLDivElement | undefined;
@@ -80,13 +106,25 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 		return $val.length === $sel ? $val : $val.slice(0, $sel);
 	});
 
-	const matchedMention = createMemo(() => {
+	const matchedCompletion = createMemo(() => {
 		const $candidate = candidateMatch();
-		const match = MENTION_AUTOCOMPLETE_RE.exec($candidate);
+
+		let match: RegExpExecArray | null;
+		let type: Suggestion;
+
+		if ((match = MENTION_AUTOCOMPLETE_RE.exec($candidate))) {
+			type = Suggestion.MENTION;
+		} else if ((match = EMOJI_AUTOCOMPLETE_RE.exec($candidate))) {
+			type = Suggestion.EMOJI;
+		} else {
+			return;
+		}
 
 		if (match) {
-			const start = match.index;
+			const start = match.index!;
 			const length = match[0].length;
+
+			const matched = match[1].toLowerCase();
 
 			const rangeStart = findNodePosition(renderer!, start);
 			const rangeEnd = findNodePosition(renderer!, start + length);
@@ -99,49 +137,111 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 			}
 
 			return {
+				type: type,
 				range: range,
 				index: start,
 				length: length,
-				query: match[1].replace(TRIM_MENTION_RE, ''),
+				query: type === Suggestion.MENTION ? matched.replace(TRIM_MENTION_RE, '') : matched,
 			};
 		}
-
-		return null;
 	});
 
-	const debouncedMatchedMention = useDebouncedValue(matchedMention, 500, (a, b) => a?.query === b?.query);
-	const [mentionSuggestions] = createResource(debouncedMatchedMention, async (match) => {
-		const $uid = props.uid;
-		const agent = await multiagent.connect($uid);
+	const debouncedMatchedCompletion = useDebouncedValue(
+		matchedCompletion,
+		500,
+		(a, b) => a?.query === b?.query,
+	);
 
-		const response = await agent.rpc.get('app.bsky.actor.searchActorsTypeahead', {
-			params: {
-				q: match.query,
-				limit: 5,
-			},
-		});
+	const [suggestions] = createResource(
+		debouncedMatchedCompletion,
+		async (match): Promise<SuggestionItem[]> => {
+			const type = match.type;
+			const query = match.query;
 
-		return response.data.actors;
-	});
+			const MATCH_LIMIT = 5;
+
+			if (type === Suggestion.EMOJI) {
+				if (!emojiPromise) {
+					emojiPromise = fetch(emojiListJson)
+						.then((response) => {
+							if (!response.ok) {
+								throw new Error(`Response error ${response.status}`);
+							}
+
+							return response.json();
+						})
+						.catch((err) => {
+							emojiPromise = undefined;
+							return Promise.reject(err);
+						});
+				}
+
+				const emojis = await emojiPromise;
+				const items: EmojiSuggestionItem[] = [];
+
+				let count = 0;
+
+				for (let idx = 0, len = emojis.length; idx < len; idx++) {
+					const [name, emoji] = emojis[idx];
+
+					if (name.startsWith(query)) {
+						items.push({ type: Suggestion.EMOJI, name, emoji });
+
+						++count;
+						// if (++count >= MATCH_LIMIT) {
+						// 	break;
+						// }
+					} else if (count > 0) {
+						break;
+					}
+				}
+
+				return items;
+			} else if (type === Suggestion.MENTION) {
+				const $uid = props.uid;
+				const agent = await multiagent.connect($uid);
+
+				const response = await agent.rpc.get('app.bsky.actor.searchActorsTypeahead', {
+					params: {
+						q: match.query,
+						limit: MATCH_LIMIT,
+					},
+				});
+
+				return response.data.actors.map((item) => ({ type: Suggestion.MENTION, data: item }));
+			}
+
+			assert(false, `expected match`);
+		},
+	);
 
 	const [floating, setFloating] = createSignal<HTMLElement>();
-	const position = useFloating(() => matchedMention()?.range, floating, {
+	const position = useFloating(() => matchedCompletion()?.range, floating, {
 		placement: 'bottom-start',
 		middleware: [autoPlacement({ allowedPlacements: ['top', 'bottom'] }), offset({ mainAxis: 4 })],
 		whileElementsMounted: autoUpdate,
 	});
 
-	const acceptMentionSuggestion = (item: RefOf<'app.bsky.actor.defs#profileViewBasic'>) => {
-		const $match = matchedMention();
+	const acceptSuggestion = (item: SuggestionItem) => {
+		const $match = matchedCompletion();
+		const type = item.type;
 
 		if (!$match) {
 			return;
 		}
 
+		let text: string;
+		if (type === Suggestion.EMOJI) {
+			text = item.emoji + ' ';
+		} else if (type === Suggestion.MENTION) {
+			text = `@${item.data.handle} `;
+		} else {
+			assert(false, `expected type`);
+		}
+
 		const $value = props.value;
 
 		const pre = $value.slice(0, $match.index);
-		const text = `@${item.handle} `;
 		const post = $value.slice($match.index + $match.length);
 
 		const final = pre + text + post;
@@ -151,6 +251,8 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 
 		textarea!.setSelectionRange(cursor, cursor);
 		textarea!.focus();
+
+		handleInputSelection();
 	};
 
 	const handleInputSelection = () => {
@@ -254,9 +356,9 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 						setTimeout(handleInputSelection, 0);
 					}
 
-					if (matchedMention()) {
+					if (matchedCompletion()) {
 						const $sel = menuSelection();
-						const $suggestions = !mentionSuggestions.error && mentionSuggestions();
+						const $suggestions = !suggestions.error && suggestions();
 
 						if ($suggestions) {
 							if (key === 'ArrowUp') {
@@ -270,7 +372,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 
 								ev.preventDefault();
 								if (item) {
-									acceptMentionSuggestion(item);
+									acceptSuggestion(item);
 								}
 							}
 						}
@@ -292,10 +394,10 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 				<div class="pointer-events-none absolute inset-0 border-2 border-dashed border-accent"></div>
 			</Show>
 
-			<Show when={matchedMention()}>
+			<Show when={matchedCompletion()}>
 				<ul
 					ref={setFloating}
-					class="absolute z-40 w-full overflow-hidden rounded-md border border-divider bg-background shadow-lg empty:hidden sm:w-max"
+					class="absolute z-40 max-h-72 w-full overflow-auto rounded-md border border-divider bg-background shadow-lg empty:hidden sm:w-max"
 					style={{
 						'max-width': 'calc(100% - 12px)',
 						'min-width': `180px`,
@@ -311,36 +413,67 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 								</div>
 							}
 						>
-							<For each={mentionSuggestions()}>
-								{(user, index) => {
+							<For each={suggestions()}>
+								{(item, index) => {
 									const selected = () => menuSelection() === index();
+									const type = item.type;
+
+									let node: JSX.Element;
+									if (type === Suggestion.EMOJI) {
+										const name = item.name;
+										const emoji = item.emoji;
+
+										node = (
+											<div class="contents">
+												<span class="text-base">{emoji}</span>
+												<span class="text-sm">{name}</span>
+											</div>
+										);
+									} else if (type === Suggestion.MENTION) {
+										const user = item.data;
+
+										node = (
+											<div class="contents">
+												<div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted-fg">
+													<Show when={user.avatar} keyed>
+														{(avatar) => <img src={avatar} class="h-full w-full" />}
+													</Show>
+												</div>
+
+												<div class="flex grow flex-col text-sm">
+													<span class="line-clamp-1 break-all font-bold">
+														{user.displayName || user.handle}
+													</span>
+													<span class="line-clamp-1 shrink-0 break-all text-muted-fg">@{user.handle}</span>
+												</div>
+											</div>
+										);
+									} else {
+										assert(false, `expected type`);
+									}
 
 									return (
 										<li
+											ref={(node) => {
+												createEffect(() => {
+													if (selected()) {
+														node.scrollIntoView({ block: 'center' });
+													}
+												});
+											}}
 											role="option"
 											tabIndex={-1}
 											aria-selected={selected()}
 											onClick={() => {
-												acceptMentionSuggestion(user);
+												acceptSuggestion(item);
 											}}
-											onMouseEnter={() => {
-												setMenuSelection(index());
-											}}
-											class="flex cursor-pointer items-center gap-4 px-4 py-2"
+											// onMouseEnter={() => {
+											// 	setMenuSelection(index());
+											// }}
+											class="flex cursor-pointer items-center gap-4 px-4 py-2 hover:bg-hinted"
 											classList={{ 'bg-hinted': selected() }}
 										>
-											<div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-												<Show when={user.avatar} keyed>
-													{(avatar) => <img src={avatar} class="h-full w-full" />}
-												</Show>
-											</div>
-
-											<div class="flex grow flex-col text-sm">
-												<span class="line-clamp-1 break-all font-bold">
-													{user.displayName || user.handle}
-												</span>
-												<span class="line-clamp-1 shrink-0 break-all text-muted-fg">@{user.handle}</span>
-											</div>
+											{node}
 										</li>
 									);
 								}}

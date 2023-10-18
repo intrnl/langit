@@ -153,15 +153,19 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 		textarea!.focus();
 	};
 
+	const handleInputSelection = () => {
+		const start = textarea!.selectionStart;
+		const end = textarea!.selectionEnd;
+
+		setInputSelection(start === end ? start : undefined);
+	};
+
 	makeEventListener(document, 'selectionchange', () => {
 		if (document.activeElement !== textarea) {
 			return;
 		}
 
-		const start = textarea!.selectionStart;
-		const end = textarea!.selectionEnd;
-
-		setInputSelection(start === end ? start : undefined);
+		handleInputSelection();
 	});
 
 	return (
@@ -245,6 +249,10 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 				}}
 				onKeyDown={(ev) => {
 					const key = ev.key;
+
+					if (key === 'Backspace') {
+						setTimeout(handleInputSelection, 0);
+					}
 
 					if (matchedMention()) {
 						const $sel = menuSelection();

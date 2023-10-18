@@ -12,6 +12,9 @@ import {
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { makeEventListener } from '@solid-primitives/event-listener';
 
+import { autoPlacement, autoUpdate, offset } from '@floating-ui/dom';
+
+import { useFloating } from 'solid-floating-ui';
 import TextareaAutosize from 'solid-textarea-autosize';
 
 import type { PreliminaryRichText } from '~/api/richtext/composer.ts';
@@ -37,8 +40,29 @@ export interface RichtextComposerProps {
 const MENTION_AUTOCOMPLETE_RE = /(?<=^|\s)@([a-zA-Z0-9-.]+)$/;
 const TRIM_MENTION_RE = /[.]+$/;
 
+const findNodePosition = (node: Node, position: number): { node: Node; position: number } | undefined => {
+	if (node.nodeType === Node.TEXT_NODE) {
+		return { node, position };
+	}
+
+	const children = node.childNodes;
+	for (let idx = 0, len = children.length; idx < len; idx++) {
+		const child = children[idx];
+		const textContentLength = child.textContent!.length;
+
+		if (position <= textContentLength!) {
+			return findNodePosition(child, position);
+		}
+
+		position -= textContentLength!;
+	}
+
+	return undefined;
+};
+
 const RichtextComposer = (props: RichtextComposerProps) => {
 	let textarea: HTMLTextAreaElement | undefined;
+	let renderer: HTMLDivElement | undefined;
 
 	const [showDrop, setShowDrop] = createSignal(false);
 
@@ -61,7 +85,25 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 		const match = MENTION_AUTOCOMPLETE_RE.exec($candidate);
 
 		if (match) {
-			return { index: match.index, length: match[0].length, query: match[1].replace(TRIM_MENTION_RE, '') };
+			const start = match.index;
+			const length = match[0].length;
+
+			const rangeStart = findNodePosition(renderer!, start);
+			const rangeEnd = findNodePosition(renderer!, start + length);
+
+			let range: Range | undefined;
+			if (rangeStart && rangeEnd) {
+				range = new Range();
+				range.setStart(rangeStart.node, rangeStart.position);
+				range.setEnd(rangeEnd.node, rangeEnd.position);
+			}
+
+			return {
+				range: range,
+				index: start,
+				length: length,
+				query: match[1].replace(TRIM_MENTION_RE, ''),
+			};
 		}
 
 		return null;
@@ -80,6 +122,13 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 		});
 
 		return response.data.actors;
+	});
+
+	const [floating, setFloating] = createSignal<HTMLElement>();
+	const position = useFloating(() => matchedMention()?.range, floating, {
+		placement: 'bottom-start',
+		middleware: [autoPlacement({ allowedPlacements: ['top', 'bottom'] }), offset({ mainAxis: 4 })],
+		whileElementsMounted: autoUpdate,
 	});
 
 	const acceptMentionSuggestion = (item: RefOf<'app.bsky.actor.defs#profileViewBasic'>) => {
@@ -117,7 +166,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 
 	return (
 		<div class="relative">
-			<div class="absolute inset-0 z-0 whitespace-pre-wrap break-words pb-4 pr-3 pt-5 text-xl">
+			<div ref={renderer} class="absolute inset-0 z-0 whitespace-pre-wrap break-words pb-4 pr-3 pt-5 text-xl">
 				{props.rt.segments.map((segment) => {
 					const feature = segment.feature;
 
@@ -238,8 +287,14 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 
 			<Show when={matchedMention()}>
 				<ul
-					class="absolute z-40 overflow-hidden rounded-md border border-divider bg-background shadow-lg empty:hidden"
-					style={{ top: 'calc(100% - 12px)', 'max-width': '80%' }}
+					ref={setFloating}
+					class="absolute z-40 w-full overflow-hidden rounded-md border border-divider bg-background shadow-lg empty:hidden sm:w-max"
+					style={{
+						'max-width': 'calc(100% - 8px)',
+						'min-width': `180px`,
+						top: `${position.y ?? 0}px`,
+						// left: `${position.x ?? 0}px`,
+					}}
 				>
 					<ErrorBoundary fallback={null}>
 						<Suspense

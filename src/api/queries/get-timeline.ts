@@ -37,6 +37,11 @@ export interface FeedTimelineParams {
 	uri: string;
 }
 
+export interface ListTimelineParams {
+	type: 'list';
+	uri: string;
+}
+
 export interface ProfileTimelineParams {
 	type: 'profile';
 	actor: DID;
@@ -49,8 +54,9 @@ export interface SearchTimelineParams {
 }
 
 export type FeedParams =
-	| HomeTimelineParams
 	| FeedTimelineParams
+	| HomeTimelineParams
+	| ListTimelineParams
 	| ProfileTimelineParams
 	| SearchTimelineParams;
 
@@ -153,7 +159,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
 		]);
-	} else if (type === 'feed') {
+	} else if (type === 'feed' || type === 'list') {
 		postFilter = combine([
 			createDuplicatePostFilter(slices),
 			createLanguagePostFilter(uid),
@@ -263,6 +269,16 @@ const fetchPage = async (
 		const response = await agent.rpc.get('app.bsky.feed.getFeed', {
 			params: {
 				feed: params.uri,
+				cursor: cursor,
+				limit: limit,
+			},
+		});
+
+		return response.data;
+	} else if (type === 'list') {
+		const response = await agent.rpc.get('app.bsky.feed.getListFeed', {
+			params: {
+				list: params.uri,
 				cursor: cursor,
 				limit: limit,
 			},

@@ -15,6 +15,7 @@ export interface TimelineListProps {
 	uid: DID;
 	timeline: FeedResource;
 	latest?: FeedLatestResource;
+	loading?: boolean;
 	timelineDid?: DID;
 	onRefetch: () => void;
 	onLoadMore: (cursor: string) => void;
@@ -36,7 +37,7 @@ const TimelineList = (props: TimelineListProps) => {
 	return (
 		<>
 			<Switch>
-				<Match when={timeline.loading && !timeline.refetchParam}>
+				<Match when={props.loading || (timeline.loading && !timeline.refetchParam)}>
 					<div
 						class="flex h-13 items-center justify-center border-divider"
 						classList={{ 'border-b': !!timeline() }}
@@ -133,7 +134,7 @@ const TimelineList = (props: TimelineListProps) => {
 					)}
 				</Match>
 
-				<Match when={!timeline.loading}>
+				<Match when={!timeline.loading && !props.loading}>
 					<div class="flex h-13 items-center justify-center">
 						<p class="text-sm text-muted-fg">End of list</p>
 					</div>

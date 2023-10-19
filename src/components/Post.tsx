@@ -361,7 +361,12 @@ const PostContent = ({ uid, post, force, timelineDid }: PostContentProps) => {
 				ref={(node) => {
 					createEffect(() => {
 						post().record.value;
-						node.style.display = content!.scrollHeight > content!.clientHeight ? 'block' : 'none';
+
+						if (content!.scrollHeight > content!.clientHeight) {
+							content!.after(node);
+						} else {
+							node.remove();
+						}
 					});
 				}}
 				link

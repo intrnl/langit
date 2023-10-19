@@ -363,10 +363,20 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 						if ($suggestions) {
 							if (key === 'ArrowUp') {
 								ev.preventDefault();
-								setMenuSelection($sel == null || $sel <= 0 ? $suggestions.length - 1 : $sel - 1);
+
+								if ($suggestions.length > 0) {
+									setMenuSelection($sel == null || $sel <= 0 ? $suggestions.length - 1 : $sel - 1);
+								} else {
+									setMenuSelection(undefined);
+								}
 							} else if (key === 'ArrowDown') {
 								ev.preventDefault();
-								setMenuSelection(($sel == null || $sel >= $suggestions.length - 1 ? -1 : $sel) + 1);
+
+								if ($suggestions.length > 0) {
+									setMenuSelection(($sel == null || $sel >= $suggestions.length - 1 ? -1 : $sel) + 1);
+								} else {
+									setMenuSelection(undefined);
+								}
 							} else if ($sel != null && key === 'Enter') {
 								const item = $suggestions[$sel];
 

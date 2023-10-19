@@ -169,9 +169,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 	} else if (type === 'profile') {
 		postFilter = createLabelPostFilter(uid);
 
-		if (params.tab !== 'likes' && params.tab !== 'media') {
-			sliceFilter = createProfileSliceFilter(params.actor, params.tab === 'replies');
-		} else {
+		if (params.tab === 'likes' || params.tab === 'media') {
 			sliceFilter = null;
 		}
 	} else {
@@ -317,7 +315,12 @@ const fetchPage = async (
 					actor: params.actor,
 					cursor: cursor,
 					limit: limit,
-					filter: params.tab === 'media' ? 'posts_with_media' : 'posts_with_replies',
+					filter:
+						params.tab === 'media'
+							? 'posts_with_media'
+							: params.tab === 'replies'
+							? 'posts_with_replies'
+							: 'posts_no_replies',
 				},
 			});
 
@@ -562,30 +565,6 @@ const createHomeSliceFilter = (uid: DID): SliceFilter | undefined => {
 			}
 		} else if (first.post.record.peek().reply) {
 			return yankReposts(items);
-		}
-
-		return true;
-	};
-};
-
-const createProfileSliceFilter = (did: DID, replies: boolean): SliceFilter | undefined => {
-	return (slice) => {
-		const items = slice.items;
-		const first = items[0];
-
-		if (!replies && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
-			const reply = first.reply;
-
-			if (reply) {
-				const root = reply.root;
-				const parent = reply.parent;
-
-				if (root.author.did !== did || parent.author.did !== did) {
-					return yankReposts(items);
-				}
-			} else if (first.post.record.peek().reply) {
-				return yankReposts(items);
-			}
 		}
 
 		return true;

@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createSignal } from 'solid-js';
+import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
@@ -113,54 +113,69 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 		close();
 	};
 
+	const flattenedLists = createMemo(() => {
+		const $lists = lists();
+
+		if ($lists) {
+			return $lists.pages.flatMap((list) => list.lists);
+		}
+
+		return [];
+	});
+
 	return (
 		<div class={/* @once */ dialog.content()}>
 			<h1 class={/* @once */ dialog.title()}>Add to list</h1>
 
 			<div ref={listEl} class="-mx-4 mt-3 flex flex-col overflow-y-auto">
-				<For each={lists()?.pages}>
-					{(page) => {
-						return page.lists.map((list) => {
-							const [result] = createQuery({
-								key: () => getProfileInListKey(uid(), profile().did, list.uri),
-								fetch: getProfileInList,
-							});
-
-							const loading = () => !result() || mutating();
-							const [checked, setChecked] = createDerivedSignal(() => !!result()?.exists.value);
-
-							const purpose = () => {
-								const raw = list.purpose.value;
-								return raw in ListPurposeLabels ? ListPurposeLabels[raw] : `Unknown list`;
-							};
-
-							return (
-								<button
-									disabled={loading()}
-									class="flex items-center gap-3 px-4 py-3 text-left hover:bg-hinted"
-									classList={{ 'opacity-50 pointer-events-none': loading() }}
-									aria-pressed={checked()}
-									onClick={() => setChecked(!checked())}
-									// @ts-expect-error
-									prop:$data={result()}
-								>
-									<div class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg">
-										<Show when={list.avatar.value}>
-											{(avatar) => <img src={avatar()} class="h-full w-full" />}
-										</Show>
-									</div>
-
-									<div class="min-w-0 grow">
-										<p class="break-words text-sm font-bold">{list.name.value}</p>
-										<p class="text-sm text-muted-fg">{purpose()}</p>
-									</div>
-
-									<Show when={checked()}>
-										<CheckIcon class="text-xl text-accent" />
-									</Show>
-								</button>
-							);
+				<For
+					each={flattenedLists()}
+					fallback={
+						<div class="px-4 py-3">
+							<span class="text-sm text-muted-fg">You don't have any lists created.</span>
+						</div>
+					}
+				>
+					{(list) => {
+						const [result] = createQuery({
+							key: () => getProfileInListKey(uid(), profile().did, list.uri),
+							fetch: getProfileInList,
 						});
+
+						const loading = () => !result() || mutating();
+						const [checked, setChecked] = createDerivedSignal(() => !!result()?.exists.value);
+
+						const purpose = () => {
+							const raw = list.purpose.value;
+							return raw in ListPurposeLabels ? ListPurposeLabels[raw] : `Unknown list`;
+						};
+
+						return (
+							<button
+								disabled={loading()}
+								class="flex items-center gap-3 px-4 py-3 text-left hover:bg-hinted"
+								classList={{ 'opacity-50 pointer-events-none': loading() }}
+								aria-pressed={checked()}
+								onClick={() => setChecked(!checked())}
+								// @ts-expect-error
+								prop:$data={result()}
+							>
+								<div class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg">
+									<Show when={list.avatar.value}>
+										{(avatar) => <img src={avatar()} class="h-full w-full" />}
+									</Show>
+								</div>
+
+								<div class="min-w-0 grow">
+									<p class="break-words text-sm font-bold">{list.name.value}</p>
+									<p class="text-sm text-muted-fg">{purpose()}</p>
+								</div>
+
+								<Show when={checked()}>
+									<CheckIcon class="text-xl text-accent" />
+								</Show>
+							</button>
+						);
 					}}
 				</For>
 
@@ -189,7 +204,11 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 				<button disabled={mutating()} onClick={close} class={/* @once */ button({ color: 'ghost' })}>
 					Cancel
 				</button>
-				<button disabled={mutating()} onClick={submit} class={/* @once */ button({ color: 'primary' })}>
+				<button
+					disabled={mutating() || flattenedLists().length < 1}
+					onClick={submit}
+					class={/* @once */ button({ color: 'primary' })}
+				>
 					Save
 				</button>
 			</div>

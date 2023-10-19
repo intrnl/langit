@@ -110,7 +110,7 @@ const AuthenticatedExplorePage = () => {
 					});
 
 					const [timeline, { refetch: refetchTimeline }] = createQuery({
-						key: () => getTimelineKey(uid(), { type: 'custom', uri: feedUri }, MAX_POSTS),
+						key: () => getTimelineKey(uid(), { type: 'feed', uri: feedUri }, MAX_POSTS),
 						fetch: getTimeline,
 						staleTime: 5_000,
 						refetchOnMount: false,

@@ -10,7 +10,7 @@ import {
 	getInitialFeedGenerator,
 } from '~/api/queries/get-feed-generator.ts';
 import {
-	type CustomTimelineParams,
+	type FeedTimelineParams,
 	type HomeTimelineParams,
 	getTimeline,
 	getTimelineKey,
@@ -40,7 +40,7 @@ const FeedTab = (props: { uid: DID; uri: string; active: boolean; onClick?: () =
 	);
 };
 
-const Feed = (props: { uid: DID; params: HomeTimelineParams | CustomTimelineParams }) => {
+const Feed = (props: { uid: DID; params: HomeTimelineParams | FeedTimelineParams }) => {
 	const uid = () => props.uid;
 	const params = () => props.params;
 
@@ -150,9 +150,9 @@ const AuthenticatedHome = () => {
 
 			<Show when={feed() ?? true} keyed>
 				{($feed) => {
-					const params: HomeTimelineParams | CustomTimelineParams =
+					const params: HomeTimelineParams | FeedTimelineParams =
 						$feed !== true
-							? { type: 'custom', uri: $feed }
+							? { type: 'feed', uri: $feed }
 							: { type: 'home', algorithm: 'reverse-chronological' };
 
 					return <Feed uid={uid()} params={params} />;

@@ -32,8 +32,8 @@ export interface HomeTimelineParams {
 	algorithm: 'reverse-chronological' | (string & {});
 }
 
-export interface CustomTimelineParams {
-	type: 'custom';
+export interface FeedTimelineParams {
+	type: 'feed';
 	uri: string;
 }
 
@@ -50,7 +50,7 @@ export interface SearchTimelineParams {
 
 export type FeedParams =
 	| HomeTimelineParams
-	| CustomTimelineParams
+	| FeedTimelineParams
 	| ProfileTimelineParams
 	| SearchTimelineParams;
 
@@ -153,7 +153,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
 		]);
-	} else if (type === 'custom') {
+	} else if (type === 'feed') {
 		postFilter = combine([
 			createDuplicatePostFilter(slices),
 			createLanguagePostFilter(uid),
@@ -259,7 +259,7 @@ const fetchPage = async (
 		});
 
 		return response.data;
-	} else if (type === 'custom') {
+	} else if (type === 'feed') {
 		const response = await agent.rpc.get('app.bsky.feed.getFeed', {
 			params: {
 				feed: params.uri,

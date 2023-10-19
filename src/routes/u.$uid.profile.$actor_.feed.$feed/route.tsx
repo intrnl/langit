@@ -12,7 +12,7 @@ import {
 } from '~/api/queries/get-feed-generator.ts';
 import { getProfileDid, getProfileDidKey } from '~/api/queries/get-profile-did.ts';
 import {
-	type CustomTimelineParams,
+	type FeedTimelineParams,
 	getTimeline,
 	getTimelineKey,
 	getTimelineLatest,
@@ -48,7 +48,7 @@ const AuthenticatedFeedPage = () => {
 	});
 
 	const feedUri = () => createFeedGeneratorUri(did()!, feed());
-	const feedParams = (): CustomTimelineParams => ({ type: 'custom', uri: feedUri() });
+	const feedParams = (): FeedTimelineParams => ({ type: 'feed', uri: feedUri() });
 
 	const [info] = createQuery({
 		key: () => getFeedGeneratorKey(uid(), feedUri()),

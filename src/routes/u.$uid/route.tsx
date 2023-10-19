@@ -168,7 +168,7 @@ const AuthenticatedLayout = () => {
 
 						<A
 							href={generatePath('/u/:uid/explore', { uid: uid() })}
-							title="Search"
+							title="Explore"
 							class="group flex items-center rounded-md hover:bg-hinted"
 							activeClass="is-active"
 						>

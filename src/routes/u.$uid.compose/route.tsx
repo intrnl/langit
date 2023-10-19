@@ -571,7 +571,7 @@ const AuthenticatedComposePage = () => {
 												indexedAt: null,
 												uri: data().uri,
 												avatar: data().avatar.value,
-												displayName: data().displayName.value,
+												displayName: data().name.value,
 												creator: {
 													did: data().creator.did,
 													handle: data().creator.handle.value,

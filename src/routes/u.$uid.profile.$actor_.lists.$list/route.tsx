@@ -7,6 +7,7 @@ import { Outlet } from '@solidjs/router';
 import { getList, getListKey } from '~/api/queries/get-list.ts';
 
 import { openModal } from '~/globals/modals.tsx';
+import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
 
@@ -140,9 +141,45 @@ const AuthenticatedListLayout = () => {
 											</button>
 										</Match>
 										<Match when={isCurationList()}>
-											<button disabled class={button({ color: 'primary' })}>
-												Follow list
-											</button>
+											{(_value) => {
+												const isSaved = createMemo(() => {
+													const $prefs = getAccountPreferences(uid());
+													const saved = $prefs?.savedFeeds;
+
+													return !!saved && saved.includes(list().uri);
+												});
+
+												const toggleSave = () => {
+													const $prefs = getAccountPreferences(uid());
+													const saved = $prefs.savedFeeds;
+
+													const uri = list().uri;
+
+													if (isSaved()) {
+														if (saved) {
+															const idx = saved.indexOf(uri);
+															saved.splice(idx, 1);
+
+															if (saved.length === 0) {
+																$prefs.savedFeeds = undefined;
+															}
+														}
+													} else if (saved) {
+														saved.push(uri);
+													} else {
+														$prefs.savedFeeds = [uri];
+													}
+												};
+
+												return (
+													<button
+														onClick={toggleSave}
+														class={button({ color: isSaved() ? 'outline' : 'primary' })}
+													>
+														{isSaved() ? 'Unfollow list' : 'Follow list'}
+													</button>
+												);
+											}}
 										</Match>
 									</Switch>
 

@@ -111,7 +111,7 @@ const FeedList = (props: FeedListProps) => {
 									</div>
 
 									<div class="grow">
-										<p class="font-bold">{feed.displayName.value}</p>
+										<p class="font-bold">{feed.name.value}</p>
 										<p class="text-muted-fg">by @{feed.creator.handle.value}</p>
 									</div>
 

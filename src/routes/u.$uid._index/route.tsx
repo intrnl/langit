@@ -1,14 +1,17 @@
 import { For, Show, Suspense, createEffect, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { createQuery } from '@intrnl/sq';
+import { type EnhancedResource, createQuery } from '@intrnl/sq';
 import { useSearchParams } from '@solidjs/router';
 
+import type { SignalizedFeedGenerator } from '~/api/cache/feed-generators.ts';
+import type { SignalizedList } from '~/api/cache/lists.ts';
 import {
 	getFeedGenerator,
 	getFeedGeneratorKey,
 	getInitialFeedGenerator,
 } from '~/api/queries/get-feed-generator.ts';
+import { getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 import {
 	type FeedTimelineParams,
 	type HomeTimelineParams,
@@ -16,26 +19,47 @@ import {
 	getTimelineKey,
 	getTimelineLatest,
 	getTimelineLatestKey,
+	type ListTimelineParams,
 } from '~/api/queries/get-timeline.ts';
+
+import { getCollectionId } from '~/api/utils.ts';
 
 import { preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
+import { assert } from '~/utils/misc.ts';
 
 import { Tab } from '~/components/Tab.tsx';
 import TimelineList from '~/components/TimelineList.tsx';
 
 const FeedTab = (props: { uid: DID; uri: string; active: boolean; onClick?: () => void }) => {
-	const [feed] = createQuery({
-		key: () => getFeedGeneratorKey(props.uid, props.uri),
-		fetch: getFeedGenerator,
-		staleTime: 30_000,
-		initialData: getInitialFeedGenerator,
-	});
+	// `uri` is static
+	const uri = props.uri;
+	const collection = getCollectionId(uri);
+
+	let info: EnhancedResource<SignalizedFeedGenerator | SignalizedList>;
+
+	if (collection === 'app.bsky.feed.generator') {
+		[info] = createQuery({
+			key: () => getFeedGeneratorKey(props.uid, props.uri),
+			fetch: getFeedGenerator,
+			staleTime: 30_000,
+			initialData: getInitialFeedGenerator,
+		});
+	} else if (collection === 'app.bsky.graph.list') {
+		[info] = createQuery({
+			key: () => getListInfoKey(props.uid, props.uri),
+			fetch: getListInfo,
+			staleTime: 30_000,
+			initialData: getInitialListInfo,
+		});
+	} else {
+		assert(false, `expected collection`);
+	}
 
 	return (
 		<Tab<'button'> component="button" active={props.active} onClick={props.onClick}>
-			{feed()?.displayName.value}
+			{info()?.name.value}
 		</Tab>
 	);
 };
@@ -146,11 +170,22 @@ const AuthenticatedHome = () => {
 
 			<Show when={feed() ?? true} keyed>
 				{($feed) => {
-					const params: HomeTimelineParams | FeedTimelineParams =
-						$feed !== true
-							? { type: 'feed', uri: $feed }
-							: { type: 'home', algorithm: 'reverse-chronological' };
+					let params: HomeTimelineParams | FeedTimelineParams | ListTimelineParams;
+					if ($feed === true) {
+						params = { type: 'home', algorithm: 'reverse-chronological' };
+					} else {
+						const collection = getCollectionId($feed);
 
+						if (collection === 'app.bsky.feed.generator') {
+							params = { type: 'feed', uri: $feed };
+						} else if (collection === 'app.bsky.graph.list') {
+							params = { type: 'list', uri: $feed };
+						} else {
+							assert(false, `unexpected collection`);
+						}
+					}
+
+					// @ts-expect-error
 					return <Feed uid={uid()} params={params} />;
 				}}
 			</Show>

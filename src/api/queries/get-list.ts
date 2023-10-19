@@ -1,10 +1,10 @@
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import type { QueryFn } from '@intrnl/sq';
+import type { InitialDataFn, QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 
-import { type SignalizedList, mergeSignalizedList } from '../cache/lists.ts';
+import { type SignalizedList, mergeSignalizedList, lists } from '../cache/lists.ts';
 import { type SignalizedProfile, mergeSignalizedProfile } from '../cache/profiles.ts';
 import { type Collection, pushCollection } from '../utils.ts';
 
@@ -49,4 +49,34 @@ export const getList: QueryFn<Collection<ListPage>, ReturnType<typeof getListKey
 	};
 
 	return pushCollection(collection, page, param);
+};
+
+export const getListInfoKey = (uid: DID, uri: string) => {
+	return ['getListInfo', uid, uri] as const;
+};
+export const getListInfo: QueryFn<SignalizedList, ReturnType<typeof getListInfoKey>> = async (key) => {
+	const [, uid, uri] = key;
+
+	const agent = await multiagent.connect(uid);
+
+	const response = await agent.rpc.get('app.bsky.graph.getList', {
+		params: {
+			list: uri,
+			limit: 1,
+		},
+	});
+
+	const data = response.data;
+	return mergeSignalizedList(uid, data.list);
+};
+
+export const getInitialListInfo: InitialDataFn<SignalizedList, ReturnType<typeof getListInfoKey>> = (key) => {
+	const [, uid, uri] = key;
+
+	const id = uid + '|' + uri;
+
+	const ref = lists[id];
+	const feed = ref?.deref();
+
+	return feed && { data: feed };
 };

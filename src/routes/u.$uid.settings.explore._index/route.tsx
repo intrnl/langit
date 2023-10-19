@@ -1,7 +1,7 @@
 import { For, Show, Suspense, SuspenseList, batch, createMemo, createSignal } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { createQuery } from '@intrnl/sq';
+import { type EnhancedResource, createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
 import {
 	DragDropProvider,
@@ -11,19 +11,22 @@ import {
 	transformStyle,
 } from '@thisbeyond/solid-dnd';
 
-import { getRecordId, getRepoId } from '~/api/utils.ts';
+import { getCollectionId, getRecordId, getRepoId } from '~/api/utils.ts';
 
+import { type SignalizedFeedGenerator } from '~/api/cache/feed-generators.ts';
+import { type SignalizedList } from '~/api/cache/lists.ts';
 import {
 	getFeedGenerator,
 	getFeedGeneratorKey,
 	getInitialFeedGenerator,
 } from '~/api/queries/get-feed-generator.ts';
+import { getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 
 import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { ConstrainXDragAxis } from '~/utils/dnd.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
-import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
+import { INTERACTION_TAGS, assert, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 
@@ -45,38 +48,68 @@ interface FeedItemProps {
 }
 
 const FeedItem = (props: FeedItemProps) => {
-	const sortable = createSortable(props.uri);
+	// `uri` here is expected to be static
+	const uri = props.uri;
+
+	const actor = getRepoId(uri);
+	const collection = getCollectionId(uri);
+	const rkey = getRecordId(uri);
+
+	const sortable = createSortable(uri);
 
 	const navigate = useNavigate();
 
-	const feedUri = () => props.uri;
 	const pinned = () => props.pinned;
 	const editing = () => props.editing;
 
-	const [feed] = createQuery({
-		key: () => getFeedGeneratorKey(props.uid, feedUri()),
-		fetch: getFeedGenerator,
-		staleTime: 30_000,
-		initialData: getInitialFeedGenerator,
-	});
+	let resource: EnhancedResource<SignalizedFeedGenerator | SignalizedList>;
+	let path: () => string;
+
+	if (collection === 'app.bsky.feed.generator') {
+		[resource] = createQuery({
+			key: () => getFeedGeneratorKey(props.uid, uri),
+			fetch: getFeedGenerator,
+			staleTime: 30_000,
+			initialData: getInitialFeedGenerator,
+		});
+
+		path = () => {
+			return generatePath('/u/:uid/profile/:actor/feed/:feed', {
+				uid: props.uid,
+				actor: actor,
+				feed: rkey,
+			});
+		};
+	} else if (collection === 'app.bsky.graph.list') {
+		[resource] = createQuery<SignalizedList, any>({
+			key: () => getListInfoKey(props.uid, uri),
+			fetch: getListInfo,
+			staleTime: 30_000,
+			initialData: getInitialListInfo,
+		});
+
+		path = () => {
+			return generatePath('/u/:uid/profile/:actor/lists/:list', {
+				uid: props.uid,
+				actor: actor,
+				list: rkey,
+			});
+		};
+	} else {
+		assert(false, `expected collection`);
+	}
 
 	const click = (ev: MouseEvent | KeyboardEvent) => {
 		if (editing() || !isElementClicked(ev, INTERACTION_TAGS)) {
 			return;
 		}
 
-		const uri = feedUri();
-
-		const path = generatePath('/u/:uid/profile/:actor/feed/:feed', {
-			uid: props.uid,
-			actor: getRepoId(uri),
-			feed: getRecordId(uri),
-		});
+		const $path = path();
 
 		if (isElementAltClicked(ev)) {
-			open(path, '_blank');
+			open($path, '_blank');
 		} else {
-			navigate(path);
+			navigate($path);
 		}
 	};
 
@@ -105,17 +138,19 @@ const FeedItem = (props: FeedItemProps) => {
 				</Show>
 
 				<div class="h-6 w-6 overflow-hidden rounded-md bg-muted-fg">
-					<Show when={feed()?.avatar.value}>{(avatar) => <img src={avatar()} class="h-full w-full" />}</Show>
+					<Show when={resource()?.avatar.value}>
+						{(avatar) => <img src={avatar()} class="h-full w-full" />}
+					</Show>
 				</div>
 
 				<div class="grow">
-					<p class="font-bold">{feed()?.displayName.value}</p>
+					<p class="font-bold">{resource()?.name.value}</p>
 				</div>
 
 				<div class="-mr-2 flex shrink-0 gap-2">
 					<button
 						title={pinned() ? `Unpin feed` : `Pin feed`}
-						onClick={() => props.onPinToggle(feedUri(), !pinned())}
+						onClick={() => props.onPinToggle(uri, !pinned())}
 						class="-my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-xl hover:bg-secondary"
 						classList={{ 'text-accent': pinned(), 'text-muted-fg': !pinned() }}
 					>
@@ -125,7 +160,7 @@ const FeedItem = (props: FeedItemProps) => {
 					<Show when={editing()}>
 						<button
 							title="Remove feed"
-							onClick={() => props.onRemove(feedUri())}
+							onClick={() => props.onRemove(uri)}
 							class="-my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-xl text-red-500 hover:bg-secondary"
 						>
 							<DeleteIcon />

@@ -19,7 +19,7 @@ export interface SignalizedFeedGenerator {
 	cid: Signal<FeedGenerator['cid']>;
 	did: Signal<FeedGenerator['did']>;
 	creator: SignalizedProfile;
-	displayName: Signal<FeedGenerator['displayName']>;
+	name: Signal<FeedGenerator['displayName']>;
 	description: Signal<FeedGenerator['description']>;
 	descriptionFacets: Signal<FeedGenerator['descriptionFacets']>;
 	avatar: Signal<FeedGenerator['avatar']>;
@@ -42,7 +42,7 @@ const createSignalizedFeedGenerator = (
 		cid: signal(feed.cid),
 		did: signal(feed.did),
 		creator: mergeSignalizedProfile(uid, feed.creator, key),
-		displayName: signal(feed.displayName),
+		name: signal(feed.displayName),
 		description: signal(feed.description),
 		descriptionFacets: signal(feed.descriptionFacets),
 		avatar: signal(feed.avatar),
@@ -75,7 +75,7 @@ export const mergeSignalizedFeedGenerator = (
 
 		val.creator = mergeSignalizedProfile(uid, feed.creator, key);
 
-		val.displayName.value = feed.displayName;
+		val.name.value = feed.displayName;
 		val.description.value = feed.description;
 		val.descriptionFacets.value = feed.descriptionFacets;
 		val.avatar.value = feed.avatar;

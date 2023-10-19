@@ -1,21 +1,25 @@
 import { For, Match, Show, Switch, createMemo, createSignal, onCleanup } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { createQuery } from '@intrnl/sq';
+import { createQuery, type EnhancedResource } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
 
-import { getRecordId, getRepoId } from '~/api/utils.ts';
+import { type Collection, getCollectionId, getRecordId, getRepoId } from '~/api/utils.ts';
 
+import type { SignalizedFeedGenerator } from '~/api/cache/feed-generators.ts';
+import { type SignalizedList } from '~/api/cache/lists.ts';
 import {
 	getFeedGenerator,
 	getFeedGeneratorKey,
 	getInitialFeedGenerator,
 } from '~/api/queries/get-feed-generator.ts';
-import { getTimeline, getTimelineKey } from '~/api/queries/get-timeline';
+import { getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
+import { type FeedPage, getTimeline, getTimelineKey } from '~/api/queries/get-timeline.ts';
 
 import { preferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
+import { assert } from '~/utils/misc.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 import Post, { createPostKey } from '~/components/Post.tsx';
@@ -101,24 +105,71 @@ const AuthenticatedExplorePage = () => {
 					</div>
 				}
 			>
-				{(feedUri) => {
-					const [feed, { refetch: refetchFeed }] = createQuery({
-						key: () => getFeedGeneratorKey(uid(), feedUri),
-						fetch: getFeedGenerator,
-						staleTime: 120_000,
-						initialData: getInitialFeedGenerator,
-					});
+				{(uri) => {
+					const actor = getRepoId(uri);
+					const collection = getCollectionId(uri);
+					const rkey = getRecordId(uri);
 
-					const [timeline, { refetch: refetchTimeline }] = createQuery({
-						key: () => getTimelineKey(uid(), { type: 'feed', uri: feedUri }, MAX_POSTS),
-						fetch: getTimeline,
-						staleTime: 5_000,
-						refetchOnMount: false,
-						refetchOnWindowFocus: false,
-					});
+					let info: EnhancedResource<SignalizedFeedGenerator | SignalizedList>;
+					let timeline: EnhancedResource<Collection<FeedPage>>;
+
+					let refetchInfo: () => void | Promise<void>;
+					let refetchTimeline: () => void | Promise<void>;
+
+					let path: () => string;
+
+					if (collection === 'app.bsky.feed.generator') {
+						[info, { refetch: refetchInfo }] = createQuery({
+							key: () => getFeedGeneratorKey(uid(), uri),
+							fetch: getFeedGenerator,
+							staleTime: 120_000,
+							initialData: getInitialFeedGenerator,
+						});
+
+						[timeline, { refetch: refetchTimeline }] = createQuery({
+							key: () => getTimelineKey(uid(), { type: 'feed', uri: uri }, MAX_POSTS),
+							fetch: getTimeline,
+							staleTime: 5_000,
+							refetchOnMount: false,
+							refetchOnWindowFocus: false,
+						});
+
+						path = () => {
+							return generatePath('/u/:uid/profile/:actor/feed/:feed', {
+								uid: uid(),
+								actor: actor,
+								feed: rkey,
+							});
+						};
+					} else if (collection === 'app.bsky.graph.list') {
+						[info, { refetch: refetchInfo }] = createQuery<SignalizedList, any>({
+							key: () => getListInfoKey(uid(), uri),
+							fetch: getListInfo,
+							staleTime: 30_000,
+							initialData: getInitialListInfo,
+						});
+
+						[timeline, { refetch: refetchTimeline }] = createQuery({
+							key: () => getTimelineKey(uid(), { type: 'list', uri: uri }, MAX_POSTS),
+							fetch: getTimeline,
+							staleTime: 5_000,
+							refetchOnMount: false,
+							refetchOnWindowFocus: false,
+						});
+
+						path = () => {
+							return generatePath('/u/:uid/profile/:actor/lists/:list/feed', {
+								uid: uid(),
+								actor: actor,
+								list: rkey,
+							});
+						};
+					} else {
+						assert(false, `expected collection`);
+					}
 
 					const refetch = () => {
-						refetchFeed();
+						refetchInfo();
 						return refetchTimeline();
 					};
 
@@ -130,16 +181,16 @@ const AuthenticatedExplorePage = () => {
 
 					return (
 						<Switch>
-							<Match when={feed()}>
+							<Match when={info()}>
 								<div class="border-b border-divider">
 									<div class="sticky top-13 z-10 flex h-13 items-center gap-4 bg-background px-4">
 										<div class="h-6 w-6 overflow-hidden rounded-md bg-muted-fg">
-											<Show when={feed()!.avatar.value}>
+											<Show when={info()!.avatar.value}>
 												{(avatar) => <img src={avatar()} class="h-full w-full" />}
 											</Show>
 										</div>
 
-										<span class="text-base font-bold">{feed()!.displayName.value}</span>
+										<span class="text-base font-bold">{info()!.name.value}</span>
 									</div>
 
 									<Switch>
@@ -184,11 +235,7 @@ const AuthenticatedExplorePage = () => {
 											<Show when={timeline()?.pages[0].cid}>
 												<a
 													link
-													href={generatePath('/u/:uid/profile/:actor/feed/:feed', {
-														uid: uid(),
-														actor: getRepoId(feedUri),
-														feed: getRecordId(feedUri),
-													})}
+													href={path()}
 													class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
 												>
 													Show more

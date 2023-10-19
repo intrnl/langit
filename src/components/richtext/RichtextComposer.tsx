@@ -7,6 +7,7 @@ import {
 	createMemo,
 	createResource,
 	createSignal,
+	onMount,
 	untrack,
 } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
@@ -266,6 +267,10 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 		}
 
 		handleInputSelection();
+	});
+
+	onMount(() => {
+		textarea!.focus();
 	});
 
 	return (

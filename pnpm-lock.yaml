@@ -24,8 +24,8 @@ dependencies:
     specifier: ^0.2.6
     version: 0.2.6
   '@intrnl/sq':
-    specifier: ^0.2.1
-    version: 0.2.1(solid-js@1.8.3)
+    specifier: ^0.3.0
+    version: 0.3.0(solid-js@1.8.3)
   '@intrnl/use-gesture-solid':
     specifier: ^0.1.0
     version: 0.1.0(solid-js@1.8.3)
@@ -1556,8 +1556,8 @@ packages:
     resolution: {integrity: sha512-aohibrc+Ka2hElLmiB3WO0/3QF4QAE6Uw0pOtW3jegyo1FF7pzlZ7tOdlT3OYRPI7n8CP+fkt0oZ5L4fGe5e4Q==}
     dev: false
 
-  /@intrnl/sq@0.2.1(solid-js@1.8.3):
-    resolution: {integrity: sha512-pFyPCgkybQSjdEp+UVHse8Wgh+3hSsBYKoEwdjBObFXi4S57a1Gla4cMTv+s6gsxpL8u5q4jVyj3Fq32vtn3sw==}
+  /@intrnl/sq@0.3.0(solid-js@1.8.3):
+    resolution: {integrity: sha512-aYhnY76m4w2BbCADqX/vCI+5TqQ++gu5h5INqqha3BT1sJuPgwiWKXr9UuUzbIdHpSA2R4s2n3rH4sj3FRmJlQ==}
     peerDependencies:
       solid-js: ^1.7.6
     dependencies:

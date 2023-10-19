@@ -55,12 +55,13 @@ const AuthenticatedMutedUsersModerationPage = () => {
 	};
 
 	const [latest, { mutate: mutateLatest }] = createQuery({
-		key: () => getSelfMutesLatestKey(uid()),
+		key: () => {
+			if (getProfileListDid(mutes())) {
+				return getSelfMutesLatestKey(uid());
+			}
+		},
 		fetch: getSelfMutesLatest,
 		staleTime: 10_000,
-		enabled: () => {
-			return !!getProfileListDid(mutes());
-		},
 	});
 
 	createEffect((prev: ReturnType<typeof mutes> | 0) => {

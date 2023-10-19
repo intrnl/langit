@@ -51,37 +51,38 @@ const AuthenticatedFeedPage = () => {
 	const feedParams = (): FeedTimelineParams => ({ type: 'feed', uri: feedUri() });
 
 	const [info] = createQuery({
-		key: () => getFeedGeneratorKey(uid(), feedUri()),
+		key: () => {
+			if (did()) {
+				return getFeedGeneratorKey(uid(), feedUri());
+			}
+		},
 		fetch: getFeedGenerator,
 		staleTime: 60_000,
 		initialData: getInitialFeedGenerator,
-		enabled: () => !!did(),
 	});
 
 	const [timeline, { refetch }] = createQuery({
-		key: () => getTimelineKey(uid(), feedParams()),
+		key: () => {
+			if (did()) {
+				return getTimelineKey(uid(), feedParams());
+			}
+		},
 		fetch: getTimeline,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
-		enabled: () => !!did(),
 	});
 
 	const [latest, { mutate: mutateLatest }] = createQuery({
-		key: () => getTimelineLatestKey(uid(), feedParams()),
+		key: () => {
+			const $timeline = timeline();
+			if ($timeline && $timeline.pages[0].cid) {
+				return getTimelineLatestKey(uid(), feedParams());
+			}
+		},
 		fetch: getTimelineLatest,
 		staleTime: 10_000,
 		refetchInterval: 30_000,
-		enabled: () => {
-			const $did = did();
-			const $timeline = timeline();
-
-			if (!$did || !$timeline || !$timeline.pages[0].cid) {
-				return false;
-			}
-
-			return true;
-		},
 	});
 
 	const isSaved = createMemo(() => {

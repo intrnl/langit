@@ -53,19 +53,15 @@ const Feed = (props: { uid: DID; params: HomeTimelineParams | FeedTimelineParams
 	});
 
 	const [latest, { mutate: mutateLatest }] = createQuery({
-		key: () => getTimelineLatestKey(uid(), params()),
+		key: () => {
+			const $timeline = timeline();
+			if ($timeline && $timeline.pages[0].cid) {
+				return getTimelineLatestKey(uid(), params());
+			}
+		},
 		fetch: getTimelineLatest,
 		staleTime: 10_000,
 		refetchInterval: 30_000,
-		enabled: () => {
-			const $timeline = timeline();
-
-			if (!$timeline || !$timeline.pages[0].cid) {
-				return false;
-			}
-
-			return true;
-		},
 	});
 
 	createEffect((prev: ReturnType<typeof timeline> | 0) => {

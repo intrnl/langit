@@ -124,44 +124,52 @@ const AuthenticatedComposePage = () => {
 	});
 
 	const [reply] = createQuery({
-		key: () => getPostKey(uid(), replyUri()!),
+		key: () => {
+			const $replyUri = replyUri();
+			if ($replyUri) {
+				return getPostKey(uid(), $replyUri);
+			}
+		},
 		fetch: getPost,
 		staleTime: 30_000,
 		initialData: getInitialPost,
-		enabled: () => {
-			return !!replyUri();
-		},
 	});
 
 	const [quote] = createQuery({
-		key: () => getPostKey(uid(), recordUri()!),
+		key: () => {
+			const $recordUri = recordUri();
+			if ($recordUri && (isAtpPostUri($recordUri) || isBskyPostUrl($recordUri))) {
+				return getPostKey(uid(), recordUri()!);
+			}
+		},
 		fetch: getPost,
 		staleTime: 30_000,
 		initialData: getInitialPost,
-		enabled: () => {
-			const uri = recordUri();
-			return !!uri && (isAtpPostUri(uri) || isBskyPostUrl(uri));
-		},
 	});
 
 	const [feed] = createQuery({
-		key: () => getFeedGeneratorKey(uid(), recordUri()!),
+		key: () => {
+			const $recordUri = recordUri();
+			if ($recordUri && (isAtpFeedUri($recordUri) || isBskyFeedUrl($recordUri))) {
+				return getFeedGeneratorKey(uid(), recordUri()!);
+			}
+		},
 		fetch: getFeedGenerator,
 		staleTime: 30_000,
 		initialData: getInitialFeedGenerator,
-		enabled: () => {
-			const uri = recordUri();
-			return !!uri && (isAtpFeedUri(uri) || isBskyFeedUrl(uri));
-		},
 	});
 
 	const [link] = createQuery({
-		key: () => getLinkMetaKey(linkUrl()!),
+		key: () => {
+			const $linkUri = linkUrl();
+			if ($linkUri) {
+				return getLinkMetaKey($linkUri);
+			}
+		},
 		fetch: getLinkMeta,
 		staleTime: 30_000,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
-		enabled: () => !!linkUrl(),
 	});
 
 	const [profile] = createQuery({

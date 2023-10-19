@@ -52,12 +52,13 @@ const AuthenticatedBlockedUsersModerationPage = () => {
 	};
 
 	const [latest, { mutate: mutateLatest }] = createQuery({
-		key: () => getSelfBlocksLatestKey(uid()),
+		key: () => {
+			if (getProfileListDid(blocks())) {
+				return getSelfBlocksLatestKey(uid());
+			}
+		},
 		fetch: getSelfBlocksLatest,
 		staleTime: 10_000,
-		enabled: () => {
-			return !!getProfileListDid(blocks());
-		},
 	});
 
 	createEffect((prev: ReturnType<typeof blocks> | 0) => {

@@ -42,18 +42,14 @@ const AuthenticatedNotificationsPage = () => {
 	});
 
 	const [latest, { mutate }] = createQuery({
-		key: () => getNotificationsLatestKey(uid()),
+		key: () => {
+			const $notifications = notifications();
+			if ($notifications && $notifications.pages[0].cid) {
+				return getNotificationsLatestKey(uid());
+			}
+		},
 		fetch: getNotificationsLatest,
 		staleTime: 10_000,
-		enabled: () => {
-			const $notifications = notifications();
-
-			if (!$notifications || !$notifications.pages[0].cid) {
-				return false;
-			}
-
-			return true;
-		},
 	});
 
 	const read = createMutation({

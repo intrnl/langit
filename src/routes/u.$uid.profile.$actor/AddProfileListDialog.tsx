@@ -128,14 +128,7 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 			<h1 class={/* @once */ dialog.title()}>Add to list</h1>
 
 			<div ref={listEl} class="-mx-4 mt-3 flex flex-col overflow-y-auto">
-				<For
-					each={flattenedLists()}
-					fallback={
-						<div class="px-4 py-3">
-							<span class="text-sm text-muted-fg">You don't have any lists created.</span>
-						</div>
-					}
-				>
+				<For each={flattenedLists()}>
 					{(list) => {
 						const [result] = createQuery({
 							key: () => getProfileInListKey(uid(), profile().did, list.uri),
@@ -183,6 +176,12 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 					<Match when={lists.loading}>
 						<div class="flex h-13 items-center justify-center border-divider">
 							<CircularProgress />
+						</div>
+					</Match>
+
+					<Match when={flattenedLists().length < 1}>
+						<div class="px-4 py-3">
+							<span class="text-sm text-muted-fg">You don't have any lists created.</span>
 						</div>
 					</Match>
 

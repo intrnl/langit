@@ -1,4 +1,4 @@
-import { type Accessor, Match, Show, Switch, createSignal } from 'solid-js';
+import { type Accessor, Match, Show, Switch, createSignal, onMount, createEffect } from 'solid-js';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { useNavigate } from '@solidjs/router';
@@ -345,13 +345,31 @@ const PostContent = ({ uid, post, force, timelineDid }: PostContentProps) => {
 		);
 	}
 
+	let content: HTMLDivElement | undefined;
+
 	return (
 		<>
 			<Show when={post().$deleted.value}>
 				<div class="text-sm text-muted-fg">This post has been deleted.</div>
 			</Show>
 
-			<div class="whitespace-pre-wrap break-words text-sm">{post().$renderedContent()}</div>
+			<div ref={content} class="line-clamp-[9] whitespace-pre-wrap break-words text-sm">
+				{post().$renderedContent()}
+			</div>
+
+			<a
+				ref={(node) => {
+					createEffect(() => {
+						post().record.value;
+						node.style.display = content!.scrollHeight > content!.clientHeight ? 'block' : 'none';
+					});
+				}}
+				link
+				href="/"
+				class="text-sm text-accent hover:underline"
+			>
+				Show more
+			</a>
 
 			<Show when={post().embed.value}>
 				{(embed) => <PostEmbedContent uid={uid} mod={mod} embed={embed} />}

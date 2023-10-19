@@ -332,7 +332,7 @@ const AuthenticatedProfileLayout = () => {
 									</Match>
 
 									<Match when>
-										<div class="flex h-13 overflow-x-auto border-b border-divider">
+										<div class="box-content flex h-13 overflow-x-auto border-b border-divider">
 											<TabLink href={generatePath('/u/:uid/profile/:actor', params)} replace end>
 												Posts
 											</TabLink>

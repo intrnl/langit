@@ -1,8 +1,8 @@
 import {
-	ErrorBoundary,
 	For,
+	Match,
 	Show,
-	Suspense,
+	Switch,
 	createEffect,
 	createMemo,
 	createResource,
@@ -147,7 +147,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 	const debouncedMatchedCompletion = useDebouncedValue(
 		matchedCompletion,
 		500,
-		(a, b) => a?.query === b?.query,
+		(a, b) => a?.query === b?.query && a?.type === b?.type,
 	);
 
 	const [suggestions] = createResource(
@@ -405,95 +405,120 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 			</Show>
 
 			<Show when={matchedCompletion()}>
-				<ul
-					ref={setFloating}
-					class="absolute z-40 max-h-72 w-full overflow-auto rounded-md border border-divider bg-background shadow-lg empty:hidden sm:w-max"
-					style={{
-						'max-width': 'calc(100% - 12px)',
-						'min-width': `180px`,
-						top: `${position.y ?? 0}px`,
-						// left: `${position.x ?? 0}px`,
-					}}
-				>
-					<ErrorBoundary fallback={null}>
-						<Suspense
-							fallback={
+				{(matchedCompletion) => (
+					<ul
+						ref={setFloating}
+						class="absolute z-40 max-h-72 w-full overflow-auto rounded-md border border-divider bg-background shadow-lg sm:w-max"
+						style={{
+							'max-width': 'calc(100% - 12px)',
+							'min-width': `180px`,
+							top: `${position.y ?? 0}px`,
+							// left: `${position.x ?? 0}px`,
+						}}
+					>
+						<Switch>
+							<Match when={suggestions.loading || (matchedCompletion() && !debouncedMatchedCompletion())}>
 								<div class="flex h-14 w-full items-center justify-center">
 									<CircularProgress />
 								</div>
-							}
-						>
-							<For each={suggestions()}>
-								{(item, index) => {
-									const selected = () => menuSelection() === index();
-									const type = item.type;
+							</Match>
 
-									let node: JSX.Element;
-									if (type === Suggestion.EMOJI) {
-										const name = item.name;
-										const emoji = item.emoji;
-
-										node = (
-											<div class="contents">
-												<span class="text-base">{emoji}</span>
-												<span class="text-sm">{name}</span>
+							<Match when={!suggestions.error && suggestions()}>
+								{(suggestions) => (
+									<For
+										each={suggestions()}
+										fallback={
+											<div class="px-4 py-2">
+												<span class="text-sm text-muted-fg">
+													No {renderSuggestionLabel(matchedCompletion().type)} found matching this query
+												</span>
 											</div>
-										);
-									} else if (type === Suggestion.MENTION) {
-										const user = item.data;
+										}
+									>
+										{(item, index) => {
+											const selected = () => menuSelection() === index();
+											const type = item.type;
 
-										node = (
-											<div class="contents">
-												<div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-													<Show when={user.avatar} keyed>
-														{(avatar) => <img src={avatar} class="h-full w-full" />}
-													</Show>
-												</div>
+											let node: JSX.Element;
+											if (type === Suggestion.EMOJI) {
+												const name = item.name;
+												const emoji = item.emoji;
 
-												<div class="flex grow flex-col text-sm">
-													<span class="line-clamp-1 break-all font-bold">
-														{user.displayName || user.handle}
-													</span>
-													<span class="line-clamp-1 shrink-0 break-all text-muted-fg">@{user.handle}</span>
-												</div>
-											</div>
-										);
-									} else {
-										assert(false, `expected type`);
-									}
+												node = (
+													<div class="contents">
+														<span class="text-base">{emoji}</span>
+														<span class="text-sm">{name}</span>
+													</div>
+												);
+											} else if (type === Suggestion.MENTION) {
+												const user = item.data;
 
-									return (
-										<li
-											ref={(node) => {
-												createEffect(() => {
-													if (selected()) {
-														node.scrollIntoView({ block: 'center' });
-													}
-												});
-											}}
-											role="option"
-											tabIndex={-1}
-											aria-selected={selected()}
-											onClick={() => {
-												acceptSuggestion(item);
-											}}
-											// onMouseEnter={() => {
-											// 	setMenuSelection(index());
-											// }}
-											class="flex cursor-pointer items-center gap-4 px-4 py-2 hover:bg-hinted"
-											classList={{ 'bg-hinted': selected() }}
-										>
-											{node}
-										</li>
-									);
-								}}
-							</For>
-						</Suspense>
-					</ErrorBoundary>
-				</ul>
+												node = (
+													<div class="contents">
+														<div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted-fg">
+															<Show when={user.avatar} keyed>
+																{(avatar) => <img src={avatar} class="h-full w-full" />}
+															</Show>
+														</div>
+
+														<div class="flex grow flex-col text-sm">
+															<span class="line-clamp-1 break-all font-bold">
+																{user.displayName || user.handle}
+															</span>
+															<span class="line-clamp-1 shrink-0 break-all text-muted-fg">
+																@{user.handle}
+															</span>
+														</div>
+													</div>
+												);
+											} else {
+												assert(false, `expected type`);
+											}
+
+											return (
+												<li
+													ref={(node) => {
+														createEffect(() => {
+															if (selected()) {
+																node.scrollIntoView({ block: 'center' });
+															}
+														});
+													}}
+													role="option"
+													tabIndex={-1}
+													aria-selected={selected()}
+													onClick={() => {
+														acceptSuggestion(item);
+													}}
+													// onMouseEnter={() => {
+													// 	setMenuSelection(index());
+													// }}
+													class="flex cursor-pointer items-center gap-4 px-4 py-2 hover:bg-hinted"
+													classList={{ 'bg-hinted': selected() }}
+												>
+													{node}
+												</li>
+											);
+										}}
+									</For>
+								)}
+							</Match>
+						</Switch>
+					</ul>
+				)}
 			</Show>
 		</div>
 	);
 };
 
 export default RichtextComposer;
+
+const renderSuggestionLabel = (suggestion: Suggestion) => {
+	if (suggestion === Suggestion.EMOJI) {
+		return `emojis`;
+	} else if (suggestion === Suggestion.MENTION) {
+		return `users`;
+	}
+
+	return `N/A`;
+};

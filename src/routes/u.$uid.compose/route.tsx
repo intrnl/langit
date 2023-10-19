@@ -372,7 +372,7 @@ const AuthenticatedComposePage = () => {
 		setImages(images().concat(next));
 	};
 
-	const addImages = async (files: (Blob | File)[]) => {
+	const addImages = async (files: File[]) => {
 		if (images().length + files.length > MAX_IMAGE) {
 			setMessage(`You can only add up to 4 images in a single post`);
 			return;

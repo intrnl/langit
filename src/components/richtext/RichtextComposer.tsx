@@ -37,7 +37,7 @@ export interface RichtextComposerProps {
 	rt: PreliminaryRichText;
 	onChange: (next: string) => void;
 	onSubmit: () => void;
-	onImageDrop: (blob: Blob[]) => void;
+	onImageDrop: (blob: File[]) => void;
 
 	minRows?: number;
 	placeholder?: string;
@@ -298,7 +298,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 				class="relative z-10 block w-full resize-none overflow-hidden bg-transparent pb-4 pr-3 pt-5 text-xl text-transparent caret-primary outline-none"
 				onPaste={(ev) => {
 					const items = ev.clipboardData?.items ?? [];
-					let images: Blob[] = [];
+					let images: File[] = [];
 
 					for (let idx = 0, len = items.length; idx < len; idx++) {
 						const item = items[idx];
@@ -331,7 +331,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 					if (dataTransfer && dataTransfer.types.includes('Files')) {
 						const files = dataTransfer.files;
 
-						let images: Blob[] = [];
+						let images: File[] = [];
 						for (let idx = 0, len = files.length; idx < len; idx++) {
 							const file = files[idx];
 

@@ -365,7 +365,11 @@ const PostContent = ({ uid, post, force, timelineDid }: PostContentProps) => {
 					});
 				}}
 				link
-				href="/"
+				href={generatePath('/u/:uid/profile/:actor/post/:status', {
+					uid: uid(),
+					actor: post().author.did,
+					status: getRecordId(post().uri),
+				})}
 				class="text-sm text-accent hover:underline"
 			>
 				Show more

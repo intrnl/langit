@@ -92,18 +92,18 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 
 	const [showDrop, setShowDrop] = createSignal(false);
 
-	const [inputSelection, setInputSelection] = createSignal<number>();
+	const [inputCursor, setInputCursor] = createSignal<number>();
 	const [menuSelection, setMenuSelection] = createSignal<number>();
 
 	const candidateMatch = createMemo(() => {
-		const $sel = inputSelection();
+		const $cursor = inputCursor();
 		const $val = untrack(() => props.value);
 
-		if ($sel == null) {
+		if ($cursor == null) {
 			return '';
 		}
 
-		return $val.length === $sel ? $val : $val.slice(0, $sel);
+		return $val.length === $cursor ? $val : $val.slice(0, $cursor);
 	});
 
 	const matchedCompletion = createMemo(() => {
@@ -259,7 +259,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 		const start = textarea!.selectionStart;
 		const end = textarea!.selectionEnd;
 
-		setInputSelection(start === end ? start : undefined);
+		setInputCursor(start === end ? start : undefined);
 	};
 
 	makeEventListener(document, 'selectionchange', () => {
@@ -360,7 +360,9 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 						const $sel = menuSelection();
 						const $suggestions = !suggestions.error && suggestions();
 
-						if ($suggestions) {
+						if (key === 'Escape') {
+							setInputCursor(undefined);
+						} else if ($suggestions) {
 							if (key === 'ArrowUp') {
 								ev.preventDefault();
 

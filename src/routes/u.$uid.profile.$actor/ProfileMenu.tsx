@@ -83,7 +83,10 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 			<button
 				onClick={() => {
 					closeModal();
-					openModal(() => <AddProfileListDialog uid={uid()} profile={profile()} />);
+
+					// TODO: no idea why Suspense is getting triggered here despite it not making use of it
+					// at all, investigate later.
+					openModal(() => <AddProfileListDialog uid={uid()} profile={profile()} />, { suspense: false });
 				}}
 				class={/* @once */ menu.item()}
 			>

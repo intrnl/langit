@@ -120,30 +120,28 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 			return;
 		}
 
-		if (match) {
-			const start = match.index!;
-			const length = match[0].length;
+		const start = match.index!;
+		const length = match[0].length;
 
-			const matched = match[1].toLowerCase();
+		const matched = match[1].toLowerCase();
 
-			const rangeStart = findNodePosition(renderer!, start);
-			const rangeEnd = findNodePosition(renderer!, start + length);
+		const rangeStart = findNodePosition(renderer!, start);
+		const rangeEnd = findNodePosition(renderer!, start + length);
 
-			let range: Range | undefined;
-			if (rangeStart && rangeEnd) {
-				range = new Range();
-				range.setStart(rangeStart.node, rangeStart.position);
-				range.setEnd(rangeEnd.node, rangeEnd.position);
-			}
-
-			return {
-				type: type,
-				range: range,
-				index: start,
-				length: length,
-				query: type === Suggestion.MENTION ? matched.replace(TRIM_MENTION_RE, '') : matched,
-			};
+		let range: Range | undefined;
+		if (rangeStart && rangeEnd) {
+			range = new Range();
+			range.setStart(rangeStart.node, rangeStart.position);
+			range.setEnd(rangeEnd.node, rangeEnd.position);
 		}
+
+		return {
+			type: type,
+			range: range,
+			index: start,
+			length: length,
+			query: type === Suggestion.MENTION ? matched.replace(TRIM_MENTION_RE, '') : matched,
+		};
 	});
 
 	const debouncedMatchedCompletion = useDebouncedValue(

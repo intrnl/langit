@@ -1,4 +1,4 @@
-import { type Accessor, Match, Show, Switch, createSignal, onMount, createEffect } from 'solid-js';
+import { type Accessor, Match, Show, Switch, createEffect, createSignal } from 'solid-js';
 
 import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { useNavigate } from '@solidjs/router';

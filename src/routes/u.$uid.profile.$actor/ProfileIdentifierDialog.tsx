@@ -113,8 +113,8 @@ const ProfileIdentifierDialog = (props: ProfileIdentifierDialogProps) => {
 					navigator.clipboard.writeText(profile().handle.value);
 				}}
 			>
-				<ContentCopyIcon class="text-lg" />
-				<span>Copy @{profile().handle.value}</span>
+				<ContentCopyIcon class="shrink-0 text-lg" />
+				<span class="line-clamp-1 break-all">Copy @{profile().handle.value}</span>
 			</button>
 
 			<button onClick={closeModal} class={/* @once */ menu.cancel()}>

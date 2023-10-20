@@ -45,6 +45,8 @@ export interface SignalizedPost {
 	};
 
 	$deleted: Signal<boolean>;
+	/** Post on timeline needs to be truncated, `undefined` if not sure. */
+	$truncated: boolean | undefined;
 
 	$renderedContent: ReturnType<typeof createPostRenderer>;
 	$mod: ReturnType<typeof createPostModerationDecision>;
@@ -68,6 +70,7 @@ const createSignalizedPost = (uid: DID, post: Post, key?: number): SignalizedPos
 		},
 
 		$deleted: signal(false),
+		$truncated: undefined,
 
 		$renderedContent: createPostRenderer(uid),
 		$mod: createPostModerationDecision(uid),

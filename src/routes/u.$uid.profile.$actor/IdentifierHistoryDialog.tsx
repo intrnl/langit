@@ -38,9 +38,11 @@ const IdentifierHistoryDialog = (props: IdentifierHistoryDialogProps) => {
 										class="border-l-4 py-1 pl-3 text-sm"
 										classList={{ 'border-muted': idx() !== 0, 'border-accent': idx() === 0 }}
 									>
-										{entry.knownAs.map((handle) => (
-											<p>{handle}</p>
-										))}
+										<ul classList={{ 'mb-1 list-disc pl-4': entry.knownAs.length > 1 }}>
+											{entry.knownAs.map((handle) => (
+												<li class="break-words">{handle}</li>
+											))}
+										</ul>
 										<p class="text-muted-fg">{relformat.formatAbsWithTime(entry.createdAt)}</p>
 									</li>
 								)}

@@ -1,10 +1,13 @@
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
-import { closeModal } from '~/globals/modals.tsx';
+import { closeModal, replaceModal } from '~/globals/modals.tsx';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
 import ContentCopyIcon from '~/icons/baseline-content-copy.tsx';
+import HistoryIcon from '~/icons/baseline-history.tsx';
+
+import IdentifierHistoryDialog from './IdentifierHistoryDialog.tsx';
 
 export interface ProfileIdentifierDialogProps {
 	profile: SignalizedProfile;
@@ -81,6 +84,16 @@ const ProfileIdentifierDialog = (props: ProfileIdentifierDialogProps) => {
 					return renderPart(id);
 				})()}
 			</div>
+
+			<button
+				class={/* @once */ menu.item()}
+				onClick={() => {
+					replaceModal(() => <IdentifierHistoryDialog profile={props.profile} />);
+				}}
+			>
+				<HistoryIcon class="text-lg" />
+				<span>View handle history</span>
+			</button>
 
 			<button
 				class={/* @once */ menu.item()}

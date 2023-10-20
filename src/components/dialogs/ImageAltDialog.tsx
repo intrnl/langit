@@ -12,7 +12,7 @@ const ImageAltDialog = (props: ImageAltDialogProps) => {
 		<div class={/* @once */ dialog.content()}>
 			<h1 class={/* @once */ dialog.title()}>Image description</h1>
 
-			<p class="mt-3 whitespace-pre-wrap break-words text-sm">{props.alt}</p>
+			<p class="mt-3 overflow-y-auto whitespace-pre-wrap break-words text-sm">{props.alt}</p>
 
 			<div class={/* @once */ dialog.actions()}>
 				<button onClick={closeModal} class={/* @once */ button({ color: 'primary' })}>

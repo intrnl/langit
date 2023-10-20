@@ -6,7 +6,7 @@ import type { SignalizedList } from '~/api/cache/lists.ts';
 
 import { getRecordId } from '~/api/utils.ts';
 
-import { closeModal, openModal } from '~/globals/modals.tsx';
+import { closeModal, replaceModal } from '~/globals/modals.tsx';
 
 import ReportDialog, { REPORT_LIST } from '~/components/dialogs/ReportDialog.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
@@ -45,8 +45,7 @@ const ListMenu = (props: ListMenuProps) => {
 				<Match when={list().creator.did === uid()}>
 					<button
 						onClick={() => {
-							closeModal();
-							openModal(() => <DeleteListDialog uid={uid()} list={list()} />);
+							replaceModal(() => <DeleteListDialog uid={uid()} list={list()} />);
 						}}
 						class={/* @once */ menu.item()}
 					>
@@ -60,8 +59,7 @@ const ListMenu = (props: ListMenuProps) => {
 						onClick={() => {
 							const $list = list();
 
-							closeModal();
-							openModal(() => (
+							replaceModal(() => (
 								<ReportDialog
 									uid={uid()}
 									report={{ type: REPORT_LIST, uri: $list.uri, cid: $list.cid.value }}

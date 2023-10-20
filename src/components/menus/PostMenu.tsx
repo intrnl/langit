@@ -8,7 +8,7 @@ import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { deletePost } from '~/api/mutations/delete-post.ts';
 
 import { multiagent } from '~/globals/agent.ts';
-import { closeModal, openModal } from '~/globals/modals.tsx';
+import { closeModal, replaceModal } from '~/globals/modals.tsx';
 import { generatePath } from '~/router.ts';
 
 import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
@@ -55,9 +55,7 @@ const PostMenu = (props: PostMenuProps) => {
 			<Show when={Object.keys(multiagent.accounts).length > 1}>
 				<button
 					onClick={() => {
-						closeModal();
-
-						openModal(() => (
+						replaceModal(() => (
 							<SwitchAccountMenu
 								uid={uid()}
 								redirect={(uid) =>
@@ -91,8 +89,7 @@ const PostMenu = (props: PostMenuProps) => {
 			<Show when={author().did !== uid()}>
 				<button
 					onClick={() => {
-						closeModal();
-						openModal(() => <LazyMuteConfirmDialog uid={uid()} profile={author()} />);
+						replaceModal(() => <LazyMuteConfirmDialog uid={uid()} profile={author()} />);
 					}}
 					class={/* @once */ menu.item()}
 				>
@@ -104,8 +101,7 @@ const PostMenu = (props: PostMenuProps) => {
 
 				<button
 					onClick={() => {
-						closeModal();
-						openModal(() => (
+						replaceModal(() => (
 							<ReportDialog
 								uid={uid()}
 								report={{ type: REPORT_POST, uri: post().uri, cid: post().cid.value }}
@@ -122,9 +118,7 @@ const PostMenu = (props: PostMenuProps) => {
 			<Show when={author().did === uid()}>
 				<button
 					onClick={() => {
-						closeModal();
-
-						openModal(() => (
+						replaceModal(() => (
 							<ConfirmDialog
 								title={`Delete post?`}
 								body={`This can't be undone, the post will be deleted from your profile, the timeline of any users that follow you, and from search results.`}

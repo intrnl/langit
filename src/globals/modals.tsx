@@ -31,14 +31,27 @@ let _id = 0;
 
 const StateContext = createContext<ModalContextState>();
 
+const createModalState = (fn: ModalComponent, options?: ModalOptions): ModalState => {
+	return {
+		id: _id++,
+		render: fn,
+		suspense: options?.suspense ?? true,
+		disableBackdropClose: signal(options?.disableBackdropClose ?? false),
+	};
+};
+
 export const openModal = (fn: ModalComponent, options?: ModalOptions) => {
 	setModals(($modals) => {
-		return $modals.concat({
-			id: _id++,
-			render: fn,
-			suspense: options?.suspense ?? true,
-			disableBackdropClose: signal(options?.disableBackdropClose ?? false),
-		});
+		return $modals.concat(createModalState(fn, options));
+	});
+};
+
+export const replaceModal = (fn: ModalComponent, options?: ModalOptions) => {
+	setModals(($modals) => {
+		const cloned = $modals.slice(0, -1);
+		cloned.push(createModalState(fn, options));
+
+		return cloned;
 	});
 };
 

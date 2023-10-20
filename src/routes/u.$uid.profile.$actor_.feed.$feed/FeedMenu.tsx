@@ -4,7 +4,7 @@ import type { SignalizedFeedGenerator } from '~/api/cache/feed-generators.ts';
 
 import { getRecordId } from '~/api/utils.ts';
 
-import { closeModal, openModal } from '~/globals/modals.tsx';
+import { closeModal, replaceModal } from '~/globals/modals.tsx';
 
 import ReportDialog, { REPORT_FEED } from '~/components/dialogs/ReportDialog.tsx';
 import * as menu from '~/styles/primitives/menu.ts';
@@ -40,8 +40,7 @@ const FeedMenu = (props: FeedMenuProps) => {
 				onClick={() => {
 					const $feed = feed();
 
-					closeModal();
-					openModal(() => (
+					replaceModal(() => (
 						<ReportDialog uid={uid()} report={{ type: REPORT_FEED, uri: $feed.uri, cid: $feed.cid.value }} />
 					));
 				}}

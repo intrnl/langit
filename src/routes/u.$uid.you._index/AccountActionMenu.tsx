@@ -3,7 +3,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import type { MultiagentAccountData } from '~/api/multiagent.ts';
 
 import { multiagent } from '~/globals/agent.ts';
-import { closeModal, openModal } from '~/globals/modals.tsx';
+import { closeModal, replaceModal } from '~/globals/modals.tsx';
 import { useNavigate } from '~/router.ts';
 
 import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
@@ -39,8 +39,7 @@ const AccountActionMenu = (props: AccountActionMenuProps) => {
 
 			<button
 				onClick={() => {
-					closeModal();
-					openModal(() => (
+					replaceModal(() => (
 						<ConfirmDialog
 							title={`Sign out?`}
 							body={`This will sign you out of ${

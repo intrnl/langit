@@ -5,7 +5,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 
 import { multiagent } from '~/globals/agent.ts';
-import { closeModal, openModal } from '~/globals/modals.tsx';
+import { closeModal, replaceModal } from '~/globals/modals.tsx';
 import { getAccountPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
 import { generatePath } from '~/router.ts';
 
@@ -64,9 +64,7 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 			<Show when={Object.keys(multiagent.accounts).length > 1}>
 				<button
 					onClick={() => {
-						closeModal();
-
-						openModal(() => (
+						replaceModal(() => (
 							<SwitchAccountMenu
 								uid={uid()}
 								redirect={(uid) => generatePath('/u/:uid/profile/:actor', { uid: uid, actor: profile().did })}
@@ -82,11 +80,9 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 
 			<button
 				onClick={() => {
-					closeModal();
-
 					// TODO: no idea why Suspense is getting triggered here despite it not making use of it
 					// at all, investigate later.
-					openModal(() => <AddProfileListDialog uid={uid()} profile={profile()} />, { suspense: false });
+					replaceModal(() => <AddProfileListDialog uid={uid()} profile={profile()} />, { suspense: false });
 				}}
 				class={/* @once */ menu.item()}
 			>
@@ -135,8 +131,7 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 
 			<button
 				onClick={() => {
-					closeModal();
-					openModal(() => <LazyMuteConfirmDialog uid={uid()} profile={profile()} />);
+					replaceModal(() => <LazyMuteConfirmDialog uid={uid()} profile={profile()} />);
 				}}
 				class={/* @once */ menu.item()}
 			>
@@ -148,8 +143,7 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 
 			<button
 				onClick={() => {
-					closeModal();
-					openModal(() => <BlockConfirmDialog uid={uid()} profile={profile()} />);
+					replaceModal(() => <BlockConfirmDialog uid={uid()} profile={profile()} />);
 				}}
 				class={/* @once */ menu.item()}
 			>
@@ -161,8 +155,9 @@ const ProfileMenu = (props: ProfileMenuProps) => {
 
 			<button
 				onClick={() => {
-					closeModal();
-					openModal(() => <ReportDialog uid={uid()} report={{ type: REPORT_PROFILE, did: profile().did }} />);
+					replaceModal(() => (
+						<ReportDialog uid={uid()} report={{ type: REPORT_PROFILE, did: profile().did }} />
+					));
 				}}
 				class={/* @once */ menu.item()}
 			>

@@ -4,6 +4,7 @@ import { For, Match, Switch } from 'solid-js';
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import { getIdentifierHistory, getIdentifierHistoryKey } from '~/api/queries/get-identifier-history.ts';
 
+import { closeModal } from '~/globals/modals.tsx';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
 import CircularProgress from '~/components/CircularProgress.tsx';
@@ -59,7 +60,9 @@ const IdentifierHistoryDialog = (props: IdentifierHistoryDialogProps) => {
 			</Switch>
 
 			<div class={/* @once */ dialog.actions()}>
-				<button class={/* @once */ button({ color: 'primary' })}>Close</button>
+				<button onClick={closeModal} class={/* @once */ button({ color: 'primary' })}>
+					Close
+				</button>
 			</div>
 		</div>
 	);

@@ -1,5 +1,7 @@
 import { createMemo } from 'solid-js';
 
+import TextareaAutosize from 'solid-textarea-autosize';
+
 import { closeModal } from '~/globals/modals.tsx';
 import { createDerivedSignal } from '~/utils/hooks.ts';
 import { model } from '~/utils/misc.ts';
@@ -27,10 +29,10 @@ const ImageAltEditDialog = (props: ImageAltEditDialogProps) => {
 
 			<BlobImage src={image().blob} class="my-4 h-full w-full object-contain" />
 
-			<textarea
+			<TextareaAutosize
 				ref={model(text, setText)}
 				placeholder="Add description..."
-				rows={4}
+				minRows={4}
 				class={/* @once */ textarea({ class: 'shrink-0' })}
 			/>
 

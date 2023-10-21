@@ -6,7 +6,7 @@ import { createMutation } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, useModalState } from '~/globals/modals.tsx';
-import { assert, model } from '~/utils/misc.ts';
+import { model } from '~/utils/misc.ts';
 
 import button from '~/styles/primitives/button.ts';
 import textarea from '~/styles/primitives/textarea.ts';

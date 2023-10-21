@@ -50,7 +50,7 @@ const AuthenticatedFeedPage = () => {
 	const feedUri = () => createFeedGeneratorUri(did()!, feed());
 	const feedParams = (): FeedTimelineParams => ({ type: 'feed', uri: feedUri() });
 
-	const [info] = createQuery({
+	const [info, { refetch: refetchInfo }] = createQuery({
 		key: () => {
 			if (did()) {
 				return getFeedGeneratorKey(uid(), feedUri());
@@ -59,9 +59,10 @@ const AuthenticatedFeedPage = () => {
 		fetch: getFeedGenerator,
 		staleTime: 60_000,
 		initialData: getInitialFeedGenerator,
+		refetchOnWindowFocus: false,
 	});
 
-	const [timeline, { refetch }] = createQuery({
+	const [timeline, { refetch: refetchTimeline }] = createQuery({
 		key: () => {
 			if (did()) {
 				return getTimelineKey(uid(), feedParams());
@@ -125,109 +126,128 @@ const AuthenticatedFeedPage = () => {
 				</Switch>
 			</div>
 
-			<Show when={info()} keyed>
-				{(info) => {
-					const creator = info.creator;
+			<Switch>
+				<Match when={info.error} keyed>
+					{(err) => (
+						<div class="flex flex-col items-center px-4 py-6 text-sm text-muted-fg">
+							<p>Something went wrong</p>
+							<p class="mb-4">{'' + err}</p>
 
-					const isLiked = () => info.viewer.like.value;
+							<button
+								disabled={info.loading}
+								onClick={() => refetchInfo()}
+								class={/* @once */ button({ color: 'primary' })}
+							>
+								Reload
+							</button>
+						</div>
+					)}
+				</Match>
 
-					const isSaved = createMemo(() => {
-						const feeds = getFeedPref(uid()).feeds;
-						const uri = feedUri();
+				<Match when={info()} keyed>
+					{(info) => {
+						const creator = info.creator;
 
-						for (let idx = 0, len = feeds.length; idx < len; idx++) {
-							const item = feeds[idx];
+						const isLiked = () => info.viewer.like.value;
 
-							if (item.uri === uri) {
-								return { index: idx, item: item };
+						const isSaved = createMemo(() => {
+							const feeds = getFeedPref(uid()).feeds;
+							const uri = feedUri();
+
+							for (let idx = 0, len = feeds.length; idx < len; idx++) {
+								const item = feeds[idx];
+
+								if (item.uri === uri) {
+									return { index: idx, item: item };
+								}
 							}
-						}
-					});
+						});
 
-					const toggleSave = () => {
-						const feeds = getFeedPref(uid()).feeds;
-						const saved = isSaved();
+						const toggleSave = () => {
+							const feeds = getFeedPref(uid()).feeds;
+							const saved = isSaved();
 
-						if (saved) {
-							feeds.splice(saved.index, 1);
-						} else {
-							feeds.push({ uri: info.uri, name: info.name.value, pinned: false });
-						}
-					};
+							if (saved) {
+								feeds.splice(saved.index, 1);
+							} else {
+								feeds.push({ uri: info.uri, name: info.name.value, pinned: false });
+							}
+						};
 
-					return (
-						<>
-							<div class="flex flex-col gap-3 border-b border-divider px-4 pb-4 pt-3">
-								<div class="flex gap-4">
-									<div class="mt-2 grow">
-										<p class="break-words text-lg font-bold">{info.name.value}</p>
-										<p class="text-sm text-muted-fg">
-											<span>by </span>
-											<a
-												link
-												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator.did })}
-												class="hover:underline"
-											>
-												@{creator.handle.value}
-											</a>
-										</p>
+						return (
+							<>
+								<div class="flex flex-col gap-3 border-b border-divider px-4 pb-4 pt-3">
+									<div class="flex gap-4">
+										<div class="mt-2 grow">
+											<p class="break-words text-lg font-bold">{info.name.value}</p>
+											<p class="text-sm text-muted-fg">
+												<span>by </span>
+												<a
+													link
+													href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator.did })}
+													class="hover:underline"
+												>
+													@{creator.handle.value}
+												</a>
+											</p>
+										</div>
+
+										<div class="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted-fg">
+											<Show when={info.avatar.value}>
+												{(avatar) => <img src={avatar()} class="h-full w-full" />}
+											</Show>
+										</div>
 									</div>
 
-									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted-fg">
-										<Show when={info.avatar.value}>
-											{(avatar) => <img src={avatar()} class="h-full w-full" />}
-										</Show>
+									<Show when={info.description.value}>
+										<div class="whitespace-pre-wrap break-words text-sm">{info.$renderedDescription()}</div>
+									</Show>
+
+									<p class="text-sm text-muted-fg">Liked by {comformat.format(info.likeCount.value)} users</p>
+
+									<div class="flex gap-2">
+										<button onClick={toggleSave} class={button({ color: isSaved() ? 'outline' : 'primary' })}>
+											{isSaved() ? 'Unfollow feed' : 'Follow feed'}
+										</button>
+
+										<button
+											title={isLiked() ? 'Unlike this feed' : 'Like this feed'}
+											onClick={() => favoriteFeed(uid(), info)}
+											class={/* @once */ button({ color: 'outline' })}
+										>
+											{isLiked() ? (
+												<FavoriteIcon class="-mx-1.5 text-base text-red-600" />
+											) : (
+												<FavoriteOutlinedIcon class="-mx-1.5 text-base" />
+											)}
+										</button>
+
+										<div class="grow" />
+
+										<button
+											title="More actions"
+											onClick={() => {
+												openModal(() => <FeedMenu uid={uid()} feed={info} />);
+											}}
+											class={/* @once */ button({ color: 'outline' })}
+										>
+											<MoreHorizIcon class="-mx-1.5 text-base" />
+										</button>
 									</div>
 								</div>
-
-								<Show when={info.description.value}>
-									<div class="whitespace-pre-wrap break-words text-sm">{info.$renderedDescription()}</div>
-								</Show>
-
-								<p class="text-sm text-muted-fg">Liked by {comformat.format(info.likeCount.value)} users</p>
-
-								<div class="flex gap-2">
-									<button onClick={toggleSave} class={button({ color: isSaved() ? 'outline' : 'primary' })}>
-										{isSaved() ? 'Unfollow feed' : 'Follow feed'}
-									</button>
-
-									<button
-										title={isLiked() ? 'Unlike this feed' : 'Like this feed'}
-										onClick={() => favoriteFeed(uid(), info)}
-										class={/* @once */ button({ color: 'outline' })}
-									>
-										{isLiked() ? (
-											<FavoriteIcon class="-mx-1.5 text-base text-red-600" />
-										) : (
-											<FavoriteOutlinedIcon class="-mx-1.5 text-base" />
-										)}
-									</button>
-
-									<div class="grow" />
-
-									<button
-										title="More actions"
-										onClick={() => {
-											openModal(() => <FeedMenu uid={uid()} feed={info} />);
-										}}
-										class={/* @once */ button({ color: 'outline' })}
-									>
-										<MoreHorizIcon class="-mx-1.5 text-base" />
-									</button>
-								</div>
-							</div>
-						</>
-					);
-				}}
-			</Show>
+							</>
+						);
+					}}
+				</Match>
+			</Switch>
 
 			<Show when={!info.error}>
 				<TimelineList
 					uid={uid()}
 					timeline={timeline}
 					latest={latest}
-					onLoadMore={(cursor) => refetch(true, cursor)}
-					onRefetch={() => refetch(true)}
+					onLoadMore={(cursor) => refetchTimeline(true, cursor)}
+					onRefetch={() => refetchTimeline(true)}
 				/>
 			</Show>
 		</div>

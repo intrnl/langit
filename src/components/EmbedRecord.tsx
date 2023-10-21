@@ -18,7 +18,7 @@ import {
 import { PreferenceWarn } from '~/api/moderation/enums.ts';
 import { getRecordId } from '~/api/utils.ts';
 
-import { getAccountModerationPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
+import { getAccountModerationOpts, isProfileTemporarilyMuted } from '~/globals/settings.ts';
 import { createLazyMemo } from '~/utils/hooks.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
@@ -80,15 +80,15 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 			const text = ($record.value as PostRecord).text;
 			const labels = $record.labels;
 
-			const prefs = getAccountModerationPreferences($uid);
+			const opts = getAccountModerationOpts($uid);
 
 			decision = createRoot(() => {
 				return createLazyMemo(() => {
 					const accu: ModerationCause[] = [];
-					decideLabelModeration(accu, labels, authorDid, prefs);
+					decideLabelModeration(accu, labels, authorDid, opts);
 					decideMutedPermanentModeration(accu, isPermanentlyMuted);
 					decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted($uid, authorDid));
-					decideMutedKeywordModeration(accu, text, PreferenceWarn, prefs);
+					decideMutedKeywordModeration(accu, text, PreferenceWarn, opts);
 
 					return finalizeModeration(accu);
 				});

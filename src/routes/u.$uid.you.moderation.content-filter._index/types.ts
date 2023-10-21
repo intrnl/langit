@@ -1,5 +1,7 @@
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
+import { DEFAULT_MODERATION_LABELER } from '~/api/defaults.ts';
+
 export interface Labeler {
 	did: DID;
 	name: string;
@@ -8,7 +10,7 @@ export interface Labeler {
 
 export const LABELERS: Labeler[] = [
 	{
-		did: 'did:plc:ar7c4by46qjdydhdevvrndac',
+		did: DEFAULT_MODERATION_LABELER,
 		name: 'bsky.social Moderation Team',
 		handle: 'moderation.bsky.social',
 	},

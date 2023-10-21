@@ -2,7 +2,7 @@ import { Match, Switch, batch, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { getAccountModerationPreferences } from '~/globals/preferences.ts';
+import { getModerationPref } from '~/globals/settings.ts';
 import { useNavigate, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
 
@@ -17,10 +17,10 @@ const AuthenticatedEditFilterModerationPage = () => {
 	const fid = () => params.fid;
 
 	const filter = createMemo(() => {
-		const prefs = getAccountModerationPreferences(uid());
+		const prefs = getModerationPref(uid());
 		const id = fid();
 
-		return prefs.filters.find((def) => def.id === id);
+		return prefs.keywords.find((def) => def.id === id);
 	});
 
 	const navigateBack = () => {
@@ -66,13 +66,13 @@ const AuthenticatedEditFilterModerationPage = () => {
 								});
 							}}
 							onDelete={() => {
-								const prefs = getAccountModerationPreferences(uid());
-								const index = prefs.filters.indexOf($filter);
+								const prefs = getModerationPref(uid());
+								const index = prefs.keywords.indexOf($filter);
 
 								navigateBack();
 
 								if (index !== -1) {
-									prefs.filters.splice(index, 1);
+									prefs.keywords.splice(index, 1);
 								}
 							}}
 						/>

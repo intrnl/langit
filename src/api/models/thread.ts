@@ -2,7 +2,7 @@ import type { DID, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
 
 import { type SignalizedPost, mergeSignalizedPost } from '../cache/posts.ts';
 
-import { isProfileTemporarilyMuted } from '~/globals/preferences.ts';
+import { isProfileTemporarilyMuted } from '~/globals/settings.ts';
 import { Stack } from '~/utils/stack.ts';
 
 type Post = RefOf<'app.bsky.feed.defs#postView'>;

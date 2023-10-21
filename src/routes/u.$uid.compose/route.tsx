@@ -21,7 +21,7 @@ import { getCurrentDate, getRecordId } from '~/api/utils.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
-import { preferences } from '~/globals/preferences.ts';
+import { getLanguagePref } from '~/globals/settings.ts';
 import { useNavigate, useParams } from '~/router.ts';
 
 import { createDerivedSignal } from '~/utils/hooks.ts';
@@ -68,7 +68,8 @@ const enum PostState {
 }
 
 const getLanguages = (uid: DID): string[] => {
-	const lang = preferences[uid]?.cl_defaultLanguage ?? 'system';
+	const prefs = getLanguagePref(uid);
+	const lang = prefs.defaultPostLanguage;
 
 	if (lang === 'none') {
 		return [];

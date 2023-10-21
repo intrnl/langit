@@ -7,7 +7,7 @@ import { useNavigate } from '@solidjs/router';
 import type { FeedsPage } from '~/api/models/feeds.ts';
 import { type Collection, getCollectionCursor, getRepoId, getRecordId } from '~/api/utils.ts';
 
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getFeedPref } from '~/globals/settings.ts';
 import { generatePath } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
@@ -33,10 +33,6 @@ const FeedList = (props: FeedListProps) => {
 
 	const uid = () => props.uid;
 
-	const prefs = createMemo(() => {
-		return getAccountPreferences(uid());
-	});
-
 	const list = () => {
 		const data = feeds();
 		return data ? data.pages.flatMap((page) => page.feeds) : [];
@@ -47,31 +43,25 @@ const FeedList = (props: FeedListProps) => {
 			<For each={list()}>
 				{(feed) => {
 					const isSaved = createMemo(() => {
-						const $prefs = prefs();
-						const saved = $prefs.savedFeeds;
+						const feeds = getFeedPref(uid()).feeds;
 
-						return !!saved && saved.includes(feed.uri);
+						for (let idx = 0, len = feeds.length; idx < len; idx++) {
+							const item = feeds[idx];
+
+							if (item.uri === feed.uri) {
+								return { index: idx, item: item };
+							}
+						}
 					});
 
 					const toggleSave = () => {
-						const $prefs = prefs();
-						const uri = feed.uri;
+						const feeds = getFeedPref(uid()).feeds;
+						const saved = isSaved();
 
-						const saved = $prefs.savedFeeds;
-
-						if (isSaved()) {
-							if (saved) {
-								const idx = saved.indexOf(uri);
-								saved.splice(idx, 1);
-
-								if (saved.length === 0) {
-									$prefs.savedFeeds = undefined;
-								}
-							}
-						} else if (saved) {
-							saved.push(uri);
+						if (saved) {
+							feeds.splice(saved.index, 1);
 						} else {
-							$prefs.savedFeeds = [uri];
+							feeds.push({ name: feed.name.value, uri: feed.uri, pinned: false });
 						}
 					};
 

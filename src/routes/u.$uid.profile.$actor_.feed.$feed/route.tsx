@@ -20,7 +20,7 @@ import {
 } from '~/api/queries/get-timeline.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getFeedPref } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import { Title } from '~/utils/meta.tsx';
@@ -85,35 +85,6 @@ const AuthenticatedFeedPage = () => {
 		refetchInterval: 30_000,
 	});
 
-	const isSaved = createMemo(() => {
-		const $prefs = getAccountPreferences(uid());
-		const saved = $prefs?.savedFeeds;
-
-		return !!saved && saved.includes(feedUri());
-	});
-
-	const toggleSave = () => {
-		const $prefs = getAccountPreferences(uid());
-		const saved = $prefs.savedFeeds;
-
-		const uri = feedUri();
-
-		if (isSaved()) {
-			if (saved) {
-				const idx = saved.indexOf(uri);
-				saved.splice(idx, 1);
-
-				if (saved.length === 0) {
-					$prefs.savedFeeds = undefined;
-				}
-			}
-		} else if (saved) {
-			saved.push(uri);
-		} else {
-			$prefs.savedFeeds = [uri];
-		}
-	};
-
 	createEffect((prev: ReturnType<typeof timeline> | 0) => {
 		const next = timeline();
 
@@ -154,41 +125,66 @@ const AuthenticatedFeedPage = () => {
 				</Switch>
 			</div>
 
-			<Show when={info()}>
+			<Show when={info()} keyed>
 				{(info) => {
-					const creator = () => info().creator;
-					const isLiked = () => info().viewer.like.value;
+					const creator = info.creator;
+
+					const isLiked = () => info.viewer.like.value;
+
+					const isSaved = createMemo(() => {
+						const feeds = getFeedPref(uid()).feeds;
+						const uri = feedUri();
+
+						for (let idx = 0, len = feeds.length; idx < len; idx++) {
+							const item = feeds[idx];
+
+							if (item.uri === uri) {
+								return { index: idx, item: item };
+							}
+						}
+					});
+
+					const toggleSave = () => {
+						const feeds = getFeedPref(uid()).feeds;
+						const saved = isSaved();
+
+						if (saved) {
+							feeds.splice(saved.index, 1);
+						} else {
+							feeds.push({ uri: info.uri, name: info.name.value, pinned: false });
+						}
+					};
 
 					return (
 						<>
 							<div class="flex flex-col gap-3 border-b border-divider px-4 pb-4 pt-3">
 								<div class="flex gap-4">
 									<div class="mt-2 grow">
-										<p class="break-words text-lg font-bold">{info().name.value}</p>
+										<p class="break-words text-lg font-bold">{info.name.value}</p>
 										<p class="text-sm text-muted-fg">
 											<span>by </span>
 											<a
 												link
-												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator().did })}
+												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator.did })}
 												class="hover:underline"
 											>
-												@{creator().handle.value}
+												@{creator.handle.value}
 											</a>
 										</p>
 									</div>
 
 									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted-fg">
-										<Show when={info().avatar.value}>
+										<Show when={info.avatar.value}>
 											{(avatar) => <img src={avatar()} class="h-full w-full" />}
 										</Show>
 									</div>
 								</div>
 
-								<Show when={info().description.value}>
-									<div class="whitespace-pre-wrap break-words text-sm">{info().$renderedDescription()}</div>
+								<Show when={info.description.value}>
+									<div class="whitespace-pre-wrap break-words text-sm">{info.$renderedDescription()}</div>
 								</Show>
 
-								<p class="text-sm text-muted-fg">Liked by {comformat.format(info().likeCount.value)} users</p>
+								<p class="text-sm text-muted-fg">Liked by {comformat.format(info.likeCount.value)} users</p>
 
 								<div class="flex gap-2">
 									<button onClick={toggleSave} class={button({ color: isSaved() ? 'outline' : 'primary' })}>
@@ -197,7 +193,7 @@ const AuthenticatedFeedPage = () => {
 
 									<button
 										title={isLiked() ? 'Unlike this feed' : 'Like this feed'}
-										onClick={() => favoriteFeed(uid(), info())}
+										onClick={() => favoriteFeed(uid(), info)}
 										class={/* @once */ button({ color: 'outline' })}
 									>
 										{isLiked() ? (
@@ -211,7 +207,9 @@ const AuthenticatedFeedPage = () => {
 
 									<button
 										title="More actions"
-										onClick={() => openModal(() => <FeedMenu uid={uid()} feed={info()} />)}
+										onClick={() => {
+											openModal(() => <FeedMenu uid={uid()} feed={info} />);
+										}}
 										class={/* @once */ button({ color: 'outline' })}
 									>
 										<MoreHorizIcon class="-mx-1.5 text-base" />

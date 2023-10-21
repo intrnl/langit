@@ -3,9 +3,12 @@ export interface DataServer {
 	url: string;
 }
 
+export const DEFAULT_SERVER = 'https://bsky.social';
+export const DEFAULT_MODERATION_LABELER = 'did:plc:ar7c4by46qjdydhdevvrndac';
+
 export const DEFAULT_DATA_SERVERS: DataServer[] = [
 	{
 		name: 'Bluesky Social',
-		url: 'https://bsky.social',
+		url: DEFAULT_SERVER,
 	},
 ];

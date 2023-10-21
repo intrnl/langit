@@ -2,7 +2,7 @@ import { createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
 import { closeModal } from '~/globals/modals.tsx';
-import { getAccountModerationPreferences } from '~/globals/preferences.ts';
+import { getModerationPref } from '~/globals/settings.ts';
 
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
@@ -15,8 +15,9 @@ export interface AddLabelerDialogProps {
 }
 
 const AddLabelerDialog = (props: AddLabelerDialogProps) => {
-	const prefs = createMemo(() => {
-		return getAccountModerationPreferences(props.uid).labelers;
+	const labelers = createMemo(() => {
+		const prefs = getModerationPref(props.uid);
+		return prefs.labelers;
 	});
 
 	const bindChooseLabeler = (labeler: Labeler) => () => {
@@ -32,7 +33,7 @@ const AddLabelerDialog = (props: AddLabelerDialogProps) => {
 				{LABELERS.map((labeler) => (
 					<button
 						onClick={bindChooseLabeler(labeler)}
-						disabled={!!prefs()[labeler.did]}
+						disabled={!!labelers()[labeler.did]}
 						class="flex items-center gap-3 px-4 py-3 text-left hover:bg-hinted disabled:pointer-events-none disabled:opacity-50"
 					>
 						<div class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg"></div>

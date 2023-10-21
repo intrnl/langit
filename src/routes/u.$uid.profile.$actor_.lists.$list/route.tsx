@@ -7,7 +7,7 @@ import { Outlet } from '@solidjs/router';
 import { getList, getListKey } from '~/api/queries/get-list.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getFeedPref } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
 
@@ -92,40 +92,40 @@ const AuthenticatedListLayout = () => {
 				</Switch>
 			</div>
 
-			<Show when={list()}>
+			<Show when={list()} keyed>
 				{(list) => {
-					const creator = () => list().creator;
+					const creator = list.creator;
 
-					const isModerationList = () => list().purpose.value === 'app.bsky.graph.defs#modlist';
-					const isCurationList = () => list().purpose.value === 'app.bsky.graph.defs#curatelist';
+					const isModerationList = () => list.purpose.value === 'app.bsky.graph.defs#modlist';
+					const isCurationList = () => list.purpose.value === 'app.bsky.graph.defs#curatelist';
 
 					return (
 						<div class="border-b border-divider">
 							<div class="flex flex-col gap-3 px-4 pb-4 pt-3">
 								<div class="flex gap-4">
 									<div class="mt-2 grow">
-										<p class="break-words text-lg font-bold">{list().name.value}</p>
+										<p class="break-words text-lg font-bold">{list.name.value}</p>
 										<p class="text-sm text-muted-fg">
 											<span>{purposeLabel()} by </span>
 											<a
 												link
-												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator().did })}
+												href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: creator.did })}
 												class="hover:underline"
 											>
-												@{creator().handle.value}
+												@{creator.handle.value}
 											</a>
 										</p>
 									</div>
 
 									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted-fg">
-										<Show when={list().avatar.value}>
+										<Show when={list.avatar.value}>
 											{(avatar) => <img src={avatar()} class="h-full w-full" />}
 										</Show>
 									</div>
 								</div>
 
-								<Show when={list().description.value}>
-									<div class="whitespace-pre-wrap break-words text-sm">{list().$renderedDescription()}</div>
+								<Show when={list.description.value}>
+									<div class="whitespace-pre-wrap break-words text-sm">{list.$renderedDescription()}</div>
 								</Show>
 
 								<div class="flex gap-2">
@@ -133,7 +133,7 @@ const AuthenticatedListLayout = () => {
 										<Match when={isModerationList()}>
 											<button
 												onClick={() => {
-													openModal(() => <SubscribeListDialog uid={uid()} list={list()} />);
+													openModal(() => <SubscribeListDialog uid={uid()} list={list} />);
 												}}
 												class={button({ color: subscription() ? 'outline' : 'primary' })}
 											>
@@ -143,31 +143,25 @@ const AuthenticatedListLayout = () => {
 										<Match when={isCurationList()}>
 											{(_value) => {
 												const isSaved = createMemo(() => {
-													const $prefs = getAccountPreferences(uid());
-													const saved = $prefs?.savedFeeds;
+													const feeds = getFeedPref(uid()).feeds;
 
-													return !!saved && saved.includes(list().uri);
+													for (let idx = 0, len = feeds.length; idx < len; idx++) {
+														const item = feeds[idx];
+
+														if (item.uri === list.uri) {
+															return { index: idx, item: item };
+														}
+													}
 												});
 
 												const toggleSave = () => {
-													const $prefs = getAccountPreferences(uid());
-													const saved = $prefs.savedFeeds;
+													const feeds = getFeedPref(uid()).feeds;
+													const saved = isSaved();
 
-													const uri = list().uri;
-
-													if (isSaved()) {
-														if (saved) {
-															const idx = saved.indexOf(uri);
-															saved.splice(idx, 1);
-
-															if (saved.length === 0) {
-																$prefs.savedFeeds = undefined;
-															}
-														}
-													} else if (saved) {
-														saved.push(uri);
+													if (saved) {
+														feeds.splice(saved.index, 1);
 													} else {
-														$prefs.savedFeeds = [uri];
+														feeds.push({ uri: list.uri, name: list.name.value, pinned: false });
 													}
 												};
 
@@ -185,7 +179,7 @@ const AuthenticatedListLayout = () => {
 
 									<div class="grow" />
 
-									<Show when={creator().did === uid()}>
+									<Show when={creator.did === uid()}>
 										<a
 											link
 											href={generatePath('/u/:uid/profile/:actor/lists/:list/edit', params)}
@@ -198,7 +192,7 @@ const AuthenticatedListLayout = () => {
 
 									<button
 										title="More actions"
-										onClick={() => openModal(() => <ListMenu uid={uid()} list={list()} />)}
+										onClick={() => openModal(() => <ListMenu uid={uid()} list={list} />)}
 										class={/* @once */ button({ color: 'outline' })}
 									>
 										<MoreHorizIcon class="-mx-1.5 text-base" />

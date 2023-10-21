@@ -1,6 +1,6 @@
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import { getAccountModerationPreferences } from '~/globals/preferences.ts';
+import { getModerationPref } from '~/globals/settings.ts';
 import { useNavigate, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
 
@@ -23,9 +23,9 @@ const AuthenticatedFilterModerationPage = () => {
 
 			<KeywordFilterForm
 				onSubmit={(fields) => {
-					const prefs = getAccountModerationPreferences(uid());
+					const prefs = getModerationPref(uid());
 
-					prefs.filters.push({
+					prefs.keywords.push({
 						id: '' + Date.now(),
 
 						name: fields.name,

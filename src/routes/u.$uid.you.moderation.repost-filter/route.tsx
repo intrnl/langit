@@ -8,7 +8,7 @@ import { mergeSignalizedProfile, type SignalizedProfile } from '~/api/cache/prof
 import { getInitialProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { fetchProfileBatched } from '~/api/queries/get-profile-batched.ts';
 
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getFilterPref } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
@@ -24,8 +24,8 @@ const AuthenticatedRepostFilterModerationPage = () => {
 	const uid = () => params.uid as DID;
 
 	const users = createMemo(() => {
-		const $prefs = getAccountPreferences(uid());
-		return $prefs.pf_hideReposts || [];
+		const prefs = getFilterPref(uid());
+		return prefs.hideReposts;
 	});
 
 	return (

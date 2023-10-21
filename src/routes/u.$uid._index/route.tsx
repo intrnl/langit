@@ -1,4 +1,4 @@
-import { For, Show, Suspense, batch, createEffect, createMemo } from 'solid-js';
+import { For, Show, createEffect, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { type EnhancedResource, createQuery } from '@intrnl/sq';
@@ -24,32 +24,41 @@ import {
 
 import { getCollectionId } from '~/api/utils.ts';
 
-import { getAccountPreferences, preferences } from '~/globals/preferences.ts';
+import { getFeedPref, type FeedPreference } from '~/globals/settings.ts';
 import { useParams } from '~/router.ts';
-import { ResourceNotFoundError } from '~/utils/batch-fetch.ts';
 import { Title } from '~/utils/meta.tsx';
 import { assert } from '~/utils/misc.ts';
+import type { UnpackArray } from '~/utils/types.ts';
 
 import { Tab } from '~/components/Tab.tsx';
 import TimelineList from '~/components/TimelineList.tsx';
 
-const FeedTab = (props: { uid: DID; uri: string; active: boolean; onClick?: () => void }) => {
-	// `uri` is static
-	const uri = props.uri;
+interface FeedTabProps {
+	uid: DID;
+	item: UnpackArray<FeedPreference['feeds']>;
+	active: boolean;
+	onClick?: () => void;
+}
+
+const FeedTab = (props: FeedTabProps) => {
+	// `item` and `item.uri` is expected to be static
+	const item = props.item;
+
+	const uri = item.uri;
 	const collection = getCollectionId(uri);
 
 	let info: EnhancedResource<SignalizedFeedGenerator | SignalizedList>;
 
 	if (collection === 'app.bsky.feed.generator') {
 		[info] = createQuery({
-			key: () => getFeedGeneratorKey(props.uid, props.uri),
+			key: () => getFeedGeneratorKey(props.uid, uri),
 			fetch: getFeedGenerator,
 			staleTime: 30_000,
 			initialData: getInitialFeedGenerator,
 		});
 	} else if (collection === 'app.bsky.graph.list') {
 		[info] = createQuery({
-			key: () => getListInfoKey(props.uid, props.uri),
+			key: () => getListInfoKey(props.uid, uri),
 			fetch: getListInfo,
 			staleTime: 30_000,
 			initialData: getInitialListInfo,
@@ -59,31 +68,16 @@ const FeedTab = (props: { uid: DID; uri: string; active: boolean; onClick?: () =
 	}
 
 	createEffect(() => {
-		if (info.error instanceof ResourceNotFoundError) {
-			const $prefs = getAccountPreferences(props.uid);
+		const $info = info();
 
-			const pinned = new Set($prefs.pinnedFeeds);
-			let saved = $prefs.savedFeeds || [];
-
-			const savedIdx = saved.indexOf(uri);
-
-			if (savedIdx !== -1) {
-				saved = saved.slice();
-				saved.splice(savedIdx, 1);
-			}
-
-			pinned.delete(uri);
-
-			batch(() => {
-				$prefs.savedFeeds = saved;
-				$prefs.pinnedFeeds = saved.filter((uri) => pinned.has(uri));
-			});
+		if ($info) {
+			item.name = $info.name.value;
 		}
 	});
 
 	return (
 		<Tab<'button'> component="button" active={props.active} onClick={props.onClick}>
-			{info()?.name.value}
+			{item.name}
 		</Tab>
 	);
 };
@@ -146,8 +140,10 @@ const AuthenticatedHome = () => {
 	const feed = () => searchParams.feed;
 
 	const pinnedFeeds = createMemo(() => {
-		const arr = preferences[uid()]?.pinnedFeeds;
-		return arr && arr.length > 0 ? arr : undefined;
+		const prefs = getFeedPref(uid());
+		const pinned = prefs.feeds.filter((item) => item.pinned);
+
+		return pinned.length > 0 ? pinned : undefined;
 	});
 
 	return (
@@ -162,34 +158,32 @@ const AuthenticatedHome = () => {
 			</div>
 
 			<Show when={pinnedFeeds()}>
-				<Suspense fallback={<hr class="-mt-px border-divider" />}>
-					<div class="sticky top-0 z-10 flex h-13 items-center overflow-x-auto border-b border-divider bg-background">
-						<Tab<'button'>
-							component="button"
-							active={!feed()}
-							onClick={() => {
-								setSearchParams({ feed: null }, { replace: true });
-								window.scrollTo({ top: 0 });
-							}}
-						>
-							Following
-						</Tab>
+				<div class="sticky top-0 z-10 flex h-13 items-center overflow-x-auto border-b border-divider bg-background">
+					<Tab<'button'>
+						component="button"
+						active={!feed()}
+						onClick={() => {
+							setSearchParams({ feed: null }, { replace: true });
+							window.scrollTo({ top: 0 });
+						}}
+					>
+						Following
+					</Tab>
 
-						<For each={pinnedFeeds()}>
-							{(uri) => (
-								<FeedTab
-									uid={uid()}
-									uri={uri}
-									active={feed() === uri}
-									onClick={() => {
-										setSearchParams({ feed: uri }, { replace: true });
-										window.scrollTo({ top: 0 });
-									}}
-								/>
-							)}
-						</For>
-					</div>
-				</Suspense>
+					<For each={pinnedFeeds()}>
+						{(item) => (
+							<FeedTab
+								uid={uid()}
+								item={item}
+								active={feed() === item.uri}
+								onClick={() => {
+									setSearchParams({ feed: item.uri }, { replace: true });
+									window.scrollTo({ top: 0 });
+								}}
+							/>
+						)}
+					</For>
+				</div>
 			</Show>
 
 			<Show when={feed() ?? true} keyed>

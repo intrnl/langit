@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, batch, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, Match, Show, Switch, createEffect, createMemo, createSignal, onCleanup } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery, type EnhancedResource } from '@intrnl/sq';
@@ -16,9 +16,8 @@ import {
 import { getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 import { type FeedPage, getTimeline, getTimelineKey } from '~/api/queries/get-timeline.ts';
 
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getFeedPref } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
-import { ResourceNotFoundError } from '~/utils/batch-fetch.ts';
 import { Title } from '~/utils/meta.tsx';
 import { assert } from '~/utils/misc.ts';
 
@@ -39,7 +38,8 @@ const AuthenticatedExplorePage = () => {
 	const uid = () => params.uid as DID;
 
 	const savedFeeds = createMemo(() => {
-		return getAccountPreferences(uid()).savedFeeds;
+		const prefs = getFeedPref(uid());
+		return prefs.feeds;
 	});
 
 	const [refetching, setRefetching] = createSignal(false);
@@ -106,7 +106,9 @@ const AuthenticatedExplorePage = () => {
 					</div>
 				}
 			>
-				{(uri) => {
+				{(item) => {
+					const uri = item.uri;
+
 					const actor = getRepoId(uri);
 					const collection = getCollectionId(uri);
 					const rkey = getRecordId(uri);
@@ -180,127 +182,80 @@ const AuthenticatedExplorePage = () => {
 						refetches.splice(idx, 1);
 					});
 
+					createEffect(() => {
+						const $info = info();
+						if ($info) {
+							item.name = $info.name.value;
+						}
+					});
+
 					return (
-						<Switch>
-							<Match when={info.error} keyed>
-								{(err) => {
-									// This feed no longer exists, let's just remove them outright.
-									// TODO: it would've been nice if we didn't do this, and instead
-									// just alert the user that yeah, it's gone. but unfortunately
-									// the way we're storing preferences right now isn't suitable.
-									if (err instanceof ResourceNotFoundError) {
-										onMount(() => {
-											const $prefs = getAccountPreferences(uid());
+						<div class="border-b border-divider">
+							<div class="sticky top-13 z-10 flex h-13 items-center gap-4 bg-background px-4">
+								<div class="h-6 w-6 overflow-hidden rounded-md bg-muted-fg">
+									<Show when={info()?.avatar.value}>
+										{(avatar) => <img src={avatar()} class="h-full w-full" />}
+									</Show>
+								</div>
 
-											const pinned = new Set($prefs.pinnedFeeds);
-											let saved = $prefs.savedFeeds || [];
+								<span class="text-base font-bold">{item.name}</span>
+							</div>
 
-											const savedIdx = saved.indexOf(uri);
+							<Switch>
+								<Match when={timeline.error}>
+									<p class="p-4 text-sm text-muted-fg">Something went wrong with retrieving the feed</p>
+								</Match>
 
-											if (savedIdx !== -1) {
-												saved = saved.slice();
-												saved.splice(savedIdx, 1);
-											}
+								<Match when={timeline()}>
+									<For
+										each={timeline()!.pages[0].slices}
+										fallback={<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>}
+									>
+										{(slice) => {
+											const items = slice.items;
+											const len = items.length;
 
-											pinned.delete(uri);
-
-											batch(() => {
-												$prefs.savedFeeds = saved;
-												$prefs.pinnedFeeds = saved.filter((uri) => pinned.has(uri));
-											});
-										});
-
-										return null;
-									}
-
-									return (
-										<div class="border-b border-divider p-4 text-sm">
-											<p class="font-bold">Failed to load feed</p>
-											<p class="text-muted-fg">{uri}</p>
-
-											<p class="mt-2">{'' + err}</p>
-										</div>
-									);
-								}}
-							</Match>
-
-							<Match when={info()}>
-								<div class="border-b border-divider">
-									<div class="sticky top-13 z-10 flex h-13 items-center gap-4 bg-background px-4">
-										<div class="h-6 w-6 overflow-hidden rounded-md bg-muted-fg">
-											<Show when={info()!.avatar.value}>
-												{(avatar) => <img src={avatar()} class="h-full w-full" />}
-											</Show>
-										</div>
-
-										<span class="text-base font-bold">{info()!.name.value}</span>
-									</div>
-
-									<Switch>
-										<Match when={timeline.error}>
-											<p class="p-4 text-sm text-muted-fg">Something went wrong with retrieving the feed</p>
-										</Match>
-
-										<Match when={timeline()}>
-											<For
-												each={timeline()!.pages[0].slices}
-												fallback={
-													<p class="p-4 text-sm text-muted-fg">Looks like there's nothing here yet!</p>
-												}
-											>
-												{(slice) => {
-													const items = slice.items;
-													const len = items.length;
-
-													return items.map((item, idx) => (
-														<VirtualContainer
-															estimateHeight={98.8}
-															id={createPostKey(
-																item.post.cid.value,
-																(!!item.reply?.parent && idx === 0) || !!item.reason,
-																idx !== len - 1,
-															)}
-														>
-															<Post
-																interactive
-																uid={uid()}
-																post={/* @once */ item.post}
-																parent={/* @once */ item.reply?.parent}
-																reason={/* @once */ item.reason}
-																prev={idx !== 0}
-																next={idx !== len - 1}
-															/>
-														</VirtualContainer>
-													));
-												}}
-											</For>
-
-											<Show when={timeline()?.pages[0].cid}>
-												<a
-													link
-													href={path()}
-													class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
+											return items.map((item, idx) => (
+												<VirtualContainer
+													estimateHeight={98.8}
+													id={createPostKey(
+														item.post.cid.value,
+														(!!item.reply?.parent && idx === 0) || !!item.reason,
+														idx !== len - 1,
+													)}
 												>
-													Show more
-												</a>
-											</Show>
-										</Match>
+													<Post
+														interactive
+														uid={uid()}
+														post={/* @once */ item.post}
+														parent={/* @once */ item.reply?.parent}
+														reason={/* @once */ item.reason}
+														prev={idx !== 0}
+														next={idx !== len - 1}
+													/>
+												</VirtualContainer>
+											));
+										}}
+									</For>
 
-										<Match when>
-											<div class="flex h-13 items-center justify-center">
-												<CircularProgress />
-											</div>
-										</Match>
-									</Switch>
-								</div>
-							</Match>
+									<Show when={timeline()?.pages[0].cid}>
+										<a
+											link
+											href={path()}
+											class="flex h-13 items-center px-4 text-sm text-accent hover:bg-hinted"
+										>
+											Show more
+										</a>
+									</Show>
+								</Match>
 
-							<Match when>
-								<div class="flex h-13 items-center justify-center border-b border-divider">
-									<CircularProgress />
-								</div>
-							</Match>
-						</Switch>
+								<Match when>
+									<div class="flex h-13 items-center justify-center">
+										<CircularProgress />
+									</div>
+								</Match>
+							</Switch>
+						</div>
 					);
 				}}
 			</For>

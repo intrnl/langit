@@ -14,7 +14,7 @@ import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import { BlockedThreadError, getPostThread, getPostThreadKey } from '~/api/queries/get-post-thread.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getTranslationPref } from '~/globals/settings.ts';
 import { systemLanguages } from '~/globals/platform.ts';
 import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
@@ -523,15 +523,15 @@ const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostConten
 			return false;
 		}
 
-		const $prefs = getAccountPreferences(uid());
-		const preferred = $prefs.ct_language ?? 'system';
+		const prefs = getTranslationPref(uid());
+		const preferred = prefs.to;
 
 		if (preferred === 'none') {
 			return false;
 		}
 
 		const preferredLang = preferred === 'system' ? systemLanguages[0] : preferred;
-		const exclusions = unwrap($prefs.ct_exclusions);
+		const exclusions = unwrap(prefs.exclusions);
 
 		const unknowns = langs.filter(
 			(code) => code !== preferredLang && (!exclusions || !exclusions.includes(code)),
@@ -541,8 +541,8 @@ const PostContent = ({ uid, post, searchParams, onTranslate, force }: PostConten
 	});
 
 	const preferredLanguage = () => {
-		const $prefs = getAccountPreferences(uid());
-		const preferred = $prefs.ct_language ?? 'system';
+		const prefs = getTranslationPref(uid());
+		const preferred = prefs.to;
 
 		const preferredLang = preferred === 'system' || preferred === 'none' ? systemLanguages[0] : preferred;
 		return preferredLang;

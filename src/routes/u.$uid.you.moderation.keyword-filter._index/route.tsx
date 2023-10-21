@@ -9,7 +9,7 @@ import {
 	PreferenceWarn,
 } from '~/api/moderation/enums.ts';
 
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getModerationPref } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
 
@@ -31,8 +31,9 @@ const AuthenticatedAddFilterModerationPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const prefs = createMemo(() => {
-		return getAccountPreferences(uid());
+	const keywords = createMemo(() => {
+		const prefs = getModerationPref(uid());
+		return prefs.keywords;
 	});
 
 	return (
@@ -55,7 +56,7 @@ const AuthenticatedAddFilterModerationPage = () => {
 			</div>
 
 			<For
-				each={prefs().cf_keywords}
+				each={keywords()}
 				fallback={<p class="p-4 text-sm text-muted-fg">You don't have any keyword filters set up yet.</p>}
 			>
 				{(filter) => (

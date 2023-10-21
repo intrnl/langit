@@ -8,7 +8,7 @@ import { mergeSignalizedProfile, type SignalizedProfile } from '~/api/cache/prof
 import { getInitialProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { fetchProfileBatched } from '~/api/queries/get-profile-batched.ts';
 
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getFilterPref } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
 import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
@@ -25,20 +25,20 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 	const uid = () => params.uid as DID;
 
 	const mutedUsersDict = createMemo(() => {
-		const $prefs = getAccountPreferences(uid());
-		const tempMutes = $prefs.pf_tempMutes;
+		const prefs = getFilterPref(uid());
+		const tempMutes = prefs.tempMutes;
 
-		return tempMutes || {};
+		return tempMutes;
 	});
 
 	const users = createMemo(() => {
-		const $dict = mutedUsersDict();
+		const dict = mutedUsersDict();
 
 		const now = Date.now();
 		const arr: DID[] = [];
 
-		for (const did in $dict) {
-			const val = $dict[did as DID];
+		for (const did in dict) {
+			const val = dict[did as DID];
 
 			if (val != null && now < val) {
 				arr.push(did as DID);

@@ -2,7 +2,7 @@ import { Match, Show, Switch, createMemo } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
 import { useParams } from '~/router.ts';
-import { getAccountModerationPreferences } from '~/globals/preferences.ts';
+import { getModerationPref } from '~/globals/settings.ts';
 import { Title } from '~/utils/meta.tsx';
 
 import { LABELERS } from '../u.$uid.you.moderation.content-filter._index/types.ts';
@@ -24,8 +24,8 @@ const AuthenticatedLabelProviderFilterModerationPage = () => {
 
 	// NOTE: this can return undefined
 	const labelerSettings = createMemo(() => {
-		const $settings = getAccountModerationPreferences(uid()).labelers;
-		return $settings[labeler()];
+		const prefs = getModerationPref(uid());
+		return prefs.labelers[labeler()];
 	});
 
 	return (

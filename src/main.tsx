@@ -3,7 +3,7 @@ import { render } from 'solid-js/web';
 
 import { Router, useRoutes } from '@solidjs/router';
 
-import { type LocalSettings, preferences } from '~/globals/preferences.ts';
+import { type LocalPreference, getLocalPref } from '~/globals/settings.ts';
 import routes from '~/router-routes.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 import '~/utils/service-worker.ts';
@@ -27,9 +27,9 @@ const App = () => {
 };
 
 createRoot(() => {
-	createRenderEffect((prev: LocalSettings['theme']) => {
-		const prefs = preferences.local;
-		const theme = prefs?.theme ?? 'auto';
+	createRenderEffect((prev?: LocalPreference['theme']) => {
+		const prefs = getLocalPref();
+		const theme = prefs.theme;
 
 		if (prev === theme) {
 			return theme;

@@ -17,7 +17,7 @@ import { segmentRichText } from '../richtext/segmentize.ts';
 
 import { type SignalizedProfile, mergeSignalizedProfile } from './profiles.ts';
 
-import { getAccountModerationPreferences, isProfileTemporarilyMuted } from '~/globals/preferences.ts';
+import { getAccountModerationOpts, isProfileTemporarilyMuted } from '~/globals/settings.ts';
 import { createLazyMemo } from '~/utils/hooks.ts';
 import { EQUALS_DEQUAL } from '~/utils/misc.ts';
 import { type Signal, signal } from '~/utils/signals.ts';
@@ -111,7 +111,7 @@ export const createPostModerationDecision = (uid: DID) => {
 
 	return function (this: SignalizedPost) {
 		if (!accessor) {
-			const prefs = getAccountModerationPreferences(uid);
+			const opts = getAccountModerationOpts(uid);
 
 			const labels = this.labels;
 			const record = this.record;
@@ -122,10 +122,10 @@ export const createPostModerationDecision = (uid: DID) => {
 				return createLazyMemo(() => {
 					const accu: ModerationCause[] = [];
 
-					decideLabelModeration(accu, labels.value, authorDid, prefs);
+					decideLabelModeration(accu, labels.value, authorDid, opts);
 					decideMutedPermanentModeration(accu, muted.value);
 					decideMutedTemporaryModeration(accu, isProfileTemporarilyMuted(uid, authorDid));
-					decideMutedKeywordModeration(accu, record.value.text, PreferenceWarn, prefs);
+					decideMutedKeywordModeration(accu, record.value.text, PreferenceWarn, opts);
 
 					return finalizeModeration(accu);
 				});

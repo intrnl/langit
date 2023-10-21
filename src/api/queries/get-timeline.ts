@@ -4,7 +4,7 @@ import type { EnhancedResource, QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';
 import { systemLanguages } from '~/globals/platform.ts';
-import { getAccountModerationPreferences, preferences } from '~/globals/preferences.ts';
+import { getAccountModerationOpts, getFilterPref, getLanguagePref } from '~/globals/settings.ts';
 import { assert } from '~/utils/misc.ts';
 
 import {
@@ -415,15 +415,15 @@ const createDuplicatePostFilter = (slices: TimelineSlice[]): PostFilter => {
 };
 
 const createLabelPostFilter = (uid: DID): PostFilter | undefined => {
-	const prefs = getAccountModerationPreferences(uid);
+	const opts = getAccountModerationOpts(uid);
 
 	return (item) => {
 		const post = item.post;
 		const labels = post.labels;
 
 		const accu: ModerationCause[] = [];
-		decideLabelModeration(accu, labels, post.author.did, prefs);
-		decideMutedKeywordModeration(accu, (post.record as PostRecord).text, PreferenceHide, prefs);
+		decideLabelModeration(accu, labels, post.author.did, opts);
+		decideMutedKeywordModeration(accu, (post.record as PostRecord).text, PreferenceHide, opts);
 
 		const decision = finalizeModeration(accu);
 
@@ -432,12 +432,12 @@ const createLabelPostFilter = (uid: DID): PostFilter | undefined => {
 };
 
 const createLanguagePostFilter = (uid: DID): PostFilter | undefined => {
-	const $prefs = preferences[uid] || {};
+	const prefs = getLanguagePref(uid);
 
-	const allowUnspecified = $prefs.cl_unspecified ?? true;
-	let languages = $prefs.cl_codes;
+	const allowUnspecified = prefs.allowUnspecified;
+	let languages = prefs.languages;
 
-	if ($prefs.cl_systemLanguage ?? true) {
+	if (prefs.useSystemLanguages) {
 		languages = languages ? systemLanguages.concat(languages) : systemLanguages;
 	}
 
@@ -462,9 +462,8 @@ const createLanguagePostFilter = (uid: DID): PostFilter | undefined => {
 };
 
 const createHiddenRepostFilter = (uid: DID): PostFilter | undefined => {
-	const $prefs = preferences[uid];
-
-	const hidden = $prefs?.pf_hideReposts;
+	const prefs = getFilterPref(uid);
+	const hidden = prefs.hideReposts;
 
 	if (!hidden) {
 		return;
@@ -478,10 +477,10 @@ const createHiddenRepostFilter = (uid: DID): PostFilter | undefined => {
 };
 
 const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
-	const $prefs = preferences[uid];
+	const prefs = getFilterPref(uid);
 	const now = Date.now();
 
-	let mutes = $prefs?.pf_tempMutes;
+	let mutes = prefs.tempMutes;
 
 	// check if there are any outdated mutes before proceeding
 	if (mutes) {
@@ -506,13 +505,8 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 			size++;
 		}
 
-		// set mutes to undefined if we no longer have any
-		if (size < 1) {
-			mutes = undefined;
-		}
-
 		if (outdated) {
-			$prefs!.pf_tempMutes = mutes;
+			prefs.tempMutes = mutes;
 		}
 	}
 

@@ -12,7 +12,7 @@ import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-l
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import { isProfileTemporarilyMuted } from '~/globals/preferences.ts';
+import { isProfileTemporarilyMuted } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';

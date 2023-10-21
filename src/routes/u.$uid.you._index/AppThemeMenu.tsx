@@ -1,26 +1,21 @@
 import { createMemo } from 'solid-js';
 
 import { closeModal } from '~/globals/modals.tsx';
-import { type LocalSettings, preferences } from '~/globals/preferences.ts';
+import { type LocalPreference, getLocalPref } from '~/globals/settings.ts';
 
 import * as menu from '~/styles/primitives/menu.ts';
 
 import CheckIcon from '~/icons/baseline-check.tsx';
 
 const AppThemeMenu = () => {
-	const prefs = createMemo(() => {
-		preferences.local ||= {};
-		return preferences.local;
-	});
-
 	const theme = createMemo(() => {
-		const $prefs = prefs();
-		return $prefs.theme ?? 'auto';
+		const prefs = getLocalPref();
+		return prefs.theme;
 	});
 
-	const setTheme = (next: NonNullable<LocalSettings['theme']>) => {
-		const $prefs = prefs();
-		$prefs.theme = next;
+	const setTheme = (next: LocalPreference['theme']) => {
+		const prefs = getLocalPref();
+		prefs.theme = next;
 	};
 
 	return (

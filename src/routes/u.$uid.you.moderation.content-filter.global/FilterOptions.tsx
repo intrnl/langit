@@ -3,7 +3,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
 import type { ModerationLabelOpts } from '~/api/moderation/types.ts';
 
-import { getAccountModerationPreferences } from '~/globals/preferences.ts';
+import { getModerationPref } from '~/globals/settings.ts';
 
 import { type FilterPrefs, LABEL_TYPES } from './types.ts';
 
@@ -42,16 +42,16 @@ const FilterOptions = (props: FilterOptionsProps) => {
 	const uid = () => props.uid;
 	const target = () => props.target;
 
-	const prefs = createMemo<FilterPrefs>(() => {
-		const $prefs = getAccountModerationPreferences(uid());
-		const $globals = $prefs.globals;
+	const config = createMemo<FilterPrefs>(() => {
+		const prefs = getModerationPref(uid());
+		const globals = prefs.globals;
 
 		const $target = target();
 
 		if ($target.type === TargetGlobal) {
-			return { global: undefined, local: $globals };
+			return { global: undefined, local: globals };
 		} else {
-			return { global: $globals, local: $target.prefs };
+			return { global: globals, local: $target.prefs };
 		}
 	});
 
@@ -59,10 +59,10 @@ const FilterOptions = (props: FilterOptionsProps) => {
 		<div class="mb-4 flex flex-col gap-2">
 			{LABEL_TYPES.map((group) => (
 				<div class="flex flex-col">
-					<LabelItem item={group} prefs={prefs} />
+					<LabelItem item={group} prefs={config} />
 
 					{group.children.map((child) => (
-						<LabelItem item={child} prefs={prefs} />
+						<LabelItem item={child} prefs={config} />
 					))}
 				</div>
 			))}

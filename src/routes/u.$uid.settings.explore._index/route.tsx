@@ -1,4 +1,4 @@
-import { For, Show, Suspense, SuspenseList, batch, createMemo, createSignal } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { type EnhancedResource, createQuery } from '@intrnl/sq';
@@ -22,34 +22,33 @@ import {
 } from '~/api/queries/get-feed-generator.ts';
 import { getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 
-import { getAccountPreferences } from '~/globals/preferences.ts';
+import { getFeedPref, type FeedPreference } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { ConstrainXDragAxis } from '~/utils/dnd.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 import { INTERACTION_TAGS, assert, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
-
-import CircularProgress from '~/components/CircularProgress.tsx';
+import type { UnpackArray } from '~/utils/types.ts';
 
 import AddIcon from '~/icons/baseline-add.tsx';
 import DeleteIcon from '~/icons/baseline-delete.tsx';
 import DragHandleIcon from '~/icons/baseline-drag-handle.tsx';
 import PushPinIcon from '~/icons/baseline-push-pin.tsx';
 
-type PinToggleHandler = (uri: string, pinned: boolean) => void;
-type RemoveHandler = (uri: string) => void;
+type PinToggleHandler = (item: UnpackArray<FeedPreference['feeds']>) => void;
+type RemoveHandler = (item: UnpackArray<FeedPreference['feeds']>) => void;
 
 interface FeedItemProps {
 	uid: DID;
-	uri: string;
-	pinned: boolean;
+	item: UnpackArray<FeedPreference['feeds']>;
 	editing: boolean;
 	onPinToggle: PinToggleHandler;
 	onRemove: RemoveHandler;
 }
 
 const FeedItem = (props: FeedItemProps) => {
-	// `uri` here is expected to be static
-	const uri = props.uri;
+	// `item` and `item.uri` is expected to be static
+	const item = props.item;
+	const uri = item.uri;
 
 	const actor = getRepoId(uri);
 	const collection = getCollectionId(uri);
@@ -59,14 +58,14 @@ const FeedItem = (props: FeedItemProps) => {
 
 	const navigate = useNavigate();
 
-	const pinned = () => props.pinned;
+	const pinned = () => item.pinned;
 	const editing = () => props.editing;
 
-	let resource: EnhancedResource<SignalizedFeedGenerator | SignalizedList>;
+	let info: EnhancedResource<SignalizedFeedGenerator | SignalizedList>;
 	let path: () => string;
 
 	if (collection === 'app.bsky.feed.generator') {
-		[resource] = createQuery({
+		[info] = createQuery({
 			key: () => getFeedGeneratorKey(props.uid, uri),
 			fetch: getFeedGenerator,
 			staleTime: 30_000,
@@ -81,7 +80,7 @@ const FeedItem = (props: FeedItemProps) => {
 			});
 		};
 	} else if (collection === 'app.bsky.graph.list') {
-		[resource] = createQuery<SignalizedList, any>({
+		[info] = createQuery<SignalizedList, any>({
 			key: () => getListInfoKey(props.uid, uri),
 			fetch: getListInfo,
 			staleTime: 30_000,
@@ -98,6 +97,13 @@ const FeedItem = (props: FeedItemProps) => {
 	} else {
 		assert(false, `expected collection`);
 	}
+
+	createEffect(() => {
+		const $info = info();
+		if ($info) {
+			item.name = $info.name.value;
+		}
+	});
 
 	const click = (ev: MouseEvent | KeyboardEvent) => {
 		if (editing() || !isElementClicked(ev, INTERACTION_TAGS)) {
@@ -138,19 +144,17 @@ const FeedItem = (props: FeedItemProps) => {
 				</Show>
 
 				<div class="h-6 w-6 overflow-hidden rounded-md bg-muted-fg">
-					<Show when={resource()?.avatar.value}>
-						{(avatar) => <img src={avatar()} class="h-full w-full" />}
-					</Show>
+					<Show when={info()?.avatar.value}>{(avatar) => <img src={avatar()} class="h-full w-full" />}</Show>
 				</div>
 
 				<div class="grow">
-					<p class="font-bold">{resource()?.name.value}</p>
+					<p class="font-bold">{item.name}</p>
 				</div>
 
 				<div class="-mr-2 flex shrink-0 gap-2">
 					<button
 						title={pinned() ? `Unpin feed` : `Pin feed`}
-						onClick={() => props.onPinToggle(uri, !pinned())}
+						onClick={() => props.onPinToggle(item)}
 						class="-my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-xl hover:bg-secondary"
 						classList={{ 'text-accent': pinned(), 'text-muted-fg': !pinned() }}
 					>
@@ -160,7 +164,7 @@ const FeedItem = (props: FeedItemProps) => {
 					<Show when={editing()}>
 						<button
 							title="Remove feed"
-							onClick={() => props.onRemove(uri)}
+							onClick={() => props.onRemove(item)}
 							class="-my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-xl text-red-500 hover:bg-secondary"
 						>
 							<DeleteIcon />
@@ -181,54 +185,22 @@ const AuthenticatedExploreSettingsPage = () => {
 
 	const isCoarse = useMediaQuery('(pointer: coarse)');
 
-	const prefs = createMemo(() => {
-		return getAccountPreferences(uid());
-	});
-
-	const pinnedFeeds = createMemo(() => {
-		return new Set(prefs().pinnedFeeds);
-	});
-
 	const savedFeeds = createMemo(() => {
-		return prefs().savedFeeds || [];
+		const prefs = getFeedPref(uid());
+		return prefs.feeds;
 	});
 
-	const handleFeedPin = (uri: string, pinned: boolean) => {
-		const $prefs = prefs();
-
-		const $savedFeeds = savedFeeds();
-		const $pinnedFeeds = pinnedFeeds();
-
-		const set = new Set($pinnedFeeds);
-
-		if (pinned) {
-			set.add(uri);
-		} else {
-			set.delete(uri);
-		}
-
-		$prefs.pinnedFeeds = $savedFeeds.filter((uri) => set.has(uri));
+	const handleFeedPin = (item: UnpackArray<FeedPreference['feeds']>) => {
+		item.pinned = !item.pinned;
 	};
 
-	const handleFeedRemove = (uri: string) => {
-		let saved = savedFeeds();
+	const handleFeedRemove = (item: UnpackArray<FeedPreference['feeds']>) => {
+		const feeds = savedFeeds();
+		const index = feeds.indexOf(item);
 
-		const pinned = new Set(pinnedFeeds());
-		const savedIdx = saved.indexOf(uri);
-
-		const $prefs = prefs();
-
-		if (savedIdx !== -1) {
-			saved = saved.slice();
-			saved.splice(savedIdx, 1);
+		if (index !== -1) {
+			feeds.splice(index, 1);
 		}
-
-		pinned.delete(uri);
-
-		batch(() => {
-			$prefs.savedFeeds = saved;
-			$prefs.pinnedFeeds = saved.filter((uri) => pinned.has(uri));
-		});
 	};
 
 	return (
@@ -250,22 +222,13 @@ const AuthenticatedExploreSettingsPage = () => {
 			<DragDropProvider
 				onDragEnd={({ draggable, droppable }) => {
 					if (draggable && droppable) {
-						const $savedFeeds = savedFeeds();
+						const feeds = savedFeeds();
 
-						const fromIndex = $savedFeeds.indexOf(draggable.id as string);
-						const toIndex = $savedFeeds.indexOf(droppable.id as string);
+						const fromIndex = feeds.findIndex((item) => item.uri === draggable.id);
+						const toIndex = feeds.findIndex((item) => item.uri === droppable.id);
 
 						if (fromIndex !== toIndex) {
-							const $pinnedFeeds = pinnedFeeds();
-							const $prefs = prefs();
-
-							const next = $savedFeeds.slice();
-							next.splice(toIndex, 0, ...next.splice(fromIndex, 1));
-
-							batch(() => {
-								$prefs.savedFeeds = next;
-								$prefs.pinnedFeeds = next.filter((uri) => $pinnedFeeds.has(uri));
-							});
+							feeds.splice(toIndex, 0, ...feeds.splice(fromIndex, 1));
 						}
 					}
 				}}
@@ -273,36 +236,23 @@ const AuthenticatedExploreSettingsPage = () => {
 				<DragDropSensors />
 				<ConstrainXDragAxis enabled={isCoarse()} />
 
-				<SortableProvider ids={savedFeeds()}>
-					<SuspenseList revealOrder="forwards" tail="collapsed">
-						<For
-							each={savedFeeds()}
-							fallback={
-								<div class="p-4 pt-2 text-sm text-muted-fg">You don't have any feeds yet, add one!</div>
-							}
-						>
-							{(feedUri) => {
-								return (
-									<Suspense
-										fallback={
-											<div class="flex h-13 items-center justify-center border-divider">
-												<CircularProgress />
-											</div>
-										}
-									>
-										<FeedItem
-											uid={uid()}
-											uri={feedUri}
-											pinned={pinnedFeeds().has(feedUri)}
-											editing={isEditing()}
-											onPinToggle={handleFeedPin}
-											onRemove={handleFeedRemove}
-										/>
-									</Suspense>
-								);
-							}}
-						</For>
-					</SuspenseList>
+				<SortableProvider ids={savedFeeds().map((feed) => feed.uri)}>
+					<For
+						each={savedFeeds()}
+						fallback={
+							<div class="p-4 pt-2 text-sm text-muted-fg">You don't have any feeds yet, add one!</div>
+						}
+					>
+						{(item) => (
+							<FeedItem
+								uid={uid()}
+								item={item}
+								editing={isEditing()}
+								onPinToggle={handleFeedPin}
+								onRemove={handleFeedRemove}
+							/>
+						)}
+					</For>
 				</SortableProvider>
 			</DragDropProvider>
 

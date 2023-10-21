@@ -38,6 +38,10 @@ interface BatchedFetchMap<Query, Id, Data> {
 	pending: Map<Id, Deferred<Data>>;
 }
 
+export class ResourceNotFoundError extends Error {
+	name = 'ResourceNotFoundError';
+}
+
 export const createBatchedFetch = <Query, Id extends QueryId, Data>(
 	options: BatchedFetchOptions<Query, Id, Data>,
 ) => {
@@ -111,7 +115,7 @@ const perform = async <Query, Id extends QueryId, Data>(
 	} finally {
 		if (!errored) {
 			for (const deferred of pending.values()) {
-				deferred.reject(new Error(`RESOURCE_NOT_FOUND`));
+				deferred.reject(new ResourceNotFoundError());
 			}
 		}
 	}

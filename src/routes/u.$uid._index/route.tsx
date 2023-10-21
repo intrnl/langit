@@ -1,4 +1,4 @@
-import { For, Show, Suspense, createEffect, createMemo } from 'solid-js';
+import { For, Show, Suspense, batch, createEffect, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { type EnhancedResource, createQuery } from '@intrnl/sq';
@@ -24,8 +24,9 @@ import {
 
 import { getCollectionId } from '~/api/utils.ts';
 
-import { preferences } from '~/globals/preferences.ts';
+import { getAccountPreferences, preferences } from '~/globals/preferences.ts';
 import { useParams } from '~/router.ts';
+import { ResourceNotFoundError } from '~/utils/batch-fetch.ts';
 import { Title } from '~/utils/meta.tsx';
 import { assert } from '~/utils/misc.ts';
 
@@ -56,6 +57,29 @@ const FeedTab = (props: { uid: DID; uri: string; active: boolean; onClick?: () =
 	} else {
 		assert(false, `expected collection`);
 	}
+
+	createEffect(() => {
+		if (info.error instanceof ResourceNotFoundError) {
+			const $prefs = getAccountPreferences(props.uid);
+
+			const pinned = new Set($prefs.pinnedFeeds);
+			let saved = $prefs.savedFeeds || [];
+
+			const savedIdx = saved.indexOf(uri);
+
+			if (savedIdx !== -1) {
+				saved = saved.slice();
+				saved.splice(savedIdx, 1);
+			}
+
+			pinned.delete(uri);
+
+			batch(() => {
+				$prefs.savedFeeds = saved;
+				$prefs.pinnedFeeds = saved.filter((uri) => pinned.has(uri));
+			});
+		}
+	});
 
 	return (
 		<Tab<'button'> component="button" active={props.active} onClick={props.onClick}>

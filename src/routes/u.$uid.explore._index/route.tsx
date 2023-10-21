@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createMemo, createSignal, onCleanup } from 'solid-js';
+import { For, Match, Show, Switch, batch, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery, type EnhancedResource } from '@intrnl/sq';
@@ -16,8 +16,9 @@ import {
 import { getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 import { type FeedPage, getTimeline, getTimelineKey } from '~/api/queries/get-timeline.ts';
 
-import { preferences } from '~/globals/preferences.ts';
+import { getAccountPreferences } from '~/globals/preferences.ts';
 import { generatePath, useParams } from '~/router.ts';
+import { ResourceNotFoundError } from '~/utils/batch-fetch.ts';
 import { Title } from '~/utils/meta.tsx';
 import { assert } from '~/utils/misc.ts';
 
@@ -38,7 +39,7 @@ const AuthenticatedExplorePage = () => {
 	const uid = () => params.uid as DID;
 
 	const savedFeeds = createMemo(() => {
-		return preferences[uid()]?.savedFeeds;
+		return getAccountPreferences(uid()).savedFeeds;
 	});
 
 	const [refetching, setRefetching] = createSignal(false);
@@ -181,6 +182,48 @@ const AuthenticatedExplorePage = () => {
 
 					return (
 						<Switch>
+							<Match when={info.error} keyed>
+								{(err) => {
+									// This feed no longer exists, let's just remove them outright.
+									// TODO: it would've been nice if we didn't do this, and instead
+									// just alert the user that yeah, it's gone. but unfortunately
+									// the way we're storing preferences right now isn't suitable.
+									if (err instanceof ResourceNotFoundError) {
+										onMount(() => {
+											const $prefs = getAccountPreferences(uid());
+
+											const pinned = new Set($prefs.pinnedFeeds);
+											let saved = $prefs.savedFeeds || [];
+
+											const savedIdx = saved.indexOf(uri);
+
+											if (savedIdx !== -1) {
+												saved = saved.slice();
+												saved.splice(savedIdx, 1);
+											}
+
+											pinned.delete(uri);
+
+											batch(() => {
+												$prefs.savedFeeds = saved;
+												$prefs.pinnedFeeds = saved.filter((uri) => pinned.has(uri));
+											});
+										});
+
+										return null;
+									}
+
+									return (
+										<div class="border-b border-divider p-4 text-sm">
+											<p class="font-bold">Failed to load feed</p>
+											<p class="text-muted-fg">{uri}</p>
+
+											<p class="mt-2">{'' + err}</p>
+										</div>
+									);
+								}}
+							</Match>
+
 							<Match when={info()}>
 								<div class="border-b border-divider">
 									<div class="sticky top-13 z-10 flex h-13 items-center gap-4 bg-background px-4">

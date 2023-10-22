@@ -64,11 +64,11 @@ export const getSubscribedLists: QueryFn<
 		const filtered = arr.filter(filter);
 		const next = filtered.map(map);
 
-		cursor = data.cursor;
 		empty = filtered.length > 0 ? 0 : empty + 1;
 		items = items.concat(next);
+		cursor = data.cursor || null;
 
-		if (!cursor || empty >= MAX_EMPTY) {
+		if (empty >= MAX_EMPTY) {
 			break;
 		}
 	}

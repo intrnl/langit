@@ -186,7 +186,7 @@ export const getTimeline: QueryFn<
 				? createTimelineSlices(uid, feed, sliceFilter, postFilter)
 				: createUnjoinedSlices(uid, feed, postFilter);
 
-		cursor = timeline.cursor;
+		cursor = timeline.cursor || null;
 		empty = result.length > 0 ? 0 : empty + 1;
 		items = items.concat(result);
 
@@ -194,7 +194,7 @@ export const getTimeline: QueryFn<
 
 		cid ||= feed.length > 0 ? feed[0].post.cid : undefined;
 
-		if (!cursor || empty >= MAX_EMPTY) {
+		if (empty >= MAX_EMPTY) {
 			break;
 		}
 	}

@@ -117,7 +117,7 @@ export const getListMembers: QueryFn<
 		}
 
 		listItems = listItems.concat(items);
-		cursor = data.cursor;
+		cursor = data.cursor || null;
 	}
 
 	const fetches = listItems.slice(0, limit);

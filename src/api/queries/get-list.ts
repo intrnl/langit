@@ -81,6 +81,7 @@ export const getListMembers: QueryFn<
 	const agent = await multiagent.connect(uid);
 	const actor = getRepoId(uri);
 
+	let attempts = 0;
 	let cursor: string | undefined | null;
 	let listItems: RawListItem[] = [];
 
@@ -118,6 +119,11 @@ export const getListMembers: QueryFn<
 
 		listItems = listItems.concat(items);
 		cursor = data.cursor || null;
+
+		// Give up after 5 attempts
+		if (++attempts >= 5) {
+			break;
+		}
 	}
 
 	const fetches = listItems.slice(0, limit);

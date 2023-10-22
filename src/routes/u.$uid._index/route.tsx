@@ -1,17 +1,9 @@
 import { For, Show, createEffect, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { type EnhancedResource, createQuery } from '@intrnl/sq';
+import { createQuery } from '@intrnl/sq';
 import { useSearchParams } from '@solidjs/router';
 
-import type { SignalizedFeedGenerator } from '~/api/cache/feed-generators.ts';
-import type { SignalizedList } from '~/api/cache/lists.ts';
-import {
-	getFeedGenerator,
-	getFeedGeneratorKey,
-	getInitialFeedGenerator,
-} from '~/api/queries/get-feed-generator.ts';
-import { getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 import {
 	type FeedTimelineParams,
 	type HomeTimelineParams,
@@ -43,37 +35,6 @@ interface FeedTabProps {
 const FeedTab = (props: FeedTabProps) => {
 	// `item` and `item.uri` is expected to be static
 	const item = props.item;
-
-	const uri = item.uri;
-	const collection = getCollectionId(uri);
-
-	let info: EnhancedResource<SignalizedFeedGenerator | SignalizedList>;
-
-	if (collection === 'app.bsky.feed.generator') {
-		[info] = createQuery({
-			key: () => getFeedGeneratorKey(props.uid, uri),
-			fetch: getFeedGenerator,
-			staleTime: 30_000,
-			initialData: getInitialFeedGenerator,
-		});
-	} else if (collection === 'app.bsky.graph.list') {
-		[info] = createQuery({
-			key: () => getListInfoKey(props.uid, uri),
-			fetch: getListInfo,
-			staleTime: 30_000,
-			initialData: getInitialListInfo,
-		});
-	} else {
-		assert(false, `expected collection`);
-	}
-
-	createEffect(() => {
-		const $info = info();
-
-		if ($info) {
-			item.name = $info.name.value;
-		}
-	});
 
 	return (
 		<Tab<'button'> component="button" active={props.active} onClick={props.onClick}>

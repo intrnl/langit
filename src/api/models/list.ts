@@ -10,8 +10,14 @@ export interface ListsPage {
 	lists: SignalizedList[];
 }
 
-export interface SubscribedListsPage extends ListsPage {
-	remainingLists: SignalizedList[];
+export interface SubscribedListsPageCursor {
+	key: string | null;
+	remaining: SignalizedList[];
+}
+
+export interface SubscribedListsPage {
+	cursor?: SubscribedListsPageCursor;
+	lists: SignalizedList[];
 }
 
 export interface DetailedListPage {

@@ -4,14 +4,17 @@ import type { EnhancedResource, QueryFn } from '@intrnl/sq';
 import { multiagent } from '~/globals/agent.ts';
 
 import { type SignalizedList, mergeSignalizedList } from '../cache/lists.ts';
-import type { SubscribedListsPage } from '../models/list.ts';
+import type { SubscribedListsPage, SubscribedListsPageCursor } from '../models/list.ts';
 
 import { type Collection, pushCollection } from '../utils.ts';
 
 // How many attempts it should try looking for more items before it gives up on empty pages.
 const MAX_EMPTY = 3;
 
-export type SubscribedListsResource = EnhancedResource<Collection<SubscribedListsPage>, string>;
+export type SubscribedListsResource = EnhancedResource<
+	Collection<SubscribedListsPage>,
+	SubscribedListsPageCursor
+>;
 
 export const MUTE_LIST = 1;
 export const BLOCK_LIST = 2;
@@ -27,30 +30,26 @@ export const getSubscribedListsKey = (uid: DID, type: ListType, limit = PAGE_SIZ
 export const getSubscribedLists: QueryFn<
 	Collection<SubscribedListsPage>,
 	ReturnType<typeof getSubscribedListsKey>,
-	string
+	SubscribedListsPageCursor
 > = async (key, { data: collection, param }) => {
 	const [, uid, type, limit] = key;
 
 	const agent = await multiagent.connect(uid);
 
-	let cursor = param;
 	let empty = 0;
 
-	let lists: SignalizedList[];
+	let cursor: string | null | undefined;
+	let items: SignalizedList[] = [];
 
-	if (param && collection) {
-		const pages = collection.pages;
-		const last = pages[pages.length - 1];
-
-		lists = last.remainingLists;
-	} else {
-		lists = [];
+	if (param) {
+		cursor = param.key;
+		items = param.remaining;
 	}
 
 	const filter = (raw: RawList) => raw.creator.did !== uid;
 	const map = (raw: RawList) => mergeSignalizedList(uid, raw);
 
-	while (lists.length < limit) {
+	while (cursor !== null && items.length < limit) {
 		const endpoint = type === MUTE_LIST ? 'app.bsky.graph.getListMutes' : 'app.bsky.graph.getListBlocks';
 		const response = await agent.rpc.get(endpoint, {
 			params: {
@@ -67,19 +66,19 @@ export const getSubscribedLists: QueryFn<
 
 		cursor = data.cursor;
 		empty = filtered.length > 0 ? 0 : empty + 1;
-		lists = lists.concat(next);
+		items = items.concat(next);
 
 		if (!cursor || empty >= MAX_EMPTY) {
 			break;
 		}
 	}
 
-	const remainingLists = lists.splice(limit, lists.length);
+	const lists = items.slice(0, limit);
+	const remaining = items.slice(limit);
 
 	const page: SubscribedListsPage = {
-		cursor,
-		lists,
-		remainingLists,
+		cursor: cursor || remaining.length > 0 ? { key: cursor || null, remaining: remaining } : undefined,
+		lists: lists,
 	};
 
 	return pushCollection(collection, page, param);

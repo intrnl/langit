@@ -4,6 +4,7 @@ import type { JSX } from 'solid-js/jsx-runtime';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
 import type { ProfileListsResource } from '~/api/queries/get-profile-lists.ts';
+import type { SubscribedListsResource } from '~/api/queries/get-subscribed-lists.ts';
 
 import { getCollectionCursor } from '~/api/utils.ts';
 
@@ -13,11 +14,11 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 
 export interface ListListProps {
 	uid: DID;
-	list: ProfileListsResource;
+	list: ProfileListsResource | SubscribedListsResource;
 	fallback?: JSX.Element;
 	disableEndMarker?: boolean;
 	hideSubscribedBadge?: boolean;
-	onLoadMore: (cursor: string) => void;
+	onLoadMore: (cursor: any) => void;
 }
 
 const ListList = (props: ListListProps) => {
@@ -44,6 +45,7 @@ const ListList = (props: ListListProps) => {
 					</div>
 				</Match>
 
+				{/* @ts-expect-error */}
 				<Match when={getCollectionCursor(list(), 'cursor')}>
 					{(cursor) => (
 						<button

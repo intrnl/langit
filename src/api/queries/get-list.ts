@@ -58,10 +58,14 @@ export interface ListMember {
 	profile: SignalizedProfile | undefined;
 }
 
+export interface ListMembersPageCursor {
+	key: string | null;
+	remaining: RawListItem[];
+}
+
 export interface ListMembersPage {
-	cursor: string | undefined;
+	cursor: ListMembersPageCursor | undefined;
 	members: ListMember[];
-	remainingItems: RawListItem[];
 }
 
 export const getListMembersKey = (uid: DID, uri: string, limit = PAGE_SIZE) => {
@@ -70,34 +74,29 @@ export const getListMembersKey = (uid: DID, uri: string, limit = PAGE_SIZE) => {
 export const getListMembers: QueryFn<
 	Collection<ListMembersPage>,
 	ReturnType<typeof getListMembersKey>,
-	string
+	ListMembersPageCursor
 > = async (key, { data: collection, param }) => {
 	const [, uid, uri, limit] = key;
 
 	const agent = await multiagent.connect(uid);
 	const actor = getRepoId(uri);
 
-	let cursor: string | undefined;
-	let listItems: RawListItem[];
+	let cursor: string | undefined | null;
+	let listItems: RawListItem[] = [];
 
-	if (param && collection) {
-		const pages = collection.pages;
-		const last = pages[pages.length - 1];
-
-		cursor = param;
-		listItems = last.remainingItems;
-	} else {
-		listItems = [];
+	if (param) {
+		cursor = param.key;
+		listItems = param.remaining;
 	}
 
 	// We don't have enough list item records to fulfill this request...
-	while (listItems.length < limit) {
+	while (cursor !== null && listItems.length < limit) {
 		const response = await agent.rpc.get('com.atproto.repo.listRecords', {
 			params: {
 				repo: actor,
 				collection: 'app.bsky.graph.listitem',
 				limit: 100,
-				cursor: cursor,
+				cursor: cursor || undefined,
 			},
 		});
 
@@ -119,10 +118,6 @@ export const getListMembers: QueryFn<
 
 		listItems = listItems.concat(items);
 		cursor = data.cursor;
-
-		if (!cursor) {
-			break;
-		}
 	}
 
 	const fetches = listItems.slice(0, limit);
@@ -145,9 +140,8 @@ export const getListMembers: QueryFn<
 	const members = await Promise.all(promises);
 
 	const page: ListMembersPage = {
-		cursor: cursor,
+		cursor: cursor || remaining.length > 0 ? { key: cursor || null, remaining: remaining } : undefined,
 		members: members,
-		remainingItems: remaining,
 	};
 
 	return pushCollection(collection, page, param);

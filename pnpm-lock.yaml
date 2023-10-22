@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  has: npm:@nolyfill/has@latest
+  function-bind: npm:@nolyfill/function-bind@latest
   string.prototype.matchall: npm:@nolyfill/string.prototype.matchall@latest
 
 patchedDependencies:
@@ -1255,7 +1255,7 @@ packages:
       babel-plugin-polyfill-corejs2: 0.4.6(@babel/core@7.23.2)
       babel-plugin-polyfill-corejs3: 0.8.5(@babel/core@7.23.2)
       babel-plugin-polyfill-regenerator: 0.5.3(@babel/core@7.23.2)
-      core-js-compat: 3.33.0
+      core-js-compat: 3.33.1
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
@@ -1632,11 +1632,9 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@nolyfill/has@1.0.21:
-    resolution: {integrity: sha512-Sf8iFaegjGp29hQVQjIc+nDR0uWqGkHsFC3jsUigFwGjpafgMaBtL++DpTU9jYAKDJEvslR1szl8qJjNGlhgcw==}
+  /@nolyfill/function-bind@1.0.21:
+    resolution: {integrity: sha512-0Jsaoxp/9HJqCa3GzEzJcoi4+VfupD/o+1pBG0qJ0X3d+sKbbfSej2Faiyp0fTHH36mhsdAKi2TahEx9JV08ZA==}
     engines: {node: '>=12.4.0'}
-    dependencies:
-      '@nolyfill/shared': 1.0.21
     dev: true
 
   /@nolyfill/shared@1.0.21:
@@ -2008,7 +2006,7 @@ packages:
     dependencies:
       '@babel/core': 7.23.2
       '@babel/helper-define-polyfill-provider': 0.4.3(@babel/core@7.23.2)
-      core-js-compat: 3.33.0
+      core-js-compat: 3.33.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2068,7 +2066,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001551
-      electron-to-chromium: 1.4.559
+      electron-to-chromium: 1.4.563
       node-releases: 2.0.13
       update-browserslist-db: 1.0.13(browserslist@4.22.1)
     dev: true
@@ -2166,8 +2164,8 @@ packages:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
     dev: true
 
-  /core-js-compat@3.33.0:
-    resolution: {integrity: sha512-0w4LcLXsVEuNkIqwjjf9rjCoPhK8uqA4tMRh4Ge26vfLtUutshn+aRJU21I9LCJlh2QQHfisNToLjw1XEJLTWw==}
+  /core-js-compat@3.33.1:
+    resolution: {integrity: sha512-6pYKNOgD/j/bkC5xS5IIg6bncid3rfrI42oBH1SQJbsmYPKF7rhzcFzYCcxYMmNQQ0rCEB8WqpW7QHndOggaeQ==}
     dependencies:
       browserslist: 4.22.1
     dev: true
@@ -2219,8 +2217,8 @@ packages:
       jake: 10.8.7
     dev: true
 
-  /electron-to-chromium@1.4.559:
-    resolution: {integrity: sha512-iS7KhLYCSJbdo3rUSkhDTVuFNCV34RKs2UaB9Ecr7VlqzjjWW//0nfsFF5dtDmyXlZQaDYYtID5fjtC/6lpRug==}
+  /electron-to-chromium@1.4.563:
+    resolution: {integrity: sha512-dg5gj5qOgfZNkPNeyKBZQAQitIQ/xwfIDmEQJHCbXaD9ebTZxwJXUsDYcBlAvZGZLi+/354l35J1wkmP6CqYaw==}
     dev: true
 
   /esbuild@0.19.5:
@@ -2404,6 +2402,13 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /hasown@2.0.0:
+    resolution: {integrity: sha512-vUptKVTpIJhcczKBbgnS+RtcuYMB8+oNzPK2/Hp3hanz8JmpATdmmgLgSaadVREkDm+e2giHwY3ZRkyjSIDDFA==}
+    engines: {node: '>= 0.4'}
+    dependencies:
+      function-bind: /@nolyfill/function-bind@1.0.21
+    dev: true
+
   /html-entities@2.3.3:
     resolution: {integrity: sha512-DV5Ln36z34NNTDgnz0EWGBLZENelNAtkiFA4kyNOG2tDI6Mz1uSWiq1wAKdyjnJwyDiDO7Fa2SO1CTxPXL8VxA==}
     dev: true
@@ -2434,10 +2439,10 @@ packages:
       binary-extensions: 2.2.0
     dev: true
 
-  /is-core-module@2.13.0:
-    resolution: {integrity: sha512-Z7dk6Qo8pOCp3l4tsX2C5ZVas4V+UxwQodwZhLopL91TX8UyyHEXafPcyoeeWuLrwzHcr3igO78wNLwHJHsMCQ==}
+  /is-core-module@2.13.1:
+    resolution: {integrity: sha512-hHrIjvZsftOsvKSn2TRYl63zvxsgE0K+0mYMoH6gD4omR5IWB2KynivBQczo3+wF1cCkjzvptnI9Q0sPU66ilw==}
     dependencies:
-      has: /@nolyfill/has@1.0.21
+      hasown: 2.0.0
     dev: true
 
   /is-extglob@2.1.1:
@@ -2922,7 +2927,7 @@ packages:
     resolution: {integrity: sha512-oKWePCxqpd6FlLvGV1VU0x7bkPmmCNolxzjMf4NczoDnQcIWrAF+cPtZn5i6n+RfD2d9i0tzpKnG6Yk168yIyw==}
     hasBin: true
     dependencies:
-      is-core-module: 2.13.0
+      is-core-module: 2.13.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
     dev: true

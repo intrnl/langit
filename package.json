@@ -44,7 +44,7 @@
 			"solid-textarea-autosize@0.0.5": "patches/solid-textarea-autosize@0.0.5.patch"
 		},
 		"overrides": {
-			"has": "npm:@nolyfill/has@latest",
+			"function-bind": "npm:@nolyfill/function-bind@latest",
 			"string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@latest"
 		}
 	}

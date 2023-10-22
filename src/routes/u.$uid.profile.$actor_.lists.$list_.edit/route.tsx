@@ -1,13 +1,13 @@
-import { Match, Switch, createMemo } from 'solid-js';
+import { Match, Switch } from 'solid-js';
 
 import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
 import { createMutation, createQuery } from '@intrnl/sq';
 
-import { lists } from '~/api/cache/lists.ts';
-import { getList, getListKey } from '~/api/queries/get-list.ts';
+import { createListUri, getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
+import { getProfileDid, getProfileDidKey } from '~/api/queries/get-profile-did.ts';
 
-import { getCurrentDate, getRecordId, isDid } from '~/api/utils.ts';
+import { getCurrentDate, getRecordId } from '~/api/utils.ts';
 
 import { multiagent } from '~/globals/agent.ts';
 import { useParams } from '~/router.ts';
@@ -25,44 +25,30 @@ const AuthenticatedListsEditPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const [listing, { refetch }] = createQuery({
-		// we're not interested in the actual members, but 1 is the minimum we can
-		// request from this endpoint.
-		key: () => getListKey(uid(), params.actor, params.list, 1),
-		fetch: getList,
-		refetchOnReconnect: false,
-		refetchOnWindowFocus: false,
-		initialData: (key) => {
-			const [, uid, actor, list] = key;
-
-			if (isDid(actor)) {
-				const uri = `at://${actor}/app.bsky.graph.list/${list}`;
-				const key = uid + '|' + uri;
-
-				const ref = lists[key];
-				const data = ref?.deref();
-
-				if (data) {
-					return {
-						data: {
-							pages: [{ list: data, items: [], cursor: undefined }],
-							params: [undefined],
-						},
-					};
-				}
-			}
-		},
+	const [did] = createQuery({
+		key: () => getProfileDidKey(uid(), params.actor),
+		fetch: getProfileDid,
+		staleTime: 60_000,
 	});
 
-	const list = createMemo(() => {
-		return listing()?.pages[0].list;
+	const [listing, { refetch }] = createQuery({
+		key: () => {
+			const $did = did();
+			if ($did) {
+				return getListInfoKey(uid(), createListUri($did, params.list));
+			}
+		},
+		fetch: getListInfo,
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
+		initialData: getInitialListInfo,
 	});
 
 	const mutation = createMutation({
 		mutate: async (data: ListSubmissionData) => {
 			const { avatar, name, purpose, description, descriptionFacets } = data;
 
-			const rkey = getRecordId(list()!.uri);
+			const rkey = getRecordId(listing()!.uri);
 			const $uid = uid();
 
 			const agent = await multiagent.connect($uid);
@@ -115,7 +101,7 @@ const AuthenticatedListsEditPage = () => {
 	});
 
 	const isInvalidEdit = () => {
-		const $list = list();
+		const $list = listing();
 		return $list ? $list.creator.did !== uid() : false;
 	};
 
@@ -123,7 +109,7 @@ const AuthenticatedListsEditPage = () => {
 		<div>
 			<Title
 				render={() => {
-					const $list = list();
+					const $list = listing();
 
 					if ($list) {
 						return `Edit "${$list.name.value}" list / Langit`;
@@ -159,7 +145,7 @@ const AuthenticatedListsEditPage = () => {
 					)}
 				</Match>
 
-				<Match when={list()}>
+				<Match when={listing()}>
 					{(list) => (
 						<ListForm
 							disabled={listing.loading || mutation.isLoading}

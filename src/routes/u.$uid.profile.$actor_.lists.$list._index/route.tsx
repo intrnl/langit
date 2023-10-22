@@ -2,7 +2,10 @@ import { For, Match, Show, Switch, useContext } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
+import { createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
+
+import { createListUri, getListMembers, getListMembersKey } from '~/api/queries/get-list.ts';
 
 import { getCollectionCursor } from '~/api/utils.ts';
 
@@ -11,22 +14,48 @@ import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils
 
 import CircularProgress from '~/components/CircularProgress.tsx';
 
-import { ProfileListContext } from '../u.$uid.profile.$actor_.lists.$list/context.tsx';
+import { ListDidContext } from '../u.$uid.profile.$actor_.lists.$list/context.tsx';
 
 const AuthenticatedListPage = () => {
-	const [listing, { refetch }] = useContext(ProfileListContext)!;
+	const [did] = useContext(ListDidContext)!;
 
 	const navigate = useNavigate();
 	const params = useParams('/u/:uid/profile/:actor/lists/:list');
 
 	const uid = () => params.uid as DID;
 
+	const [listing, { refetch }] = createQuery({
+		key: () => {
+			const $did = did();
+			if ($did) {
+				return getListMembersKey(uid(), createListUri($did, params.list));
+			}
+		},
+		fetch: getListMembers,
+		refetchOnMount: false,
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
+	});
+
 	return (
 		<>
 			<For each={listing()?.pages}>
 				{(page) => {
-					return page.items.map((item) => {
-						const profile = item.subject;
+					return page.members.map((member) => {
+						const { subject, profile } = member;
+
+						if (!profile) {
+							return (
+								<div class="flex items-center gap-3 px-4 py-3 text-sm">
+									<div class="h-12 w-12 shrink-0 rounded-full bg-muted-fg"></div>
+
+									<div class="text-muted-fg">
+										<p>This user no longer exists</p>
+										<p>{subject}</p>
+									</div>
+								</div>
+							);
+						}
 
 						const click = (ev: MouseEvent | KeyboardEvent) => {
 							if (!isElementClicked(ev, INTERACTION_TAGS)) {

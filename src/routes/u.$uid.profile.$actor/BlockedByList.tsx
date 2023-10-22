@@ -3,7 +3,7 @@ import { createQuery } from '@intrnl/sq';
 import { Match, Switch } from 'solid-js';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
-import { getList, getListKey } from '~/api/queries/get-list.ts';
+import { getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 
 import { getCollectionId, getRecordId, getRepoId } from '~/api/utils.ts';
 
@@ -23,8 +23,8 @@ export const BlockedByList = (props: { uid: DID; uri: string }) => {
 	const uri = () => props.uri;
 
 	const [list] = createQuery({
-		key: () => getListKey(uid(), getRepoId(uri()), getRecordId(uri()), 1),
-		fetch: getList,
+		key: () => getListInfoKey(uid(), uri()),
+		fetch: getListInfo,
 		staleTime: 60_000,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
@@ -33,10 +33,8 @@ export const BlockedByList = (props: { uid: DID; uri: string }) => {
 	return (
 		<div class="text-sm text-muted-fg">
 			<Switch>
-				<Match when={list()?.pages[0]} keyed>
-					{(page) => {
-						const list = page.list;
-
+				<Match when={list()} keyed>
+					{(list) => {
 						return (
 							<p>
 								This user is blocked by{' '}

@@ -3,6 +3,7 @@ import { createEffect, useContext } from 'solid-js';
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
+import { createListUri } from '~/api/queries/get-list.ts';
 import {
 	type ListTimelineParams,
 	getTimeline,
@@ -15,19 +16,19 @@ import { useParams } from '~/router.ts';
 
 import TimelineList from '~/components/TimelineList.tsx';
 
-import { ProfileListContext } from '../u.$uid.profile.$actor_.lists.$list/context';
+import { ListDidContext } from '../u.$uid.profile.$actor_.lists.$list/context';
 
 const AuthenticatedListFeedPage = () => {
-	const [list] = useContext(ProfileListContext)!;
+	const [did] = useContext(ListDidContext)!;
 
 	const params = useParams('/u/:uid/profile/:actor/lists/:list/feed');
 
 	const uid = () => params.uid as DID;
 
 	const listParams = (): ListTimelineParams | undefined => {
-		const $list = list();
-		if ($list) {
-			return { type: 'list', uri: $list.pages[0].list.uri };
+		const $did = did();
+		if ($did) {
+			return { type: 'list', uri: createListUri($did, params.list) };
 		}
 	};
 
@@ -76,7 +77,7 @@ const AuthenticatedListFeedPage = () => {
 			uid={uid()}
 			timeline={timeline}
 			latest={latest}
-			loading={!list()}
+			loading={!did()}
 			onLoadMore={(cursor) => refetch(true, cursor)}
 			onRefetch={() => refetch(true)}
 		/>

@@ -1,8 +1,6 @@
 import { createContext } from 'solid-js';
 
+import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import type { QueryReturn } from '@intrnl/sq';
 
-import type { ListPage } from '~/api/queries/get-list.ts';
-import type { Collection } from '~/api/utils.ts';
-
-export const ProfileListContext = createContext<QueryReturn<Collection<ListPage>, string>>();
+export const ListDidContext = createContext<QueryReturn<DID, unknown>>();

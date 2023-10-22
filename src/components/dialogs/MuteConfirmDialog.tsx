@@ -5,12 +5,12 @@ import { createQuery, useQueryMutation } from '@intrnl/sq';
 
 import { produce, setAutoFreeze } from 'immer';
 
-import { getRecordId, getRepoId, type Collection } from '~/api/utils.ts';
+import { type Collection } from '~/api/utils.ts';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import type { TimelineSlice } from '~/api/models/timeline.ts';
 import { muteProfile } from '~/api/mutations/mute-profile.ts';
-import { getList, getListKey } from '~/api/queries/get-list.ts';
+import { getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 import type { FeedPage } from '~/api/queries/get-timeline.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
@@ -127,8 +127,8 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 				<Match when={profile().viewer.mutedByList.value}>
 					{(record) => {
 						const [list] = createQuery({
-							key: () => getListKey(uid(), getRepoId(record().uri), getRecordId(record().uri), 1),
-							fetch: getList,
+							key: () => getListInfoKey(uid(), record().uri),
+							fetch: getListInfo,
 							staleTime: 60_000,
 							refetchOnReconnect: false,
 							refetchOnWindowFocus: false,
@@ -145,9 +145,9 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 
 								<div class="mt-3 rounded-md border border-divider">
 									<Switch>
-										<Match when={list()?.pages[0]}>
+										<Match when={list()}>
 											{(data) => (
-												<ListItem uid={uid()} list={data().list} hideSubscribedBadge onClick={closeModal} />
+												<ListItem uid={uid()} list={data()} hideSubscribedBadge onClick={closeModal} />
 											)}
 										</Match>
 

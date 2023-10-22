@@ -5,9 +5,9 @@ import { createQuery } from '@intrnl/sq';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import { blockProfile } from '~/api/mutations/block-profile.ts';
-import { getList, getListKey } from '~/api/queries/get-list.ts';
+import { getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 
-import { getCollectionId, getRecordId, getRepoId } from '~/api/utils.ts';
+import { getCollectionId } from '~/api/utils.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
 
@@ -39,8 +39,8 @@ const BlockConfirmDialog = (props: BlockConfirmDialogProps) => {
 			<Match when={isBlockedByList(profile())}>
 				{(uri) => {
 					const [list] = createQuery({
-						key: () => getListKey(uid(), getRepoId(uri()), getRecordId(uri()), 1),
-						fetch: getList,
+						key: () => getListInfoKey(uid(), uri()),
+						fetch: getListInfo,
 						staleTime: 60_000,
 						refetchOnReconnect: false,
 						refetchOnWindowFocus: false,
@@ -57,9 +57,9 @@ const BlockConfirmDialog = (props: BlockConfirmDialogProps) => {
 
 							<div class="mt-3 rounded-md border border-divider">
 								<Switch>
-									<Match when={list()?.pages[0]}>
+									<Match when={list()}>
 										{(data) => (
-											<ListItem uid={uid()} list={data().list} hideSubscribedBadge onClick={closeModal} />
+											<ListItem uid={uid()} list={data()} hideSubscribedBadge onClick={closeModal} />
 										)}
 									</Match>
 

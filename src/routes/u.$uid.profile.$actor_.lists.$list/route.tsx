@@ -4,23 +4,23 @@ import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Outlet } from '@solidjs/router';
 
-import { getList, getListKey } from '~/api/queries/get-list.ts';
+import { createListUri, getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
+import { getProfileDid, getProfileDidKey } from '~/api/queries/get-profile-did.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { getFeedPref } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
 
+import { TabLink } from '~/components/Tab.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import EditIcon from '~/icons/baseline-edit.tsx';
 import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
 
+import { ListDidContext } from './context.tsx';
 import ListMenu from './ListMenu.tsx';
 import SubscribeListDialog from './SubscribeListDialog.tsx';
-
-import { ProfileListContext } from './context.tsx';
-import { TabLink } from '~/components/Tab.tsx';
 
 const enum Subscription {
 	MUTED = 1,
@@ -39,16 +39,24 @@ const AuthenticatedListLayout = () => {
 
 	const uid = () => params.uid as DID;
 
-	const [listing, actions] = createQuery({
-		key: () => getListKey(uid(), params.actor, params.list),
-		fetch: getList,
-		refetchOnMount: false,
-		refetchOnReconnect: false,
-		refetchOnWindowFocus: false,
+	const [did, actions] = createQuery({
+		key: () => getProfileDidKey(uid(), params.actor),
+		fetch: getProfileDid,
+		staleTime: 60_000,
 	});
 
-	const list = createMemo(() => {
-		return listing()?.pages[0].list;
+	const [list] = createQuery({
+		key: () => {
+			const $did = did();
+			if ($did) {
+				return getListInfoKey(uid(), createListUri($did, params.list));
+			}
+		},
+		fetch: getListInfo,
+		initialData: getInitialListInfo,
+		staleTime: 60_000,
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
 	});
 
 	const subscription = createMemo(() => {
@@ -215,9 +223,9 @@ const AuthenticatedListLayout = () => {
 				}}
 			</Show>
 
-			<ProfileListContext.Provider value={/* @once */ [listing, actions]}>
+			<ListDidContext.Provider value={/* @once */ [did, actions]}>
 				<Outlet />
-			</ProfileListContext.Provider>
+			</ListDidContext.Provider>
 		</div>
 	);
 };

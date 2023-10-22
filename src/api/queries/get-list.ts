@@ -1,4 +1,4 @@
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
 
 import type { InitialDataFn, QueryFn } from '@intrnl/sq';
 
@@ -6,49 +6,15 @@ import { multiagent } from '~/globals/agent.ts';
 
 import { type SignalizedList, mergeSignalizedList, lists } from '../cache/lists.ts';
 import { type SignalizedProfile, mergeSignalizedProfile } from '../cache/profiles.ts';
-import { type Collection, pushCollection } from '../utils.ts';
+import { type Collection, pushCollection, getRepoId } from '../utils.ts';
 
 import _getDid from './_did.ts';
+import { fetchProfileBatched } from './get-profile-batched.ts';
 
-export interface ListPage {
-	cursor?: string;
-	list: SignalizedList;
-	items: Array<{ subject: SignalizedProfile }>;
-}
+const PAGE_SIZE = 25;
 
-const PAGE_SIZE = 30;
-
-export const getListKey = (uid: DID, actor: string, list: string, limit = PAGE_SIZE) => {
-	return ['getList', uid, actor, list, limit] as const;
-};
-export const getList: QueryFn<Collection<ListPage>, ReturnType<typeof getListKey>, string> = async (
-	key,
-	{ data: collection, param },
-) => {
-	const [, uid, actor, list, limit] = key;
-
-	const agent = await multiagent.connect(uid);
-	const did = await _getDid(agent, actor);
-
-	const uri = `at://${did}/app.bsky.graph.list/${list}`;
-	const response = await agent.rpc.get('app.bsky.graph.getList', {
-		params: { list: uri, limit, cursor: param },
-	});
-
-	const data = response.data;
-	const items = data.items;
-
-	const page: ListPage = {
-		// NOTE: `items` are likely to return less than what we requested, because
-		// the API does not skip over records of users that have been deleted, so
-		// use the cursor as is.
-		// cursor: items.length >= limit ? data.cursor : undefined,
-		cursor: data.cursor,
-		list: mergeSignalizedList(uid, data.list),
-		items: items.map((item) => ({ subject: mergeSignalizedProfile(uid, item.subject) })),
-	};
-
-	return pushCollection(collection, page, param);
+export const createListUri = (actor: DID, rkey: string) => {
+	return `at://${actor}/app.bsky.graph.list/${rkey}`;
 };
 
 export const getListInfoKey = (uid: DID, uri: string) => {
@@ -79,4 +45,110 @@ export const getInitialListInfo: InitialDataFn<SignalizedList, ReturnType<typeof
 	const feed = ref?.deref();
 
 	return feed && { data: feed };
+};
+
+export interface RawListItem {
+	uri: string;
+	subject: DID;
+}
+
+export interface ListMember {
+	uri: string;
+	subject: DID;
+	profile: SignalizedProfile | undefined;
+}
+
+export interface ListMembersPage {
+	cursor: string | undefined;
+	members: ListMember[];
+	remainingItems: RawListItem[];
+}
+
+export const getListMembersKey = (uid: DID, uri: string, limit = PAGE_SIZE) => {
+	return ['getListMembers', uid, uri, limit] as const;
+};
+export const getListMembers: QueryFn<
+	Collection<ListMembersPage>,
+	ReturnType<typeof getListMembersKey>,
+	string
+> = async (key, { data: collection, param }) => {
+	const [, uid, uri, limit] = key;
+
+	const agent = await multiagent.connect(uid);
+	const actor = getRepoId(uri);
+
+	let cursor: string | undefined;
+	let listItems: RawListItem[];
+
+	if (param && collection) {
+		const pages = collection.pages;
+		const last = pages[pages.length - 1];
+
+		cursor = param;
+		listItems = last.remainingItems;
+	} else {
+		listItems = [];
+	}
+
+	// We don't have enough list item records to fulfill this request...
+	while (listItems.length < limit) {
+		const response = await agent.rpc.get('com.atproto.repo.listRecords', {
+			params: {
+				repo: actor,
+				collection: 'app.bsky.graph.listitem',
+				limit: 100,
+				cursor: cursor,
+			},
+		});
+
+		const data = response.data;
+		const records = data.records;
+
+		const items: RawListItem[] = [];
+
+		for (let idx = 0, len = records.length; idx < len; idx++) {
+			const record = records[idx];
+			const value = record.value as Records['app.bsky.graph.listitem'];
+
+			if (value.list !== uri) {
+				continue;
+			}
+
+			items.push({ uri: record.uri, subject: value.subject });
+		}
+
+		listItems = listItems.concat(items);
+		cursor = data.cursor;
+
+		if (!cursor) {
+			break;
+		}
+	}
+
+	const fetches = listItems.slice(0, limit);
+	const remaining = listItems.slice(limit);
+
+	const promises: Promise<ListMember>[] = [];
+
+	for (let idx = 0, len = fetches.length; idx < len; idx++) {
+		const { uri, subject } = fetches[idx];
+		const request = fetchProfileBatched([uid, subject]);
+
+		promises.push(
+			request.then(
+				(value) => ({ uri: uri, subject: subject, profile: mergeSignalizedProfile(uid, value) }),
+				(_err) => ({ uri: uri, subject: subject, profile: undefined }),
+			),
+		);
+	}
+
+	const members = await Promise.all(promises);
+
+	const page: ListMembersPage = {
+		cursor: cursor,
+		members: members,
+		remainingItems: remaining,
+	};
+
+	return pushCollection(collection, page, param);
 };

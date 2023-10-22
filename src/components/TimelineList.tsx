@@ -2,7 +2,7 @@ import { For, Match, Show, Switch } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
-import type { FeedLatestResource, FeedResource } from '~/api/queries/get-timeline.ts';
+import type { FeedLatestResource, FeedPageCursor, FeedResource } from '~/api/queries/get-timeline.ts';
 
 import { getCollectionCursor } from '~/api/utils.ts';
 
@@ -18,7 +18,7 @@ export interface TimelineListProps {
 	loading?: boolean;
 	timelineDid?: DID;
 	onRefetch: () => void;
-	onLoadMore: (cursor: string) => void;
+	onLoadMore: (cursor: FeedPageCursor) => void;
 }
 
 const TimelineList = (props: TimelineListProps) => {

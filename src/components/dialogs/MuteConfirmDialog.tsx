@@ -11,7 +11,7 @@ import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import type { TimelineSlice } from '~/api/models/timeline.ts';
 import { muteProfile } from '~/api/mutations/mute-profile.ts';
 import { getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
-import type { FeedPage } from '~/api/queries/get-timeline.ts';
+import type { FeedPage, FeedPageCursor } from '~/api/queries/get-timeline.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
 import { getFilterPref, isProfileTemporarilyMuted } from '~/globals/settings.ts';
@@ -75,12 +75,11 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 
 		const updateFeed = produce((data: Collection<FeedPage>) => {
 			const pages = data.pages;
+			const params = data.params;
 
 			for (let i = 0, il = pages.length; i < il; i++) {
 				const page = pages[i];
-
 				const slices = page.slices;
-				const remainingSlices = page.remainingSlices;
 
 				for (let j = slices.length - 1; j >= 0; j--) {
 					const slice = slices[j];
@@ -89,12 +88,20 @@ const MuteConfirmDialog = (props: MuteConfirmDialogProps) => {
 						slices.splice(j, 1);
 					}
 				}
+			}
 
-				for (let j = remainingSlices.length - 1; j >= 0; j--) {
-					const slice = remainingSlices[j];
+			for (let i = 0, il = params.length; i < il; i++) {
+				const param = params[i] as FeedPageCursor | undefined;
 
-					if (isSliceMatching(slice)) {
-						remainingSlices.splice(j, 1);
+				if (param) {
+					const slices = param.remaining;
+
+					for (let j = slices.length - 1; j >= 0; j--) {
+						const slice = slices[j];
+
+						if (isSliceMatching(slice)) {
+							slices.splice(j, 1);
+						}
 					}
 				}
 			}

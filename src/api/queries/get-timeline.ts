@@ -60,18 +60,22 @@ export type FeedParams =
 	| ProfileTimelineParams
 	| SearchTimelineParams;
 
+export interface FeedPageCursor {
+	key: string | null;
+	remaining: TimelineSlice[];
+}
+
 export interface FeedPage {
-	cursor?: string;
+	cursor?: FeedPageCursor;
 	cid?: string;
 	slices: TimelineSlice[];
-	remainingSlices: TimelineSlice[];
 }
 
 export interface FeedLatestResult {
 	cid: string | undefined;
 }
 
-export type FeedResource = EnhancedResource<Collection<FeedPage>, string>;
+export type FeedResource = EnhancedResource<Collection<FeedPage>, FeedPageCursor>;
 export type FeedLatestResource = EnhancedResource<FeedLatestResult>;
 
 type TimelineResponse = ResponseOf<'app.bsky.feed.getTimeline'>;
@@ -122,46 +126,43 @@ export class IncompatibleSearchError extends Error {
 export const getTimelineKey = (uid: DID, params: FeedParams, limit = MAX_POSTS) => {
 	return ['getFeed', uid, params, limit] as const;
 };
-export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTimelineKey>, string> = async (
-	key,
-	{ data: prevData, param: prevCursor },
-) => {
+export const getTimeline: QueryFn<
+	Collection<FeedPage>,
+	ReturnType<typeof getTimelineKey>,
+	FeedPageCursor
+> = async (key, { data: collection, param }) => {
 	const [, uid, params, limit] = key;
 	const type = params.type;
 
 	const agent = await multiagent.connect(uid);
 
-	let cursor = prevCursor;
 	let empty = 0;
 	let cid: string | undefined;
 
-	let slices: TimelineSlice[];
+	let cursor: string | null | undefined;
+	let items: TimelineSlice[] = [];
 	let count = 0;
 
 	let sliceFilter: SliceFilter | undefined | null;
 	let postFilter: PostFilter | undefined;
 
-	if (cursor && prevData) {
-		const pages = prevData.pages;
-		const last = pages[pages.length - 1];
-
-		slices = last.remainingSlices;
-		count = countPosts(slices);
-	} else {
-		slices = [];
+	if (param) {
+		cursor = param.key;
+		items = param.remaining;
+		count = countPosts(items);
 	}
 
 	if (type === 'home') {
 		sliceFilter = createHomeSliceFilter(uid);
 		postFilter = combine([
 			createHiddenRepostFilter(uid),
-			createDuplicatePostFilter(slices),
+			createDuplicatePostFilter(items),
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
 		]);
 	} else if (type === 'feed' || type === 'list') {
 		postFilter = combine([
-			createDuplicatePostFilter(slices),
+			createDuplicatePostFilter(items),
 			createLanguagePostFilter(uid),
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
@@ -176,7 +177,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 		postFilter = createLabelPostFilter(uid);
 	}
 
-	while (count < limit) {
+	while (cursor !== null && count < limit) {
 		const timeline = await fetchPage(agent, params, limit, cursor);
 
 		const feed = timeline.feed;
@@ -187,7 +188,7 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 
 		cursor = timeline.cursor;
 		empty = result.length > 0 ? 0 : empty + 1;
-		slices = slices.concat(result);
+		items = items.concat(result);
 
 		count += countPosts(result);
 
@@ -199,16 +200,18 @@ export const getTimeline: QueryFn<Collection<FeedPage>, ReturnType<typeof getTim
 	}
 
 	// we're still slicing by the amount of slices and not amount of posts
-	const remainingSlices = slices.splice(countPosts(slices, limit) + 1, slices.length);
+	const spliced = countPosts(items, limit) + 1;
+
+	const slices = items.slice(0, spliced);
+	const remaining = items.slice(spliced);
 
 	const page: FeedPage = {
-		cursor,
-		cid,
-		slices,
-		remainingSlices,
+		cursor: cursor || remaining.length > 0 ? { key: cursor || null, remaining: remaining } : undefined,
+		cid: cid,
+		slices: slices,
 	};
 
-	return pushCollection(prevData, page, prevCursor);
+	return pushCollection(collection, page, param);
 };
 
 /// Latest feed query

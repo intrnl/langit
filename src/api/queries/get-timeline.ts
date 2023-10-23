@@ -113,16 +113,6 @@ const countPosts = (slices: TimelineSlice[], limit?: number) => {
 	return count;
 };
 
-// Error thrown when post search is being used outside of bsky.social, since we
-// are currently unable to determine the BGS affiliation of other instances.
-// ref: https://github.com/bluesky-social/atproto/issues/1307
-export class IncompatibleSearchError extends Error {
-	constructor(message?: string, options?: ErrorOptions) {
-		super(message, options);
-		this.name = 'IncompatibleSearchError';
-	}
-}
-
 export const getTimelineKey = (uid: DID, params: FeedParams, limit = MAX_POSTS) => {
 	return ['getFeed', uid, params, limit] as const;
 };
@@ -330,10 +320,6 @@ const fetchPage = async (
 			return response.data;
 		}
 	} else if (type === 'search') {
-		if (agent.rpc.serviceUri !== 'https://bsky.social') {
-			throw new IncompatibleSearchError();
-		}
-
 		const offset = cursor ? +cursor : 0;
 		const searchUri =
 			`https://search.bsky.social/search/posts` +

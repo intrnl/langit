@@ -1,31 +1,18 @@
-import { type ComponentProps, For, createMemo, Show } from 'solid-js';
+import { For, createMemo, Show } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 
+import { openModal } from '~/globals/modals.tsx';
 import { systemLanguages } from '~/globals/platform.ts';
 import { getLanguagePref, getTranslationPref } from '~/globals/settings.ts';
 import { useParams } from '~/router.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
 
-import LanguagePicker from '~/components/pickers/LanguagePicker';
-import { openModal } from '~/globals/modals';
+import LanguagePicker from '~/components/pickers/LanguagePicker.tsx';
+import Checkbox from '~/components/Checkbox.tsx';
+
 import AddIcon from '~/icons/baseline-add.tsx';
-import CheckBoxOutlineBlankIcon from '~/icons/baseline-check-box-outline-blank.tsx';
-import CheckBoxIcon from '~/icons/baseline-check-box.tsx';
 import DeleteIcon from '~/icons/baseline-delete.tsx';
-
-const Checkbox = (props: ComponentProps<'input'>) => {
-	return (
-		<label class="relative inline-flex  cursor-pointer text-xl">
-			<input {...props} type="checkbox" class="peer h-0 w-0 appearance-none leading-none" />
-
-			<div class="pointer-events-none absolute -inset-1.5 rounded-full peer-hover:bg-hinted peer-focus-visible:bg-hinted" />
-
-			<CheckBoxOutlineBlankIcon class="z-10 text-muted-fg peer-checked:hidden peer-disabled:opacity-50" />
-			<CheckBoxIcon class="z-10 hidden text-accent peer-checked:block peer-disabled:opacity-50" />
-		</label>
-	);
-};
 
 const AuthenticatedLanguagesSettingsPage = () => {
 	const params = useParams('/u/:uid/settings/languages');

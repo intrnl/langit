@@ -18,6 +18,7 @@ import { type FeedPage, getTimeline, getTimelineKey } from '~/api/queries/get-ti
 
 import { getFeedPref } from '~/globals/settings.ts';
 import { generatePath, useParams } from '~/router.ts';
+import { useMediaQuery } from '~/utils/media-query.ts';
 import { Title } from '~/utils/meta.tsx';
 import { assert } from '~/utils/misc.ts';
 
@@ -29,6 +30,8 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 import RefreshIcon from '~/icons/baseline-refresh.tsx';
 import SettingsIcon from '~/icons/baseline-settings.tsx';
 
+import TrendingSection from './TrendingSection.tsx';
+
 const MAX_POSTS = 6;
 
 const AuthenticatedExplorePage = () => {
@@ -36,6 +39,8 @@ const AuthenticatedExplorePage = () => {
 	const navigate = useNavigate();
 
 	const uid = () => params.uid as DID;
+
+	const isWideDesktop = useMediaQuery('(width >= 1280px)');
 
 	const savedFeeds = createMemo(() => {
 		const prefs = getFeedPref(uid());
@@ -98,6 +103,11 @@ const AuthenticatedExplorePage = () => {
 					<SettingsIcon />
 				</a>
 			</div>
+
+			<Show when={!isWideDesktop()}>
+				<TrendingSection uid={uid()} />
+			</Show>
+
 			<For
 				each={savedFeeds()}
 				fallback={

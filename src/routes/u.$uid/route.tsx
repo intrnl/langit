@@ -28,6 +28,7 @@ import HomeOutlinedIcon from '~/icons/outline-home.tsx';
 import NotificationsOutlinedIcon from '~/icons/outline-notifications.tsx';
 
 import InvalidSessionNoticeDialog from './InvalidSessionNoticeDialog.tsx';
+import RightSidebar from './RightSidebar.tsx';
 
 const handleError = (error: any, reset: () => void) => {
 	const parseFileName = (file: string) => {
@@ -90,6 +91,7 @@ const AuthenticatedLayout = () => {
 	}
 
 	const isDesktop = useMediaQuery('(width >= 640px)');
+	const isWideDesktop = useMediaQuery('(width >= 1280px)');
 
 	const [profile] = createQuery({
 		key: () => getProfileKey(uid(), uid()),
@@ -238,13 +240,17 @@ const AuthenticatedLayout = () => {
 				</div>
 			</Show>
 
-			<div class="flex min-w-0 max-w-2xl shrink grow flex-col border-divider sm:border-x xl:max-w-none xl:basis-2/4">
+			<div class="flex min-w-0 max-w-2xl shrink grow flex-col border-divider sm:border-x xl:basis-2/4">
 				<ErrorBoundary fallback={handleError}>
 					<Outlet />
 				</ErrorBoundary>
 			</div>
 
-			<div class="hidden basis-1/4 xl:block"></div>
+			<div class="hidden basis-1/4 xl:block">
+				<Show when={isWideDesktop()}>
+					<RightSidebar uid={uid()} />
+				</Show>
+			</div>
 
 			<Show when={!isDesktop()}>
 				<div class="sticky bottom-0 z-30 flex h-13 border-t border-divider bg-background text-primary">

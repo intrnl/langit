@@ -42,6 +42,12 @@ export interface ListTimelineParams {
 	uri: string;
 }
 
+export interface TagTimelineParams {
+	type: 'tag';
+	tag: string;
+	sort: 'new' | 'hn4' | 'hn10' | 'like24h' | 'like3d' | 'like7d' | 'random';
+}
+
 export interface ProfileTimelineParams {
 	type: 'profile';
 	actor: DID;
@@ -58,7 +64,8 @@ export type TimelineParams =
 	| HomeTimelineParams
 	| ListTimelineParams
 	| ProfileTimelineParams
-	| SearchTimelineParams;
+	| SearchTimelineParams
+	| TagTimelineParams;
 
 export interface FeedPageCursor {
 	key: string | null;
@@ -150,7 +157,7 @@ export const getTimeline: QueryFn<
 			createLabelPostFilter(uid),
 			createTempMutePostFilter(uid),
 		]);
-	} else if (type === 'feed' || type === 'list') {
+	} else if (type === 'feed' || type === 'list' || type === 'tag') {
 		postFilter = combine([
 			createDuplicatePostFilter(items),
 			createLanguagePostFilter(uid),
@@ -276,6 +283,44 @@ const fetchPage = async (
 		});
 
 		return response.data;
+	} else if (type === 'tag') {
+		const tag = params.tag;
+		const sort = params.sort;
+
+		const search = new URLSearchParams();
+		search.set('feed', `at://skyfeed:tags/app.bsky.feed.generator/${tag}-${sort}`);
+		search.set('limit', '' + limit);
+
+		if (cursor) {
+			search.set('cursor', cursor);
+		}
+
+		const url = `https://skyfeed.me/xrpc/app.bsky.feed.getFeedSkeleton?` + search.toString();
+		const skeleton = await fetch(url);
+
+		if (!skeleton.ok) {
+			throw new Error(`Response error ${skeleton.status}`);
+		}
+
+		const skeletonData = (await skeleton.json()) as ResponseOf<'app.bsky.feed.getFeedSkeleton'>;
+		const requests = await Promise.allSettled(
+			skeletonData.feed.map((item) => fetchPost([agent.session!.did, item.post])),
+		);
+
+		const posts: RefOf<'app.bsky.feed.defs#feedViewPost'>[] = [];
+
+		for (let idx = 0, len = requests.length; idx < len; idx++) {
+			const req = requests[idx];
+
+			if (req.status === 'fulfilled') {
+				posts.push({ post: req.value });
+			}
+		}
+
+		return {
+			cursor: skeletonData.cursor,
+			feed: posts,
+		};
 	} else if (type === 'profile') {
 		if (params.tab === 'likes') {
 			const uid = agent.session!.did;

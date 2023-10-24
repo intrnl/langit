@@ -31,7 +31,11 @@ const TrendingSection = (props: TrendingSectionProps) => {
 						<>
 							<For each={trending().slice(0, 5)}>
 								{(topic) => (
-									<a class="px-4 py-3 text-sm hover:bg-hinted">
+									<a
+										link
+										href={generatePath('/u/:uid/tags/:tag', { uid: props.uid, tag: topic.name })}
+										class="px-4 py-3 text-sm hover:bg-hinted"
+									>
 										<p class="font-bold">#{topic.name}</p>
 										<p class="text-muted-fg">{topic.count} posts</p>
 									</a>

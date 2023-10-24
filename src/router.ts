@@ -49,6 +49,7 @@ export type PathsWithParams =
 	| "/u/:uid/explore/tags"
 	| "/u/:uid/you/invites"
 	| "/u/:uid/you"
+	| "/u/:uid/tags/:tag"
 	| "/u/:uid/compose"
 	| "/r/*";
 export type PathsWithoutParams = 
@@ -99,6 +100,7 @@ export interface Params {
 	"/u/:uid/explore/tags": { "uid": string };
 	"/u/:uid/you/invites": { "uid": string };
 	"/u/:uid/you": { "uid": string };
+	"/u/:uid/tags/:tag": { "uid": string, "tag": string };
 	"/u/:uid/compose": { "uid": string };
 	"/r/*": { "*": string };
 }

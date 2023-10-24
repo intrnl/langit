@@ -191,6 +191,10 @@ const routes: RouteDefinition[] = [
         component: lazy(() => import("./routes/u.$uid.you._index/route.tsx")),
       },
       {
+        path: "tags/:tag",
+        component: lazy(() => import("./routes/u.$uid.tags.$tag/route.tsx")),
+      },
+      {
         path: "compose",
         component: lazy(() => import("./routes/u.$uid.compose/route.tsx")),
       },

@@ -105,9 +105,7 @@ const AuthenticatedExplorePage = () => {
 			</div>
 
 			<div class="block xl:hidden">
-				<Show when={!isWideDesktop()}>
-					<TrendingSection uid={uid()} />
-				</Show>
+				<TrendingSection uid={uid()} />
 			</div>
 
 			<For

@@ -2,7 +2,7 @@ import { For, Match, Show, Switch, createMemo } from 'solid-js';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { useLocation } from '@solidjs/router';
+import { useLocation, useNavigate } from '@solidjs/router';
 
 import { getTrendingTopics, getTrendingTopicsKey } from '~/api/queries/get-trending-topics.ts';
 
@@ -28,12 +28,27 @@ const RightSidebar = (props: RightSidebarProps) => {
 	return (
 		<div class="sticky top-0 flex h-screen flex-col gap-4 overflow-y-auto p-4">
 			<Show when={!isExplorePage()}>
-				<div>
-					<SearchInput onEnter={() => {}} />
-				</div>
+				{(_value) => {
+					const navigate = useNavigate();
+
+					return (
+						<div>
+							<SearchInput
+								onEnter={(next) => {
+									if (next.trim()) {
+										const path =
+											generatePath('/u/:uid/explore/search', props) + `?t=user&q=${encodeURIComponent(next)}`;
+
+										navigate(path);
+									}
+								}}
+							/>
+						</div>
+					);
+				}}
 			</Show>
 
-			<TrendingSection uid={props.uid} />
+			<TrendingSection {...props} />
 		</div>
 	);
 };

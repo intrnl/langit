@@ -75,7 +75,7 @@ const TrendingSection = (props: { uid: DID }) => {
 									<a
 										link
 										href={generatePath('/u/:uid/tags/:tag', { uid: props.uid, tag: topic.name })}
-										class="rounded px-4 py-2 hover:bg-hinted"
+										class="mx-1 rounded px-3 py-2 hover:bg-hinted"
 									>
 										<p class="font-bold">#{topic.name}</p>
 										<p class="text-muted-fg">{topic.count} posts</p>
@@ -86,7 +86,7 @@ const TrendingSection = (props: { uid: DID }) => {
 							<a
 								link
 								href={generatePath('/u/:uid/explore/tags', props)}
-								class="rounded px-4 py-2 text-accent hover:bg-hinted"
+								class="mx-1 rounded px-3 py-2 text-accent hover:bg-hinted"
 							>
 								Show more
 							</a>

@@ -4,7 +4,7 @@ import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import {
-	type TagTimelineParams,
+	type SearchTimelineParams,
 	getTimeline,
 	getTimelineKey,
 	getTimelineLatest,
@@ -22,8 +22,8 @@ const AuthenticatedTagFeedPage = () => {
 	const uid = () => params.uid as DID;
 	const tag = () => params.tag;
 
-	const feedParams = (): TagTimelineParams => {
-		return { type: 'tag', tag: tag().toLowerCase(), sort: 'new' };
+	const feedParams = (): SearchTimelineParams => {
+		return { type: 'search', query: `#${tag().toLowerCase()}` };
 	};
 
 	const [timeline, { refetch }] = createQuery({

@@ -48,8 +48,8 @@ const TrendingSection = (props: { uid: DID }) => {
 	});
 
 	return (
-		<div class="flex flex-col px-4 text-sm">
-			<h3 class="mb-2 font-bold text-muted-fg">Trending now</h3>
+		<div class="flex flex-col text-sm">
+			<h3 class="px-4 pb-2 font-bold text-muted-fg">Trending now</h3>
 
 			<Switch>
 				<Match when={trending()}>
@@ -57,7 +57,7 @@ const TrendingSection = (props: { uid: DID }) => {
 						<>
 							<For each={trending().slice(0, 5)}>
 								{(topic) => (
-									<a href="#" class="-mx-4 rounded px-4 py-2 hover:bg-hinted">
+									<a href="#" class=" rounded px-4 py-2 hover:bg-hinted">
 										<p class="font-bold">#{topic.name}</p>
 										<p class="text-muted-fg">{topic.count} posts</p>
 									</a>
@@ -67,7 +67,7 @@ const TrendingSection = (props: { uid: DID }) => {
 							<a
 								link
 								href={generatePath('/u/:uid/explore/tags', props)}
-								class="-mx-4 rounded px-4 py-2 text-accent hover:bg-hinted"
+								class="rounded px-4 py-2 text-accent hover:bg-hinted"
 							>
 								Show more
 							</a>

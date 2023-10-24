@@ -53,7 +53,7 @@ export interface SearchTimelineParams {
 	query: string;
 }
 
-export type FeedParams =
+export type TimelineParams =
 	| FeedTimelineParams
 	| HomeTimelineParams
 	| ListTimelineParams
@@ -113,7 +113,7 @@ const countPosts = (slices: TimelineSlice[], limit?: number) => {
 	return count;
 };
 
-export const getTimelineKey = (uid: DID, params: FeedParams, limit = MAX_POSTS) => {
+export const getTimelineKey = (uid: DID, params: TimelineParams, limit = MAX_POSTS) => {
 	return ['getFeed', uid, params, limit] as const;
 };
 export const getTimeline: QueryFn<
@@ -205,7 +205,7 @@ export const getTimeline: QueryFn<
 };
 
 /// Latest feed query
-export const getTimelineLatestKey = (uid: DID, params: FeedParams) => {
+export const getTimelineLatestKey = (uid: DID, params: TimelineParams) => {
 	return ['getFeedLatest', uid, params] as const;
 };
 export const getTimelineLatest: QueryFn<FeedLatestResult, ReturnType<typeof getTimelineLatestKey>> = async (
@@ -240,7 +240,7 @@ interface PostSearchView {
 
 const fetchPage = async (
 	agent: Agent,
-	params: FeedParams,
+	params: TimelineParams,
 	limit: number,
 	cursor: string | undefined,
 ): Promise<TimelineResponse> => {

@@ -30,7 +30,7 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 import RefreshIcon from '~/icons/baseline-refresh.tsx';
 import SettingsIcon from '~/icons/baseline-settings.tsx';
 
-import TrendingSection from './TrendingSection.tsx';
+// import TrendingSection from './TrendingSection.tsx';
 
 const MAX_POSTS = 6;
 
@@ -40,7 +40,7 @@ const AuthenticatedExplorePage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const isWideDesktop = useMediaQuery('(width >= 1280px)');
+	// const isWideDesktop = useMediaQuery('(width >= 1280px)');
 
 	const savedFeeds = createMemo(() => {
 		const prefs = getFeedPref(uid());
@@ -104,9 +104,9 @@ const AuthenticatedExplorePage = () => {
 				</a>
 			</div>
 
-			<div class="block xl:hidden">
+			{/* <div class="block xl:hidden">
 				<TrendingSection uid={uid()} />
-			</div>
+			</div> */}
 
 			<For
 				each={savedFeeds()}

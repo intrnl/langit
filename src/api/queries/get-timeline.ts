@@ -370,7 +370,7 @@ const fetchPage = async (
 			`https://search.bsky.social/search/posts` +
 			`?count=${limit}` +
 			`&offset=${offset}` +
-			`&q=${encodeURI(params.query)}`;
+			`&q=${encodeURIComponent(params.query)}`;
 
 		const searchResponse = await fetch(searchUri);
 

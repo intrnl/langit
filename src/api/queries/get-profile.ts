@@ -21,10 +21,11 @@ export const getProfile: QueryFn<SignalizedProfile, ReturnType<typeof getProfile
 	const profile = mergeSignalizedProfile(uid, data);
 
 	if (profile.did === uid) {
-		const $account = getAccountData(uid)!;
+		const account = getAccountData(uid)!;
+		const profile = account.profile;
 
-		if (!$account.profile || $account.profile.indexedAt !== data.indexedAt) {
-			$account.profile = {
+		if (!profile || profile.indexedAt !== data.indexedAt || profile.handle !== data.handle) {
+			account.profile = {
 				displayName: data.displayName,
 				handle: data.handle,
 				avatar: data.avatar,

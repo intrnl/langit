@@ -1,4 +1,7 @@
 import type { SignalizedPost } from '~/api/cache/posts.ts';
+
+import { isLinkValid } from '~/api/richtext/renderer.ts';
+import { segmentRichText } from '~/api/richtext/segmentize.ts';
 import { getRecordId } from '~/api/utils.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
@@ -28,6 +31,36 @@ const PostShareMenu = (props: PostShareMenuProps) => {
 		return `${protocol}//${host}/r/profile/${author}/post/${status}`;
 	};
 
+	const getPostText = () => {
+		const record = post().record.peek();
+
+		const text = record.text;
+		const facets = record.facets;
+
+		if (facets) {
+			const segments = segmentRichText({ text, facets });
+
+			let result = '';
+
+			for (let idx = 0, len = segments.length; idx < len; idx++) {
+				const segment = segments[idx];
+
+				const text = segment.text;
+				const link = segment.link;
+
+				if (link && isLinkValid(link.uri, text)) {
+					result += link.uri;
+				} else {
+					result += text;
+				}
+			}
+
+			return result;
+		} else {
+			return text;
+		}
+	};
+
 	return (
 		<div class={/* @once */ menu.content()}>
 			<button
@@ -43,7 +76,7 @@ const PostShareMenu = (props: PostShareMenuProps) => {
 
 			<button
 				onClick={() => {
-					navigator.clipboard.writeText(post().record.value.text);
+					navigator.clipboard.writeText(getPostText());
 					closeModal();
 				}}
 				class={/* @once */ menu.item()}

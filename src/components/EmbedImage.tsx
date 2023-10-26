@@ -37,13 +37,24 @@ const EmbedImage = (props: EmbedImageProps) => {
 
 	const render_ = (index: number, mode: RenderMode) => {
 		const image = images()[index];
-		const alt = image.alt;
 
-		// FIXME: on STANDALONE_RATIO mode, images that don't currently have its
-		// metadata loaded yet will have this image container be resized to the
-		// smallest it can be for that layout, I have not figured out a solution
-		// why, other than the fact that putting down an empty <canvas> fixes it.
-		let canvas: HTMLCanvasElement | undefined;
+		const alt = image.alt;
+		const aspectRatio = image.aspectRatio;
+
+		// FIXME: with STANDALONE_RATIO, we are resizing the image to make it fit
+		// the container with our given constraints, but this doesn't work when the
+		// image hasn't had its metadata loaded yet, the browser will snap to the
+		// smallest possible size for our layout.
+
+		// clients will typically just shove the actual resolution info to the
+		// `aspectRatio` field, but we can't rely on that as it could send
+		// simplified ratios instead.
+
+		// so what we'll do here is to just have an empty <div> sized to the device
+		// screen width and height, and then remove it after the image has loaded.
+		// there's theoretically no issue with keeping the <div> around though.
+
+		let placeholder: HTMLDivElement | undefined;
 
 		let cn: string | undefined;
 		let ratio: string | undefined;
@@ -54,7 +65,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 			cn = `relative aspect-video`;
 		} else if (mode === RenderMode.STANDALONE_RATIO) {
 			cn = `min-h-16 min-w-16 relative max-h-80 max-w-full`;
-			ratio = `${image.aspectRatio!.width}/${image.aspectRatio!.height}`;
+			ratio = `${aspectRatio!.width}/${aspectRatio!.height}`;
 		}
 
 		return (
@@ -67,10 +78,10 @@ const EmbedImage = (props: EmbedImageProps) => {
 							openModal(() => <LazyImageViewerDialog images={images()} active={index} />);
 						}
 					}}
-					onLoadStart={() => {
-						if (canvas) {
-							canvas.remove();
-							canvas = undefined;
+					onLoad={() => {
+						if (placeholder) {
+							placeholder.remove();
+							placeholder = undefined;
 						}
 					}}
 					class="h-full w-full object-cover"
@@ -82,7 +93,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 					}}
 				/>
 
-				{mode === RenderMode.STANDALONE_RATIO && <canvas ref={canvas}></canvas>}
+				{mode === RenderMode.STANDALONE_RATIO && <div ref={placeholder} class="h-screen w-screen"></div>}
 
 				{interactive && alt && (
 					<button

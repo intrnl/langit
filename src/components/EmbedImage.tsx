@@ -39,6 +39,12 @@ const EmbedImage = (props: EmbedImageProps) => {
 		const image = images()[index];
 		const alt = image.alt;
 
+		// FIXME: on STANDALONE_RATIO mode, images that don't currently have its
+		// metadata loaded yet will have this image container be resized to the
+		// smallest it can be for that layout, I have not figured out a solution
+		// why, other than the fact that putting down an empty <canvas> fixes it.
+		let canvas: HTMLCanvasElement | undefined;
+
 		let cn: string | undefined;
 		let ratio: string | undefined;
 
@@ -61,6 +67,12 @@ const EmbedImage = (props: EmbedImageProps) => {
 							openModal(() => <LazyImageViewerDialog images={images()} active={index} />);
 						}
 					}}
+					onLoadStart={() => {
+						if (canvas) {
+							canvas.remove();
+							canvas = undefined;
+						}
+					}}
 					class="h-full w-full object-cover"
 					classList={{
 						'cursor-pointer': interactive,
@@ -69,6 +81,8 @@ const EmbedImage = (props: EmbedImageProps) => {
 						'blur-lg': blur() && borderless,
 					}}
 				/>
+
+				{mode === RenderMode.STANDALONE_RATIO && <canvas ref={canvas}></canvas>}
 
 				{interactive && alt && (
 					<button

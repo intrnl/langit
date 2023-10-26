@@ -30,6 +30,11 @@ const EmbedImage = (props: EmbedImageProps) => {
 	const borderless = props.borderless;
 	const blur = () => props.blur;
 
+	const hasStandaloneImage = (): boolean => {
+		const $images = images();
+		return interactive ? $images.length === 1 && !!$images[0].aspectRatio : false;
+	};
+
 	const render_ = (index: number, mode: RenderMode) => {
 		const image = images()[index];
 		const alt = image.alt;
@@ -82,8 +87,10 @@ const EmbedImage = (props: EmbedImageProps) => {
 
 	return (
 		<div
-			classList={{ 'overflow-hidden rounded-md border border-divider': !borderless }}
-			class="max-w-full self-baseline"
+			classList={{
+				'overflow-hidden rounded-md border border-divider': !borderless,
+				'max-w-full self-baseline': hasStandaloneImage(),
+			}}
 		>
 			<Switch>
 				<Match when={images().length >= 4}>
@@ -118,14 +125,7 @@ const EmbedImage = (props: EmbedImageProps) => {
 					</div>
 				</Match>
 
-				<Match
-					when={(() => {
-						const $images = images();
-						return interactive && $images.length === 1 && $images[0].aspectRatio;
-					})()}
-				>
-					{render_(0, RenderMode.STANDALONE_RATIO)}
-				</Match>
+				<Match when={hasStandaloneImage()}>{render_(0, RenderMode.STANDALONE_RATIO)}</Match>
 
 				<Match when={images().length === 1}>{render_(0, RenderMode.STANDALONE)}</Match>
 			</Switch>

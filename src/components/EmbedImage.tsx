@@ -17,6 +17,12 @@ export interface EmbedImageProps {
 
 const LazyImageViewerDialog = lazy(() => import('~/components/dialogs/ImageViewerDialog.tsx'));
 
+const enum RenderMode {
+	MULTIPLE,
+	STANDALONE,
+	STANDALONE_RATIO,
+}
+
 const EmbedImage = (props: EmbedImageProps) => {
 	const images = () => props.images;
 
@@ -24,12 +30,24 @@ const EmbedImage = (props: EmbedImageProps) => {
 	const borderless = props.borderless;
 	const blur = () => props.blur;
 
-	const render = (index: number, standalone: boolean) => {
+	const render_ = (index: number, mode: RenderMode) => {
 		const image = images()[index];
 		const alt = image.alt;
 
+		let cn: string | undefined;
+		let ratio: string | undefined;
+
+		if (mode === RenderMode.MULTIPLE) {
+			cn = `relative min-h-0 grow basis-0`;
+		} else if (mode === RenderMode.STANDALONE) {
+			cn = `relative aspect-video`;
+		} else if (mode === RenderMode.STANDALONE_RATIO) {
+			cn = `min-h-16 min-w-16 relative max-h-80 max-w-full`;
+			ratio = `${image.aspectRatio!.width}/${image.aspectRatio!.height}`;
+		}
+
 		return (
-			<div class={'relative overflow-hidden ' + (standalone ? 'aspect-video' : 'min-h-0 grow basis-0')}>
+			<div class={cn} style={{ 'aspect-ratio': ratio }}>
 				<img
 					src={/* @once */ image.thumb}
 					alt={alt}
@@ -63,18 +81,21 @@ const EmbedImage = (props: EmbedImageProps) => {
 	};
 
 	return (
-		<div classList={{ 'overflow-hidden rounded-md border border-divider': !borderless }}>
+		<div
+			classList={{ 'overflow-hidden rounded-md border border-divider': !borderless }}
+			class="max-w-full self-baseline"
+		>
 			<Switch>
 				<Match when={images().length >= 4}>
 					<div class="flex aspect-video gap-0.5">
 						<div class="flex grow basis-0 flex-col gap-0.5">
-							{render(0, false)}
-							{render(1, false)}
+							{render_(0, RenderMode.MULTIPLE)}
+							{render_(1, RenderMode.MULTIPLE)}
 						</div>
 
 						<div class="flex grow basis-0 flex-col gap-0.5">
-							{render(2, false)}
-							{render(3, false)}
+							{render_(2, RenderMode.MULTIPLE)}
+							{render_(3, RenderMode.MULTIPLE)}
 						</div>
 					</div>
 				</Match>
@@ -82,22 +103,31 @@ const EmbedImage = (props: EmbedImageProps) => {
 				<Match when={images().length >= 3}>
 					<div class="flex aspect-video gap-0.5">
 						<div class="flex grow basis-0 flex-col gap-0.5">
-							{render(0, false)}
-							{render(1, false)}
+							{render_(0, RenderMode.MULTIPLE)}
+							{render_(1, RenderMode.MULTIPLE)}
 						</div>
 
-						<div class="flex grow basis-0 flex-col gap-0.5">{render(2, false)}</div>
+						<div class="flex grow basis-0 flex-col gap-0.5">{render_(2, RenderMode.MULTIPLE)}</div>
 					</div>
 				</Match>
 
 				<Match when={images().length >= 2}>
 					<div class="flex aspect-video gap-0.5">
-						<div class="flex grow basis-0 flex-col gap-0.5">{render(0, false)}</div>
-						<div class="flex grow basis-0 flex-col gap-0.5">{render(1, false)}</div>
+						<div class="flex grow basis-0 flex-col gap-0.5">{render_(0, RenderMode.MULTIPLE)}</div>
+						<div class="flex grow basis-0 flex-col gap-0.5">{render_(1, RenderMode.MULTIPLE)}</div>
 					</div>
 				</Match>
 
-				<Match when={images().length === 1}>{render(0, true)}</Match>
+				<Match
+					when={(() => {
+						const $images = images();
+						return interactive && $images.length === 1 && $images[0].aspectRatio;
+					})()}
+				>
+					{render_(0, RenderMode.STANDALONE_RATIO)}
+				</Match>
+
+				<Match when={images().length === 1}>{render_(0, RenderMode.STANDALONE)}</Match>
 			</Switch>
 		</div>
 	);

@@ -151,7 +151,7 @@ export const getTimeline: QueryFn<
 			createTempMutePostFilter(uid),
 		]);
 	} else if (type === 'feed' || type === 'list') {
-		sliceFilter = createFeedSliceFilter(uid);
+		sliceFilter = createFeedSliceFilter();
 		postFilter = combine([
 			createDuplicatePostFilter(items),
 			createLanguagePostFilter(uid),
@@ -539,13 +539,13 @@ const createHomeSliceFilter = (uid: DID): SliceFilter | undefined => {
 	};
 };
 
-const createFeedSliceFilter = (uid: DID): SliceFilter | undefined => {
+const createFeedSliceFilter = (): SliceFilter | undefined => {
 	return (slice) => {
 		const items = slice.items;
 		const first = items[0];
 
 		// skip any posts that are in reply to non-followed
-		if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+		if (first.reply) {
 			const root = first.reply.root;
 			const parent = first.reply.parent;
 
@@ -555,11 +555,9 @@ const createFeedSliceFilter = (uid: DID): SliceFilter | undefined => {
 			const rViewer = rAuthor.viewer;
 			const pViewer = pAuthor.viewer;
 
-			if ((rAuthor.did !== uid && rViewer.muted.peek()) || (pAuthor.did !== uid && pViewer.muted.peek())) {
+			if (rViewer.muted.peek() || pViewer.muted.peek()) {
 				return yankReposts(items);
 			}
-		} else if (first.post.record.peek().reply) {
-			return yankReposts(items);
 		}
 
 		return true;

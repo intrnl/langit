@@ -1,9 +1,11 @@
-import { For, Match, Show, Switch } from 'solid-js';
+import { type Accessor, For, Match, Show, Switch } from 'solid-js';
+import type { JSX } from 'solid-js/jsx-runtime';
 
 import type { DID } from '@intrnl/bluesky-client/atp-schema';
 import type { EnhancedResource } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
 
+import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import type { ProfilesListPage } from '~/api/models/profiles-list.ts';
 import { type Collection, getCollectionCursor } from '~/api/utils.ts';
 
@@ -17,14 +19,14 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 export interface ProfileListProps {
 	uid: DID;
 	list: EnhancedResource<Collection<ProfilesListPage>, string>;
-	hideFollow?: boolean;
+	renderAccessory?: (item: SignalizedProfile, uid: Accessor<DID>) => JSX.Element;
 	onLoadMore: (cursor: string) => void;
 }
 
 const ProfileList = (props: ProfileListProps) => {
 	// we're destructuring these props because we don't expect these to ever
 	// change, they shouldn't.
-	const { list, onLoadMore } = props;
+	const { list, renderAccessory, onLoadMore } = props;
 
 	const navigate = useNavigate();
 
@@ -35,8 +37,6 @@ const ProfileList = (props: ProfileListProps) => {
 			<For each={list()?.pages}>
 				{(page) => {
 					return page.profiles.map((profile) => {
-						const showFollowButton = () => !props.hideFollow && profile.did !== uid();
-
 						const handleClick = (ev: MouseEvent | KeyboardEvent) => {
 							if (!isElementClicked(ev, INTERACTION_TAGS)) {
 								return;
@@ -55,7 +55,7 @@ const ProfileList = (props: ProfileListProps) => {
 						};
 
 						return (
-							<VirtualContainer id={`profile/${profile.did}/${+showFollowButton()}`} estimateHeight={112}>
+							<VirtualContainer id={`profile/${profile.did}/${!renderAccessory}`} estimateHeight={112}>
 								<div
 									onClick={handleClick}
 									onAuxClick={handleClick}
@@ -79,11 +79,7 @@ const ProfileList = (props: ProfileListProps) => {
 												<span class="line-clamp-1 break-all text-muted-fg">@{profile.handle.value}</span>
 											</div>
 
-											<div>
-												<Show when={showFollowButton()}>
-													<FollowButton uid={uid()} profile={profile} />
-												</Show>
-											</div>
+											<div>{/* @once */ renderAccessory?.(profile, uid)}</div>
 										</div>
 
 										<Show when={profile.description.value}>
@@ -127,3 +123,11 @@ const ProfileList = (props: ProfileListProps) => {
 };
 
 export default ProfileList;
+
+export const renderFollowAccessory = (profile: SignalizedProfile, uid: Accessor<DID>) => {
+	return (
+		<Show when={profile.did !== uid()}>
+			<FollowButton uid={uid()} profile={profile} />
+		</Show>
+	);
+};

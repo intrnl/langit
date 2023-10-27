@@ -5,7 +5,7 @@ import { getPostRepostedBy, getPostRepostedByKey } from '~/api/queries/get-post-
 
 import { useParams } from '~/router.ts';
 
-import ProfileList from '~/components/ProfileList';
+import ProfileList, { renderFollowAccessory } from '~/components/ProfileList';
 
 const PAGE_SIZE = 30;
 
@@ -14,7 +14,7 @@ const AuthenticatedPostRespostsPage = () => {
 
 	const uid = () => params.uid as DID;
 
-	const [likes, { refetch }] = createQuery({
+	const [reposts, { refetch }] = createQuery({
 		key: () => getPostRepostedByKey(uid(), params.actor, params.status, PAGE_SIZE),
 		fetch: getPostRepostedBy,
 		refetchOnMount: false,
@@ -28,7 +28,12 @@ const AuthenticatedPostRespostsPage = () => {
 				<p class="text-base font-bold leading-5">Reposts</p>
 			</div>
 
-			<ProfileList uid={uid()} list={likes} onLoadMore={(cursor) => refetch(true, cursor)} />
+			<ProfileList
+				uid={uid()}
+				list={reposts}
+				renderAccessory={renderFollowAccessory}
+				onLoadMore={(cursor) => refetch(true, cursor)}
+			/>
 		</div>
 	);
 };

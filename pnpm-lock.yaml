@@ -17,12 +17,12 @@ patchedDependencies:
     path: patches/solid-textarea-autosize@0.0.5.patch
 
 dependencies:
+  '@externdefs/bluesky-client':
+    specifier: ^0.3.1
+    version: 0.3.1
   '@floating-ui/dom':
     specifier: ^1.5.3
     version: 1.5.3
-  '@intrnl/bluesky-client':
-    specifier: ^0.2.6
-    version: 0.2.6
   '@intrnl/sq':
     specifier: ^0.3.0
     version: 0.3.0(solid-js@1.8.4)
@@ -1535,6 +1535,10 @@ packages:
     dev: true
     optional: true
 
+  /@externdefs/bluesky-client@0.3.1:
+    resolution: {integrity: sha512-ZiKUzPBOcrFAtsIl7jUk1MhraiioUd/NW/joix1S7cvp9YpC+9DixLCn1u4zbx1jiyPq9JGQ/qMLAb17PVs+Tw==}
+    dev: false
+
   /@floating-ui/core@1.5.0:
     resolution: {integrity: sha512-kK1h4m36DQ0UHGj5Ah4db7R0rHemTqqO0QLvUqi1/mUUp3LuAWbWxdxSIf/XsnH9VS6rRVPLJCncjRzUvyCLXg==}
     dependencies:
@@ -1550,11 +1554,6 @@ packages:
 
   /@floating-ui/utils@0.1.6:
     resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
-    dev: false
-
-  /@intrnl/bluesky-client@0.2.6:
-    resolution: {integrity: sha512-aohibrc+Ka2hElLmiB3WO0/3QF4QAE6Uw0pOtW3jegyo1FF7pzlZ7tOdlT3OYRPI7n8CP+fkt0oZ5L4fGe5e4Q==}
-    deprecated: I no longer maintain bluesky-client anymore, I've transferred ownership to an acquaintance who can maintain it in the long run, so long. consider switching to @externdefs/bluesky-client
     dev: false
 
   /@intrnl/sq@0.3.0(solid-js@1.8.4):

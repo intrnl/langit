@@ -1,5 +1,5 @@
 import { For, createMemo } from 'solid-js';
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 
 import { openModal } from '~/globals/modals.tsx';
 import { getModerationPref } from '~/globals/settings.ts';

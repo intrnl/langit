@@ -1,4 +1,4 @@
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { createRenderedRichText, handleInvalidLinkClick } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';

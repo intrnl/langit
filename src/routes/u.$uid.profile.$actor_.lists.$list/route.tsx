@@ -1,6 +1,6 @@
 import { Match, Show, Switch, createMemo } from 'solid-js';
 
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Outlet } from '@solidjs/router';
 

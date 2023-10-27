@@ -1,4 +1,4 @@
-import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records } from '@externdefs/bluesky-client/atp-schema';
 import { createMutation } from '@intrnl/sq';
 
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';

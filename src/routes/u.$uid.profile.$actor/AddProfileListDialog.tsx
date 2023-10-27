@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import { getCollectionCursor, getRecordId } from '~/api/utils.ts';

@@ -1,4 +1,4 @@
-import type { DID, ResponseOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, ResponseOf } from '@externdefs/bluesky-client/atp-schema';
 import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';

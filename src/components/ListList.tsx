@@ -1,7 +1,7 @@
 import { For, Match, Switch } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 
 import type { ProfileListsResource } from '~/api/queries/get-profile-lists.ts';
 import type { SubscribedListsResource } from '~/api/queries/get-subscribed-lists.ts';

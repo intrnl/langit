@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createMemo, createSignal } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { type EnhancedResource, createQuery } from '@intrnl/sq';
 import { useNavigate } from '@solidjs/router';
 import {

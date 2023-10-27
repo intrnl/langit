@@ -1,7 +1,7 @@
 import { type Accessor, Show, createMemo, createSignal, createRoot } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
-import type { DID, Records, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 import { A } from '@solidjs/router';
 
 import {

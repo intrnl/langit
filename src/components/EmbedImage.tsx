@@ -1,6 +1,6 @@
 import { Match, Switch, lazy } from 'solid-js';
 
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { openModal } from '~/globals/modals.tsx';
 

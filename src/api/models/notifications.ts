@@ -1,4 +1,4 @@
-import type { Records, RefOf, ResponseOf } from '@intrnl/bluesky-client/atp-schema';
+import type { Records, RefOf, ResponseOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { getCollectionId } from '../utils.ts';
 

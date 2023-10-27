@@ -1,6 +1,6 @@
 import { Match, Show, Switch } from 'solid-js';
 
-import type { DID, Records, ResponseOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records, ResponseOf } from '@externdefs/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
 
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';

@@ -1,7 +1,7 @@
 import type { Component } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { useSearchParams } from '@solidjs/router';
 
 import { useParams } from '~/router.ts';

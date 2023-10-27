@@ -1,6 +1,6 @@
 import { batch } from 'solid-js';
 
-import type { AtUri, DID } from '@intrnl/bluesky-client/atp-schema';
+import type { AtUri, DID } from '@externdefs/bluesky-client/atp-schema';
 
 import { PreferenceWarn } from '~/api/moderation/enums.ts';
 import type { ModerationOpts } from '~/api/moderation/types.ts';

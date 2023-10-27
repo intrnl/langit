@@ -12,7 +12,7 @@ import {
 } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 import { makeEventListener } from '@solid-primitives/event-listener';
 
 import { autoPlacement, autoUpdate, offset } from '@floating-ui/dom';

@@ -1,6 +1,6 @@
 import { Show } from 'solid-js';
 
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { type SignalizedList } from '~/api/cache/lists.ts';
 

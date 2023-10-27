@@ -1,4 +1,4 @@
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { UnicodeString, utf16IndexToUtf8Index } from './unicode.ts';
 

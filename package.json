@@ -9,8 +9,8 @@
 		"lint:types": "tsc"
 	},
 	"dependencies": {
+		"@externdefs/bluesky-client": "^0.3.1",
 		"@floating-ui/dom": "^1.5.3",
-		"@intrnl/bluesky-client": "^0.2.6",
 		"@intrnl/sq": "^0.3.0",
 		"@intrnl/use-gesture-solid": "^0.1.0",
 		"@solid-primitives/event-listener": "^2.3.0",

@@ -1,6 +1,6 @@
 import { Match, Show, Switch, createSignal } from 'solid-js';
 
-import { Agent } from '@intrnl/bluesky-client/agent';
+import { Agent } from '@externdefs/bluesky-client/agent';
 import { createMutation, createQuery, useQueryMutation } from '@intrnl/sq';
 import { useNavigate, useSearchParams } from '@solidjs/router';
 

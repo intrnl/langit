@@ -1,7 +1,7 @@
 import { ErrorBoundary, Show, createEffect } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
+import { XRPCError } from '@externdefs/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { A, Navigate, Outlet, useLocation } from '@solidjs/router';
 

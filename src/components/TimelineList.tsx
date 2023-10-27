@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 
 import type { FeedLatestResource, FeedPageCursor, FeedResource } from '~/api/queries/get-timeline.ts';
 

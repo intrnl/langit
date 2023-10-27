@@ -1,8 +1,8 @@
 import { type Accessor, For, Match, Show, Switch, createSignal, createMemo } from 'solid-js';
 import { unwrap } from 'solid-js/store';
 
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
-import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
+import { XRPCError } from '@externdefs/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
 import { useLocation, useSearchParams } from '@solidjs/router';
 

@@ -1,6 +1,6 @@
 import { Match, Show, Switch, createRenderEffect, createSignal } from 'solid-js';
 
-import type { DID, RefOf, ResponseOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf, ResponseOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { multiagent } from '~/globals/agent.ts';
 import { closeModal, useModalState } from '~/globals/modals.tsx';

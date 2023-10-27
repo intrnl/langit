@@ -1,6 +1,6 @@
 import { Show, lazy } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 
 import { getRecordId } from '~/api/utils.ts';
 

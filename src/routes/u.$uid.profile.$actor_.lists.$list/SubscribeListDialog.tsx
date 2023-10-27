@@ -1,7 +1,7 @@
 import { Match, Switch, createMemo, createSignal } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 
 import type { SignalizedList } from '~/api/cache/lists.ts';
 import { subscribeBlockList } from '~/api/mutations/subscribe-block-list.ts';

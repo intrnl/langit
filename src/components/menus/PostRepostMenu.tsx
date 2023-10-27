@@ -1,4 +1,4 @@
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { useNavigate } from '@solidjs/router';
 
 import type { SignalizedPost } from '~/api/cache/posts.ts';

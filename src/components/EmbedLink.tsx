@@ -1,7 +1,7 @@
 import { Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
-import type { RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import BlobImage from '~/components/BlobImage.tsx';
 

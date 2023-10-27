@@ -1,5 +1,5 @@
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
+import { XRPCError } from '@externdefs/bluesky-client/xrpc-utils';
 
 import { multiagent } from '~/globals/agent.ts';
 

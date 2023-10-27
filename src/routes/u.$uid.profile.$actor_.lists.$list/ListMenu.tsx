@@ -1,6 +1,6 @@
 import { Match, Switch } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 
 import type { SignalizedList } from '~/api/cache/lists.ts';
 

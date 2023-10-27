@@ -1,6 +1,6 @@
 import { createRoot, type Accessor } from 'solid-js';
 
-import type { DID, Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records, RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import {
 	type ModerationCause,

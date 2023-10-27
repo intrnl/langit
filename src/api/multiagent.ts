@@ -5,9 +5,9 @@ import {
 	type AtpAccessJwt,
 	type AtpLoginOptions,
 	type AtpSessionData,
-} from '@intrnl/bluesky-client/agent';
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
-import { decodeJwt } from '@intrnl/bluesky-client/jwt';
+} from '@externdefs/bluesky-client/agent';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
+import { decodeJwt } from '@externdefs/bluesky-client/jwt';
 
 import { createReactiveLocalStorage } from './storage.ts';
 

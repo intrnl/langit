@@ -1,6 +1,6 @@
 import { For, Match, Switch, createSignal } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import { getAppPasswords, getAppPasswordsKey } from '~/api/queries/get-app-passwords.ts';

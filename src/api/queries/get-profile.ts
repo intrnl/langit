@@ -1,4 +1,4 @@
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import type { InitialDataFn, QueryFn } from '@intrnl/sq';
 
 import { getAccountData, multiagent } from '~/globals/agent.ts';

@@ -1,4 +1,4 @@
-import type { AtBlob } from '@intrnl/bluesky-client/atp-schema';
+import type { AtBlob } from '@externdefs/bluesky-client/atp-schema';
 
 import type { CompressResult } from '~/utils/image.ts';
 import type { Signal } from '~/utils/signals.ts';

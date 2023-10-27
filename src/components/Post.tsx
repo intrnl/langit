@@ -1,6 +1,6 @@
 import { type Accessor, Match, Show, Switch, createEffect, createSignal } from 'solid-js';
 
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 import { useNavigate } from '@solidjs/router';
 
 import type { SignalizedPost } from '~/api/cache/posts.ts';

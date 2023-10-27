@@ -1,6 +1,6 @@
 import { type Accessor, createEffect } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';

@@ -1,6 +1,6 @@
 import { Match, Switch, batch, createSignal } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery, useQueryMutation } from '@intrnl/sq';
 
 import { produce, setAutoFreeze } from 'immer';

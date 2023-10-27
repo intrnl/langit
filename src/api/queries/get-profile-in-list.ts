@@ -1,4 +1,4 @@
-import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records } from '@externdefs/bluesky-client/atp-schema';
 import type { QueryFn } from '@intrnl/sq';
 
 import { multiagent } from '~/globals/agent.ts';

@@ -1,6 +1,6 @@
 import { For, Show } from 'solid-js';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { useNavigate } from '@solidjs/router';
 
 import { multiagent } from '~/globals/agent.ts';

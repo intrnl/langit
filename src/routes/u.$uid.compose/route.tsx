@@ -1,6 +1,6 @@
 import { For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
 
-import type { AtBlob, DID, Records, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import type { AtBlob, DID, Records, RefOf, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 

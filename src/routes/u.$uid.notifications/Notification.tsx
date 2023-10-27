@@ -2,7 +2,7 @@ import { For, Match, Show, Switch } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 import { Dynamic } from 'solid-js/web';
 
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
 import {

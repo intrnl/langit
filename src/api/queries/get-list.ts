@@ -1,4 +1,4 @@
-import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records } from '@externdefs/bluesky-client/atp-schema';
 
 import type { InitialDataFn, QueryFn } from '@intrnl/sq';
 

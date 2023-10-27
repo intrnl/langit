@@ -1,6 +1,6 @@
 import { Match, Switch } from 'solid-js';
 
-import type { DID, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 

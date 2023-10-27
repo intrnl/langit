@@ -1,4 +1,4 @@
-import type { DID, RefOf, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { type SignalizedPost, mergeSignalizedPost } from '../cache/posts.ts';
 

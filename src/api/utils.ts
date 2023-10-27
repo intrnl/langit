@@ -1,4 +1,4 @@
-import type { DID } from '@intrnl/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 
 export const isDid = (value: string): value is DID => {
 	return value.startsWith('did:');

@@ -1,7 +1,7 @@
 import { Match, Switch } from 'solid-js';
 
-import type { DID, Records } from '@intrnl/bluesky-client/atp-schema';
-import { XRPCError } from '@intrnl/bluesky-client/xrpc-utils';
+import type { DID, Records } from '@externdefs/bluesky-client/atp-schema';
+import { XRPCError } from '@externdefs/bluesky-client/xrpc-utils';
 import { createMutation, createQuery } from '@intrnl/sq';
 
 import { createListUri, getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';

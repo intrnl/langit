@@ -1,4 +1,4 @@
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { multiagent } from '~/globals/agent.ts';
 import { createBatchedFetch } from '~/utils/batch-fetch.ts';

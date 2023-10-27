@@ -1,4 +1,4 @@
-import type { DID, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import type { KeywordPreference } from './enums.ts';
 

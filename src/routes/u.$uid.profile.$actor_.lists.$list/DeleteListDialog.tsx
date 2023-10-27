@@ -1,7 +1,7 @@
 import { Match, Switch, createRenderEffect, createSignal } from 'solid-js';
 import { createMutable } from 'solid-js/store';
 
-import type { DID, Records, UnionOf } from '@intrnl/bluesky-client/atp-schema';
+import type { DID, Records, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 
 import type { SignalizedList } from '~/api/cache/lists.ts';
 

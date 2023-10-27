@@ -143,7 +143,7 @@ export const getTimeline: QueryFn<
 	}
 
 	if (type === 'home') {
-		sliceFilter = createSliceFilter(uid);
+		sliceFilter = createHomeSliceFilter(uid);
 		postFilter = combine([
 			createHiddenRepostFilter(uid),
 			createDuplicatePostFilter(items),
@@ -151,7 +151,7 @@ export const getTimeline: QueryFn<
 			createTempMutePostFilter(uid),
 		]);
 	} else if (type === 'feed' || type === 'list') {
-		sliceFilter = createSliceFilter(uid);
+		sliceFilter = createFeedSliceFilter(uid);
 		postFilter = combine([
 			createDuplicatePostFilter(items),
 			createLanguagePostFilter(uid),
@@ -509,7 +509,7 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 	};
 };
 
-const createSliceFilter = (uid: DID): SliceFilter | undefined => {
+const createHomeSliceFilter = (uid: DID): SliceFilter | undefined => {
 	return (slice) => {
 		const items = slice.items;
 		const first = items[0];
@@ -529,6 +529,33 @@ const createSliceFilter = (uid: DID): SliceFilter | undefined => {
 				(rAuthor.did !== uid && (!rViewer.following.peek() || rViewer.muted.peek())) ||
 				(pAuthor.did !== uid && (!pViewer.following.peek() || pViewer.muted.peek()))
 			) {
+				return yankReposts(items);
+			}
+		} else if (first.post.record.peek().reply) {
+			return yankReposts(items);
+		}
+
+		return true;
+	};
+};
+
+const createFeedSliceFilter = (uid: DID): SliceFilter | undefined => {
+	return (slice) => {
+		const items = slice.items;
+		const first = items[0];
+
+		// skip any posts that are in reply to non-followed
+		if (first.reply && (!first.reason || first.reason.$type !== 'app.bsky.feed.defs#reasonRepost')) {
+			const root = first.reply.root;
+			const parent = first.reply.parent;
+
+			const rAuthor = root.author;
+			const pAuthor = parent.author;
+
+			const rViewer = rAuthor.viewer;
+			const pViewer = pAuthor.viewer;
+
+			if ((rAuthor.did !== uid && rViewer.muted.peek()) || (pAuthor.did !== uid && pViewer.muted.peek())) {
 				return yankReposts(items);
 			}
 		} else if (first.post.record.peek().reply) {

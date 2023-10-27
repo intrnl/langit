@@ -335,17 +335,17 @@ const fetchPage = async (
 
 		const searchResults = (await searchResponse.json()) as SearchResult;
 
-		const postUris = searchResults.map((view) => `at://${view.user.did}/${view.tid}`);
-
 		const uid = agent.session!.did;
-		const queries = await Promise.allSettled(postUris.map((uri) => fetchPost([uid, uri])));
+		const queries = await Promise.allSettled(
+			searchResults.map((view) => fetchPost([uid, `at://${view.user.did}/${view.tid}`])),
+		);
 
 		const posts = queries
 			.filter((result): result is PromiseFulfilledResult<Post> => result.status === 'fulfilled')
 			.map((result) => ({ post: result.value }));
 
 		return {
-			cursor: '' + (offset + postUris.length),
+			cursor: '' + (offset + searchResults.length),
 			feed: posts,
 		};
 	} else {

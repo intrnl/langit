@@ -455,7 +455,7 @@ const createHiddenRepostFilter = (uid: DID): PostFilter | undefined => {
 	const prefs = getFilterPref(uid);
 	const hidden = prefs.hideReposts;
 
-	if (!hidden) {
+	if (hidden.length < 1) {
 		return;
 	}
 

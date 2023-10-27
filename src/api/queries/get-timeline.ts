@@ -470,7 +470,8 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 	const prefs = getFilterPref(uid);
 	const now = Date.now();
 
-	let mutes = prefs.tempMutes;
+	const mutes = prefs.tempMutes;
+	let hasMutes = false;
 
 	// check if there are any outdated mutes before proceeding
 	for (const did in mutes) {
@@ -478,7 +479,13 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 
 		if (date === undefined || now >= date) {
 			delete mutes[did as DID];
+		} else {
+			hasMutes = true;
 		}
+	}
+
+	if (!hasMutes) {
+		return;
 	}
 
 	return (item) => {

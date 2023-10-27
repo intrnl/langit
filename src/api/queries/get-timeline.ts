@@ -143,7 +143,7 @@ export const getTimeline: QueryFn<
 	}
 
 	if (type === 'home') {
-		sliceFilter = createHomeSliceFilter(uid);
+		sliceFilter = createSliceFilter(uid);
 		postFilter = combine([
 			createHiddenRepostFilter(uid),
 			createDuplicatePostFilter(items),
@@ -151,6 +151,7 @@ export const getTimeline: QueryFn<
 			createTempMutePostFilter(uid),
 		]);
 	} else if (type === 'feed' || type === 'list') {
+		sliceFilter = createSliceFilter(uid);
 		postFilter = combine([
 			createDuplicatePostFilter(items),
 			createLanguagePostFilter(uid),
@@ -501,7 +502,7 @@ const createTempMutePostFilter = (uid: DID): PostFilter | undefined => {
 	};
 };
 
-const createHomeSliceFilter = (uid: DID): SliceFilter | undefined => {
+const createSliceFilter = (uid: DID): SliceFilter | undefined => {
 	return (slice) => {
 		const items = slice.items;
 		const first = items[0];

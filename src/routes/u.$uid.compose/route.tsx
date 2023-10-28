@@ -218,7 +218,7 @@ const AuthenticatedComposePage = () => {
 		const $labels = labels();
 
 		let replyRecord: PostRecord['reply'];
-		let embedRecord: PostRecord['embed'];
+		let embedded: PostRecord['embed'];
 
 		if ($reply) {
 			const ref: StrongRef = {
@@ -260,7 +260,7 @@ const AuthenticatedComposePage = () => {
 				}
 			}
 
-			embedRecord = {
+			embedded = {
 				$type: 'app.bsky.embed.images',
 				images: $images.map((img) => ({
 					alt: img.alt.value,
@@ -268,7 +268,9 @@ const AuthenticatedComposePage = () => {
 					aspectRatio: img.ratio,
 				})),
 			};
-		} else if ($link) {
+		}
+
+		if ($link) {
 			if ($link.thumb && !$link.record) {
 				setMessage(`Uploading link thumbnail`);
 
@@ -285,7 +287,7 @@ const AuthenticatedComposePage = () => {
 				}
 			}
 
-			embedRecord = {
+			embedded = {
 				$type: 'app.bsky.embed.external',
 				external: {
 					uri: $link.uri,
@@ -305,14 +307,17 @@ const AuthenticatedComposePage = () => {
 				},
 			};
 
-			if (embedRecord && embedRecord.$type === 'app.bsky.embed.images') {
-				embedRecord = {
+			if (
+				embedded &&
+				(embedded.$type === 'app.bsky.embed.images' || embedded.$type === 'app.bsky.embed.external')
+			) {
+				embedded = {
 					$type: 'app.bsky.embed.recordWithMedia',
-					media: embedRecord,
+					media: embedded,
 					record: rec,
 				};
 			} else {
-				embedRecord = rec;
+				embedded = rec;
 			}
 		}
 
@@ -335,7 +340,7 @@ const AuthenticatedComposePage = () => {
 			facets: (rt as any).res.facets,
 			text: (rt as any).res.text,
 			reply: replyRecord,
-			embed: embedRecord,
+			embed: embedded,
 			langs: $languages.length > 0 ? $languages : undefined,
 			labels:
 				$labels.length > 0

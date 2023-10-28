@@ -187,7 +187,7 @@ const ImageCarousel = (props: ImageCarouselProps) => {
 	// 	handleZoomDrag([deltaCenterX, deltaCenterY]);
 	// };
 
-	const handleLastDrag = (tap: boolean, swipe: Vector2, movement: Vector2, position: Vector2) => {
+	const handleLastDrag = (tap: boolean, swipe: Vector2, movement: Vector2, _position: Vector2) => {
 		setDragging(false);
 
 		if (tap) {
@@ -264,7 +264,7 @@ const ImageCarousel = (props: ImageCarouselProps) => {
 		goToFocusedSlide();
 	};
 
-	const handleDrag = (delta: Vector2, movement: Vector2) => {
+	const handleDrag = (_delta: Vector2, movement: Vector2) => {
 		setDragging(true);
 
 		// if (isZoomedIn()) {

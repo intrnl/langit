@@ -5,7 +5,8 @@ import { getPostRepostedBy, getPostRepostedByKey } from '~/api/queries/get-post-
 
 import { useParams } from '~/router.ts';
 
-import ProfileList, { renderFollowAccessory } from '~/components/ProfileList';
+import { ProfileFollowAccessory } from '~/components/lists/ProfileItem.tsx';
+import ProfileList from '~/components/lists/ProfileList.tsx';
 
 const PAGE_SIZE = 30;
 
@@ -31,7 +32,7 @@ const AuthenticatedPostRespostsPage = () => {
 			<ProfileList
 				uid={uid()}
 				list={reposts}
-				renderAccessory={renderFollowAccessory}
+				accessory={ProfileFollowAccessory}
 				onLoadMore={(cursor) => refetch(true, cursor)}
 			/>
 		</div>

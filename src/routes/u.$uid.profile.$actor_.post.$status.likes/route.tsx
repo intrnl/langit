@@ -5,7 +5,8 @@ import { getPostLikedBy, getPostLikedByKey } from '~/api/queries/get-post-liked-
 
 import { useParams } from '~/router.ts';
 
-import ProfileList, { renderFollowAccessory } from '~/components/ProfileList';
+import { ProfileFollowAccessory } from '~/components/lists/ProfileItem.tsx';
+import ProfileList from '~/components/lists/ProfileList.tsx';
 
 const PAGE_SIZE = 30;
 
@@ -31,7 +32,7 @@ const AuthenticatedPostLikesPage = () => {
 			<ProfileList
 				uid={uid()}
 				list={likes}
-				renderAccessory={renderFollowAccessory}
+				accessory={ProfileFollowAccessory}
 				onLoadMore={(cursor) => refetch(true, cursor)}
 			/>
 		</div>

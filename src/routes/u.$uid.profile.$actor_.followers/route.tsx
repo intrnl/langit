@@ -7,7 +7,8 @@ import { getProfileFollowers, getProfileFollowersKey } from '~/api/queries/get-p
 
 import { useParams } from '~/router.ts';
 
-import ProfileList, { renderFollowAccessory } from '~/components/ProfileList.tsx';
+import { ProfileFollowAccessory } from '~/components/lists/ProfileItem.tsx';
+import ProfileList from '~/components/lists/ProfileList.tsx';
 
 const PAGE_SIZE = 30;
 
@@ -43,7 +44,7 @@ const AuthenticatedProfileFollowersPage = () => {
 			<ProfileList
 				uid={uid()}
 				list={followers}
-				renderAccessory={renderFollowAccessory}
+				accessory={ProfileFollowAccessory}
 				onLoadMore={(cursor) => refetch(true, cursor)}
 			/>
 		</div>

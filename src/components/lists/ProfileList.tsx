@@ -14,14 +14,14 @@ import ProfileItem, { type ProfileItemAccessory, createProfileItemKey } from './
 export interface ProfileListProps {
 	uid: DID;
 	list: EnhancedResource<Collection<ProfilesListPage>, string>;
-	accessory?: ProfileItemAccessory;
+	asideAccessory?: ProfileItemAccessory;
 	onLoadMore: (cursor: string) => void;
 }
 
 const ProfileList = (props: ProfileListProps) => {
 	// we're destructuring these props because we don't expect these to ever
 	// change, they shouldn't.
-	const { list, accessory, onLoadMore } = props;
+	const { list, asideAccessory, onLoadMore } = props;
 
 	return (
 		<>
@@ -29,8 +29,8 @@ const ProfileList = (props: ProfileListProps) => {
 				{(page) => {
 					return page.profiles.map((profile) => {
 						return (
-							<VirtualContainer id={createProfileItemKey(profile, accessory)} estimateHeight={112}>
-								<ProfileItem uid={props.uid} profile={profile} accessory={accessory} />
+							<VirtualContainer id={createProfileItemKey(profile, asideAccessory)} estimateHeight={112}>
+								<ProfileItem uid={props.uid} profile={profile} aside={asideAccessory} />
 							</VirtualContainer>
 						);
 					});

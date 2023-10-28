@@ -22,7 +22,7 @@ const SearchUsers = (props: SearchComponentProps) => {
 		<ProfileList
 			uid={uid()}
 			list={profiles}
-			accessory={ProfileFollowAccessory}
+			asideAccessory={ProfileFollowAccessory}
 			onLoadMore={(cursor) => refetch(true, cursor)}
 		/>
 	);

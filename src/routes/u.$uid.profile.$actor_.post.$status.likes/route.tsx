@@ -32,7 +32,7 @@ const AuthenticatedPostLikesPage = () => {
 			<ProfileList
 				uid={uid()}
 				list={likes}
-				accessory={ProfileFollowAccessory}
+				asideAccessory={ProfileFollowAccessory}
 				onLoadMore={(cursor) => refetch(true, cursor)}
 			/>
 		</div>

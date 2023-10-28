@@ -136,7 +136,7 @@ const AuthenticatedBlockedUsersModerationPage = () => {
 								id={createProfileItemKey(profile, ProfileBlockedAccessory)}
 								estimateHeight={88}
 							>
-								<ProfileItem uid={uid()} profile={profile} accessory={ProfileBlockedAccessory} />
+								<ProfileItem uid={uid()} profile={profile} aside={ProfileBlockedAccessory} />
 							</VirtualContainer>
 						);
 					});

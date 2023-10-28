@@ -44,7 +44,7 @@ const AuthenticatedProfileFollowersPage = () => {
 			<ProfileList
 				uid={uid()}
 				list={followers}
-				accessory={ProfileFollowAccessory}
+				asideAccessory={ProfileFollowAccessory}
 				onLoadMore={(cursor) => refetch(true, cursor)}
 			/>
 		</div>

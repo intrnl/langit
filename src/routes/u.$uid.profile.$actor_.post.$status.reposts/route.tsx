@@ -32,7 +32,7 @@ const AuthenticatedPostRespostsPage = () => {
 			<ProfileList
 				uid={uid()}
 				list={reposts}
-				accessory={ProfileFollowAccessory}
+				asideAccessory={ProfileFollowAccessory}
 				onLoadMore={(cursor) => refetch(true, cursor)}
 			/>
 		</div>

@@ -94,7 +94,7 @@ export const createProfileItemKey = (
 };
 
 export const ProfileFollowAccessory: ProfileItemAccessory = {
-	key: 'f',
+	key: '',
 	render: (profile, uid) => {
 		if (profile.did !== uid) {
 			return <FollowButton uid={uid} profile={profile} />;

@@ -28,7 +28,7 @@ import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 const ProfileBlockedAccessory: ProfileItemAccessory = {
-	key: 'b',
+	key: '',
 	render: (profile, uid) => {
 		const isBlocked = () => profile.viewer.blocking.value;
 

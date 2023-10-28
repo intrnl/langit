@@ -31,7 +31,7 @@ import VolumeOffIcon from '~/icons/baseline-volume-off.tsx';
 import VolumeUpIcon from '~/icons/baseline-volume-up.tsx';
 
 const MuteAccessory: ProfileItemAccessory = {
-	key: 'm',
+	key: '',
 	render: (profile, uid) => {
 		const isMuted = () => profile.viewer.muted.value;
 

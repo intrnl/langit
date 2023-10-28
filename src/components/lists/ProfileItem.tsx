@@ -20,12 +20,14 @@ export interface ProfileItemProps {
 	uid: DID;
 	profile: SignalizedProfile;
 	aside?: ProfileItemAccessory;
+	footer?: ProfileItemAccessory;
 }
 
 const ProfileItem = (props: ProfileItemProps) => {
 	const uid = () => props.uid;
 	const profile = () => props.profile;
 	const aside = props.aside;
+	const footer = props.footer;
 
 	const navigate = useNavigate();
 
@@ -74,6 +76,8 @@ const ProfileItem = (props: ProfileItemProps) => {
 				<Show when={profile().description.value}>
 					<div class="line-clamp-3 break-words text-sm">{profile().$renderedDescription()}</div>
 				</Show>
+
+				{footer?.render(profile(), uid())}
 			</div>
 		</div>
 	);
@@ -81,8 +85,12 @@ const ProfileItem = (props: ProfileItemProps) => {
 
 export default ProfileItem;
 
-export const createProfileItemKey = (profile: SignalizedProfile, aside?: ProfileItemAccessory) => {
-	return 'profile/' + profile.did + (aside ? '/a:' + aside.key : '');
+export const createProfileItemKey = (
+	profile: SignalizedProfile,
+	aside?: ProfileItemAccessory,
+	footer?: ProfileItemAccessory,
+) => {
+	return 'profile/' + profile.did + (aside ? '/a:' + aside.key : '') + (footer ? '/f:' + footer.key : '');
 };
 
 export const ProfileFollowAccessory: ProfileItemAccessory = {

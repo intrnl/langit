@@ -2,25 +2,25 @@ import { For, Show, Suspense, SuspenseList, createMemo } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { useNavigate } from '@solidjs/router';
 
 import { mergeSignalizedProfile, type SignalizedProfile } from '~/api/cache/profiles.ts';
 import { getInitialProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 import { fetchProfileBatched } from '~/api/queries/get-profile-batched.ts';
 
 import { getFilterPref } from '~/globals/settings.ts';
-import { generatePath, useParams } from '~/router.ts';
+import { useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
-import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 import * as relformat from '~/utils/intl/relformatter.ts';
 
+import ProfileItem, {
+	createProfileItemKey,
+	type ProfileItemAccessory,
+} from '~/components/lists/ProfileItem.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
 
 const AuthenticatedTempMutedUsersModerationPage = () => {
 	const params = useParams('/u/:uid/you/moderation/muted/temp');
-
-	const navigate = useNavigate();
 
 	const uid = () => params.uid as DID;
 
@@ -48,6 +48,19 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 		return arr;
 	});
 
+	const TempMuteAccessory: ProfileItemAccessory = {
+		key: 'tm',
+		render: (profile) => {
+			const date = () => mutedUsersDict()[profile.did]!;
+
+			return (
+				<p class="text-sm text-muted-fg">
+					Muted until <span class="font-bold">{relformat.formatAbsWithTime(date())}</span>
+				</p>
+			);
+		},
+	};
+
 	return (
 		<div class="flex flex-col">
 			<Title render={`Temporarily muted users / Langit`} />
@@ -62,8 +75,6 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 					fallback={<div class="p-4 text-sm text-muted-fg">You don't have any temporarily muted users</div>}
 				>
 					{(actor) => {
-						const date = () => mutedUsersDict()[actor]!;
-
 						const [profile] = createQuery<SignalizedProfile, ReturnType<typeof getProfileKey>>({
 							key: () => getProfileKey(uid(), actor),
 							fetch: async ([, uid, actor]) => {
@@ -78,23 +89,6 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 							refetchOnWindowFocus: false,
 						});
 
-						const handleClick = (ev: MouseEvent | KeyboardEvent) => {
-							if (!isElementClicked(ev, INTERACTION_TAGS)) {
-								return;
-							}
-
-							const path = generatePath('/u/:uid/profile/:actor', {
-								uid: uid(),
-								actor: profile()!.did,
-							});
-
-							if (isElementAltClicked(ev)) {
-								open(path, '_blank');
-							} else {
-								navigate(path);
-							}
-						};
-
 						return (
 							<Suspense
 								fallback={
@@ -103,43 +97,16 @@ const AuthenticatedTempMutedUsersModerationPage = () => {
 									</div>
 								}
 							>
-								<VirtualContainer id={/* @once */ `profile/${profile()?.did}/mt`} estimateHeight={88}>
-									<div
-										onClick={handleClick}
-										onAuxClick={handleClick}
-										onKeyDown={handleClick}
-										role="button"
-										tabindex={0}
-										class="flex gap-3 px-4 py-3 hover:bg-hinted"
-									>
-										<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-											<Show when={profile()?.avatar.value}>
-												{(avatar) => <img src={avatar()} class="h-full w-full" />}
-											</Show>
-										</div>
-
-										<div class="flex min-w-0 grow flex-col gap-1">
-											<div class="flex items-center justify-between gap-3">
-												<div class="flex flex-col text-sm">
-													<span class="line-clamp-1 break-all font-bold">
-														{profile()?.displayName.value || profile()?.handle.value}
-													</span>
-													<span class="line-clamp-1 break-all text-muted-fg">@{profile()?.handle.value}</span>
-												</div>
-											</div>
-
-											<Show when={profile()?.description.value}>
-												<div class="line-clamp-3 break-words text-sm">
-													{profile()?.$renderedDescription()}
-												</div>
-											</Show>
-
-											<p class="text-sm text-muted-fg">
-												Muted until <span class="font-bold">{relformat.formatAbsWithTime(date())}</span>
-											</p>
-										</div>
-									</div>
-								</VirtualContainer>
+								<Show when={profile()} keyed>
+									{(profile) => (
+										<VirtualContainer
+											id={createProfileItemKey(profile, undefined, TempMuteAccessory)}
+											estimateHeight={88}
+										>
+											<ProfileItem uid={uid()} profile={profile} footer={TempMuteAccessory} />
+										</VirtualContainer>
+									)}
+								</Show>
 							</Suspense>
 						);
 					}}

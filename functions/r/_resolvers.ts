@@ -1,4 +1,4 @@
-import type { AtUri, DID } from '@intrnl/bluesky-client/atp-schema';
+import type { AtUri, DID } from '@externdefs/bluesky-client/atp-schema';
 
 import { rpc } from './_global.ts';
 

@@ -1,5 +1,5 @@
-import { XRPC } from '@intrnl/bluesky-client/xrpc';
-import type { Procedures, Queries } from '@intrnl/bluesky-client/atp-schema';
+import { XRPC } from '@externdefs/bluesky-client/xrpc';
+import type { Procedures, Queries } from '@externdefs/bluesky-client/atp-schema';
 
 export const INSTANCE_URL = `https://bsky.social`;
 

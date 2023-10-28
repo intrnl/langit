@@ -1,4 +1,4 @@
-import type { Records, RefOf } from '@intrnl/bluesky-client/atp-schema';
+import type { Records, RefOf } from '@externdefs/bluesky-client/atp-schema';
 
 import { escape } from '../_global.ts';
 import { getDid, getPostThread } from '../_resolvers.ts';

@@ -274,7 +274,7 @@ const AuthenticatedProfileLayout = () => {
 										<Match when={profile().viewer.muted.value}>
 											<div class="text-sm text-muted-fg">
 												<p>
-													You have muted posts from this user.{' '}
+													You've muted posts from this user.{' '}
 													<button
 														onClick={() => {
 															openModal(() => <LazyMuteConfirmDialog uid={uid()} profile={profile()} />);
@@ -291,7 +291,7 @@ const AuthenticatedProfileLayout = () => {
 											{(date) => (
 												<div class="text-sm text-muted-fg">
 													<p>
-														You have temporarily muted posts from this user until{' '}
+														You've temporarily muted posts from this user until{' '}
 														<span class="font-bold">{relformat.formatAbsWithTime(date())}</span>.{' '}
 														<button
 															onClick={() => {

@@ -1,25 +1,24 @@
-import { For, Match, Show, Switch, useContext } from 'solid-js';
+import { For, Match, Switch, useContext } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { XRPCError } from '@externdefs/bluesky-client/xrpc-utils';
 import { createQuery } from '@intrnl/sq';
-import { useNavigate } from '@solidjs/router';
 
 import { createListUri, getListMembers, getListMembersKey } from '~/api/queries/get-list.ts';
 
 import { getCollectionCursor } from '~/api/utils.ts';
 
-import { generatePath, useParams } from '~/router.ts';
-import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
+import { useParams } from '~/router.ts';
 
+import ProfileItem, { createProfileItemKey } from '~/components/lists/ProfileItem.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
+import VirtualContainer from '~/components/VirtualContainer.tsx';
 
 import { ListDidContext } from '../u.$uid.profile.$actor_.lists.$list/context.tsx';
 
 const AuthenticatedListPage = () => {
 	const [did] = useContext(ListDidContext)!;
 
-	const navigate = useNavigate();
 	const params = useParams('/u/:uid/profile/:actor/lists/:list');
 
 	const uid = () => params.uid as DID;
@@ -57,50 +56,10 @@ const AuthenticatedListPage = () => {
 							);
 						}
 
-						const click = (ev: MouseEvent | KeyboardEvent) => {
-							if (!isElementClicked(ev, INTERACTION_TAGS)) {
-								return;
-							}
-
-							const path = generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: profile.did });
-
-							if (isElementAltClicked(ev)) {
-								open(path, '_blank');
-							} else {
-								navigate(path);
-							}
-						};
-
 						return (
-							<div
-								tabindex={0}
-								onClick={click}
-								onAuxClick={click}
-								onKeyDown={click}
-								role="button"
-								class="flex gap-3 px-4 py-3 hover:bg-hinted"
-							>
-								<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-									<Show when={profile.avatar.value}>
-										{(avatar) => <img src={avatar()} class="h-full w-full" />}
-									</Show>
-								</div>
-
-								<div class="flex min-w-0 grow flex-col gap-1">
-									<div class="flex items-center justify-between gap-3">
-										<div class="flex flex-col text-sm">
-											<span dir="auto" class="line-clamp-1 break-all font-bold">
-												{profile.displayName.value || profile.handle.value}
-											</span>
-											<span class="line-clamp-1 break-all text-muted-fg">@{profile.handle.value}</span>
-										</div>
-									</div>
-
-									<Show when={profile.description.value}>
-										<div class="line-clamp-3 break-words text-sm">{profile.$renderedDescription()}</div>
-									</Show>
-								</div>
-							</div>
+							<VirtualContainer id={createProfileItemKey(profile)} estimateHeight={88}>
+								<ProfileItem uid={uid()} profile={profile} />
+							</VirtualContainer>
 						);
 					});
 				}}

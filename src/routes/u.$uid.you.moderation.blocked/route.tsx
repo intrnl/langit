@@ -2,7 +2,6 @@ import { For, Match, Show, Switch, createEffect } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
-import { useNavigate } from '@solidjs/router';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
 import type { ProfilesListPage } from '~/api/models/profiles-list.ts';
@@ -16,18 +15,38 @@ import {
 import { getCollectionCursor } from '~/api/utils.ts';
 
 import { openModal } from '~/globals/modals.tsx';
-import { generatePath, useParams } from '~/router.ts';
+import { useParams } from '~/router.ts';
 import { Title } from '~/utils/meta.tsx';
-import { INTERACTION_TAGS, isElementAltClicked, isElementClicked } from '~/utils/misc.ts';
 
 import BlockConfirmDialog from '~/components/dialogs/BlockConfirmDialog.tsx';
+import ProfileItem, {
+	createProfileItemKey,
+	type ProfileItemAccessory,
+} from '~/components/lists/ProfileItem.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
 import button from '~/styles/primitives/button.ts';
 
+const ProfileBlockedAccessory: ProfileItemAccessory = {
+	key: 'b',
+	render: (profile, uid) => {
+		const isBlocked = () => profile.viewer.blocking.value;
+
+		return (
+			<button
+				onClick={() => {
+					openModal(() => <BlockConfirmDialog uid={uid} profile={profile} />);
+				}}
+				class={button({ color: isBlocked() ? 'danger' : 'outline' })}
+			>
+				{isBlocked() ? 'Blocked' : 'Block'}
+			</button>
+		);
+	},
+};
+
 const AuthenticatedBlockedUsersModerationPage = () => {
 	const params = useParams('/u/:uid/you/moderation/muted');
-	const navigate = useNavigate();
 
 	const uid = () => params.uid as DID;
 
@@ -112,67 +131,12 @@ const AuthenticatedBlockedUsersModerationPage = () => {
 			<For each={blocks()?.pages}>
 				{(page) => {
 					return page.profiles.map((profile) => {
-						const isBlocked = () => profile.viewer.blocking.value;
-
-						const handleClick = (ev: MouseEvent | KeyboardEvent) => {
-							if (!isElementClicked(ev, INTERACTION_TAGS)) {
-								return;
-							}
-
-							const path = generatePath('/u/:uid/profile/:actor', {
-								uid: uid(),
-								actor: profile.did,
-							});
-
-							if (isElementAltClicked(ev)) {
-								open(path, '_blank');
-							} else {
-								navigate(path);
-							}
-						};
-
 						return (
-							<VirtualContainer id={/* @once */ `profile/${profile.did}/b`} estimateHeight={88}>
-								<div
-									onClick={handleClick}
-									onAuxClick={handleClick}
-									onKeyDown={handleClick}
-									role="button"
-									tabindex={0}
-									class="flex gap-3 px-4 py-3 hover:bg-hinted"
-								>
-									<div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted-fg">
-										<Show when={profile.avatar.value}>
-											{(avatar) => <img src={avatar()} class="h-full w-full" />}
-										</Show>
-									</div>
-
-									<div class="flex min-w-0 grow flex-col gap-1">
-										<div class="flex items-center justify-between gap-3">
-											<div class="flex flex-col text-sm">
-												<span dir="auto" class="line-clamp-1 break-all font-bold">
-													{profile.displayName.value || profile.handle.value}
-												</span>
-												<span class="line-clamp-1 break-all text-muted-fg">@{profile.handle.value}</span>
-											</div>
-
-											<div>
-												<button
-													onClick={() => {
-														openModal(() => <BlockConfirmDialog uid={uid()} profile={profile} />);
-													}}
-													class={button({ color: isBlocked() ? 'danger' : 'outline' })}
-												>
-													{isBlocked() ? 'Blocked' : 'Block'}
-												</button>
-											</div>
-										</div>
-
-										<Show when={profile.description.value}>
-											<div class="line-clamp-3 break-words text-sm">{profile.$renderedDescription()}</div>
-										</Show>
-									</div>
-								</div>
+							<VirtualContainer
+								id={createProfileItemKey(profile, ProfileBlockedAccessory)}
+								estimateHeight={88}
+							>
+								<ProfileItem uid={uid()} profile={profile} accessory={ProfileBlockedAccessory} />
 							</VirtualContainer>
 						);
 					});

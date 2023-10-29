@@ -78,29 +78,23 @@ const AuthenticatedListPage = () => {
 						);
 					}
 
-					return (
-						<>
-							{(() => {
-								if (isListOwner()) {
-									// Marking props as static here because if it changes then
-									// we won't even be rendering this.
-									return (
-										<OwnedListItem
-											uid={/* @once */ uid()}
-											profile={profile}
-											uri={uri}
-											listRkey={/* @once */ params.list}
-										/>
-									);
-								}
+					// This is expected to be static, because if `uid` changes we won't
+					// even be rendering the list with the same objects.
+					if (isListOwner()) {
+						return (
+							<OwnedListItem
+								uid={/* @once */ uid()}
+								profile={profile}
+								uri={uri}
+								listRkey={/* @once */ params.list}
+							/>
+						);
+					}
 
-								return (
-									<VirtualContainer id={createProfileItemKey(profile)} estimateHeight={88}>
-										<ProfileItem uid={uid()} profile={profile} />
-									</VirtualContainer>
-								);
-							})()}
-						</>
+					return (
+						<VirtualContainer id={createProfileItemKey(profile)} estimateHeight={88}>
+							<ProfileItem uid={uid()} profile={profile} />
+						</VirtualContainer>
 					);
 				}}
 			</For>

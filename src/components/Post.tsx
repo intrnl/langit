@@ -363,11 +363,9 @@ const PostContent = ({ uid, post, force, timelineDid }: PostContentProps) => {
 
 					createEffect(() => {
 						const $post = post();
-						const next = content!.scrollHeight > content!.clientHeight;
+						const next = !!$post.record.value.text && content!.scrollHeight > content!.clientHeight;
 
-						$post.record.value;
 						$post.$truncated = next;
-
 						node.style.display = next ? 'block' : 'none';
 					});
 				}}

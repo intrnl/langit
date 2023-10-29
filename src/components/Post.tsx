@@ -353,7 +353,7 @@ const PostContent = ({ uid, post, force, timelineDid }: PostContentProps) => {
 				<div class="text-sm text-muted-fg">This post has been deleted.</div>
 			</Show>
 
-			<div ref={content} class="line-clamp-[9] whitespace-pre-wrap break-words text-sm">
+			<div ref={content} class="line-clamp-[12] whitespace-pre-wrap break-words text-sm">
 				{post().$renderedContent()}
 			</div>
 

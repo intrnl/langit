@@ -1,4 +1,4 @@
-import { For, Match, Switch, createEffect } from 'solid-js';
+import { For, Match, Switch, createEffect, createMemo } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
@@ -86,6 +86,10 @@ const AuthenticatedNotificationsPage = () => {
 		},
 	});
 
+	const flattenedNotifications = createMemo(() => {
+		return notifications()?.pages.flatMap((page) => page.slices);
+	});
+
 	// We set the initial value of the effect to 0, this is so we can tell that
 	// we just mounted this effect.
 	createEffect((prev: ReturnType<typeof notifications> | 0) => {
@@ -147,16 +151,14 @@ const AuthenticatedNotificationsPage = () => {
 			</Switch>
 
 			<div>
-				<For each={notifications()?.pages}>
-					{(page) =>
-						page.slices.map((slice) => {
-							return (
-								<VirtualContainer id={/* @once */ `notifs/${slice.date}`} estimateHeight={168.4}>
-									<Notification uid={uid()} data={slice} />
-								</VirtualContainer>
-							);
-						})
-					}
+				<For each={flattenedNotifications()}>
+					{(slice) => {
+						return (
+							<VirtualContainer id={/* @once */ `notifs/${slice.date}`} estimateHeight={168.4}>
+								<Notification uid={uid()} data={slice} />
+							</VirtualContainer>
+						);
+					}}
 				</For>
 			</div>
 

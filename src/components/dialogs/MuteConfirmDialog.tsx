@@ -16,8 +16,8 @@ import type { FeedPage, FeedPageCursor } from '~/api/queries/get-timeline.ts';
 import { closeModal } from '~/globals/modals.tsx';
 import { getFilterPref, isProfileTemporarilyMuted } from '~/globals/settings.ts';
 
+import ListItem from '~/components/lists/ListItem.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
-import ListItem from '~/components/ListItem.tsx';
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';
 import select from '~/styles/primitives/select.ts';

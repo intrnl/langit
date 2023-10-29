@@ -5,7 +5,7 @@ import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-l
 
 import { generatePath, useParams } from '~/router.ts';
 
-import ListList from '~/components/ListList.tsx';
+import ListList from '~/components/lists/ListList.tsx';
 
 import AddIcon from '~/icons/baseline-add.tsx';
 

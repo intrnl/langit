@@ -11,9 +11,9 @@ import { getCollectionId } from '~/api/utils.ts';
 
 import { closeModal } from '~/globals/modals.tsx';
 
-import CircularProgress from '~/components/CircularProgress.tsx';
 import ConfirmDialog from '~/components/dialogs/ConfirmDialog.tsx';
-import ListItem from '~/components/ListItem.tsx';
+import ListItem from '~/components/lists/ListItem.tsx';
+import CircularProgress from '~/components/CircularProgress.tsx';
 
 import button from '~/styles/primitives/button.ts';
 import * as dialog from '~/styles/primitives/dialog.ts';

@@ -7,7 +7,7 @@ import {
 	getSubscribedListsKey,
 } from '~/api/queries/get-subscribed-lists.ts';
 
-import ListList from '~/components/ListList.tsx';
+import ListList from '~/components/lists/ListList.tsx';
 
 export interface SubscribedListsProps {
 	uid: DID;

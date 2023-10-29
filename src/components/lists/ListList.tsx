@@ -8,8 +8,8 @@ import type { SubscribedListsResource } from '~/api/queries/get-subscribed-lists
 
 import { getCollectionCursor } from '~/api/utils.ts';
 
+import ListItem, { createListItemKey } from '~/components/lists/ListItem.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
-import ListItem from '~/components/ListItem.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
 
 export interface ListListProps {
@@ -31,7 +31,7 @@ const ListList = (props: ListListProps) => {
 			<For each={list()?.pages}>
 				{(page) => {
 					return page.lists.map((list) => (
-						<VirtualContainer id={/* @once */ `list/${list.uri}`} estimateHeight={88}>
+						<VirtualContainer id={createListItemKey(list)} estimateHeight={88}>
 							<ListItem uid={props.uid} list={list} hideSubscribedBadge={props.hideSubscribedBadge} />
 						</VirtualContainer>
 					));

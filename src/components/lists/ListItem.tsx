@@ -71,3 +71,7 @@ const ListItem = (props: ListItemProps) => {
 };
 
 export default ListItem;
+
+export const createListItemKey = (list: SignalizedList) => {
+	return 'list/' + list.uri;
+};

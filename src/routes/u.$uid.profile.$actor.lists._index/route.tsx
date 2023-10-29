@@ -5,7 +5,7 @@ import { getProfileLists, getProfileListsKey } from '~/api/queries/get-profile-l
 
 import { useParams } from '~/router.ts';
 
-import ListList from '~/components/ListList';
+import ListList from '~/components/lists/ListList.tsx';
 
 const AuthenticatedProfileListsPage = () => {
 	const params = useParams('/u/:uid/profile/:actor/lists');

@@ -6,10 +6,12 @@ import type { EnhancedResource } from '@intrnl/sq';
 import type { ProfilesListPage } from '~/api/models/profiles-list.ts';
 import { type Collection, getCollectionCursor } from '~/api/utils.ts';
 
+import ProfileItem, {
+	type ProfileItemAccessory,
+	createProfileItemKey,
+} from '~/components/lists/ProfileItem.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
-
-import ProfileItem, { type ProfileItemAccessory, createProfileItemKey } from './ProfileItem.tsx';
 
 export interface ProfileListProps {
 	uid: DID;

@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, Match, Switch, useContext } from 'solid-js';
+import { For, Match, Switch, createMemo, createSignal, useContext } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { XRPCError } from '@externdefs/bluesky-client/xrpc-utils';
@@ -55,9 +55,9 @@ const AuthenticatedListPage = () => {
 		return uid() === did();
 	});
 
-	const flattenedMembers = createMemo(() => {
+	const flattenedMembers = () => {
 		return listing()?.pages.flatMap((page) => page.members);
-	});
+	};
 
 	return (
 		<>

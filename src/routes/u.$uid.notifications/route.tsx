@@ -1,4 +1,4 @@
-import { For, Match, Switch, createEffect, createMemo } from 'solid-js';
+import { For, Match, Switch, createEffect } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createMutation, createQuery } from '@intrnl/sq';
@@ -86,9 +86,9 @@ const AuthenticatedNotificationsPage = () => {
 		},
 	});
 
-	const flattenedNotifications = createMemo(() => {
+	const flattenedNotifications = () => {
 		return notifications()?.pages.flatMap((page) => page.slices);
-	});
+	};
 
 	// We set the initial value of the effect to 0, this is so we can tell that
 	// we just mounted this effect.

@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createSignal } from 'solid-js';
+import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
 import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
@@ -113,9 +113,9 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 		close();
 	};
 
-	const flattenedLists = () => {
-		return lists()?.pages.flatMap((list) => list.lists);
-	};
+	const flattenedLists = createMemo(() => {
+		return lists()?.pages.flatMap((list) => list.lists) || [];
+	});
 
 	return (
 		<div class={/* @once */ dialog.content()}>

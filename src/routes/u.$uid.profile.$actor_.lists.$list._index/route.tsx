@@ -55,51 +55,53 @@ const AuthenticatedListPage = () => {
 		return uid() === did();
 	});
 
+	const flattenedMembers = createMemo(() => {
+		return listing()?.pages.flatMap((page) => page.members);
+	});
+
 	return (
 		<>
-			<For each={listing()?.pages}>
-				{(page) => {
-					return page.members.map((member) => {
-						const { uri, subject, profile } = member;
+			<For each={flattenedMembers()}>
+				{(member) => {
+					const { uri, subject, profile } = member;
 
-						if (!profile) {
-							return (
-								<div class="flex items-center gap-3 px-4 py-3 text-sm">
-									<div class="h-12 w-12 shrink-0 rounded-full bg-muted-fg"></div>
-
-									<div class="text-muted-fg">
-										<p>This user no longer exists</p>
-										<p>{subject}</p>
-									</div>
-								</div>
-							);
-						}
-
+					if (!profile) {
 						return (
-							<>
-								{(() => {
-									if (isListOwner()) {
-										// Marking props as static here because if it changes then
-										// we won't even be rendering this.
-										return (
-											<OwnedListItem
-												uid={/* @once */ uid()}
-												profile={profile}
-												uri={uri}
-												listRkey={/* @once */ params.list}
-											/>
-										);
-									}
+							<div class="flex items-center gap-3 px-4 py-3 text-sm">
+								<div class="h-12 w-12 shrink-0 rounded-full bg-muted-fg"></div>
 
-									return (
-										<VirtualContainer id={createProfileItemKey(profile)} estimateHeight={88}>
-											<ProfileItem uid={uid()} profile={profile} />
-										</VirtualContainer>
-									);
-								})()}
-							</>
+								<div class="text-muted-fg">
+									<p>This user no longer exists</p>
+									<p>{subject}</p>
+								</div>
+							</div>
 						);
-					});
+					}
+
+					return (
+						<>
+							{(() => {
+								if (isListOwner()) {
+									// Marking props as static here because if it changes then
+									// we won't even be rendering this.
+									return (
+										<OwnedListItem
+											uid={/* @once */ uid()}
+											profile={profile}
+											uri={uri}
+											listRkey={/* @once */ params.list}
+										/>
+									);
+								}
+
+								return (
+									<VirtualContainer id={createProfileItemKey(profile)} estimateHeight={88}>
+										<ProfileItem uid={uid()} profile={profile} />
+									</VirtualContainer>
+								);
+							})()}
+						</>
+					);
 				}}
 			</For>
 

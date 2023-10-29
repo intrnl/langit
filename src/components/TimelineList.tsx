@@ -27,11 +27,7 @@ const TimelineList = (props: TimelineListProps) => {
 	const { timeline, latest, onRefetch, onLoadMore } = props;
 
 	const flattenedSlices = () => {
-		if (timeline.error || !timeline()) {
-			return [];
-		}
-
-		return timeline()!.pages.flatMap((page) => page.slices);
+		return timeline()?.pages.flatMap((page) => page.slices);
 	};
 
 	return (

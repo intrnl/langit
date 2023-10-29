@@ -252,7 +252,7 @@ const renderText = (
 				link
 				dir="auto"
 				href={generatePath('/u/:uid/profile/:actor', { uid: uid, actor: author.did })}
-				class="font-bold hover:underline"
+				class="inline-block overflow-hidden align-top font-bold hover:underline"
 			>
 				{author.displayName?.trim() || `@${author.handle}`}
 			</a>,

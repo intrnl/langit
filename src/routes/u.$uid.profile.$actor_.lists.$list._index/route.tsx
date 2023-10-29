@@ -1,20 +1,35 @@
-import { For, Match, Switch, useContext } from 'solid-js';
+import { createMemo, createSignal, For, Match, Switch, useContext } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { XRPCError } from '@externdefs/bluesky-client/xrpc-utils';
-import { createQuery } from '@intrnl/sq';
+import { createQuery, useQueryMutation } from '@intrnl/sq';
 
-import { createListUri, getListMembers, getListMembersKey } from '~/api/queries/get-list.ts';
+import {
+	type ListMembersPage,
+	createListUri,
+	getListMembers,
+	getListMembersKey,
+} from '~/api/queries/get-list.ts';
 
-import { getCollectionCursor } from '~/api/utils.ts';
+import { getCollectionCursor, getRecordId, type Collection } from '~/api/utils.ts';
 
+import { multiagent } from '~/globals/agent.ts';
+import { openModal } from '~/globals/modals.tsx';
 import { useParams } from '~/router.ts';
 
-import ProfileItem, { createProfileItemKey } from '~/components/lists/ProfileItem.tsx';
+import ProfileItem, {
+	createProfileItemKey,
+	type ProfileItemAccessory,
+	type ProfileItemProps,
+} from '~/components/lists/ProfileItem.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import VirtualContainer from '~/components/VirtualContainer.tsx';
 
+import MoreHorizIcon from '~/icons/baseline-more-horiz.tsx';
+
 import { ListDidContext } from '../u.$uid.profile.$actor_.lists.$list/context.tsx';
+
+import ListItemMenu from './ListItemMenu.tsx';
 
 const AuthenticatedListPage = () => {
 	const [did] = useContext(ListDidContext)!;
@@ -36,12 +51,16 @@ const AuthenticatedListPage = () => {
 		refetchOnWindowFocus: false,
 	});
 
+	const isListOwner = createMemo(() => {
+		return uid() === did();
+	});
+
 	return (
 		<>
 			<For each={listing()?.pages}>
 				{(page) => {
 					return page.members.map((member) => {
-						const { subject, profile } = member;
+						const { uri, subject, profile } = member;
 
 						if (!profile) {
 							return (
@@ -57,9 +76,28 @@ const AuthenticatedListPage = () => {
 						}
 
 						return (
-							<VirtualContainer id={createProfileItemKey(profile)} estimateHeight={88}>
-								<ProfileItem uid={uid()} profile={profile} />
-							</VirtualContainer>
+							<>
+								{(() => {
+									if (isListOwner()) {
+										// Marking props as static here because if it changes then
+										// we won't even be rendering this.
+										return (
+											<OwnedListItem
+												uid={/* @once */ uid()}
+												profile={profile}
+												uri={uri}
+												listRkey={/* @once */ params.list}
+											/>
+										);
+									}
+
+									return (
+										<VirtualContainer id={createProfileItemKey(profile)} estimateHeight={88}>
+											<ProfileItem uid={uid()} profile={profile} />
+										</VirtualContainer>
+									);
+								})()}
+							</>
 						);
 					});
 				}}
@@ -105,3 +143,84 @@ const AuthenticatedListPage = () => {
 };
 
 export default AuthenticatedListPage;
+
+interface OwnedListItemProps extends Pick<ProfileItemProps, 'uid' | 'profile'> {
+	uri: string;
+	listRkey: string;
+}
+
+const enum ItemState {
+	DEFAULT,
+	PENDING,
+	DELETED,
+}
+
+const OwnedListItem = (props: OwnedListItemProps) => {
+	// These are expected to be static.
+	const { uid, profile, uri, listRkey } = props;
+
+	const [state, setState] = createSignal(ItemState.DEFAULT);
+	const mutate = useQueryMutation();
+
+	const onRemove = async () => {
+		if (state() !== ItemState.DEFAULT) {
+			return;
+		}
+
+		setState(ItemState.PENDING);
+
+		try {
+			const agent = await multiagent.connect(uid);
+
+			await agent.rpc.call('com.atproto.repo.deleteRecord', {
+				data: {
+					repo: uid,
+					collection: 'app.bsky.graph.listitem',
+					rkey: getRecordId(uri),
+				},
+			});
+
+			mutate(
+				false,
+				getListMembersKey(uid, createListUri(uid, listRkey)),
+				(prev: Collection<ListMembersPage>): Collection<ListMembersPage> => {
+					return {
+						...prev,
+						pages: prev.pages.map((page) => {
+							return {
+								...page,
+								members: page.members.filter((member) => member.uri !== uri),
+							};
+						}),
+					};
+				},
+			);
+		} catch (_err) {}
+
+		setState(ItemState.DEFAULT);
+	};
+
+	const accessory: ProfileItemAccessory = {
+		key: '',
+		render: () => {
+			return (
+				<button
+					onClick={() => {
+						openModal(() => <ListItemMenu onRemove={onRemove} />);
+					}}
+					class="-mx-2 flex h-8 w-8 items-center justify-center rounded-full text-base text-muted-fg hover:bg-secondary"
+				>
+					<MoreHorizIcon />
+				</button>
+			);
+		},
+	};
+
+	return (
+		<VirtualContainer id={createProfileItemKey(profile, accessory)} estimateHeight={88}>
+			<div classList={{ 'pointer-events-none opacity-50': state() === ItemState.PENDING }}>
+				<ProfileItem uid={uid} profile={profile} aside={accessory} />
+			</div>
+		</VirtualContainer>
+	);
+};

@@ -243,26 +243,28 @@ const AuthenticatedPostPage = () => {
 								</Show>
 
 								<div ref={focusRef} class="scroll-m-16 px-4 pt-3">
-									<div class="mb-1 flex items-center gap-3">
+									<div class="mb-3 flex items-center text-sm text-muted-fg">
 										<a
 											link
 											href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author.did })}
-											class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
+											class="group pointer-events-none inline-flex max-w-full items-start overflow-hidden"
 										>
-											<Show when={author.avatar.value}>
-												{(avatar) => <img src={avatar()} class="h-full w-full" />}
-											</Show>
-										</a>
+											<div class="z-2 pointer-events-auto mr-3 h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted-fg">
+												<Show when={author.avatar.value}>
+													{(avatar) => <img src={avatar()} class="h-full w-full" />}
+												</Show>
+											</div>
 
-										<a
-											link
-											href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author.did })}
-											class="flex flex-col text-sm"
-										>
-											<span dir="auto" class="line-clamp-1 break-all font-bold hover:underline">
-												{author.displayName.value || author.handle.value}
+											<span class="pointer-events-auto block max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+												<bdi class="overflow-hidden text-ellipsis group-hover:underline">
+													<span class="font-bold text-primary">
+														{author.displayName.value || author.handle.value}
+													</span>
+												</bdi>
+												<span class="block overflow-hidden text-ellipsis whitespace-nowrap">
+													@{author.handle.value}
+												</span>
 											</span>
-											<span class="line-clamp-1 break-all text-muted-fg">@{author.handle.value}</span>
 										</a>
 
 										<div class="flex shrink-0 grow justify-end">

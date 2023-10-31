@@ -93,7 +93,9 @@ const AuthenticatedProfileLayout = () => {
 
 					<Match when>
 						<Title render={() => `Profile (${actor()}) / Langit`} />
-						<p class="text-base font-bold">Profile</p>
+						<div class="flex h-full items-center">
+							<p class="text-base font-bold">Profile</p>
+						</div>
 					</Match>
 				</Switch>
 			</div>

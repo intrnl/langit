@@ -6,8 +6,13 @@ export default {
 	content: ['./src/**/*.{ts,tsx}'],
 	theme: {
 		extend: {
+			zIndex: {
+				1: '1',
+				2: '2',
+			},
 			spacing: {
 				7.5: '1.875rem',
+				9.5: '2.375rem',
 				13: '3.25rem',
 				17: '4.24rem',
 				30: '7.5rem',

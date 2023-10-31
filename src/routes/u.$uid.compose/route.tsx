@@ -499,7 +499,7 @@ const AuthenticatedComposePage = () => {
 				</Match>
 			</Switch>
 
-			<div class="flex pb-4">
+			<div class="flex pb-4 z-2">
 				<div class="shrink-0 p-4">
 					<div class="h-10 w-10 overflow-hidden rounded-full bg-muted-fg">
 						<Show when={profile()?.avatar.value}>

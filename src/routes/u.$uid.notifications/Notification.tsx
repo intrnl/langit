@@ -145,7 +145,7 @@ const Notification = (props: NotificationProps) => {
 									</For>
 								</div>
 
-								<div class="break-words text-sm">{renderText(uid(), data())}</div>
+								<div class="overflow-hidden break-words text-sm">{renderText(uid(), data())}</div>
 
 								<Show
 									when={(() => {

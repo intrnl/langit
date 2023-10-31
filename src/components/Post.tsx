@@ -3,6 +3,8 @@ import { type Accessor, Match, Show, Switch, createEffect, createSignal } from '
 import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 import { useNavigate } from '@solidjs/router';
 
+import { sanitizeDisplayName } from '~/api/display.ts';
+
 import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { favoritePost } from '~/api/mutations/favorite-post.ts';
 import type { SignalizedTimelineItem } from '~/api/models/timeline.ts';
@@ -105,7 +107,7 @@ const Post = (props: PostProps) => {
 								class="flex font-medium hover:underline"
 							>
 								<span dir="auto" class="line-clamp-1 break-all">
-									{reason()!.by.displayName || reason()!.by.handle}
+									{sanitizeDisplayName(reason()!.by.displayName) || reason()!.by.handle}
 								</span>
 								<span class="whitespace-pre"> Reposted</span>
 							</a>

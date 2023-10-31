@@ -1,5 +1,7 @@
 import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 
+import { sanitizeDisplayName } from '../display.ts';
+
 import { detectFacets } from '../richtext/detection.ts';
 import { createRenderedRichText, handleInvalidLinkClick } from '../richtext/renderer.ts';
 import { segmentRichText } from '../richtext/segmentize.ts';
@@ -51,7 +53,7 @@ const createSignalizedProfile = (
 		_key: key,
 		did: profile.did,
 		handle: signal(profile.handle),
-		displayName: signal(profile.displayName),
+		displayName: signal(sanitizeDisplayName(profile.displayName)),
 		description: signal(isProfile ? profile.description : ''),
 		avatar: signal(profile.avatar),
 		banner: signal(isDetailed ? profile.banner : ''),
@@ -89,7 +91,7 @@ export const mergeSignalizedProfile = (
 		val._key = key;
 
 		val.handle.value = profile.handle;
-		val.displayName.value = profile.displayName;
+		val.displayName.value = sanitizeDisplayName(profile.displayName);
 		val.avatar.value = profile.avatar;
 		val.labels.value = profile.labels;
 

@@ -4,8 +4,6 @@ import { Dynamic } from 'solid-js/web';
 import type { DID, Records, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 import { A } from '@solidjs/router';
 
-import { sanitizeDisplayName } from '~/api/display.ts';
-
 import {
 	type ModerationCause,
 	type ModerationDecision,
@@ -141,7 +139,7 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 					</div>
 
 					<span class="line-clamp-1 break-all font-bold text-primary group-hover:underline">
-						{sanitizeDisplayName(author().displayName)}
+						{author().displayName}
 					</span>
 					<span class="ml-1 line-clamp-1 break-all">@{author().handle}</span>
 					<span class="px-1">·</span>

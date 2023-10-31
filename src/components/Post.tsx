@@ -170,7 +170,7 @@ const Post = (props: PostProps) => {
 
 						figure out how to solve this if possible
 					*/}
-					<div class="z-1 absolute left-9 h-full border-l-2 border-divider"></div>
+					<div class="absolute left-9 z-1 h-full border-l-2 border-divider"></div>
 				</Show>
 
 				<a
@@ -178,7 +178,7 @@ const Post = (props: PostProps) => {
 					href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author().did })}
 					class="group pointer-events-none inline-flex max-w-full items-start overflow-hidden"
 				>
-					<div class="z-2 pointer-events-auto mr-3 h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted-fg">
+					<div class="pointer-events-auto z-2 mr-3 h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted-fg">
 						<Show when={author().avatar.value}>
 							{(avatar) => <img src={avatar()} class="h-full w-full" />}
 						</Show>

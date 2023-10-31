@@ -68,11 +68,11 @@ const AuthenticatedProfileLayout = () => {
 
 	return (
 		<div class="flex grow flex-col">
-			<div class="sticky top-0 z-20 flex h-13 items-center border-b border-divider bg-background px-4">
+			<div class="sticky top-0 z-20 block h-13 items-center border-b border-divider bg-background px-4">
 				<Switch>
 					<Match when={profile()}>
 						{(profile) => (
-							<div class="flex flex-col gap-0.5">
+							<div class="flex h-full flex-col justify-center gap-0.5">
 								<Title
 									render={() => {
 										const $profile = profile();

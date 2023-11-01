@@ -1,4 +1,4 @@
-import { type Accessor, Match, Show, Switch, createEffect, createSignal, createMemo } from 'solid-js';
+import { type Accessor, Match, Show, Switch, createEffect, createSignal } from 'solid-js';
 
 import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
 import { useNavigate } from '@solidjs/router';
@@ -85,7 +85,7 @@ const Post = (props: PostProps) => {
 			onClick={handleClick}
 			onAuxClick={handleClick}
 			onKeyDown={handleClick}
-			class="relative border-divider px-4 pb-3 outline-2 -outline-offset-2 outline-primary focus-visible:outline"
+			class="relative border-divider px-4 outline-2 -outline-offset-2 outline-primary focus-visible:outline"
 			classList={{
 				'border-b': !props.next,
 				'hover:bg-hinted': interactive(),
@@ -161,132 +161,133 @@ const Post = (props: PostProps) => {
 				</Switch>
 			</div>
 
-			<div class="mb-0.5 flex h-5 items-start justify-start text-sm text-muted-fg">
-				<Show when={props.next}>
-					{/*
-						TODO(mary-ext): this can overflow if:
-						- this post has a repost and disconnected reply context going
-						- the next post doesn't have a repost context
-
-						figure out how to solve this if possible
-					*/}
-					<div class="absolute left-9 z-1 h-full border-l-2 border-divider"></div>
-				</Show>
-
-				<a
-					link
-					href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author().did })}
-					class="group pointer-events-none inline-flex max-w-full items-start overflow-hidden"
-				>
-					<div class="pointer-events-auto z-2 mr-3 h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted-fg">
+			<div class="flex gap-3">
+				<div class="flex shrink-0 flex-col items-center">
+					<a
+						link
+						href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author().did })}
+						class="h-10 w-10 overflow-hidden rounded-full bg-muted-fg hover:opacity-80"
+					>
 						<Show when={author().avatar.value}>
 							{(avatar) => <img src={avatar()} class="h-full w-full" />}
 						</Show>
-					</div>
+					</a>
 
-					<span class="pointer-events-auto flex max-w-full gap-1 overflow-hidden text-ellipsis whitespace-nowrap">
-						<bdi class="overflow-hidden text-ellipsis group-hover:underline">
-							<span class="font-bold text-primary">
-								{author().displayName.value || author().handle.value}
-							</span>
-						</bdi>
-						<span class="block overflow-hidden text-ellipsis whitespace-nowrap">
-							@{author().handle.value}
-						</span>
-					</span>
-				</a>
+					<Show when={props.next}>
+						<div class="mt-3 grow border-l-2 border-divider" />
+					</Show>
+				</div>
 
-				<span class="mx-1">·</span>
-
-				<a
-					link
-					title={relformat.formatAbsWithTime(record().createdAt)}
-					href={generatePath('/u/:uid/profile/:actor/post/:status', {
-						uid: uid(),
-						actor: author().did,
-						status: getRecordId(post().uri),
-					})}
-					class="whitespace-nowrap hover:underline"
-				>
-					{relformat.format(record().createdAt)}
-				</a>
-
-				<div class="grow"></div>
-
-				<Show when={interactive()}>
-					<button
-						onClick={() => {
-							openModal(() => (
-								<PostMenu uid={uid()} post={post()} onTranslate={(ev) => handleClick(ev, true)} />
-							));
-						}}
-						class="-my-1.5 -mr-2 ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base text-muted-fg hover:bg-secondary"
-					>
-						<MoreHorizIcon />
-					</button>
-				</Show>
-			</div>
-
-			<div class="ml-13">
-				<PostContent uid={uid} post={post} timelineDid={props.timelineDid} />
-
-				<Show when={interactive()}>
-					<div class="mt-3 flex text-muted-fg">
-						<div class="flex grow basis-0 items-end gap-0.5">
+				<div class="min-w-0 grow pb-3">
+					<div class="mb-0.5 flex items-center justify-between gap-4">
+						<div class="flex items-center overflow-hidden text-sm text-muted-fg">
 							<a
 								link
-								href={
-									generatePath('/u/:uid/compose', { uid: uid() }) + `?reply=${encodeURIComponent(post().uri)}`
-								}
-								class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
+								href={generatePath('/u/:uid/profile/:actor', { uid: uid(), actor: author().did })}
+								class="group flex max-w-full gap-1 overflow-hidden text-ellipsis whitespace-nowrap"
 							>
-								<ChatBubbleOutlinedIcon />
+								<bdi class="overflow-hidden text-ellipsis group-hover:underline">
+									<span class="font-bold text-primary">
+										{author().displayName.value || author().handle.value}
+									</span>
+								</bdi>
+								<span class="block overflow-hidden text-ellipsis whitespace-nowrap">
+									@{author().handle.value}
+								</span>
 							</a>
-							<span class="text-[0.8125rem]">{comformat.format(post().replyCount.value)}</span>
-						</div>
 
-						<div
-							class="flex grow basis-0 items-end gap-0.5"
-							classList={{ 'text-green-600': !!post().viewer.repost.value }}
-						>
-							<button
-								class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
-								onClick={() => {
-									openModal(() => <PostRepostMenu uid={uid()} post={post()} />);
-								}}
+							<span class="px-1">·</span>
+							<a
+								link
+								title={relformat.formatAbsWithTime(record().createdAt)}
+								href={generatePath('/u/:uid/profile/:actor/post/:status', {
+									uid: uid(),
+									actor: author().did,
+									status: getRecordId(post().uri),
+								})}
+								class="whitespace-nowrap hover:underline"
 							>
-								<RepeatIcon />
-							</button>
-
-							<span class="text-[0.8125rem]">{comformat.format(post().repostCount.value)}</span>
+								{relformat.format(record().createdAt)}
+							</a>
 						</div>
 
-						<div
-							class="group flex grow basis-0 items-end gap-0.5"
-							classList={{ 'is-active text-red-600': !!post().viewer.like.value }}
-						>
-							<button
-								class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
-								onClick={() => favoritePost(uid(), post())}
-							>
-								<FavoriteOutlinedIcon class="group-[.is-active]:hidden" />
-								<FavoriteIcon class="hidden group-[.is-active]:block" />
-							</button>
-							<span class="text-[0.8125rem]">{comformat.format(post().likeCount.value)}</span>
-						</div>
-
-						<div class="shrink-0">
-							<button
-								class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
-								onClick={() => {
-									openModal(() => <PostShareMenu post={post()} />);
-								}}
-							>
-								<ShareIcon />
-							</button>
-						</div>
+						<Show when={interactive()}>
+							<div class="shrink-0">
+								<button
+									onClick={() => {
+										openModal(() => (
+											<PostMenu uid={uid()} post={post()} onTranslate={(ev) => handleClick(ev, true)} />
+										));
+									}}
+									class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base text-muted-fg hover:bg-secondary"
+								>
+									<MoreHorizIcon />
+								</button>
+							</div>
+						</Show>
 					</div>
-				</Show>
+
+					<PostContent uid={uid} post={post} timelineDid={props.timelineDid} />
+
+					<Show when={interactive()}>
+						<div class="mt-3 flex text-muted-fg">
+							<div class="flex grow basis-0 items-end gap-0.5">
+								<a
+									link
+									href={
+										generatePath('/u/:uid/compose', { uid: uid() }) +
+										`?reply=${encodeURIComponent(post().uri)}`
+									}
+									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
+								>
+									<ChatBubbleOutlinedIcon />
+								</a>
+								<span class="text-[0.8125rem]">{comformat.format(post().replyCount.value)}</span>
+							</div>
+
+							<div
+								class="flex grow basis-0 items-end gap-0.5"
+								classList={{ 'text-green-600': !!post().viewer.repost.value }}
+							>
+								<button
+									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
+									onClick={() => {
+										openModal(() => <PostRepostMenu uid={uid()} post={post()} />);
+									}}
+								>
+									<RepeatIcon />
+								</button>
+
+								<span class="text-[0.8125rem]">{comformat.format(post().repostCount.value)}</span>
+							</div>
+
+							<div
+								class="group flex grow basis-0 items-end gap-0.5"
+								classList={{ 'is-active text-red-600': !!post().viewer.like.value }}
+							>
+								<button
+									class="-my-1.5 -ml-2 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
+									onClick={() => favoritePost(uid(), post())}
+								>
+									<FavoriteOutlinedIcon class="group-[.is-active]:hidden" />
+									<FavoriteIcon class="hidden group-[.is-active]:block" />
+								</button>
+								<span class="text-[0.8125rem]">{comformat.format(post().likeCount.value)}</span>
+							</div>
+
+							<div class="shrink-0">
+								<button
+									class="-mx-2 -my-1.5 flex h-8 w-8 items-center justify-center rounded-full text-base hover:bg-secondary"
+									onClick={() => {
+										openModal(() => <PostShareMenu post={post()} />);
+									}}
+								>
+									<ShareIcon />
+								</button>
+							</div>
+						</div>
+					</Show>
+				</div>
 			</div>
 		</div>
 	);

@@ -63,12 +63,16 @@ const ProfileItem = (props: ProfileItemProps) => {
 
 			<div class="flex min-w-0 grow flex-col gap-1">
 				<div class="flex items-center justify-between gap-3">
-					<div class="flex flex-col text-sm">
-						<span dir="auto" class="line-clamp-1 break-all font-bold">
-							{profile().displayName.value || profile().handle.value}
+					<span class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm text-muted-fg">
+						<bdi class="overflow-hidden text-ellipsis group-hover:underline">
+							<span class="font-bold text-primary">
+								{profile().displayName.value || profile().handle.value}
+							</span>
+						</bdi>
+						<span class="block overflow-hidden text-ellipsis whitespace-nowrap">
+							@{profile().handle.value}
 						</span>
-						<span class="line-clamp-1 break-all text-muted-fg">@{profile().handle.value}</span>
-					</div>
+					</span>
 
 					<div class="empty:hidden">{aside?.render(profile(), uid())}</div>
 				</div>

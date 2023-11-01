@@ -94,14 +94,14 @@ const FeedList = (props: FeedListProps) => {
 								class="flex cursor-pointer flex-col gap-3 px-4 py-3 text-sm outline-2 -outline-offset-2 outline-primary hover:bg-hinted focus-visible:outline"
 							>
 								<div class="flex items-center gap-4">
-									<div class="h-9 w-9 overflow-hidden rounded-md bg-muted-fg">
+									<div class="h-9 w-9 shrink-0 overflow-hidden rounded-md bg-muted-fg">
 										<Show when={feed.avatar.value}>
 											{(avatar) => <img src={avatar()} class="h-full w-full" />}
 										</Show>
 									</div>
 
-									<div class="grow">
-										<p class="font-bold">{feed.name.value}</p>
+									<div class="min-w-0 grow">
+										<p class="overflow-hidden text-ellipsis font-bold">{feed.name.value}</p>
 										<p class="text-muted-fg">by @{feed.creator.handle.value}</p>
 									</div>
 

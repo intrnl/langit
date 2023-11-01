@@ -114,7 +114,9 @@ const AuthenticatedFeedPage = () => {
 										return `Feed (${$info.name.value || feed()}) / Langit`;
 									}}
 								/>
-								<p class="text-base font-bold">{info().name.value}</p>
+								<p class="overflow-hidden text-ellipsis whitespace-nowrap text-base font-bold">
+									{info().name.value}
+								</p>
 							</>
 						)}
 					</Match>
@@ -178,8 +180,10 @@ const AuthenticatedFeedPage = () => {
 							<>
 								<div class="flex flex-col gap-3 border-b border-divider px-4 pb-4 pt-3">
 									<div class="flex gap-4">
-										<div class="mt-2 grow">
-											<p class="break-words text-lg font-bold">{info.name.value}</p>
+										<div class="mt-2 min-w-0 grow">
+											<p class="overflow-hidden text-ellipsis break-words text-lg font-bold">
+												{info.name.value}
+											</p>
 											<p class="text-sm text-muted-fg">
 												<span>by </span>
 												<a

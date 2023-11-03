@@ -78,7 +78,7 @@ const AuthenticatedExplorePage = () => {
 						if (next.trim()) {
 							const path =
 								generatePath('/u/:uid/explore/search', { uid: uid() }) +
-								`?t=user&q=${encodeURIComponent(next)}`;
+								`?t=post&q=${encodeURIComponent(next)}`;
 
 							navigate(path);
 						}

@@ -37,7 +37,7 @@ const RightSidebar = (props: RightSidebarProps) => {
 								onEnter={(next) => {
 									if (next.trim()) {
 										const path =
-											generatePath('/u/:uid/explore/search', props) + `?t=user&q=${encodeURIComponent(next)}`;
+											generatePath('/u/:uid/explore/search', props) + `?t=post&q=${encodeURIComponent(next)}`;
 
 										navigate(path);
 									}

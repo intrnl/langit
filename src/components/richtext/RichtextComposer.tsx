@@ -98,11 +98,12 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 
 	const candidateMatch = createMemo(() => {
 		const $cursor = inputCursor();
-		const $val = untrack(() => props.value);
 
 		if ($cursor == null) {
 			return '';
 		}
+
+		const $val = props.value;
 
 		return $val.length === $cursor ? $val : $val.slice(0, $cursor);
 	});

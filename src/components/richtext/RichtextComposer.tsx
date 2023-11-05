@@ -8,7 +8,6 @@ import {
 	createResource,
 	createSignal,
 	onMount,
-	untrack,
 } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 

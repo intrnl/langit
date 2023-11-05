@@ -8,6 +8,7 @@ import {
 	createResource,
 	createSignal,
 	onMount,
+	untrack,
 } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 
@@ -63,7 +64,7 @@ const findNodePosition = (node: Node, position: number): { node: Node; position:
 		position -= textContentLength!;
 	}
 
-	return undefined;
+	return;
 };
 
 let emojiPromise: Promise<[string, string][]> | undefined;
@@ -97,12 +98,11 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 
 	const candidateMatch = createMemo(() => {
 		const $cursor = inputCursor();
+		const $val = untrack(() => props.value);
 
 		if ($cursor == null) {
 			return '';
 		}
-
-		const $val = props.value;
 
 		return $val.length === $cursor ? $val : $val.slice(0, $cursor);
 	});

@@ -586,15 +586,14 @@ const AuthenticatedComposePage = () => {
 						</Show>
 					</div>
 
-					<Show when={embedding()}>
+					<Show when={embedding()} keyed>
 						{(embedding) => (
 							<div class="relative mb-3 mr-3 flex flex-col">
 								<Switch>
 									<Match
 										when={(() => {
-											const $embedding = embedding();
-											if ($embedding.type === 'quote') {
-												return $embedding.resource();
+											if (embedding.type === 'quote') {
+												return embedding.resource();
 											}
 										})()}
 									>
@@ -631,9 +630,8 @@ const AuthenticatedComposePage = () => {
 
 									<Match
 										when={(() => {
-											const $embedding = embedding();
-											if ($embedding.type === 'feed') {
-												return $embedding.resource();
+											if (embedding.type === 'feed') {
+												return embedding.resource();
 											}
 										})()}
 									>
@@ -665,9 +663,8 @@ const AuthenticatedComposePage = () => {
 
 									<Match
 										when={(() => {
-											const $embedding = embedding();
-											if ($embedding.type === 'list') {
-												return $embedding.resource();
+											if (embedding.type === 'list') {
+												return embedding.resource();
 											}
 										})()}
 									>

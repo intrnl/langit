@@ -14,8 +14,8 @@ const enum RichText {
 	TAG,
 }
 
-const WS_RE = /\s+(?=\n)/g;
-const EOF_WS_RE = /\s+$|\s+(?=\n)/g;
+const WS_RE = / +(?=\n)/g;
+const EOF_WS_RE = / +$| +(?=\n)/g;
 
 const ABS_LINK_RE = /https?:\/\/[\S]+/g;
 const TRAILING_RE = /\)?[.,;]*$/;

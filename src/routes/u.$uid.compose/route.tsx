@@ -1,4 +1,14 @@
-import { type Resource, For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
+import {
+	type Accessor,
+	type Resource,
+	For,
+	Match,
+	Show,
+	Switch,
+	batch,
+	createMemo,
+	createSignal,
+} from 'solid-js';
 
 import type { AtBlob, DID, Records, RefOf, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
@@ -590,104 +600,94 @@ const AuthenticatedComposePage = () => {
 						{(embedding) => (
 							<div class="relative mb-3 mr-3 flex flex-col">
 								<Switch>
-									<Match
-										when={(() => {
-											if (embedding.type === 'quote') {
-												return embedding.resource();
-											}
-										})()}
-									>
+									<Match when={embedding.resource()}>
 										{(data) => {
-											const author = () => data().author;
-											const record = () => data().record.value;
+											const type = embedding.type;
 
-											return (
-												<EmbedRecord
-													uid={uid()}
-													record={{
-														$type: 'app.bsky.embed.record#viewRecord',
-														// @ts-expect-error
-														cid: null,
-														// @ts-expect-error
-														indexedAt: null,
-														uri: data().uri,
-														author: {
-															did: author().did,
-															avatar: author().avatar.value,
-															handle: author().handle.value,
-															displayName: author().displayName.value,
-														},
-														embeds: data().embed.value ? [data().embed.value!] : [],
-														value: {
-															createdAt: record().createdAt,
-															text: record().text,
-														},
-													}}
-												/>
-											);
-										}}
-									</Match>
+											if (type === 'quote') {
+												const _data = data as Accessor<SignalizedPost>;
 
-									<Match
-										when={(() => {
-											if (embedding.type === 'feed') {
-												return embedding.resource();
+												const author = () => _data().author;
+												const record = () => _data().record.value;
+
+												return (
+													<EmbedRecord
+														uid={uid()}
+														record={{
+															$type: 'app.bsky.embed.record#viewRecord',
+															// @ts-expect-error
+															cid: null,
+															// @ts-expect-error
+															indexedAt: null,
+															uri: data().uri,
+															author: {
+																did: author().did,
+																avatar: author().avatar.value,
+																handle: author().handle.value,
+																displayName: author().displayName.value,
+															},
+															embeds: _data().embed.value ? [_data().embed.value!] : [],
+															value: {
+																createdAt: record().createdAt,
+																text: record().text,
+															},
+														}}
+													/>
+												);
 											}
-										})()}
-									>
-										{(data) => {
-											return (
-												<EmbedFeed
-													uid={uid()}
-													feed={{
-														$type: 'app.bsky.feed.defs#generatorView',
-														// @ts-expect-error
-														cid: null,
-														// @ts-expect-error
-														did: null,
-														// @ts-expect-error
-														indexedAt: null,
-														uri: data().uri,
-														avatar: data().avatar.value,
-														displayName: data().name.value,
-														creator: {
-															did: data().creator.did,
-															handle: data().creator.handle.value,
-														},
-														likeCount: data().likeCount.value,
-													}}
-												/>
-											);
-										}}
-									</Match>
 
-									<Match
-										when={(() => {
-											if (embedding.type === 'list') {
-												return embedding.resource();
+											if (type === 'feed') {
+												const _data = data as Accessor<SignalizedFeedGenerator>;
+
+												return (
+													<EmbedFeed
+														uid={uid()}
+														feed={{
+															$type: 'app.bsky.feed.defs#generatorView',
+															// @ts-expect-error
+															cid: null,
+															// @ts-expect-error
+															did: null,
+															// @ts-expect-error
+															indexedAt: null,
+															uri: _data().uri,
+															avatar: _data().avatar.value,
+															displayName: _data().name.value,
+															creator: {
+																did: _data().creator.did,
+																handle: _data().creator.handle.value,
+															},
+															likeCount: _data().likeCount.value,
+														}}
+													/>
+												);
 											}
-										})()}
-									>
-										{(data) => {
-											return (
-												<EmbedList
-													uid={uid()}
-													list={{
-														$type: 'app.bsky.graph.defs#listView',
-														// @ts-expect-error
-														cid: null,
-														// @ts-expect-error
-														indexedAt: null,
-														uri: data().uri,
-														avatar: data().avatar.value,
-														displayName: data().name.value,
-														creator: {
-															did: data().creator.did,
-															handle: data().creator.handle.value,
-														},
-													}}
-												/>
-											);
+
+											if (type === 'list') {
+												const _data = data as Accessor<SignalizedList>;
+
+												return (
+													<EmbedList
+														uid={uid()}
+														list={{
+															$type: 'app.bsky.graph.defs#listView',
+															// @ts-expect-error
+															cid: null,
+															// @ts-expect-error
+															indexedAt: null,
+															uri: _data().uri,
+															avatar: _data().avatar.value,
+															displayName: _data().name.value,
+															creator: {
+																did: _data().creator.did,
+																handle: _data().creator.handle.value,
+															},
+														}}
+													/>
+												);
+											}
+
+											return null;
 										}}
 									</Match>
 

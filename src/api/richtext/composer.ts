@@ -14,7 +14,8 @@ const enum RichText {
 	TAG,
 }
 
-const WHITESPACE_RE = / +(?=\n)/g;
+const WS_RE = /\s+(?=\n)/g;
+const EOF_WS_RE = /\s+$|\s+(?=\n)/g;
 
 const ABS_LINK_RE = /https?:\/\/[\S]+/g;
 const TRAILING_RE = /\)?[.,;]*$/;
@@ -61,8 +62,6 @@ export const textToPrelimRt = (text: string): PreliminaryRichText => {
 	const matches: PreliminaryMatch[] = [];
 	let match: RegExpExecArray | null;
 
-	text = text.trimEnd();
-
 	while ((match = ABS_LINK_RE.exec(text))) {
 		matches.push({ t: RichText.LINK, m: match });
 	}
@@ -91,7 +90,7 @@ export const textToPrelimRt = (text: string): PreliminaryRichText => {
 
 			if (textCursor < start) {
 				const sliced = text.slice(textCursor, start);
-				segments.push({ text: sliced, orig: sliced });
+				segments.push({ text: sliced.replace(WS_RE, ''), orig: sliced });
 			} else if (textCursor > start) {
 				matchCursor++;
 				continue;
@@ -158,10 +157,10 @@ export const textToPrelimRt = (text: string): PreliminaryRichText => {
 
 		if (textCursor < text.length) {
 			const sliced = text.slice(textCursor);
-			segments.push({ text: sliced.replace(WHITESPACE_RE, ''), orig: sliced });
+			segments.push({ text: sliced.replace(EOF_WS_RE, ''), orig: sliced });
 		}
 	} else {
-		segments.push({ text: text.replace(WHITESPACE_RE, ''), orig: text });
+		segments.push({ text: text.replace(EOF_WS_RE, ''), orig: text });
 	}
 
 	return {

@@ -5,6 +5,7 @@ export const BSKY_LIST_URL_RE = /\/profile\/([^\/]+)\/lists\/([^\/]+)$/;
 
 export const ATP_POST_URL_RE = /([^\/]+)\/app.bsky.feed.post\/([^\/]+)$/;
 export const ATP_FEED_URL_RE = /([^\/]+)\/app.bsky.feed.generator\/([^\/]+)$/;
+export const ATP_LIST_URL_RE = /([^\/]+)\/app.bsky.graph.list\/([^\/]+)$/;
 
 export const isBskyUrl = (url: string) => {
 	return url.startsWith('https://bsky.app/');
@@ -36,4 +37,8 @@ export const isAtpPostUri = (uri: string) => {
 
 export const isAtpFeedUri = (uri: string) => {
 	return isAtpUri(uri) && ATP_FEED_URL_RE.test(uri);
+};
+
+export const isAtpListUri = (uri: string) => {
+	return isAtpUri(uri) && ATP_LIST_URL_RE.test(uri);
 };

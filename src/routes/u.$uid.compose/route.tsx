@@ -1,11 +1,12 @@
-import { For, Match, Show, Switch, batch, createMemo, createSignal, type Resource } from 'solid-js';
+import { type Resource, For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
 
 import type { AtBlob, DID, Records, RefOf, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
-import type { SignalizedPost } from '~/api/cache/posts.ts';
 import type { SignalizedFeedGenerator } from '~/api/cache/feed-generators.ts';
+import type { SignalizedList } from '~/api/cache/lists.ts';
+import type { SignalizedPost } from '~/api/cache/posts.ts';
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
 import {
@@ -14,6 +15,7 @@ import {
 	getInitialFeedGenerator,
 } from '~/api/queries/get-feed-generator.ts';
 import { getLinkMeta, getLinkMetaKey } from '~/api/queries/get-link-meta';
+import { getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 import { getInitialPost, getPost, getPostKey } from '~/api/queries/get-post.ts';
 import { getInitialProfile, getProfile, getProfileKey } from '~/api/queries/get-profile.ts';
 
@@ -29,7 +31,14 @@ import { useNavigate, useParams } from '~/router.ts';
 import { createDerivedSignal } from '~/utils/hooks.ts';
 import { compressPostImage } from '~/utils/image.ts';
 import { languageNames } from '~/utils/intl/displaynames.ts';
-import { isAtpFeedUri, isAtpPostUri, isBskyFeedUrl, isBskyPostUrl } from '~/utils/link.ts';
+import {
+	isAtpFeedUri,
+	isAtpListUri,
+	isAtpPostUri,
+	isBskyFeedUrl,
+	isBskyListUrl,
+	isBskyPostUrl,
+} from '~/utils/link.ts';
 import { Title } from '~/utils/meta.tsx';
 import { signal } from '~/utils/signals.ts';
 
@@ -37,6 +46,7 @@ import BlobImage from '~/components/BlobImage.tsx';
 import CircularProgress from '~/components/CircularProgress.tsx';
 import EmbedFeed from '~/components/EmbedFeed.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';
+import EmbedList from '~/components/EmbedList.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
 import Post from '~/components/Post.tsx';
 import RichtextComposer from '~/components/richtext/RichtextComposer.tsx';
@@ -75,7 +85,10 @@ interface BaseEmbedding<T, D> {
 	resource: Resource<D>;
 }
 
-type Embedding = BaseEmbedding<'quote', SignalizedPost> | BaseEmbedding<'feed', SignalizedFeedGenerator>;
+type Embedding =
+	| BaseEmbedding<'quote', SignalizedPost>
+	| BaseEmbedding<'feed', SignalizedFeedGenerator>
+	| BaseEmbedding<'list', SignalizedList>;
 
 const getLanguages = (uid: DID): string[] => {
 	const prefs = getLanguagePref(uid);
@@ -192,6 +205,21 @@ const AuthenticatedComposePage = () => {
 					type: 'feed',
 					uri: uri,
 					resource: feed,
+				};
+			}
+
+			if (isAtpListUri(uri) || isBskyListUrl(uri)) {
+				const [list] = createQuery({
+					key: () => getListInfoKey($uid, uri),
+					fetch: getListInfo,
+					staleTime: 30_000,
+					initialData: getInitialListInfo,
+				});
+
+				return {
+					type: 'list',
+					uri: uri,
+					resource: list,
 				};
 			}
 		}
@@ -560,21 +588,21 @@ const AuthenticatedComposePage = () => {
 
 					<Show when={embedding()}>
 						{(embedding) => (
-							<Switch>
-								<Match
-									when={(() => {
-										const $embedding = embedding();
-										if ($embedding.type === 'quote') {
-											return $embedding.resource();
-										}
-									})()}
-								>
-									{(data) => {
-										const author = () => data().author;
-										const record = () => data().record.value;
+							<div class="relative mb-3 mr-3 flex flex-col">
+								<Switch>
+									<Match
+										when={(() => {
+											const $embedding = embedding();
+											if ($embedding.type === 'quote') {
+												return $embedding.resource();
+											}
+										})()}
+									>
+										{(data) => {
+											const author = () => data().author;
+											const record = () => data().record.value;
 
-										return (
-											<div class="mb-3 mr-3 flex flex-col">
+											return (
 												<EmbedRecord
 													uid={uid()}
 													record={{
@@ -597,22 +625,20 @@ const AuthenticatedComposePage = () => {
 														},
 													}}
 												/>
-											</div>
-										);
-									}}
-								</Match>
+											);
+										}}
+									</Match>
 
-								<Match
-									when={(() => {
-										const $embedding = embedding();
-										if ($embedding.type === 'feed') {
-											return $embedding.resource();
-										}
-									})()}
-								>
-									{(data) => {
-										return (
-											<div class="mb-3 mr-3 flex flex-col">
+									<Match
+										when={(() => {
+											const $embedding = embedding();
+											if ($embedding.type === 'feed') {
+												return $embedding.resource();
+											}
+										})()}
+									>
+										{(data) => {
+											return (
 												<EmbedFeed
 													uid={uid()}
 													feed={{
@@ -633,17 +659,48 @@ const AuthenticatedComposePage = () => {
 														likeCount: data().likeCount.value,
 													}}
 												/>
-											</div>
-										);
-									}}
-								</Match>
+											);
+										}}
+									</Match>
 
-								<Match when>
-									<div class="mb-3 mr-3 flex items-center justify-center rounded-md border border-divider p-4">
-										<CircularProgress />
-									</div>
-								</Match>
-							</Switch>
+									<Match
+										when={(() => {
+											const $embedding = embedding();
+											if ($embedding.type === 'list') {
+												return $embedding.resource();
+											}
+										})()}
+									>
+										{(data) => {
+											return (
+												<EmbedList
+													uid={uid()}
+													list={{
+														$type: 'app.bsky.graph.defs#listView',
+														// @ts-expect-error
+														cid: null,
+														// @ts-expect-error
+														indexedAt: null,
+														uri: data().uri,
+														avatar: data().avatar.value,
+														displayName: data().name.value,
+														creator: {
+															did: data().creator.did,
+															handle: data().creator.handle.value,
+														},
+													}}
+												/>
+											);
+										}}
+									</Match>
+
+									<Match when>
+										<div class="flex items-center justify-center rounded-md border border-divider p-4">
+											<CircularProgress />
+										</div>
+									</Match>
+								</Switch>
+							</div>
 						)}
 					</Show>
 
@@ -766,7 +823,7 @@ const AuthenticatedComposePage = () => {
 										})()}
 									>
 										{(link) => {
-											const isRecord = isBskyPostUrl(link) || isBskyFeedUrl(link);
+											const isRecord = isBskyPostUrl(link) || isBskyFeedUrl(link) || isBskyListUrl(link);
 
 											return (
 												<button

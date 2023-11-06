@@ -7,6 +7,7 @@ import { getCollectionId } from '~/api/utils.ts';
 import EmbedFeed from '~/components/EmbedFeed.tsx';
 import EmbedImage from '~/components/EmbedImage.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';
+import EmbedList from '~/components/EmbedList.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
 import EmbedRecordBlocked from '~/components/EmbedRecordBlocked.tsx';
 import EmbedRecordNotFound from '~/components/EmbedRecordNotFound.tsx';
@@ -85,6 +86,10 @@ const Embed = (props: EmbedProps) => {
 
 					if (type === 'app.bsky.feed.defs#generatorView') {
 						return <EmbedFeed uid={uid()} feed={record} />;
+					}
+
+					if (type === 'app.bsky.graph.defs#listView') {
+						return <EmbedList uid={uid()} list={record} />;
 					}
 
 					return <></>;

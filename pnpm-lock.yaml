@@ -9,17 +9,17 @@ overrides:
   string.prototype.matchall: npm:@nolyfill/string.prototype.matchall@latest
 
 patchedDependencies:
-  '@solidjs/router@0.8.3':
+  '@solidjs/router@0.8.4':
     hash: gcvajasovcbiq2qrorgjn6zpci
-    path: patches/@solidjs__router@0.8.3.patch
+    path: patches/@solidjs__router@0.8.4.patch
   solid-textarea-autosize@0.0.5:
     hash: m53hb4poiqst2dnlekcumcjoby
     path: patches/solid-textarea-autosize@0.0.5.patch
 
 dependencies:
   '@externdefs/bluesky-client':
-    specifier: ^0.3.1
-    version: 0.3.1
+    specifier: ^0.3.2
+    version: 0.3.2
   '@floating-ui/dom':
     specifier: ^1.5.3
     version: 1.5.3
@@ -33,8 +33,8 @@ dependencies:
     specifier: ^2.3.0
     version: 2.3.0(solid-js@1.8.5)
   '@solidjs/router':
-    specifier: ^0.8.3
-    version: 0.8.3(patch_hash=gcvajasovcbiq2qrorgjn6zpci)(solid-js@1.8.5)
+    specifier: ^0.8.4
+    version: 0.8.4(patch_hash=gcvajasovcbiq2qrorgjn6zpci)(solid-js@1.8.5)
   '@thisbeyond/solid-dnd':
     specifier: ^0.7.4
     version: 0.7.4(solid-js@1.8.5)
@@ -51,8 +51,8 @@ dependencies:
     specifier: ^0.0.5
     version: 0.0.5(patch_hash=m53hb4poiqst2dnlekcumcjoby)(solid-js@1.8.5)
   tldts:
-    specifier: ^6.0.18
-    version: 6.0.18
+    specifier: ^6.0.19
+    version: 6.0.19
 
 devDependencies:
   '@cloudflare/workers-types':
@@ -1535,8 +1535,8 @@ packages:
     dev: true
     optional: true
 
-  /@externdefs/bluesky-client@0.3.1:
-    resolution: {integrity: sha512-ZiKUzPBOcrFAtsIl7jUk1MhraiioUd/NW/joix1S7cvp9YpC+9DixLCn1u4zbx1jiyPq9JGQ/qMLAb17PVs+Tw==}
+  /@externdefs/bluesky-client@0.3.2:
+    resolution: {integrity: sha512-dyBgDBcpWh7mEFMOoR9aMuF2zLK29cHUTMngaFGUUsccQSblGy0xhdEM2qOcKTQIoyJ6zzX++5zZ/RxMwFXsuw==}
     dev: false
 
   /@floating-ui/core@1.5.0:
@@ -1815,8 +1815,8 @@ packages:
       solid-js: 1.8.5
     dev: false
 
-  /@solidjs/router@0.8.3(patch_hash=gcvajasovcbiq2qrorgjn6zpci)(solid-js@1.8.5):
-    resolution: {integrity: sha512-oJuqQo10rVTiQYhe1qXIG1NyZIZ2YOwHnlLc8Xx+g/iJhFCJo1saLOIrD/Dkh2fpIaIny5ZMkz1cYYqoTYGJbg==}
+  /@solidjs/router@0.8.4(patch_hash=gcvajasovcbiq2qrorgjn6zpci)(solid-js@1.8.5):
+    resolution: {integrity: sha512-Gi/WVoVseGMKS1DBdT3pNAMgOzEOp6Q3dpgNd2mW9GUEnVocPmtyBjDvXwN6m7tjSGsqqfqJFXk7bm1hxabSRw==}
     peerDependencies:
       solid-js: ^1.5.3
     dependencies:
@@ -1850,31 +1850,31 @@ packages:
       solid-js: 1.8.5
     dev: false
 
-  /@types/babel__core@7.20.3:
-    resolution: {integrity: sha512-54fjTSeSHwfan8AyHWrKbfBWiEUrNTZsUwPTDSNaaP1QDQIZbeNUg3a59E9D+375MzUw/x1vx2/0F5LBz+AeYA==}
+  /@types/babel__core@7.20.4:
+    resolution: {integrity: sha512-mLnSC22IC4vcWiuObSRjrLd9XcBTGf59vUSoq2jkQDJ/QQ8PMI9rSuzE+aEV8karUMbskw07bKYoUJCKTUaygg==}
     dependencies:
       '@babel/parser': 7.23.0
       '@babel/types': 7.23.0
-      '@types/babel__generator': 7.6.6
-      '@types/babel__template': 7.4.3
-      '@types/babel__traverse': 7.20.3
+      '@types/babel__generator': 7.6.7
+      '@types/babel__template': 7.4.4
+      '@types/babel__traverse': 7.20.4
     dev: true
 
-  /@types/babel__generator@7.6.6:
-    resolution: {integrity: sha512-66BXMKb/sUWbMdBNdMvajU7i/44RkrA3z/Yt1c7R5xejt8qh84iU54yUWCtm0QwGJlDcf/gg4zd/x4mpLAlb/w==}
+  /@types/babel__generator@7.6.7:
+    resolution: {integrity: sha512-6Sfsq+EaaLrw4RmdFWE9Onp63TOUue71AWb4Gpa6JxzgTYtimbM086WnYTy2U67AofR++QKCo08ZP6pwx8YFHQ==}
     dependencies:
       '@babel/types': 7.23.0
     dev: true
 
-  /@types/babel__template@7.4.3:
-    resolution: {integrity: sha512-ciwyCLeuRfxboZ4isgdNZi/tkt06m8Tw6uGbBSBgWrnnZGNXiEyM27xc/PjXGQLqlZ6ylbgHMnm7ccF9tCkOeQ==}
+  /@types/babel__template@7.4.4:
+    resolution: {integrity: sha512-h/NUaSyG5EyxBIp8YRxo4RMe2/qQgvyowRwVMzhYhBCONbW8PUsg4lkFMrhgZhUe5z3L3MiLDuvyJ/CaPa2A8A==}
     dependencies:
       '@babel/parser': 7.23.0
       '@babel/types': 7.23.0
     dev: true
 
-  /@types/babel__traverse@7.20.3:
-    resolution: {integrity: sha512-Lsh766rGEFbaxMIDH7Qa+Yha8cMVI3qAK6CHt3OR0YfxOIn5Z54iHiyDRycHrBqeIiqGa20Kpsv1cavfBKkRSw==}
+  /@types/babel__traverse@7.20.4:
+    resolution: {integrity: sha512-mSM/iKUk5fDDrEV/e83qY+Cr3I1+Q3qqTuEn++HAWYjEa1+NxZr6CNrcJGf2ZTnq4HoFGC3zaTPZTobCzCFukA==}
     dependencies:
       '@babel/types': 7.23.0
     dev: true
@@ -2274,8 +2274,8 @@ packages:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
     dev: true
 
-  /fast-glob@3.3.1:
-    resolution: {integrity: sha512-kNFPyjhh5cKjrUltxs+wFx+ZkbRaxxmZ+X0ZU31SOsxCEtP9VPgtq2teZw1DebupL5GmDaNQ6yKMMVcM41iqDg==}
+  /fast-glob@3.3.2:
+    resolution: {integrity: sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==}
     engines: {node: '>=8.6.0'}
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -2645,8 +2645,8 @@ packages:
       thenify-all: 1.6.0
     dev: true
 
-  /nanoid@3.3.6:
-    resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
+  /nanoid@3.3.7:
+    resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
@@ -2774,7 +2774,7 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
-      nanoid: 3.3.6
+      nanoid: 3.3.7
       picocolors: 1.0.0
       source-map-js: 1.0.2
     dev: true
@@ -3126,7 +3126,7 @@ packages:
       chokidar: 3.5.3
       didyoumean: 1.2.2
       dlv: 1.1.3
-      fast-glob: 3.3.1
+      fast-glob: 3.3.2
       glob-parent: 6.0.2
       is-glob: 4.0.3
       jiti: 1.21.0
@@ -3186,15 +3186,15 @@ packages:
       any-promise: 1.3.0
     dev: true
 
-  /tldts-core@6.0.18:
-    resolution: {integrity: sha512-uLZcNYrs6tJO3E15vVQeJPuFTzDceOVEbWiBaB1EM1tgLoMqFaR0XGpXmqCPkUhHG6M/6J66Vhl2G8j1n6GTlQ==}
+  /tldts-core@6.0.19:
+    resolution: {integrity: sha512-kdLllt2VRzBx6SfvUpPc89Gnm/fuH+DG0WgNFVhs6udnk9uadUPpmwtzczyXTUCE1Pmh8e0wtzRkyEn3WhdpXg==}
     dev: false
 
-  /tldts@6.0.18:
-    resolution: {integrity: sha512-fQ5BiBHYC95p5rHI1/n0enPSkdpcUNw47ofAPYRvpsb2DF1gRFuw/5z8/y4IGJId4SDNj9z34SJjCROr9bfGYw==}
+  /tldts@6.0.19:
+    resolution: {integrity: sha512-uVGeVYgntRF3E1XRJTEOy/O+SMBINhZddOqKnWVQMXBPP7WL2VSHXw/nuThhnjPKyIbUTH8kCVUswZwjCj6e5g==}
     hasBin: true
     dependencies:
-      tldts-core: 6.0.18
+      tldts-core: 6.0.19
     dev: false
 
   /to-fast-properties@2.0.0:
@@ -3306,7 +3306,7 @@ packages:
       vite: ^3.1.0 || ^4.0.0 || ^5.0.0-0
     dependencies:
       debug: 4.3.4
-      fast-glob: 3.3.1
+      fast-glob: 3.3.2
       pretty-bytes: 6.1.1
       vite: 5.0.0-beta.16(@types/node@20.8.10)(terser@5.24.0)
       workbox-build: 7.0.0
@@ -3324,7 +3324,7 @@ packages:
     dependencies:
       '@babel/core': 7.23.2
       '@babel/preset-typescript': 7.23.2(@babel/core@7.23.2)
-      '@types/babel__core': 7.20.3
+      '@types/babel__core': 7.20.4
       babel-preset-solid: 1.8.4(@babel/core@7.23.2)
       merge-anything: 5.1.7
       solid-js: 1.8.5

@@ -1,9 +1,11 @@
-import { For, Match, Show, Switch, batch, createMemo, createSignal } from 'solid-js';
+import { For, Match, Show, Switch, batch, createMemo, createSignal, type Resource } from 'solid-js';
 
 import type { AtBlob, DID, Records, RefOf, UnionOf } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { useBeforeLeave, useSearchParams } from '@solidjs/router';
 
+import type { SignalizedPost } from '~/api/cache/posts.ts';
+import type { SignalizedFeedGenerator } from '~/api/cache/feed-generators.ts';
 import { createPost } from '~/api/mutations/create-post.ts';
 import { uploadBlob } from '~/api/mutations/upload-blob.ts';
 import {
@@ -37,6 +39,7 @@ import EmbedFeed from '~/components/EmbedFeed.tsx';
 import EmbedLink from '~/components/EmbedLink.tsx';
 import EmbedRecord from '~/components/EmbedRecord.tsx';
 import Post from '~/components/Post.tsx';
+import RichtextComposer from '~/components/richtext/RichtextComposer.tsx';
 import button from '~/styles/primitives/button.ts';
 
 import ArrowDropDownIcon from '~/icons/baseline-arrow-drop-down.tsx';
@@ -51,7 +54,6 @@ import AddSelfLabelDialog from './AddSelfLabelDialog.tsx';
 import ComposeLanguageMenu from './ComposeLanguageMenu.tsx';
 import ImageAltEditDialog from './ImageAltEditDialog.tsx';
 import ImageUploadCompressDialog from './ImageUploadCompressDialog.tsx';
-import RichtextComposer from '~/components/richtext/RichtextComposer.tsx';
 
 type PostRecord = Records['app.bsky.feed.post'];
 type StrongRef = RefOf<'com.atproto.repo.strongRef'>;
@@ -66,6 +68,14 @@ const enum PostState {
 	DISPATCHING,
 	SENT,
 }
+
+interface BaseEmbedding<T, D> {
+	type: T;
+	uri: string;
+	resource: Resource<D>;
+}
+
+type Embedding = BaseEmbedding<'quote', SignalizedPost> | BaseEmbedding<'feed', SignalizedFeedGenerator>;
 
 const getLanguages = (uid: DID): string[] => {
 	const prefs = getLanguagePref(uid);
@@ -136,41 +146,57 @@ const AuthenticatedComposePage = () => {
 		initialData: getInitialPost,
 	});
 
-	const [quote] = createQuery({
+	const [external] = createQuery({
 		key: () => {
-			const $recordUri = recordUri();
-			if ($recordUri && (isAtpPostUri($recordUri) || isBskyPostUrl($recordUri))) {
-				return getPostKey(uid(), recordUri()!);
-			}
-		},
-		fetch: getPost,
-		staleTime: 30_000,
-		initialData: getInitialPost,
-	});
-
-	const [feed] = createQuery({
-		key: () => {
-			const $recordUri = recordUri();
-			if ($recordUri && (isAtpFeedUri($recordUri) || isBskyFeedUrl($recordUri))) {
-				return getFeedGeneratorKey(uid(), recordUri()!);
-			}
-		},
-		fetch: getFeedGenerator,
-		staleTime: 30_000,
-		initialData: getInitialFeedGenerator,
-	});
-
-	const [link] = createQuery({
-		key: () => {
-			const $linkUri = linkUrl();
-			if ($linkUri) {
-				return getLinkMetaKey($linkUri);
+			const $linkUrl = linkUrl();
+			if ($linkUrl) {
+				return getLinkMetaKey($linkUrl);
 			}
 		},
 		fetch: getLinkMeta,
-		staleTime: 30_000,
+		cacheTime: 3_000,
+		staleTime: Infinity,
 		refetchOnReconnect: false,
 		refetchOnWindowFocus: false,
+	});
+
+	const embedding = createMemo((): Embedding | null => {
+		const $uid = uid();
+		const uri = recordUri();
+
+		if (uri) {
+			if (isAtpPostUri(uri) || isBskyPostUrl(uri)) {
+				const [quote] = createQuery({
+					key: () => getPostKey($uid, uri),
+					fetch: getPost,
+					staleTime: 30_000,
+					initialData: getInitialPost,
+				});
+
+				return {
+					type: 'quote',
+					uri: uri,
+					resource: quote,
+				};
+			}
+
+			if (isAtpFeedUri(uri) || isBskyFeedUrl(uri)) {
+				const [feed] = createQuery({
+					key: () => getFeedGeneratorKey($uid, uri),
+					fetch: getFeedGenerator,
+					staleTime: 30_000,
+					initialData: getInitialFeedGenerator,
+				});
+
+				return {
+					type: 'feed',
+					uri: uri,
+					resource: feed,
+				};
+			}
+		}
+
+		return null;
 	});
 
 	const [profile] = createQuery({
@@ -189,19 +215,23 @@ const AuthenticatedComposePage = () => {
 	});
 
 	const isEnabled = createMemo(() => {
+		const $state = state();
+		const $length = length();
+
+		const $embedding = embedding();
+
 		return (
+			$state === PostState.IDLE &&
+			(($length > 0 && $length <= 300) || images().length > 0) &&
 			reply.state !== 'pending' &&
-			quote.state !== 'pending' &&
-			feed.state !== 'pending' &&
-			state() === PostState.IDLE &&
-			((length() > 0 && length() <= 300) || images().length > 0)
+			(!$embedding || $embedding.resource.state !== 'pending')
 		);
 	});
 
 	const handleSubmit = async () => {
 		const rt = prelimRichtext();
 
-		if (state() !== PostState.IDLE || !(length() > 0 || images().length > 0)) {
+		if (!isEnabled()) {
 			return;
 		}
 
@@ -210,8 +240,8 @@ const AuthenticatedComposePage = () => {
 		const $uid = uid();
 
 		const $reply = reply();
-		const $quote = quote() || feed();
-		const $link = link();
+		const $embedding = embedding();
+		const $external = external();
 		const $images = images();
 
 		const $languages = languages();
@@ -270,14 +300,14 @@ const AuthenticatedComposePage = () => {
 			};
 		}
 
-		if ($link) {
-			if ($link.thumb && !$link.record) {
+		if ($external) {
+			if ($external.thumb && !$external.record) {
 				setMessage(`Uploading link thumbnail`);
 
 				try {
-					const blob = await uploadBlob($uid, $link.thumb);
+					const blob = await uploadBlob($uid, $external.thumb);
 
-					$link.record = blob;
+					$external.record = blob;
 				} catch (err) {
 					console.error(`Failed to upload image`, err);
 
@@ -290,20 +320,22 @@ const AuthenticatedComposePage = () => {
 			embedded = {
 				$type: 'app.bsky.embed.external',
 				external: {
-					uri: $link.uri,
-					title: $link.title,
-					description: $link.description,
-					thumb: $link.record as any,
+					uri: $external.uri,
+					title: $external.title,
+					description: $external.description,
+					thumb: $external.record as any,
 				},
 			};
 		}
 
-		if ($quote) {
+		if ($embedding && $embedding.resource.state === 'ready') {
+			const thing = $embedding.resource.latest!;
+
 			const rec: PostRecordEmbed = {
 				$type: 'app.bsky.embed.record',
 				record: {
-					cid: $quote.cid.value,
-					uri: $quote.uri,
+					cid: thing.cid.value,
+					uri: thing.uri,
 				},
 			};
 
@@ -526,76 +558,94 @@ const AuthenticatedComposePage = () => {
 						</Show>
 					</div>
 
-					<Switch>
-						<Match when={quote()}>
-							{(data) => {
-								const author = () => data().author;
-								const record = () => data().record.value;
+					<Show when={embedding()}>
+						{(embedding) => (
+							<Switch>
+								<Match
+									when={(() => {
+										const $embedding = embedding();
+										if ($embedding.type === 'quote') {
+											return $embedding.resource();
+										}
+									})()}
+								>
+									{(data) => {
+										const author = () => data().author;
+										const record = () => data().record.value;
 
-								return (
-									<div class="mb-3 mr-3 flex flex-col">
-										<EmbedRecord
-											uid={uid()}
-											record={{
-												$type: 'app.bsky.embed.record#viewRecord',
-												// @ts-expect-error
-												cid: null,
-												// @ts-expect-error
-												indexedAt: null,
-												uri: data().uri,
-												author: {
-													did: author().did,
-													avatar: author().avatar.value,
-													handle: author().handle.value,
-													displayName: author().displayName.value,
-												},
-												embeds: data().embed.value ? [data().embed.value!] : [],
-												value: {
-													createdAt: record().createdAt,
-													text: record().text,
-												},
-											}}
-										/>
+										return (
+											<div class="mb-3 mr-3 flex flex-col">
+												<EmbedRecord
+													uid={uid()}
+													record={{
+														$type: 'app.bsky.embed.record#viewRecord',
+														// @ts-expect-error
+														cid: null,
+														// @ts-expect-error
+														indexedAt: null,
+														uri: data().uri,
+														author: {
+															did: author().did,
+															avatar: author().avatar.value,
+															handle: author().handle.value,
+															displayName: author().displayName.value,
+														},
+														embeds: data().embed.value ? [data().embed.value!] : [],
+														value: {
+															createdAt: record().createdAt,
+															text: record().text,
+														},
+													}}
+												/>
+											</div>
+										);
+									}}
+								</Match>
+
+								<Match
+									when={(() => {
+										const $embedding = embedding();
+										if ($embedding.type === 'feed') {
+											return $embedding.resource();
+										}
+									})()}
+								>
+									{(data) => {
+										return (
+											<div class="mb-3 mr-3 flex flex-col">
+												<EmbedFeed
+													uid={uid()}
+													feed={{
+														$type: 'app.bsky.feed.defs#generatorView',
+														// @ts-expect-error
+														cid: null,
+														// @ts-expect-error
+														did: null,
+														// @ts-expect-error
+														indexedAt: null,
+														uri: data().uri,
+														avatar: data().avatar.value,
+														displayName: data().name.value,
+														creator: {
+															did: data().creator.did,
+															handle: data().creator.handle.value,
+														},
+														likeCount: data().likeCount.value,
+													}}
+												/>
+											</div>
+										);
+									}}
+								</Match>
+
+								<Match when>
+									<div class="mb-3 mr-3 flex items-center justify-center rounded-md border border-divider p-4">
+										<CircularProgress />
 									</div>
-								);
-							}}
-						</Match>
-
-						<Match when={feed()}>
-							{(data) => {
-								return (
-									<div class="mb-3 mr-3 flex flex-col">
-										<EmbedFeed
-											uid={uid()}
-											feed={{
-												$type: 'app.bsky.feed.defs#generatorView',
-												// @ts-expect-error
-												cid: null,
-												// @ts-expect-error
-												did: null,
-												// @ts-expect-error
-												indexedAt: null,
-												uri: data().uri,
-												avatar: data().avatar.value,
-												displayName: data().name.value,
-												creator: {
-													did: data().creator.did,
-													handle: data().creator.handle.value,
-												},
-												likeCount: data().likeCount.value,
-											}}
-										/>
-									</div>
-								);
-							}}
-						</Match>
-
-						<Match when={quote.loading || feed.loading}>
-							<div class="mb-3 mr-3 flex items-center justify-center rounded-md border border-divider p-4">
-								<CircularProgress />
-							</div>
-						</Match>
-					</Switch>
+								</Match>
+							</Switch>
+						)}
+					</Show>
 
 					<Switch>
 						<Match when={images().length > 0}>
@@ -641,7 +691,7 @@ const AuthenticatedComposePage = () => {
 							</div>
 						</Match>
 
-						<Match when={link.state === 'pending'}>
+						<Match when={external.state === 'pending'}>
 							<div class="mb-3 mr-3 flex items-center justify-between gap-3 rounded-md border border-divider p-3 pl-4">
 								<CircularProgress />
 
@@ -655,7 +705,7 @@ const AuthenticatedComposePage = () => {
 							</div>
 						</Match>
 
-						<Match when={link.error}>
+						<Match when={external.error}>
 							{(error) => (
 								<div class="mb-3 mr-3 flex items-center justify-between gap-3 rounded-md border border-divider p-3">
 									<div class="grow text-sm">
@@ -674,7 +724,7 @@ const AuthenticatedComposePage = () => {
 							)}
 						</Match>
 
-						<Match when={link()}>
+						<Match when={external()}>
 							{(data) => {
 								return (
 									<div class="relative mb-3 mr-3 flex flex-col">
@@ -703,7 +753,18 @@ const AuthenticatedComposePage = () => {
 						<Match when={links()}>
 							{(links) => (
 								<div class="mb-3 mr-3 flex flex-col gap-3 empty:hidden">
-									<For each={links()}>
+									<For
+										each={(() => {
+											const $links = links();
+											const $embedding = embedding();
+
+											if ($embedding) {
+												return $links.filter((uri) => uri !== $embedding.uri);
+											} else {
+												return $links;
+											}
+										})()}
+									>
 										{(link) => {
 											const isRecord = isBskyPostUrl(link) || isBskyFeedUrl(link);
 

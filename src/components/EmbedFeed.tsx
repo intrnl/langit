@@ -7,11 +7,11 @@ import { getRecordId } from '~/api/utils.ts';
 import { generatePath } from '~/router.ts';
 import * as comformat from '~/utils/intl/comformatter.ts';
 
-type EmbeddedGeneratorRecord = UnionOf<'app.bsky.feed.defs#generatorView'>;
+type EmbeddedFeed = UnionOf<'app.bsky.feed.defs#generatorView'>;
 
 export interface EmbedFeedProps {
 	uid: DID;
-	feed: EmbeddedGeneratorRecord;
+	feed: EmbeddedFeed;
 }
 
 const EmbedFeed = (props: EmbedFeedProps) => {

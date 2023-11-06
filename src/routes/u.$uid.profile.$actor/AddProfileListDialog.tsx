@@ -1,8 +1,9 @@
 import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
-import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 
+import { ListPurposeLabels } from '~/api/display.ts';
 import { getCollectionCursor, getRecordId } from '~/api/utils.ts';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
@@ -29,13 +30,6 @@ export interface AddProfileListDialogProps {
 }
 
 const PAGE_SIZE = 30;
-
-type ListPurpose = RefOf<'app.bsky.graph.defs#listPurpose'>;
-
-const ListPurposeLabels: Record<ListPurpose, string> = {
-	'app.bsky.graph.defs#modlist': 'Moderation list',
-	'app.bsky.graph.defs#curatelist': 'Curation list',
-};
 
 const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 	let listEl: HTMLDivElement | undefined;

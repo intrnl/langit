@@ -1,11 +1,13 @@
 import { Match, Show, Switch, createMemo } from 'solid-js';
 
-import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 import { createQuery } from '@intrnl/sq';
 import { Outlet } from '@solidjs/router';
 
 import { createListUri, getInitialListInfo, getListInfo, getListInfoKey } from '~/api/queries/get-list.ts';
 import { getProfileDid, getProfileDidKey } from '~/api/queries/get-profile-did.ts';
+
+import { ListPurposeLabels } from '~/api/display.ts';
 
 import { openModal } from '~/globals/modals.tsx';
 import { getFeedPref } from '~/globals/settings.ts';
@@ -26,13 +28,6 @@ const enum Subscription {
 	MUTED = 1,
 	BLOCKED,
 }
-
-type ListPurpose = RefOf<'app.bsky.graph.defs#listPurpose'>;
-
-const ListPurposeLabels: Record<ListPurpose, string> = {
-	'app.bsky.graph.defs#modlist': 'Moderation list',
-	'app.bsky.graph.defs#curatelist': 'Curation list',
-};
 
 const AuthenticatedListLayout = () => {
 	const params = useParams('/u/:uid/profile/:actor/lists/:list');

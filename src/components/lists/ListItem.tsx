@@ -1,9 +1,10 @@
 import { Show } from 'solid-js';
 
-import type { DID, RefOf } from '@externdefs/bluesky-client/atp-schema';
+import type { DID } from '@externdefs/bluesky-client/atp-schema';
 
 import { type SignalizedList } from '~/api/cache/lists.ts';
 
+import { ListPurposeLabels } from '~/api/display.ts';
 import { getRecordId, getRepoId } from '~/api/utils.ts';
 
 import { generatePath } from '~/router.ts';
@@ -14,13 +15,6 @@ export interface ListItemProps {
 	onClick?: () => void;
 	hideSubscribedBadge?: boolean;
 }
-
-type ListPurpose = RefOf<'app.bsky.graph.defs#listPurpose'>;
-
-const ListPurposeLabels: Record<ListPurpose, string> = {
-	'app.bsky.graph.defs#modlist': 'Moderation list',
-	'app.bsky.graph.defs#curatelist': 'Curation list',
-};
 
 const ListItem = (props: ListItemProps) => {
 	const uid = () => props.uid;

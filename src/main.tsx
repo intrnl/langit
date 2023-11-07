@@ -3,7 +3,7 @@ import { render } from 'solid-js/web';
 
 import { Router, useRoutes } from '@solidjs/router';
 
-import { type LocalPreference, getLocalPref } from '~/globals/settings.ts';
+import { getLocalPref } from '~/globals/settings.ts';
 import routes from '~/router-routes.ts';
 import { useMediaQuery } from '~/utils/media-query.ts';
 import '~/utils/service-worker.ts';
@@ -27,13 +27,9 @@ const App = () => {
 };
 
 createRoot(() => {
-	createRenderEffect((prev?: LocalPreference['theme']) => {
+	createRenderEffect(() => {
 		const prefs = getLocalPref();
 		const theme = prefs.theme;
-
-		if (prev === theme) {
-			return theme;
-		}
 
 		const cl = document.documentElement.classList;
 
@@ -46,8 +42,6 @@ createRoot(() => {
 		} else {
 			cl.toggle('is-dark', theme === 'dark');
 		}
-
-		return theme;
 	});
 });
 

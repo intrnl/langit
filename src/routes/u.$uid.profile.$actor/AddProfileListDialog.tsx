@@ -1,12 +1,13 @@
 import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
-import { createQuery } from '@intrnl/sq';
+import { createQuery, useQueryMutation } from '@intrnl/sq';
 
 import { ListPurposeLabels } from '~/api/display.ts';
 import { getCollectionCursor, getRecordId } from '~/api/utils.ts';
 
 import type { SignalizedProfile } from '~/api/cache/profiles.ts';
+import { getProfileKey } from '~/api/queries/get-profile.ts';
 import {
 	type ProfileExistsResult,
 	getProfileInList,
@@ -37,6 +38,7 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 	const { close } = useModalState();
 
 	const [mutating, setMutating] = createSignal(false);
+	const mutate = useQueryMutation();
 
 	const uid = () => props.uid;
 	const profile = () => props.profile;
@@ -105,6 +107,9 @@ const AddProfileListDialog = (props: AddProfileListDialogProps) => {
 
 		setMutating(false);
 		close();
+
+		mutate(true, getProfileKey($uid, $profile.did), (prev: unknown) => prev);
+		mutate(true, getProfileKey($uid, $profile.handle.peek()), (prev: unknown) => prev);
 	};
 
 	const flattenedLists = createMemo(() => {

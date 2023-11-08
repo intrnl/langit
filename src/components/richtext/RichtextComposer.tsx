@@ -95,6 +95,9 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 	const [inputCursor, setInputCursor] = createSignal<number>();
 	const [menuSelection, setMenuSelection] = createSignal<number>();
 
+	// `candidateMatch` needs the value after it has been committed to DOM
+	const debouncedValue = useDebouncedValue(() => props.value, 0);
+
 	const candidateMatch = createMemo(() => {
 		const $cursor = inputCursor();
 
@@ -102,7 +105,7 @@ const RichtextComposer = (props: RichtextComposerProps) => {
 			return '';
 		}
 
-		const $val = props.value;
+		const $val = debouncedValue();
 		return $val.length === $cursor ? $val : $val.slice(0, $cursor);
 	});
 

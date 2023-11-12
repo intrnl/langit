@@ -1,4 +1,4 @@
-import type { Agent } from '@externdefs/bluesky-client/agent';
+import { Agent } from '@externdefs/bluesky-client/agent';
 import type { DID, Records, RefOf, ResponseOf } from '@externdefs/bluesky-client/atp-schema';
 import type { EnhancedResource, QueryFn } from '@intrnl/sq';
 
@@ -321,32 +321,26 @@ const fetchPage = async (
 			return response.data;
 		}
 	} else if (type === 'search') {
-		const offset = cursor ? +cursor : 0;
-		const searchUri =
-			`https://search.bsky.social/search/posts` +
-			`?count=${limit}` +
-			`&offset=${offset}` +
-			`&q=${encodeURIComponent(params.query)}`;
+		const searchAgent = new Agent({ serviceUri: 'https://palomar.bsky.social' });
+		const response = await searchAgent.rpc.get('app.bsky.unspecced.searchPostsSkeleton', {
+			params: {
+				q: params.query,
+				cursor: cursor,
+				limit: limit,
+			},
+		});
 
-		const searchResponse = await fetch(searchUri);
-
-		if (!searchResponse.ok) {
-			throw new Error(`Response error ${searchResponse.status}`);
-		}
-
-		const searchResults = (await searchResponse.json()) as SearchResult;
+		const data = response.data;
 
 		const uid = agent.session!.did;
-		const queries = await Promise.allSettled(
-			searchResults.map((view) => fetchPost([uid, `at://${view.user.did}/${view.tid}`])),
-		);
+		const queries = await Promise.allSettled(data.posts.map((item) => fetchPost([uid, item.uri])));
 
 		const posts = queries
 			.filter((result): result is PromiseFulfilledResult<Post> => result.status === 'fulfilled')
 			.map((result) => ({ post: result.value }));
 
 		return {
-			cursor: '' + (offset + searchResults.length),
+			cursor: data.cursor,
 			feed: posts,
 		};
 	} else {

@@ -1,14 +1,14 @@
-import { For, Match, Show, Switch, createMemo } from 'solid-js';
+import { /* For, Match, */ Show, /* Switch, */ createMemo } from 'solid-js';
 
 import type { DID } from '@externdefs/bluesky-client/atp-schema';
-import { createQuery } from '@intrnl/sq';
+// import { createQuery } from '@intrnl/sq';
 import { useLocation, useNavigate } from '@solidjs/router';
 
-import { getTrendingTopics, getTrendingTopicsKey } from '~/api/queries/get-trending-topics.ts';
+// import { getTrendingTopics, getTrendingTopicsKey } from '~/api/queries/get-trending-topics.ts';
 
 import { generatePath } from '~/router.ts';
 
-import CircularProgress from '~/components/CircularProgress.tsx';
+// import CircularProgress from '~/components/CircularProgress.tsx';
 import SearchInput from '~/components/SearchInput.tsx';
 
 export interface RightSidebarProps {
@@ -48,58 +48,58 @@ const RightSidebar = (props: RightSidebarProps) => {
 				}}
 			</Show>
 
-			<TrendingSection {...props} />
+			{/* <TrendingSection {...props} /> */}
 		</div>
 	);
 };
 
 export default RightSidebar;
 
-const TrendingSection = (props: { uid: DID }) => {
-	const [trending] = createQuery({
-		key: getTrendingTopicsKey,
-		fetch: getTrendingTopics,
-		staleTime: 5 * 60_000, // 5 minutes
-	});
+// const TrendingSection = (props: { uid: DID }) => {
+// 	const [trending] = createQuery({
+// 		key: getTrendingTopicsKey,
+// 		fetch: getTrendingTopics,
+// 		staleTime: 5 * 60_000, // 5 minutes
+// 	});
 
-	return (
-		<div class="flex flex-col text-sm">
-			<h3 class="px-4 pb-2 font-bold text-muted-fg">Trending now</h3>
+// 	return (
+// 		<div class="flex flex-col text-sm">
+// 			<h3 class="px-4 pb-2 font-bold text-muted-fg">Trending now</h3>
 
-			<Switch>
-				<Match when={trending()}>
-					{(trending) => (
-						<>
-							<For each={trending().slice(0, 5)}>
-								{(topic) => (
-									<a
-										link
-										href={generatePath('/u/:uid/tags/:tag', { uid: props.uid, tag: topic.name })}
-										class="mx-1 rounded px-3 py-2 hover:bg-hinted"
-									>
-										<p class="font-bold">#{topic.name}</p>
-										<p class="text-muted-fg">{topic.count} posts</p>
-									</a>
-								)}
-							</For>
+// 			<Switch>
+// 				<Match when={trending()}>
+// 					{(trending) => (
+// 						<>
+// 							<For each={trending().slice(0, 5)}>
+// 								{(topic) => (
+// 									<a
+// 										link
+// 										href={generatePath('/u/:uid/tags/:tag', { uid: props.uid, tag: topic.name })}
+// 										class="mx-1 rounded px-3 py-2 hover:bg-hinted"
+// 									>
+// 										<p class="font-bold">#{topic.name}</p>
+// 										<p class="text-muted-fg">{topic.count} posts</p>
+// 									</a>
+// 								)}
+// 							</For>
 
-							<a
-								link
-								href={generatePath('/u/:uid/explore/tags', props)}
-								class="mx-1 rounded px-3 py-2 text-accent hover:bg-hinted"
-							>
-								Show more
-							</a>
-						</>
-					)}
-				</Match>
+// 							<a
+// 								link
+// 								href={generatePath('/u/:uid/explore/tags', props)}
+// 								class="mx-1 rounded px-3 py-2 text-accent hover:bg-hinted"
+// 							>
+// 								Show more
+// 							</a>
+// 						</>
+// 					)}
+// 				</Match>
 
-				<Match when>
-					<div class="flex justify-center">
-						<CircularProgress />
-					</div>
-				</Match>
-			</Switch>
-		</div>
-	);
-};
+// 				<Match when>
+// 					<div class="flex justify-center">
+// 						<CircularProgress />
+// 					</div>
+// 				</Match>
+// 			</Switch>
+// 		</div>
+// 	);
+// };

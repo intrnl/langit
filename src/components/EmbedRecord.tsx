@@ -113,8 +113,8 @@ const EmbedRecord = (props: EmbedRecordProps) => {
 							return source.t === CauseLabel
 								? `Quote warning: ${source.l.val}`
 								: source.t === CauseMutedKeyword
-								? `Filtered: ${source.n}`
-								: `Quote from a user you've muted`;
+								  ? `Filtered: ${source.n}`
+								  : `Quote from a user you've muted`;
 						})()}
 					</p>
 

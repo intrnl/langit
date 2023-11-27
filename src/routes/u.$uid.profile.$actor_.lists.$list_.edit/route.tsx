@@ -77,8 +77,8 @@ const AuthenticatedListsEditPage = () => {
 					avatar === undefined
 						? undefined
 						: avatar instanceof Blob
-						? ((avatar as any).$blob ||= await uploadBlob($uid, avatar))
-						: prev?.avatar,
+						  ? ((avatar as any).$blob ||= await uploadBlob($uid, avatar))
+						  : prev?.avatar,
 				name: name,
 				purpose: purpose,
 				description: description,

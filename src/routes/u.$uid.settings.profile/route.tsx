@@ -73,14 +73,14 @@ const AuthenticatedProfileSettingsPage = () => {
 					$avatar === undefined
 						? undefined
 						: $avatar instanceof Blob
-						? (($avatar as any).$blob ||= await uploadBlob($uid, $avatar))
-						: rec?.avatar,
+						  ? (($avatar as any).$blob ||= await uploadBlob($uid, $avatar))
+						  : rec?.avatar,
 				banner:
 					$banner === undefined
 						? undefined
 						: $banner instanceof Blob
-						? (($banner as any).$blob ||= await uploadBlob($uid, $banner))
-						: rec?.banner,
+						  ? (($banner as any).$blob ||= await uploadBlob($uid, $banner))
+						  : rec?.banner,
 			};
 
 			await agent.rpc.call('com.atproto.repo.putRecord', {

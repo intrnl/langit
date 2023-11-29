@@ -11,7 +11,7 @@
 
 import type { JSX } from 'solid-js/jsx-runtime';
 
-import { batch, createSignal } from 'solid-js';
+import { Show, createSignal } from 'solid-js';
 
 import { createMutable } from 'solid-js/store';
 
@@ -33,39 +33,25 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const [intersecting, setIntersecting] = createSignal(false);
 	const estimateHeight = props.estimateHeight;
 
-	const handleIntersect = (nextEntry: IntersectionObserverEntry) => {
-		const prev = intersecting();
-		const next = nextEntry.isIntersecting;
+	const calculateHeight = () => {
+		const next = getRectFromEntry(entry!).height;
 
-		entry = nextEntry;
-
-		if (!prev && next) {
-			// Hidden -> Visible
-			setIntersecting(next);
-		} else if (prev && !next) {
-			// Visible -> Hidden
-
-			scheduleIdleTask(() => {
-				// Bail out if it's no longer us.
-				if (entry !== nextEntry) {
-					return;
-				}
-
-				const nextHeight = getRectFromEntry(nextEntry!).height;
-				const truncatedHeight = Math.trunc(nextHeight * 100) / 100;
-
-				if (truncatedHeight !== height) {
-					batch(() => {
-						height = truncatedHeight;
-						cachedHeights[props.id] = truncatedHeight;
-
-						setIntersecting(next);
-					});
-				} else {
-					setIntersecting(next);
-				}
-			});
+		if (next !== height) {
+			height = next;
+			cachedHeights[props.id] = height;
 		}
+	};
+
+	const handleIntersect = (next: IntersectionObserverEntry) => {
+		const intersect = next.isIntersecting;
+
+		entry = next;
+
+		if (intersect && !intersecting()) {
+			scheduleIdleTask(calculateHeight);
+		}
+
+		setIntersecting(intersect);
 	};
 
 	const measure = (node: HTMLElement) => scrollObserver.observe(node);
@@ -79,11 +65,7 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 			style={{ height: shouldHide() ? `${height || cachedHeight()}px` : undefined }}
 			prop:$onintersect={handleIntersect}
 		>
-			{(() => {
-				if (!shouldHide()) {
-					return props.children;
-				}
-			})()}
+			<Show when={!shouldHide()}>{props.children}</Show>
 		</article>
 	);
 };

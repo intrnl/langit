@@ -20,6 +20,8 @@ import { getRectFromEntry, scrollObserver } from '~/utils/intersection-observer.
 
 const cachedHeights = createMutable<Record<string, number>>({});
 
+const isMobile = /Android/.test(navigator.userAgent);
+
 export interface VirtualContainerProps {
 	id: string;
 	estimateHeight?: number;
@@ -47,29 +49,61 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 
 		entry = nextEntry;
 
-		if (!prev && next) {
-			// Hidden -> Visible
-			setIntersecting(next);
+		// @todo: figure out why this is at all.
+		// after scratching my head on and off for 12 hours, I've concluded that:
+		//
+		// 1. the broken assumption around how the virtual container attempts to
+		//    store the height of items somehow makes scroll restoration work.
+		//
+		// 2. fixing this broken assumption somehow breaks scroll restoration.
+		//
+		// 3. this only happens on mobile browsers.
+		//
+		// my only assumption is that mobile phones are slow, but I am not willing
+		// to spend more hours on this for now.
 
-			scheduleIdleTask(() => {
-				// Bail out if it's no longer us.
-				if (entry !== nextEntry) {
-					return;
-				}
+		if (!isMobile) {
+			// new behavior.
 
-				calculateHeight();
-			});
-		} else if (prev && !next) {
-			// Visible -> Hidden
-			scheduleIdleTask(() => {
-				// Bail out if it's no longer us.
-				if (entry !== nextEntry) {
-					return;
-				}
-
-				calculateHeight();
+			if (!prev && next) {
+				// hidden -> visible
+				// immediately mount the new items, but schedule a task to update the
+				// cached height, this handles the scenario where the virtual container
+				// is being unmounted for page loads as an example.
 				setIntersecting(next);
-			});
+
+				scheduleIdleTask(() => {
+					// bail out if it's no longer us.
+					if (entry !== nextEntry) {
+						return;
+					}
+
+					calculateHeight();
+				});
+			} else if (prev && !next) {
+				// visible -> hidden
+				// unmounting is cheap, but we don't need to immediately unmount it, say
+				// for scenarios where layout is still being figured out and we don't
+				// actually know where the virtual container is gonna end up.
+				scheduleIdleTask(() => {
+					// bail out if it's no longer us.
+					if (entry !== nextEntry) {
+						return;
+					}
+
+					calculateHeight();
+					setIntersecting(next);
+				});
+			}
+		} else {
+			// old behavior.
+
+			if (!prev && next) {
+				// hidden -> visible
+				scheduleIdleTask(calculateHeight);
+			}
+
+			setIntersecting(next);
 		}
 	};
 

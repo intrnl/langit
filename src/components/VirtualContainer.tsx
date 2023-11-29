@@ -11,7 +11,7 @@
 
 import type { JSX } from 'solid-js/jsx-runtime';
 
-import { batch, createSignal } from 'solid-js';
+import { createSignal } from 'solid-js';
 
 import { createMutable } from 'solid-js/store';
 
@@ -33,6 +33,15 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const [intersecting, setIntersecting] = createSignal(false);
 	const estimateHeight = props.estimateHeight;
 
+	const calculateHeight = () => {
+		const next = getRectFromEntry(entry!).height;
+
+		if (next !== height) {
+			height = next;
+			cachedHeights[props.id] = height;
+		}
+	};
+
 	const handleIntersect = (nextEntry: IntersectionObserverEntry) => {
 		const prev = intersecting();
 		const next = nextEntry.isIntersecting;
@@ -42,8 +51,6 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 		if (!prev && next) {
 			// Hidden -> Visible
 			setIntersecting(next);
-		} else if (prev && !next) {
-			// Visible -> Hidden
 
 			scheduleIdleTask(() => {
 				// Bail out if it's no longer us.
@@ -51,19 +58,18 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 					return;
 				}
 
-				const nextHeight = getRectFromEntry(nextEntry!).height;
-				const truncatedHeight = Math.trunc(nextHeight * 100) / 100;
-
-				if (truncatedHeight !== height) {
-					batch(() => {
-						height = truncatedHeight;
-						cachedHeights[props.id] = truncatedHeight;
-
-						setIntersecting(next);
-					});
-				} else {
-					setIntersecting(next);
+				calculateHeight();
+			});
+		} else if (prev && !next) {
+			// Visible -> Hidden
+			scheduleIdleTask(() => {
+				// Bail out if it's no longer us.
+				if (entry !== nextEntry) {
+					return;
 				}
+
+				calculateHeight();
+				setIntersecting(next);
 			});
 		}
 	};

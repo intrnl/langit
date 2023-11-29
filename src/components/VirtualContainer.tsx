@@ -34,24 +34,43 @@ const VirtualContainer = (props: VirtualContainerProps) => {
 	const estimateHeight = props.estimateHeight;
 
 	const calculateHeight = () => {
-		const next = getRectFromEntry(entry!).height;
+		const nextHeight = getRectFromEntry(entry!).height;
 
-		if (next !== height) {
-			height = next;
-			cachedHeights[props.id] = height;
+		if (nextHeight !== height) {
+			cachedHeights[props.id] = height = nextHeight;
 		}
 	};
 
-	const handleIntersect = (next: IntersectionObserverEntry) => {
-		const intersect = next.isIntersecting;
+	const handleIntersect = (nextEntry: IntersectionObserverEntry) => {
+		const prev = intersecting();
+		const next = nextEntry.isIntersecting;
 
-		entry = next;
+		entry = nextEntry;
 
-		if (intersect && !intersecting()) {
-			scheduleIdleTask(calculateHeight);
+		if (!prev && next) {
+			// Hidden -> Visible
+			setIntersecting(next);
+
+			scheduleIdleTask(() => {
+				// Bail out if it's no longer us.
+				if (entry !== nextEntry) {
+					return;
+				}
+
+				calculateHeight();
+			});
+		} else if (prev && !next) {
+			// Visible -> Hidden
+			scheduleIdleTask(() => {
+				// Bail out if it's no longer us.
+				if (entry !== nextEntry) {
+					return;
+				}
+
+				calculateHeight();
+				setIntersecting(next);
+			});
 		}
-
-		setIntersecting(intersect);
 	};
 
 	const measure = (node: HTMLElement) => scrollObserver.observe(node);
